@@ -1,0 +1,47 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            APP_DIR="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app"
+            LARAVEL_DIR="${APP_DIR}/laravel"
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "ERROR: $APP_DIR is not a git repo on server"
+              exit 1
+            fi
+
+            cd "$APP_DIR"
+            git fetch --all --prune
+            git reset --hard origin/main
+
+            cd "$LARAVEL_DIR"
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            php artisan migrate --force
+            php artisan optimize:clear
+
+            # Static site files are referenced as /<file> and must be in public/
+            cd "$LARAVEL_DIR/public"
+            cp -rn site/* .
+
