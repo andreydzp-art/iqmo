@@ -7,6 +7,7 @@ use App\Services\IqmoJwt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 final class IqmoAuthController extends Controller
 {
@@ -91,6 +92,15 @@ final class IqmoAuthController extends Controller
     {
         $token = IqmoJwt::fromConfig()->sign(['uid' => $userId, 'email' => $email]);
         $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
+        $domain = config('iqmo.cookie_domain');
+        if (!is_string($domain) || $domain === '') {
+            $domain = null;
+        }
+        $secure = config('iqmo.cookie_secure');
+        if ($secure === null) {
+            $appUrl = (string) config('app.url', '');
+            $secure = Str::startsWith($appUrl, 'https://');
+        }
 
         cookie()->queue(
             cookie(
@@ -98,8 +108,8 @@ final class IqmoAuthController extends Controller
                 value: $token,
                 minutes: 30 * 24 * 60,
                 path: '/',
-                domain: null,
-                secure: false,
+                domain: $domain,
+                secure: (bool) $secure,
                 httpOnly: true,
                 raw: false,
                 sameSite: 'lax'
