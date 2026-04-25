@@ -18,4 +18,4 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 (new IqmoDemoStudentSeeder)->run();
 
 echo 'Готово. Вход: '.IqmoDemoStudentSeeder::EMAIL.' / '.IqmoDemoStudentSeeder::PASSWORD."\n";
-echo "Откройте uploads/login.html на том же хосте, что и API, затем profile.html (кабинет).\n";
+echo "Откройте /login.html на том же хосте, что и API, затем profile.html (кабинет).\n";

@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
+// Deprecated URL: keep bookmarks working, canonical login is `/login.html`.
+Route::redirect('/uploads/login.html', '/login.html', 301);
+
 // Static site assets (served by Nginx on VPS; routed here for local `php artisan serve`)
 foreach (['assets', 'img', 'uploads', 'badges', 'admin'] as $dir) {
     Route::get("/{$dir}/{path}", function (string $path) use ($dir) {

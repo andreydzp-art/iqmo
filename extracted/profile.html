@@ -466,7 +466,7 @@
 					</svg>
 				</a>
 				<div class="header__btns">
-					<a href="/login" class="btn btn--ghost" id="prof-header-login">Вход</a>
+					<a href="/login.html" class="btn btn--ghost" id="prof-header-login">Вход</a>
 					<a href="./subject-chemistry.html" class="btn btn--ghost">Химия · ОГЭ</a>
 				</div>
 			</div>
@@ -992,7 +992,7 @@
 								'Вы не вошли. Прогресс хранится только локально. Чтобы синхронизировать между устройствами, откройте сайт через сервер (папка server → npm start) и войдите.';
 							line2.textContent = '';
 							actions.innerHTML =
-								'<a class="btn btn--primary" href="/login">Войти или зарегистрироваться</a>';
+								'<a class="btn btn--primary" href="/login.html">Войти или зарегистрироваться</a>';
 							backups.style.display = 'none';
 							backups.innerHTML = '';
 							if (hdrLogin) hdrLogin.style.display = '';
@@ -1071,7 +1071,7 @@
 						line1.textContent =
 							'Сервер аккаунта недоступен (откройте сайт через http://localhost:3780 после npm start в папке server). Пока работает только локальное хранилище.';
 						line2.textContent = '';
-						actions.innerHTML = '<a class="btn btn--ghost" href="/login">Страница входа</a>';
+						actions.innerHTML = '<a class="btn btn--ghost" href="/login.html">Страница входа</a>';
 						backups.style.display = 'none';
 					}
 				}
