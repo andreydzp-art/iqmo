@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Сапёр — игра в браузере</title>
+    <meta name="description" content="Базовая игра «Сапёр» в браузере: 3 уровня сложности, флажки, таймер, победа/поражение." />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app" data-app>
+      <header class="topbar">
+        <div class="topbar__inner">
+          <button class="icon-btn" type="button" data-action="new" aria-label="Новая игра">
+            <span aria-hidden="true">↻</span>
+          </button>
+          <div class="topbar__title" aria-live="polite">Сапёр</div>
+          <div class="topbar__spacer"></div>
+          <div class="ms-topstats" aria-label="Статус игры">
+            <div class="ms-stat" title="Осталось мин">
+              <span class="ms-stat__k">Мины</span>
+              <span class="ms-stat__v" data-mines-left>—</span>
+            </div>
+            <div class="ms-stat" title="Время">
+              <span class="ms-stat__k">Время</span>
+              <span class="ms-stat__v" data-time>0</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="screen is-active">
+          <div class="hero">
+            <div class="badge">Minesweeper</div>
+            <h1 class="h1">Сапёр</h1>
+            <p class="lead">
+              ЛКМ — открыть клетку, ПКМ — поставить/снять флажок. Первая клетка всегда безопасна.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="ms-controls">
+              <label class="ms-control">
+                <span class="ms-control__k">Сложность</span>
+                <select class="ms-select" data-difficulty>
+                  <option value="easy">Лёгкая (9×9, 10 мин)</option>
+                  <option value="medium" selected>Средняя (16×16, 40 мин)</option>
+                  <option value="hard">Сложная (16×30, 99 мин)</option>
+                </select>
+              </label>
+              <button class="btn btn--primary" type="button" data-action="new">Новая игра</button>
+            </div>
+
+            <div class="ms-status" role="status" aria-live="polite" data-status>
+              Нажмите на поле, чтобы начать.
+            </div>
+          </div>
+
+          <div class="card card--muted">
+            <div class="ms-board-wrap">
+              <div class="ms-board" data-board aria-label="Игровое поле"></div>
+            </div>
+          </div>
+
+          <p class="fineprint">
+            Подсказка: удерживайте ПКМ, чтобы быстро расставлять флажки. На тач-устройствах используйте долгий тап.
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>

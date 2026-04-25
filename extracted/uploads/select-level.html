@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru" class="page">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO - ОГЭ тест по биологии | Выбор уровня теста</title>
+		<meta
+			name="description"
+			content="Сдай ОГЭ по биологии 
+на «5» с первого раза"
+		/>
+		<meta name="description" content="Описание проекта" />
+		<link rel="icon" type="image/png" href="./favicon/favicon-16x16.png" sizes="16x16" />
+		<link rel="icon" type="image/png" href="./favicon/favicon-32x32.png" sizes="32x32" />
+		<link rel="shortcut icon" type="image/x-icon" href="./favicon/favicon.ico" />
+		<link rel="apple-touch-icon" href="./favicon/apple-touch-icon.png" />
+		<link rel="manifest" href="./favicon/site.webmanifest" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+		<!-- css -->
+		<link rel="stylesheet" href="./css/main.min.css" />
+	</head>
+
+	<body class="page__body">
+		<!-- Scroll to Top Button -->
+		<button type="button" id="btnScrollTop" title="Наверх"></button>
+
+		<!-- Header -->
+		<header class="header">
+			<div class="container header__container">
+				<div class="header__left">
+					<div class="logo header__logo"><img loading="lazy" src="./img/logo.svg" width="90" height="24" alt="IQMO" /></div>
+				</div>
+				<div class="header__btns">
+					<a href="./login.html" class="btn header__btn">Войти</a>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main -->
+		<main class="page__main">
+			<!-- select-level -->
+			<section class="select-level full-height">
+				<div class="container select-level__container">
+					<div class="section-heading text-center select-level__heading">
+						<h2 class="section-title">
+							<span class="text-accent">Выбери уровень</span>
+							сложности
+						</h2>
+						<p class="section-subtitle">От выбранного уровня зависит количество и сложность вопросов и заданий.</p>
+					</div>
+					<div class="grid grid--2 select-level__levels">
+						<!-- Легкий уровень (10 вопросов) -->
+						<a href="./easy-test.html" class="item-style level-item is--easy">
+							<div class="level-item__content">
+								<div class="item-icon level-item__icon">
+									<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path
+											id="6c435aac"
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M0.731655 0C4.28268 0.0785287 7.69708 0.801142 10.9748 2.16783C13.1117 3.06641 14.8521 4.45604 16.1962 6.33673C17.1187 8.06599 17.2074 9.84474 16.4622 11.6729C16.1066 12.5311 15.6742 13.3426 15.1652 14.1076C16.0159 16.0446 16.6257 18.0568 16.9944 20.1441C17.5652 19.4345 18.1748 18.7564 18.8235 18.1097C18.4364 14.6506 19.8554 12.2716 23.0804 10.9725C25.9891 10.0775 28.8049 10.3221 31.5277 11.7063C31.8801 11.9327 32.0353 12.255 31.9933 12.6735C31.4868 15.6138 30.1121 18.0485 27.8694 19.9774C26.2256 21.1537 24.4298 21.4427 22.4818 20.8445C21.6958 20.5966 20.9309 20.2965 20.187 19.944C18.9515 20.9978 18.0425 22.2875 17.46 23.8127C17.5281 26.0639 17.4394 28.3096 17.1939 30.5497C17.1635 31.8271 16.5538 32.2607 15.3648 31.8504C15.1914 31.7211 15.0695 31.5544 14.9989 31.3501C15.1308 29.5305 15.2305 27.7073 15.2982 25.8805C15.3399 22.2544 14.6858 18.7636 13.3361 15.4082C11.3973 16.3309 9.39073 16.5198 7.31655 15.9752C6.39859 15.6206 5.61149 15.0758 4.9553 14.341C3.66366 12.6181 2.66595 10.7281 1.96217 8.67131C1.0946 6.18064 0.440549 3.63484 0 1.03389C0.0580269 0.54858 0.301914 0.203956 0.731655 0ZM9.31197 7.53737C9.77584 7.45666 10.1749 7.57892 10.5092 7.90423C12.4538 9.62515 13.9614 11.6707 15.0322 14.0409C14.8583 14.3434 14.6366 14.6102 14.367 14.8413C14.0467 15.0078 13.7253 15.1746 13.4026 15.3415C12.3746 12.9024 10.8448 10.8346 8.81312 9.13823C8.46751 8.43692 8.6338 7.9033 9.31197 7.53737ZM23.7455 15.0747C24.4359 15.1 24.835 15.4557 24.9428 16.142C24.8825 16.4742 24.7273 16.7522 24.4772 16.9758C22.865 17.6823 21.4128 18.6272 20.1205 19.8106C19.7984 19.6046 19.488 19.3823 19.1893 19.1436C19.0433 18.871 18.9435 18.5819 18.89 18.2765C20.2968 16.8925 21.9153 15.8253 23.7455 15.0747Z"
+											fill="currentColor"
+										></path>
+									</svg>
+								</div>
+								<div class="level-item__text">
+									<h3 class="item-title">Легкий уровень</h3>
+									<p>Вопросов в тесте: 10</p>
+								</div>
+							</div>
+							<button type="button" class="btn btn--secondary">Пройти тест</button>
+						</a>
+
+						<!-- Сложный уровень (21 вопрос) -->
+						<a href="./hard-test.html" class="item-style level-item is-hard">
+							<div class="level-item__content">
+								<div class="item-icon level-item__icon">
+									<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M15.6249 0C15.8749 0 16.1249 0 16.3748 0C16.6235 0.113426 16.8006 0.300926 16.9061 0.5625C16.9478 2.08333 16.9478 3.60417 16.9061 5.125C16.5841 5.68592 16.1154 5.84217 15.4999 5.59375C15.314 5.48345 15.1786 5.3272 15.0936 5.125C15.0519 3.60417 15.0519 2.08333 15.0936 0.5625C15.1991 0.300926 15.3762 0.113426 15.6249 0Z" fill="currentColor"></path>
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M5.12499 4.43751C5.50255 4.38081 5.83588 4.47456 6.12498 4.71876C6.98953 5.58334 7.85415 6.44795 8.7187 7.31251C9.11482 7.85114 9.08357 8.36151 8.62495 8.84376C8.15927 9.08132 7.72178 9.0397 7.31247 8.71876C6.44791 7.8542 5.58332 6.98957 4.71874 6.12501C4.39782 5.71569 4.35616 5.27819 4.59375 4.81251C4.73886 4.63155 4.91594 4.50655 5.12499 4.43751Z" fill="currentColor"></path>
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M26.3122 4.43744C27.3913 4.42229 27.7558 4.92229 27.4059 5.93744C26.5223 6.88357 25.6161 7.81063 24.6872 8.71869C24.1486 9.11482 23.6382 9.08357 23.1559 8.62494C22.9519 8.24819 22.9519 7.87319 23.1559 7.49994C24.1411 6.40001 25.1932 5.37919 26.3122 4.43744Z" fill="currentColor"></path>
+										<path
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M14.9995 7.56248C19.0618 7.3268 21.9888 9.0143 23.7806 12.625C24.8361 15.3732 24.6278 18.019 23.1556 20.5625C22.5961 21.3097 22.0127 22.0389 21.4057 22.75C20.8938 23.7049 20.6438 24.7257 20.6557 25.8125C20.5619 26.0729 20.3848 26.25 20.1244 26.3437C17.3276 26.4055 14.5359 26.3847 11.7495 26.2812C11.5637 26.1709 11.4283 26.0147 11.3433 25.8125C11.3802 24.5845 11.0677 23.4595 10.4058 22.4375C7.68129 19.7334 6.91043 16.5459 8.09329 12.875C9.05065 10.5426 10.7069 8.92805 13.062 8.03123C13.7054 7.82998 14.3512 7.67373 14.9995 7.56248ZM15.2495 11.375C15.6042 11.3646 15.9584 11.375 16.312 11.4062C16.9211 11.7728 17.0357 12.2624 16.6557 12.875C16.5411 12.9479 16.4265 13.0208 16.312 13.0937C14.6783 13.1119 13.6262 13.8931 13.1557 15.4375C12.8431 15.8664 12.4369 15.981 11.937 15.7812C11.5312 15.521 11.3958 15.1565 11.5308 14.6875C12.1363 12.8627 13.3759 11.7585 15.2495 11.375Z"
+											fill="currentColor"
+										></path>
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M0 16.375C0 16.125 0 15.875 0 15.625C0.113424 15.3763 0.300922 15.1993 0.562494 15.0938C2.08331 15.0521 3.60413 15.0521 5.12495 15.0938C5.68586 15.4158 5.84211 15.8845 5.59369 16.5C5.48339 16.6858 5.32715 16.8213 5.12495 16.9063C3.60413 16.948 2.08331 16.948 0.562494 16.9063C0.300922 16.8008 0.113424 16.6237 0 16.375Z" fill="currentColor"></path>
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M32 15.625C32 15.875 32 16.125 32 16.375C31.8866 16.6237 31.6991 16.8008 31.4375 16.9063C29.9167 16.948 28.3959 16.948 26.8751 16.9063C26.3141 16.5843 26.1579 16.1155 26.4063 15.5C26.5166 15.3142 26.6729 15.1788 26.8751 15.0938C28.3959 15.0521 29.9167 15.0521 31.4375 15.0938C31.6991 15.1993 31.8866 15.3763 32 15.625Z" fill="currentColor"></path>
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M17.5623 32C16.5206 32 15.479 32 14.4373 32C13.3133 31.678 12.5946 30.9489 12.2811 29.8125C12.2499 29.2921 12.2395 28.7712 12.2499 28.25C14.7498 28.25 17.2498 28.25 19.7498 28.25C20.0163 29.7564 19.5163 30.9126 18.2498 31.7188C18.0119 31.808 17.7827 31.9018 17.5623 32Z" fill="currentColor"></path>
+									</svg>
+								</div>
+								<div class="level-item__text">
+									<h3 class="item-title">Сложный уровень</h3>
+									<p>21 вопрос в тесте</p>
+									<p>Тест основан на </p>
+								</div>
+							</div>
+							<button type="button" class="btn btn--secondary">Пройти тест</button>
+						</a>
+					</div>
+				</div>
+			</section>
+		</main>
+		<!-- end Main -->
+
+		<!-- footer -->
+		<footer class="footer">
+			<div class="footer__top">
+				<div class="container footer__top-container">
+					<ul class="footer__list">
+						<li class="footer__title">Организация</li>
+						<li>ИП Романюк Максим Юрьевич</li>
+						<li>ИНН: 781631785828</li>
+					</ul>
+					<ul class="footer__list">
+						<li class="footer__title">Контакты</li>
+						<li>
+							Telegram:
+							<a href="https://t.me/vikadayneko" target="_blank">@vikadayneko</a>
+						</li>
+						<li>
+							Тел.:
+							<a href="tel:+77273101276">+77273101276</a>
+						</li>
+						<li>
+							Email:
+							<a href="mailto:support@iqmo.ru">support@iqmo.ru</a>
+						</li>
+					</ul>
+					<ul class="footer__list">
+						<li class="footer__title">Документы</li>
+						<li><a href="./policy.pdf" target="_blank">Политика конфиденциальности</a></li>
+						<li><a href="./oferta.pdf" target="_blank">Оферта</a></li>
+						<li>
+							<a href="./sogl.pdf" target="_blank">
+								Соглашение
+								<br />
+								об использовании платной подписки
+							</a>
+						</li>
+					</ul>
+					<ul class="footer__list">
+						<li class="footer__title">Информация</li>
+						<li><a href="./tariff.pdf" target="_blank">Тарифы</a></li>
+						<li><a href="./unsubscribe/">Отменить подписку</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="footer__bottom">
+				<div class="container footer__bottom-container">
+					<p class="footer__copyright">© Все права защищены 2026 г.</p>
+					<div class="footer__payments">
+						<img loading="lazy" src="./img/footer-payment1.svg" width="232" height="32" alt="" />
+						<img loading="lazy" src="./img/footer-payment2.svg" width="232" height="32" alt="" />
+					</div>
+				</div>
+			</div>
+		</footer>
+	</body>
+</html>

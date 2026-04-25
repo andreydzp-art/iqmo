@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="ru" class="page">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO — Периодическая система Менделеева · Химия</title>
+		<meta
+			name="description"
+			content="Периодическая система Менделеева для ОГЭ по химии: теория, интерактивная таблица элементов, подтемы и тренировка."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f3f5f8;
+				--ink: #11141a;
+				--ink-2: #2a2f38;
+				--muted: #6b7280;
+				--line: #e6e9ef;
+				--card: #ffffff;
+				--dark: #1f2430;
+				--accent: #4f7bd6;
+				--accent-weak: #eaf0fb;
+				--green: #3ec37a;
+				--amber: #e39b2a;
+				--red: #d65a5a;
+				--radius: 18px;
+				--shadow: 0 1px 2px rgba(17,20,26,.04), 0 8px 24px -12px rgba(17,20,26,.08);
+			}
+			* { box-sizing: border-box; }
+			html, body { margin: 0; padding: 0; }
+			body {
+				font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+				color: var(--ink); background: var(--bg);
+				font-size: 16px; line-height: 1.55;
+				-webkit-font-smoothing: antialiased;
+				min-height: 100vh; display: flex; flex-direction: column;
+			}
+			a { color: inherit; text-decoration: none; }
+			button { font-family: inherit; cursor: pointer; border: 0; background: none; }
+			h1, h2, h3, h4, p { margin: 0; }
+			.container { width: 100%; max-width: 1220px; margin: 0 auto; padding: 0 24px; }
+
+			.header { background: #fff; border-bottom: 1px solid var(--line); padding: 16px 0; position: sticky; top: 0; z-index: 20; }
+			.header__container { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+			.logo { font-weight: 800; letter-spacing: .04em; font-size: 18px; }
+			.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 15px; padding: 11px 20px; border-radius: 999px; border: 1.5px solid transparent; transition: .12s; cursor: pointer; white-space: nowrap; }
+			.btn:active { transform: translateY(1px); }
+			.btn--primary { background: linear-gradient(180deg, #44c77d, #2fa965); color: #fff; box-shadow: 0 8px 20px -8px rgba(62,195,122,.55); }
+			.btn--primary:hover { filter: brightness(1.05); }
+			.btn--ghost { background: #fff; border-color: var(--line); color: var(--ink); }
+			.btn--ghost:hover { border-color: var(--ink); }
+			.btn--dark { background: var(--dark); color: #fff; }
+			.btn--dark:hover { background: #111520; }
+
+			.crumbs { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); padding: 16px 0 0; flex-wrap: wrap; }
+			.crumbs a:hover { color: var(--accent); }
+			.crumbs__sep { opacity: .5; }
+
+			.page__main { flex: 1; padding: 8px 0 72px; }
+
+			/* ---- hero ---- */
+			.thero {
+				background: linear-gradient(135deg, #2a3044 0%, #1f2430 100%);
+				color: #fff; border-radius: var(--radius); padding: 32px 32px 28px;
+				margin-top: 16px; position: relative; overflow: hidden;
+			}
+			.thero::after {
+				content: ''; position: absolute; right: -60px; top: -40px;
+				width: 260px; height: 260px; border-radius: 50%;
+				background: radial-gradient(circle, rgba(79,123,214,.3), transparent 70%);
+			}
+			.thero__tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #ffd166; margin-bottom: 10px; }
+			.thero__title { font-size: 32px; font-weight: 800; letter-spacing: -.015em; max-width: 720px; }
+			.thero__sub { margin-top: 10px; color: rgba(255,255,255,.7); font-size: 15px; max-width: 640px; }
+			.thero__grid { display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: end; margin-top: 22px; position: relative; z-index: 1; }
+			.thero__progress { max-width: 460px; }
+			.thero__progress-bar { height: 8px; background: rgba(255,255,255,.12); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+			.thero__progress-fill { height: 100%; background: linear-gradient(90deg, #44c77d, #6dd58f); border-radius: 999px; }
+			.thero__progress-meta { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,.7); margin-top: 8px; }
+			.thero__progress-meta b { color: #fff; font-weight: 700; }
+			.thero__cta { display: flex; gap: 10px; flex-wrap: wrap; }
+			.thero__cta .btn--ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.22); }
+			.thero__cta .btn--ghost:hover { border-color: #fff; }
+
+			/* ---- sections ---- */
+			.section { margin-top: 32px; }
+			.section-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+			.section-title h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+			.section-title p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+			.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); }
+
+			/* ---- actions row ---- */
+			.actions-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+			.action-card {
+				background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+				padding: 20px; display: flex; gap: 14px; align-items: flex-start;
+				transition: .15s; cursor: pointer;
+			}
+			.action-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 8px 20px -12px rgba(79,123,214,.4); }
+			.action-card__ic {
+				width: 44px; height: 44px; flex: 0 0 44px; border-radius: 12px;
+				display: flex; align-items: center; justify-content: center;
+				background: var(--accent-weak); color: var(--accent);
+			}
+			.action-card__ic svg { width: 22px; height: 22px; stroke: currentColor; }
+			.action-card.is--train .action-card__ic { background: #e7f6ec; color: var(--green); }
+			.action-card__title { font-size: 17px; font-weight: 700; }
+			.action-card__sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+			.dumb-callout {
+				background: #fff8ea; border: 1px solid #f5e0b8; border-radius: 12px;
+				padding: 14px 18px; margin: 14px 0; font-size: 14px; color: var(--ink-2);
+			}
+			.dumb-callout strong { color: var(--ink); }
+			.cheat-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
+			.cheat-table th, .cheat-table td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; }
+			.cheat-table th { background: #f7f8fb; font-weight: 700; }
+			.lesson-block { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-bottom: 14px; }
+			.lesson-block h3 { font-size: 17px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.01em; }
+			.lesson-block p, .lesson-block li { font-size: 15px; color: var(--ink-2); }
+			.lesson-block a:not(.btn),
+			.dumb-callout a:not(.btn),
+			.cheat-table a:not(.btn) {
+				color: var(--accent);
+				font-weight: 600;
+				text-decoration: underline;
+				text-decoration-thickness: 1px;
+				text-underline-offset: 2px;
+			}
+			.lesson-block a:not(.btn):hover,
+			.dumb-callout a:not(.btn):hover,
+			.cheat-table a:not(.btn):hover {
+				color: #3d63b8;
+			}
+
+			/* ---- theory ---- */
+			.theory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+			.theory-block { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+			.theory-block h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+			.theory-block p { font-size: 14px; color: var(--ink-2); }
+			.theory-block ul { margin: 8px 0 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); }
+			.theory-block ul li { margin: 4px 0; }
+			.theory-block .formula { background: #f7f8fb; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-family: 'SF Mono', Menlo, monospace; font-size: 13px; margin-top: 10px; display: inline-block; }
+
+			details.theory-acc {
+				background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				padding: 14px 18px; margin-bottom: 10px; transition: border-color .15s;
+			}
+			details.theory-acc[open] { border-color: var(--accent); }
+			details.theory-acc summary {
+				font-weight: 700; font-size: 15px; cursor: pointer; display: flex;
+				align-items: center; gap: 10px; list-style: none;
+			}
+			details.theory-acc summary::-webkit-details-marker { display: none; }
+			details.theory-acc summary::before {
+				content: ''; width: 8px; height: 8px; border-right: 2px solid var(--muted);
+				border-bottom: 2px solid var(--muted); transform: rotate(-45deg);
+				transition: transform .15s;
+			}
+			details.theory-acc[open] summary::before { transform: rotate(45deg); }
+			details.theory-acc .theory-content { margin-top: 12px; color: var(--ink-2); font-size: 14px; }
+			details.theory-acc .theory-content p + p { margin-top: 8px; }
+
+			/* ---- periodic table ---- */
+			.ptable-wrap { overflow-x: auto; padding: 4px 2px 2px; margin: 0 -4px; }
+			.ptable {
+				display: grid;
+				grid-template-columns: repeat(18, 44px);
+				grid-template-rows: repeat(9, 44px);
+				gap: 3px;
+				min-width: calc(18 * 44px + 17 * 3px);
+			}
+			.elem {
+				position: relative; width: 44px; height: 44px; border-radius: 5px;
+				display: flex; flex-direction: column; justify-content: space-between;
+				padding: 3px 4px; cursor: pointer; border: 1.5px solid transparent;
+				transition: transform .08s, box-shadow .12s;
+				background: #eef1f6; color: var(--ink);
+				font-weight: 600;
+			}
+			.elem:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -6px rgba(17,20,26,.22); z-index: 2; }
+			.elem:focus { outline: none; }
+			.elem:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+				z-index: 4;
+			}
+			.elem__z { font-size: 9px; font-weight: 500; opacity: .7; text-align: left; line-height: 1; }
+			.elem__sym { font-size: 15px; font-weight: 800; text-align: center; line-height: 1; margin-top: 2px; }
+			.elem__name { font-size: 8px; line-height: 1; opacity: .7; text-align: center; margin-bottom: 1px; }
+			.elem.is--s { background: #ffecd4; }
+			.elem.is--p { background: #d9ebff; }
+			.elem.is--d { background: #e4dcff; }
+			.elem.is--f { background: #f5e6ff; }
+			.elem.is--noble { background: #fce1b3; }
+			.elem.is--metalloid { background: #d5f2e0; }
+			.elem.is--active {
+				background: var(--ink) !important; color: #fff;
+				border-color: var(--ink); transform: translateY(-2px); z-index: 3;
+			}
+			.elem.is--active .elem__z, .elem.is--active .elem__name { opacity: .75; }
+
+			.ptable-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 14px; }
+			.ptable-legend__item { display: inline-flex; align-items: center; gap: 6px; }
+			.ptable-legend__sw { width: 12px; height: 12px; border-radius: 3px; }
+
+			.elem-card {
+				background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+				padding: 18px; margin-top: 16px;
+				display: grid; grid-template-columns: 96px 1fr; gap: 18px; align-items: start;
+			}
+			.elem-card__big {
+				aspect-ratio: 1; border-radius: 12px; background: var(--ink); color: #fff;
+				display: flex; flex-direction: column; justify-content: center; align-items: center;
+				padding: 8px;
+			}
+			.elem-card__big-z { font-size: 11px; opacity: .7; align-self: flex-start; }
+			.elem-card__big-sym { font-size: 36px; font-weight: 800; line-height: 1; margin: 2px 0; }
+			.elem-card__big-mass { font-size: 10px; opacity: .7; }
+			.elem-card__name { font-size: 20px; font-weight: 800; }
+			.elem-card__tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+			.elem-card__tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 3px 8px; border-radius: 999px; background: var(--accent-weak); color: var(--accent); }
+			.elem-card__props { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+			.elem-card__prop { background: #f7f8fb; border-radius: 8px; padding: 8px 10px; }
+			.elem-card__prop-label { font-size: 11px; color: var(--muted); }
+			.elem-card__prop-value { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+			.elem-card__hint { margin-top: 10px; font-size: 13px; color: var(--ink-2); padding: 10px 12px; background: #fff8ea; border-left: 3px solid var(--amber); border-radius: 0 8px 8px 0; }
+
+			/* ---- subtopics checklist ---- */
+			.subtopics { display: flex; flex-direction: column; gap: 8px; }
+			.subtopic-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+			.subtopic-row .subtopic { flex: 1; min-width: 0; }
+			.subtopic-row > .btn { flex-shrink: 0; }
+			.subtopic {
+				display: flex; align-items: center; gap: 12px;
+				padding: 12px 14px; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				transition: .12s;
+			}
+			.subtopic:hover { border-color: var(--accent); }
+			button.subtopic {
+				width: 100%;
+				font: inherit;
+				color: inherit;
+				text-align: left;
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 12px 14px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				transition: .12s;
+				cursor: pointer;
+			}
+			button.subtopic:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+			}
+			.subtopics-hint { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.45; }
+			.ptable-disclaimer { font-size: 13px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+			.subtopic__check {
+				width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line);
+				flex: 0 0 22px; display: flex; align-items: center; justify-content: center;
+				color: #fff; background: #fff;
+			}
+			.subtopic.is--done .subtopic__check { background: var(--green); border-color: var(--green); }
+			.subtopic.is--partial .subtopic__check { background: var(--amber); border-color: var(--amber); }
+			.subtopic__name { flex: 1; font-weight: 600; font-size: 15px; }
+			.subtopic__meta { color: var(--muted); font-size: 13px; }
+			.subtopic__go { color: var(--muted); }
+			.subtopic:hover .subtopic__go { color: var(--accent); }
+
+			/* ---- related ---- */
+			.related-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+			.related {
+				background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				padding: 16px; display: flex; align-items: center; gap: 12px;
+				transition: .12s;
+			}
+			.related:hover { border-color: var(--accent); transform: translateY(-1px); }
+			.related__ic {
+				width: 38px; height: 38px; border-radius: 10px; background: var(--accent-weak); color: var(--accent);
+				display: flex; align-items: center; justify-content: center;
+			}
+			.related__ic svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+			.related__name { font-weight: 700; font-size: 15px; }
+			.related__meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+			/* footer */
+			.footer { background: #fff; border-top: 1px solid var(--line); padding: 24px 0; margin-top: 40px; font-size: 13px; color: var(--muted); }
+			.footer__row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+			@media (max-width: 900px) {
+				.thero { padding: 24px 22px; }
+				.thero__title { font-size: 26px; }
+				.thero__grid { grid-template-columns: 1fr; gap: 18px; }
+				.actions-row, .theory-grid, .related-row { grid-template-columns: 1fr; }
+				.elem-card { grid-template-columns: 84px 1fr; }
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="header">
+			<div class="container header__container">
+				<a href="./index.html" class="logo">IQMO</a>
+				<div style="display:flex; gap:10px;">
+					<a href="./subject-chemistry.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;">← К предмету</a>
+				</div>
+			</div>
+		</header>
+
+		<main class="page__main">
+			<div class="container">
+				<nav class="crumbs">
+					<a href="./index.html">Главная</a>
+					<span class="crumbs__sep">/</span>
+					<a href="./index.html">Предметы</a>
+					<span class="crumbs__sep">/</span>
+					<a href="./subject-chemistry.html">Химия</a>
+					<span class="crumbs__sep">/</span>
+					<span>Периодическая система</span>
+				</nav>
+
+				<!-- HERO -->
+				<section class="thero">
+					<div class="thero__tag">ТЕМА 01 · ЗАДАНИЯ 1–3 ОГЭ</div>
+					<div class="thero__title">Периодическая система Д. И. Менделеева</div>
+					<div class="thero__sub">Закономерности в расположении элементов, строение атома и сравнение свойств — всё, что нужно знать, чтобы уверенно решать задания №1–3 ОГЭ.</div>
+					<div class="thero__grid">
+						<div class="thero__progress" id="thero-progress">
+							<div class="thero__progress-meta"><span id="thero-progress-label">Подтемы</span><b id="thero-progress-value">—</b></div>
+							<div class="thero__progress-bar"><div class="thero__progress-fill" id="thero-progress-fill" style="width:0%;"></div></div>
+							<div class="thero__progress-meta" style="margin-top:6px;"><span id="thero-progress-sub">Отметьте блок ниже или пройдите тренировку.</span><span id="thero-progress-extra"></span></div>
+						</div>
+						<div class="thero__cta">
+							<a href="#oge-focus" class="btn btn--ghost">Фокус ОГЭ</a>
+							<a href="#theory" class="btn btn--ghost">Изучить теорию</a>
+							<a href="#train" class="btn btn--primary">Тренироваться →</a>
+						</div>
+					</div>
+				</section>
+
+				<section class="section" id="oge-focus" style="margin-top: 24px;">
+					<div class="section-title">
+						<h2>Фокус ОГЭ: периодическая система в билете</h2>
+						<p>Слоты 1–3</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Где это встречается</h3>
+						<p>В карте курса строка <b>01</b> привязана к номерам <b>1, 2 и 3</b> части 1: <b>положение элемента</b> в таблице, <b>сравнение свойств</b> (металлические / неметаллические, атомный радиус, электроотрицательность в формулировках ФИПИ), иногда связка с <b>семейством</b> s-, p-, d-элементов. Разминка: <a href="./warmup-chemistry.html?topic=periodic">по таблице (слоты 1–3)</a>. Схема атома и электронные слои чаще идут в <a href="./topic-atom-structure.html">теме 02</a> (слоты 4–6), <a href="./warmup-chemistry.html?topic=atom">разминка темы 02</a>.</p>
+					</div>
+					<div class="card" style="padding: 20px;">
+						<p style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:10px;">Если в формулировке задания…</p>
+						<table class="cheat-table" style="margin-top:0;">
+							<thead>
+								<tr>
+									<th>Формулировка / ситуация</th>
+									<th>Сначала проверьте</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>«Более сильные металлические свойства…» в периоде или группе</td>
+									<td>В <b>периоде</b> слева направо металлические слабеют; в <b>группе</b> сверху вниз — усиливаются (для типичных главных подгрупп).</td>
+								</tr>
+								<tr>
+									<td>«Больший атомный радиус»</td>
+									<td>В периоде радиус уменьшается слева направо; в группе — растёт сверху вниз.</td>
+								</tr>
+								<tr>
+									<td>Номер периода и группы по элементу</td>
+									<td>Период ≈ число электронных слоёв; для главной подгруппы (А) номер группы часто совпадает с числом <b>внешних</b> электронов (кроме He и нюансов переходных металлов).</td>
+								</tr>
+								<tr>
+									<td>s-, p- или d-элемент</td>
+									<td>I–II А и H, He — чаще s; III–VII А — p; побочные подгруппы (Б) — d (переходные металлы).</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="dumb-callout" style="margin-top:14px;">
+						<strong>Ловушки:</strong> путать направление изменения свойств в <b>периоде</b> и в <b>группе</b>; забыть про исключения вроде <b>водорода</b> по положению; смешивать «порядковый номер» и «массовое число». Закрепление: <a href="./warmup-chemistry.html?topic=periodic">разминка 1–3</a>.
+					</div>
+				</section>
+
+				<section class="section" id="oge-cheat">
+					<div class="section-title">
+						<h2>Шпаргалка для части 1</h2>
+						<p>Быстрые ориентиры по таблице</p>
+					</div>
+					<div class="card" style="padding: 20px;">
+						<table class="cheat-table" style="margin-top:0;">
+							<thead>
+								<tr>
+									<th>Вопрос теста</th>
+									<th>Опора</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Неметалл / металл по положению</td>
+									<td>«Лестница» металлов слева внизу, неметаллов справа вверху; металлоиды — у границы.</td>
+								</tr>
+								<tr>
+									<td>Высшая степень окисления и группа (главная А)</td>
+									<td>Часто совпадает с номером группы для неметаллов; у металлов — положительные ст. ок. по курсу.</td>
+								</tr>
+								<tr>
+									<td>Сравнение электроотрицательности</td>
+									<td>Растёт к правому верхнему углу таблицы (F — максимум среди типичных примеров ОГЭ).</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="lesson-block" id="oge-recipe-mini">
+						<h3>Алгоритм на минуту</h3>
+						<ol style="margin:0; padding-left:22px; font-size:15px; color:var(--ink-2);">
+							<li style="margin:6px 0;">Найдите элемент в таблице: <b>период</b> (строка) и <b>группу</b> (столбец).</li>
+							<li style="margin:6px 0;">Определите тип: металл / неметалл / благородный газ / металлоид.</li>
+							<li style="margin:6px 0;">Для сравнения свойств двух элементов — проверьте, в одном ли они <b>периоде</b> или <b>группе</b>, и примените закономерность.</li>
+							<li style="margin:6px 0;">Если в условии есть <b>схема атома</b> — перейдите к <a href="./topic-atom-structure.html#oge-recipe">алгоритму темы 02</a>.</li>
+						</ol>
+					</div>
+				</section>
+
+				<!-- QUICK ACTIONS -->
+				<div class="actions-row">
+					<a href="#ptable-section" class="action-card">
+						<span class="action-card__ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+						<div>
+							<div class="action-card__title">Интерактивная таблица</div>
+							<div class="action-card__sub">Кликайте по элементам — всё, что может спросить ОГЭ</div>
+						</div>
+					</a>
+					<a href="#train" class="action-card is--train">
+						<span class="action-card__ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>
+						<div>
+							<div class="action-card__title">Разминка · 5 вопросов</div>
+							<div class="action-card__sub">Можно взять вопросы только по этой теме</div>
+						</div>
+					</a>
+				</div>
+
+				<!-- 1. THEORY -->
+				<section class="section" id="theory">
+					<div class="section-title">
+						<h2>Теория · кратко</h2>
+						<p>Выжимка по теме — для быстрого повторения</p>
+					</div>
+					<div class="theory-grid">
+						<div class="theory-block">
+							<h3>🧭 Как устроена таблица</h3>
+							<p>Элементы расположены в порядке возрастания <b>заряда ядра</b> (порядкового номера Z).</p>
+							<ul>
+								<li><b>Период</b> (строка) — электронный слой. В ОГЭ — 7 периодов.</li>
+								<li><b>Группа</b> (столбец): для <b>главной подгруппы (А)</b> номер группы совпадает с числом <b>электронов на внешнем уровне</b> (для большинства задач ОГЭ этого достаточно). Валентность и степени окисления — отдельно.</li>
+								<li>Главная подгруппа (А) — в одном столбце s- и p-элементы.</li>
+								<li>Побочная подгруппа (Б) — d-элементы (переходные металлы).</li>
+							</ul>
+							<span class="formula">№ периода = число энерг. уровней</span>
+						</div>
+						<div class="theory-block">
+							<h3>📈 Закономерности свойств</h3>
+							<p>В периоде слева направо и в группе снизу вверх:</p>
+							<ul>
+								<li>↓ радиус атома</li>
+								<li>↑ электроотрицательность</li>
+								<li>↑ неметаллические свойства</li>
+								<li>↓ металлические и восстановительные</li>
+							</ul>
+							<span class="formula">Cs ← Na → F (усиление окислительных)</span>
+						</div>
+					</div>
+
+					<details class="theory-acc" style="margin-top: 14px;">
+						<summary>Как определить элемент по схеме строения атома</summary>
+						<div class="theory-content">
+							<p>Номер периода = число электронных слоёв на схеме.</p>
+							<p>Номер группы (главная А) = число электронов на <b>внешнем</b> слое.</p>
+							<p>Пример: 2 слоя + 6 внешних электронов → 2 период, VI группа → <b>кислород</b>.</p>
+						</div>
+					</details>
+					<details class="theory-acc">
+						<summary>Высший оксид и летучее водородное соединение</summary>
+						<div class="theory-content">
+							<p>Высшая степень окисления = номер группы (для главных подгрупп). Формула высшего оксида — Э₂O<sub>N</sub>, где N — номер группы.</p>
+							<p>Для неметаллов VII–IV групп: летучее водородное соединение — ЭH<sub>(8−N)</sub>. Например, для VI группы — H₂S, для V — NH₃.</p>
+						</div>
+					</details>
+					<details class="theory-acc">
+						<summary>Семейства: s, p, d, f</summary>
+						<div class="theory-content">
+							<p><b>s-элементы</b> — I–II А группы (щелочные + щелочноземельные + H, He).</p>
+							<p><b>p-элементы</b> — III–VIII А группы (кроме He).</p>
+							<p><b>d-элементы</b> — побочные подгруппы (все переходные металлы).</p>
+							<p><b>f-элементы</b> — лантаноиды и актиноиды (в ОГЭ не встречаются).</p>
+						</div>
+					</details>
+				</section>
+
+				<!-- 2. INTERACTIVE PERIODIC TABLE -->
+				<section class="section" id="ptable-section">
+					<div class="section-title">
+						<h2>Интерактивная таблица</h2>
+						<p>Кликайте по элементу — для ОГЭ чаще всего нужны H, Li, Na, K, Ca, Mg, Al, Fe, Cu, Zn, C, N, O, S, Cl; ниже дана полная таблица 1–118 для ориентира и сравнения.</p>
+					</div>
+					<div class="card" style="padding: 20px;">
+						<div class="ptable-wrap">
+							<div class="ptable" id="ptable-grid"></div>
+						</div>
+						<div class="ptable-legend">
+							<span class="ptable-legend__item"><span class="ptable-legend__sw" style="background:#ffecd4;"></span>s-элементы</span>
+							<span class="ptable-legend__item"><span class="ptable-legend__sw" style="background:#d9ebff;"></span>p-элементы</span>
+							<span class="ptable-legend__item"><span class="ptable-legend__sw" style="background:#e4dcff;"></span>d-элементы</span>
+							<span class="ptable-legend__item"><span class="ptable-legend__sw" style="background:#f5e6ff;"></span>f-элементы (лантаноиды и актиноиды)</span>
+							<span class="ptable-legend__item"><span class="ptable-legend__sw" style="background:#d5f2e0;"></span>металлоиды</span>
+							<span class="ptable-legend__item"><span class="ptable-legend__sw" style="background:#fce1b3;"></span>благородные газы</span>
+						</div>
+						<div id="elem-card-slot"></div>
+						<p class="ptable-disclaimer">Подсказки в карточках ориентированы на формат ОГЭ. Атомные массы — усреднённые по данным для школьного курса.</p>
+					</div>
+				</section>
+
+				<!-- 3. SUBTOPICS CHECKLIST -->
+				<section class="section" id="subtopics-section">
+					<div class="section-title">
+						<h2>Подтемы</h2>
+						<p>Нажмите строку, чтобы сменить статус: не начато → в процессе → освоено. Прогресс сохраняется в браузере.</p>
+					</div>
+					<div class="subtopics" id="subtopics-root" aria-label="Чеклист подтем темы 01"></div>
+					<p class="subtopics-hint">Кнопка «к разделу» открывает теорию или таблицу. Полный курс по другим темам — с страницы предмета.</p>
+				</section>
+
+				<!-- 4. TRAIN -->
+				<section class="section" id="train">
+					<div class="card" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; background: linear-gradient(135deg, #eaf0fb 0%, #f7f8fb 100%); border-color: transparent;">
+						<div style="flex:1; min-width:260px;">
+							<div style="font-size: 12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color: var(--accent); margin-bottom:6px;">Тренировка</div>
+							<h3 style="font-size: 22px; font-weight: 800; letter-spacing:-.01em;">Закрепить тему</h3>
+							<p style="color: var(--muted); margin-top:6px; font-size:14px;">5 вопросов в разминке (можно только по периодической теме) · без общего таймера · проверка после каждого ответа</p>
+						</div>
+						<div style="display:flex; gap:10px; flex-wrap: wrap;">
+							<a href="./warmup-chemistry.html" class="btn btn--ghost" style="background:#fff;">Быстрая разминка</a>
+							<a href="./warmup-chemistry.html?topic=periodic" class="btn btn--primary">Начать тренировку →</a>
+						</div>
+					</div>
+				</section>
+
+				<!-- 5. RELATED TOPICS -->
+				<section class="section">
+					<div class="section-title">
+						<h2>После этой темы</h2>
+						<p>Советуем пройти дальше</p>
+					</div>
+					<div class="related-row">
+						<a href="./topic-atom-structure.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/></svg></span>
+							<div>
+								<div class="related__name">Тема 02 · Строение атома</div>
+								<div class="related__meta">Подробный курс: схема, период, группа</div>
+							</div>
+						</a>
+						<a href="./subject-chemistry.html#formats" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/></svg></span>
+							<div>
+								<div class="related__name">Другие темы курса</div>
+								<div class="related__meta">К предмету · полный вариант и пробник</div>
+							</div>
+						</a>
+					</div>
+					<div class="related-row" style="margin-top:12px;">
+						<a href="./topic-chemical-bond.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h8M12 8v8"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/></svg></span>
+							<div>
+								<div class="related__name">Тема 03 · Химическая связь</div>
+								<div class="related__meta">Типы связи для ОГЭ</div>
+							</div>
+						</a>
+						<a href="./mistakes-chemistry.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/><path d="M3 9h3M3 15h3M18 9h3M18 15h3M9 3v3M15 3v3M9 18v3M15 18v3"/></svg></span>
+							<div>
+								<div class="related__name">Работа над ошибками</div>
+								<div class="related__meta">Закрепить типичные промахи из тестов</div>
+							</div>
+						</a>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<footer class="footer">
+			<div class="container footer__row">
+				<span>© IQMO · 2026</span>
+				<span>Химия · ОГЭ · Тема 01</span>
+			</div>
+		</footer>
+
+		<script src="./iqmo-sync.js"></script>
+		<script src="./chem-progress.js"></script>
+		<script src="./mistakes-store.js"></script>
+		<script src="./chemistry-topic-map.js"></script>
+		<script src="./topic-periodic-table.page.js?v=20260423"></script>
+	</body>
+</html>
