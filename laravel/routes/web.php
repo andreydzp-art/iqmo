@@ -31,10 +31,14 @@ Route::get('/profile.html', function () {
 })->name('iqmo.profile_html');
 
 Route::get('/login', function () {
-    // `admin/index.html` loads `./mock-data.js` relative to the URL path.
-    // Serving the same HTML at `/login` breaks relative assets, so redirect to the canonical admin URL.
+    // Portal login page lives under `/uploads/` (relative assets), so keep it there
+    // and provide a clean entrypoint at `/login`.
+    return redirect('/uploads/login.html', 302);
+})->name('iqmo.portal_login');
+
+Route::get('/admin', function () {
     return redirect('/admin/index.html', 302);
-})->name('iqmo.admin_login');
+})->name('iqmo.admin');
 
 Route::get('/cabinet', function () {
     return response()->file(public_path('site/profile.html'));
