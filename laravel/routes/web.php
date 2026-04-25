@@ -31,9 +31,8 @@ Route::get('/profile.html', function () {
 })->name('iqmo.profile_html');
 
 Route::get('/login', function () {
-    // Portal login page lives under `/uploads/` (relative assets), so keep it there
-    // and provide a clean entrypoint at `/login`.
-    return redirect('/uploads/login.html', 302);
+    // Canonical login entrypoint is `/login.html` (served from `public/site/login.html`).
+    return redirect('/login.html', 302);
 })->name('iqmo.portal_login');
 
 Route::get('/admin', function () {
