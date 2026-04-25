@@ -11,3 +11,6 @@ Thumbs.db
 
 # Optional: secrets (never commit)
 *.pem
+
+# Local Composer binary (use `composer` globally or `php composer.phar` locally)
+composer.phar

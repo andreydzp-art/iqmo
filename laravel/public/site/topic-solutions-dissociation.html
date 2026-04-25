@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="ru" class="page">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO — Растворы и электролитическая диссоциация · Химия ОГЭ</title>
+		<meta
+			name="description"
+			content="ОГЭ по химии: растворы, электролиты и неэлектролиты, уравнения электролитической диссоциации, ионные уравнения. Слоты 13–14 части 1."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f3f5f8;
+				--ink: #11141a;
+				--ink-2: #2a2f38;
+				--muted: #6b7280;
+				--line: #e6e9ef;
+				--card: #ffffff;
+				--dark: #1f2430;
+				--accent: #4f7bd6;
+				--accent-weak: #eaf0fb;
+				--green: #3ec37a;
+				--amber: #e39b2a;
+				--red: #d65a5a;
+				--radius: 18px;
+				--shadow: 0 1px 2px rgba(17,20,26,.04), 0 8px 24px -12px rgba(17,20,26,.08);
+			}
+			* { box-sizing: border-box; }
+			html, body { margin: 0; padding: 0; }
+			body {
+				font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+				color: var(--ink); background: var(--bg);
+				font-size: 16px; line-height: 1.55;
+				-webkit-font-smoothing: antialiased;
+				min-height: 100vh; display: flex; flex-direction: column;
+			}
+			a { color: inherit; text-decoration: none; }
+			button { font-family: inherit; cursor: pointer; border: 0; background: none; }
+			h1, h2, h3, h4, p { margin: 0; }
+			.container { width: 100%; max-width: 1220px; margin: 0 auto; padding: 0 24px; }
+
+			.header { background: #fff; border-bottom: 1px solid var(--line); padding: 16px 0; position: sticky; top: 0; z-index: 20; }
+			.header__container { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+			.logo { font-weight: 800; letter-spacing: .04em; font-size: 18px; }
+			.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 15px; padding: 11px 20px; border-radius: 999px; border: 1.5px solid transparent; transition: .12s; cursor: pointer; white-space: nowrap; }
+			.btn:active { transform: translateY(1px); }
+			.btn--primary { background: linear-gradient(180deg, #44c77d, #2fa965); color: #fff; box-shadow: 0 8px 20px -8px rgba(62,195,122,.55); }
+			.btn--primary:hover { filter: brightness(1.05); }
+			.btn--ghost { background: #fff; border-color: var(--line); color: var(--ink); }
+			.btn--ghost:hover { border-color: var(--ink); }
+
+			.crumbs { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); padding: 16px 0 0; flex-wrap: wrap; }
+			.crumbs a:hover { color: var(--accent); }
+			.crumbs__sep { opacity: .5; }
+
+			.page__main { flex: 1; padding: 8px 0 72px; }
+
+			.thero {
+				background: linear-gradient(135deg, #2a3044 0%, #1f2430 100%);
+				color: #fff; border-radius: var(--radius); padding: 32px 32px 28px;
+				margin-top: 16px; position: relative; overflow: hidden;
+			}
+			.thero::after {
+				content: ''; position: absolute; right: -60px; top: -40px;
+				width: 260px; height: 260px; border-radius: 50%;
+				background: radial-gradient(circle, rgba(79,123,214,.3), transparent 70%);
+			}
+			.thero__tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #ffd166; margin-bottom: 10px; }
+			.thero__title { font-size: 32px; font-weight: 800; letter-spacing: -.015em; max-width: 720px; }
+			.thero__sub { margin-top: 10px; color: rgba(255,255,255,.7); font-size: 15px; max-width: 720px; }
+			.thero__grid { display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: end; margin-top: 22px; position: relative; z-index: 1; }
+			.thero__progress { max-width: 460px; }
+			.thero__progress-bar { height: 8px; background: rgba(255,255,255,.12); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+			.thero__progress-fill { height: 100%; background: linear-gradient(90deg, #44c77d, #6dd58f); border-radius: 999px; }
+			.thero__progress-meta { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,.7); margin-top: 8px; }
+			.thero__progress-meta b { color: #fff; font-weight: 700; }
+			.thero__cta { display: flex; gap: 10px; flex-wrap: wrap; }
+			.thero__cta .btn--ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.22); }
+			.thero__cta .btn--ghost:hover { border-color: #fff; }
+
+			.section { margin-top: 32px; }
+			.section-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+			.section-title h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+			.section-title p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+			.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); }
+
+			.actions-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+			.action-card {
+				background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+				padding: 20px; display: flex; gap: 14px; align-items: flex-start;
+				transition: .15s; cursor: pointer;
+			}
+			.action-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 8px 20px -12px rgba(79,123,214,.4); }
+			.action-card__ic {
+				width: 44px; height: 44px; flex: 0 0 44px; border-radius: 12px;
+				display: flex; align-items: center; justify-content: center;
+				background: var(--accent-weak); color: var(--accent);
+			}
+			.action-card__ic svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
+			.action-card.is--train .action-card__ic { background: #e7f6ec; color: var(--green); }
+			.action-card__title { font-size: 17px; font-weight: 700; }
+			.action-card__sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+			.dumb-callout {
+				background: #fff8ea; border: 1px solid #f5e0b8; border-radius: 12px;
+				padding: 14px 18px; margin: 14px 0; font-size: 14px; color: var(--ink-2);
+			}
+			.dumb-callout strong { color: var(--ink); }
+
+			.lesson-block { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-bottom: 14px; }
+			.lesson-block h3 { font-size: 17px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.01em; }
+			.lesson-block p, .lesson-block li { font-size: 15px; color: var(--ink-2); }
+			.lesson-block ul, .lesson-block ol { margin: 8px 0 0; padding-left: 22px; }
+			.lesson-block li { margin: 6px 0; }
+			.lesson-block a:not(.btn),
+			.dumb-callout a:not(.btn),
+			.cheat-table a:not(.btn) {
+				color: var(--accent);
+				font-weight: 600;
+				text-decoration: underline;
+				text-decoration-thickness: 1px;
+				text-underline-offset: 2px;
+			}
+			.lesson-block a:not(.btn):hover,
+			.dumb-callout a:not(.btn):hover,
+			.cheat-table a:not(.btn):hover {
+				color: #3d63b8;
+			}
+			.formula {
+				display: inline-block; margin-top: 10px; padding: 8px 12px;
+				background: #f7f8fb; border: 1px solid var(--line); border-radius: 8px;
+				font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+			}
+
+			.cheat-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
+			.cheat-table th, .cheat-table td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; }
+			.cheat-table th { background: #f7f8fb; font-weight: 700; }
+
+			details.theory-acc {
+				background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				padding: 14px 18px; margin-bottom: 10px; transition: border-color .15s;
+			}
+			details.theory-acc[open] { border-color: var(--accent); }
+			details.theory-acc summary {
+				font-weight: 700; font-size: 15px; cursor: pointer; display: flex;
+				align-items: center; gap: 10px; list-style: none;
+			}
+			details.theory-acc summary::-webkit-details-marker { display: none; }
+			details.theory-acc summary::before {
+				content: ''; width: 8px; height: 8px; border-right: 2px solid var(--muted);
+				border-bottom: 2px solid var(--muted); transform: rotate(-45deg);
+				transition: transform .15s;
+			}
+			details.theory-acc[open] summary::before { transform: rotate(45deg); }
+			details.theory-acc .theory-content { margin-top: 12px; color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+			details.theory-acc .theory-content p + p { margin-top: 8px; }
+
+			.subtopics { display: flex; flex-direction: column; gap: 8px; }
+			.subtopic-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+			.subtopic-row .subtopic { flex: 1; min-width: 0; }
+			.subtopic-row > .btn { flex-shrink: 0; }
+			button.subtopic {
+				width: 100%; font: inherit; color: inherit; text-align: left;
+				display: flex; align-items: center; gap: 12px;
+				padding: 12px 14px; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				transition: .12s; cursor: pointer;
+			}
+			button.subtopic:hover { border-color: var(--accent); }
+			button.subtopic:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+			.subtopics-hint { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.45; }
+			.subtopic__check {
+				width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line);
+				flex: 0 0 22px; display: flex; align-items: center; justify-content: center;
+				color: #fff; background: #fff;
+			}
+			.subtopic.is--done .subtopic__check { background: var(--green); border-color: var(--green); }
+			.subtopic.is--partial .subtopic__check { background: var(--amber); border-color: var(--amber); }
+			.subtopic__name { flex: 1; font-weight: 600; font-size: 15px; }
+			.subtopic__meta { color: var(--muted); font-size: 13px; }
+			.subtopic__go { color: var(--muted); }
+			.subtopic:hover .subtopic__go { color: var(--accent); }
+
+			.related-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+			.related {
+				background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				padding: 16px; display: flex; align-items: center; gap: 12px;
+				transition: .12s;
+			}
+			.related:hover { border-color: var(--accent); transform: translateY(-1px); }
+			.related__ic {
+				width: 38px; height: 38px; border-radius: 10px; background: var(--accent-weak); color: var(--accent);
+				display: flex; align-items: center; justify-content: center;
+			}
+			.related__ic svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+			.related__name { font-weight: 700; font-size: 15px; }
+			.related__meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+			.footer { background: #fff; border-top: 1px solid var(--line); padding: 24px 0; margin-top: 40px; font-size: 13px; color: var(--muted); }
+			.footer__row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+			@media (max-width: 900px) {
+				.thero { padding: 24px 22px; }
+				.thero__title { font-size: 26px; }
+				.thero__grid { grid-template-columns: 1fr; gap: 18px; }
+				.actions-row, .related-row { grid-template-columns: 1fr; }
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class="container header__container">
+				<a href="./index.html" class="logo">IQMO</a>
+				<div style="display:flex; gap:10px;">
+					<a href="./subject-chemistry.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;">← К предмету</a>
+				</div>
+			</div>
+		</header>
+
+		<main class="page__main">
+			<div class="container">
+				<nav class="crumbs">
+					<a href="./index.html">Главная</a>
+					<span class="crumbs__sep">/</span>
+					<a href="./index.html">Предметы</a>
+					<span class="crumbs__sep">/</span>
+					<a href="./subject-chemistry.html">Химия</a>
+					<span class="crumbs__sep">/</span>
+					<span>Растворы. Электролитическая диссоциация</span>
+				</nav>
+
+				<section class="thero">
+					<div class="thero__tag">ТЕМА 06 · ПРОСТЫМИ СЛОВАМИ</div>
+					<div class="thero__title">Растворы и электролитическая диссоциация</div>
+					<div class="thero__sub">
+						В воде (и в других полярных растворителях) часть веществ распадается на ионы — это <b>диссоциация</b>. От неё зависят проводимость, pH и ионные уравнения. Перед этой темой полезно освежить <a href="./topic-inorganic-classes.html" style="color:#9ec0ff;">классы соединений</a> и <a href="./topic-chemical-bond.html" style="color:#9ec0ff;">тип связи</a>.
+					</div>
+					<div class="thero__grid">
+						<div class="thero__progress" id="thero-progress">
+							<div class="thero__progress-meta"><span id="thero-progress-label">Подтемы курса</span><b id="thero-progress-value">—</b></div>
+							<div class="thero__progress-bar"><div class="thero__progress-fill" id="thero-progress-fill" style="width:0%;"></div></div>
+							<div class="thero__progress-meta" style="margin-top:6px;"><span id="thero-progress-sub">Читайте блоки ниже или пройдите разминку.</span><span id="thero-progress-extra"></span></div>
+						</div>
+						<div class="thero__cta">
+							<a href="#oge-focus" class="btn btn--ghost">Фокус ОГЭ</a>
+							<a href="#why" class="btn btn--ghost">С чего начать</a>
+							<a href="#train" class="btn btn--primary">Разминка →</a>
+						</div>
+					</div>
+				</section>
+
+				<section class="section" id="oge-focus" style="margin-top: 24px;">
+					<div class="section-title">
+						<h2>Фокус ОГЭ: растворы в билете</h2>
+						<p>Слоты 13–14 и типичные сценарии</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Где это встречается</h3>
+						<p>В разметке курса к теме привязаны номера <b>13 и 14</b> части 1: обычно это <b>электролиты / неэлектролиты</b>, <b>уравнения диссоциации</b>, иногда связка с <b>ионными уравнениями</b> и качественными реакциями в растворе. После блока реакций (тема&nbsp;05) это логичный следующий «технический» слой.</p>
+					</div>
+					<div class="card" style="padding: 20px;">
+						<p style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:10px;">Если в формулировке задания…</p>
+						<table class="cheat-table" style="margin-top:0;">
+							<thead>
+								<tr>
+									<th>Формулировка / ситуация</th>
+									<th>Сначала проверьте</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>«Электролит / неэлектролит» среди перечисленных</td>
+									<td>Класс вещества: соли, кислоты, щёлочи в воде → чаще <b>электролиты</b>; многие молекулярные оксиды и органика в школьном минимуме — <b>неэлектролиты</b> (ориентируйтесь на подсказку задачи).</td>
+								</tr>
+								<tr>
+									<td>«Запишите уравнение электролитической диссоциации»</td>
+									<td>Катионы и анионы, <b>стехиометрия</b> (индексы в формуле → коэффициенты перед ионами), заряды сходятся.</td>
+								</tr>
+								<tr>
+									<td>Ионное уравнение / сокращённые ионы</td>
+									<td>Уберите <b>спектаторов</b> (ионы, не участвующие в реакции); не разлагайте слабые электролиты и осадки «на ионы» в сокращённой записи.</td>
+								</tr>
+								<tr>
+									<td>Связь с реакцией обмена</td>
+									<td>Сначала молекулярное уравнение, потом полное ионное — см. <a href="./topic-chemical-reactions.html">тему 05</a>.</td>
+								</tr>
+								<tr>
+									<td>pH воды, стоки, ионы в экологическом контексте</td>
+									<td>Слоты <b>15–16</b> — <a href="./topic-life-ecology.html">тема 10</a>, <a href="./warmup-chemistry.html?topic=ecology">разминка 15–16 (экология)</a>.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="dumb-callout" style="margin-top:14px;">
+						<strong>Ловушки:</strong> ошибиться в <b>заряде</b> иона (SO₄²⁻, CO₃²⁻, PO₄³⁻); забыть, что <b>многоосновная кислота</b> даёт несколько H⁺ по ступеням; спутать <b>раствор</b> и <b>расплав</b> в формулировке. Закрепление: <a href="./warmup-chemistry.html?topic=solutions">разминка по слотам 13–14</a>.
+					</div>
+				</section>
+
+				<div class="actions-row">
+					<a href="#oge-cheat" class="action-card">
+						<span class="action-card__ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span>
+						<div>
+							<div class="action-card__title">Шпаргалка для теста</div>
+							<div class="action-card__sub">Электролит или нет · диссоциация</div>
+						</div>
+					</a>
+					<a href="#train" class="action-card is--train">
+						<span class="action-card__ic"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg></span>
+						<div>
+							<div class="action-card__title">5 вопросов по теме</div>
+							<div class="action-card__sub">Слоты 13–14 части 1</div>
+						</div>
+					</a>
+				</div>
+
+				<section class="section" id="why">
+					<div class="section-title">
+						<h2>1. Раствор и растворённое вещество</h2>
+						<p>Гомогенная система</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Растворитель и что в нём творится</h3>
+						<p><b>Раствор</b> — гомогенная смесь: обычно <b>растворитель</b> (часто вода) + <b>растворённое вещество</b>. Концентрацию в ОГЭ чаще дают словами («насыщенный», «разбавленный») или через массовую долю в отдельных задачах.</p>
+						<p>Для электролитической диссоциации важен <b>полярный</b> растворитель: вода разрушает ионную и полярную ковалентную связь, стабилизируя ионы гидратацией.</p>
+					</div>
+				</section>
+
+				<section class="section" id="electrolytes">
+					<div class="section-title">
+						<h2>2. Электролиты и неэлектролиты</h2>
+						<p>Проводят ли ток в растворе или расплаве</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Кто даёт ионы</h3>
+						<p><b>Электролиты</b> — вещества, в водных растворах или расплавах распадающиеся на ионы (почти полностью или частично) и проводящие ток: кислоты, щёлочи, соли.</p>
+						<p><b>Неэлектролиты</b> в воде остаются в виде молекул (или не дают достаточно ионов): многие органические вещества, простые неметаллы в привычном виде, часть молекулярных соединений по условию задачи.</p>
+						<div class="dumb-callout">
+							<strong>ОГЭ:</strong> ориентируйтесь на <b>класс</b> вещества и формулировку билета; спорные случаи (очень слабая кислота, мало растворимая соль) решаются контекстом задания и таблицей растворимости.
+						</div>
+					</div>
+					<div class="lesson-block">
+						<h3>Сильные и слабые электролиты</h3>
+						<p><b>Сильные</b> диссоциируют почти полностью: HCl, HNO₃, H₂SO₄ (первая ступень), NaOH, KOH, большинство растворимых солей.</p>
+						<p><b>Слабые</b> — частично: H₂CO₃, CH₃COOH, NH₃·H₂O (как слабое основание в воде), вода.</p>
+					</div>
+				</section>
+
+				<section class="section" id="dissociation">
+					<div class="section-title">
+						<h2>3. Уравнения электролитической диссоциации</h2>
+						<p>Стрелка «→» в сторону ионов</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Правила записи</h3>
+						<ul>
+							<li>Катионы пишут справа с положительным зарядом, анионы — с отрицательным.</li>
+							<li>Сумма зарядов слева (0 для нейтральной молекулы) равна сумме зарядов справа с учётом коэффициентов.</li>
+							<li>Многоосновная кислота диссоциирует по ступеням; в простых заданиях ОГЭ часто достаточно первой ступени или полной для сильной кислоты по условию.</li>
+						</ul>
+						<span class="formula">NaCl → Na⁺ + Cl⁻</span>
+						<span class="formula" style="margin-left:8px;">H₂SO₄ → 2H⁺ + SO₄²⁻</span>
+						<span class="formula" style="display:block; margin-top:8px;">Ba(OH)₂ → Ba²⁺ + 2OH⁻</span>
+					</div>
+				</section>
+
+				<section class="section" id="ionic">
+					<div class="section-title">
+						<h2>4. Ионные уравнения (связь с реакциями)</h2>
+						<p>Сокращение спектаторов</p>
+					</div>
+					<div class="lesson-block">
+						<h3>От молекулярного к сокращённому</h3>
+						<p>Сильные электролиты в уравнении записывают <b>ионами</b>; слабые электролиты, осадки, газы — в <b>молекулярном</b> виде. Ионы, которые не меняются, вычёркивают как <b>спектаторы</b> — получают сокращённое ионное уравнение.</p>
+						<p>Это тот же логический слой, что и <b>реакция ионного обмена</b> в теме&nbsp;05: сначала убедитесь, что реакция возможна (осадок / газ / вода).</p>
+					</div>
+				</section>
+
+				<section class="section" id="oge-cheat">
+					<div class="section-title">
+						<h2>5. Шпаргалка для части 1</h2>
+						<p>Быстрый выбор в тесте</p>
+					</div>
+					<div class="card" style="padding: 20px;">
+						<table class="cheat-table" style="margin-top:0;">
+							<thead>
+								<tr>
+									<th>Вещество (школьный уровень)</th>
+									<th>В водном растворе</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Растворимая соль, сильная кислота, щёлочь</td>
+									<td><b>Сильный электролит</b> → в уравнении диссоциации и в полном ионном — ионы</td>
+								</tr>
+								<tr>
+									<td>Слабая кислота / NH₃·H₂O</td>
+									<td><b>Слабый электролит</b> → в ионных уравнениях чаще «как молекула»</td>
+								</tr>
+								<tr>
+									<td>Вода</td>
+									<td>Очень слабый электролит; H⁺ и OH⁻ — в отдельных заданиях про pH</td>
+								</tr>
+								<tr>
+									<td>Осадок после обмена</td>
+									<td>В ионном уравнении <b>не раскладывать</b></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="lesson-block" id="oge-recipe">
+						<h3>Алгоритм на минуту</h3>
+						<ol>
+							<li>Определите класс вещества и сильный ли это электролит.</li>
+							<li>Запишите диссоциацию: катион(ы) + анион(ы), проверьте заряды и коэффициенты.</li>
+							<li>Для ионного уравнения: перепишите только то, что реально реагирует; спектаторов уберите.</li>
+						</ol>
+					</div>
+				</section>
+
+				<section class="section" id="extra">
+					<div class="section-title">
+						<h2>6. Дополнительно</h2>
+					</div>
+					<details class="theory-acc">
+						<summary>Степень диссоциации α</summary>
+						<div class="theory-content">
+							<p>Для слабых электролитов доля распавшихся молекул α = n<sub>дисс</sub>/n<sub>общ</sub>. На ОГЭ реже считают численно, чаще качественно сравнивают «сильнее / слабее».</p>
+						</div>
+					</details>
+					<details class="theory-acc">
+						<summary>Гидролиз солей (кратко)</summary>
+						<div class="theory-content">
+							<p>Взаимодействие ионов соли с водой может сдвигать pH раствора. Для части 1 важно не путать гидролиз с простой диссоциацией — разные типы заданий.</p>
+						</div>
+					</details>
+				</section>
+
+				<section class="section" id="subtopics-section">
+					<div class="section-title">
+						<h2>Подтемы · чеклист</h2>
+						<p>Отметьте, что уже прочитали и поняли</p>
+					</div>
+					<div class="subtopics" id="subtopics-root" aria-label="Чеклист подтем темы 06"></div>
+					<p class="subtopics-hint">Статус сохраняется в браузере. Кнопка «к разделу» ведёт к нужному заголовку.</p>
+				</section>
+
+				<section class="section" id="train">
+					<div class="card" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; background: linear-gradient(135deg, #eaf0fb 0%, #f7f8fb 100%); border-color: transparent;">
+						<div style="flex:1; min-width:260px;">
+							<div style="font-size: 12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color: var(--accent); margin-bottom:6px;">Тренировка</div>
+							<h3 style="font-size: 22px; font-weight: 800; letter-spacing:-.01em;">Закрепить тему 06</h3>
+							<p style="color: var(--muted); margin-top:6px; font-size:14px;">Подборка по слотам 13–14. Не хватит пяти вопросов — доберётся из общего пула. Реакции в растворе — в <a href="./warmup-chemistry.html?topic=reactions" style="color:var(--accent); font-weight:600;">разминке темы 05</a>. Катионы металлов в задачах на вытеснение — <a href="./topic-metals-compounds.html" style="color:var(--accent); font-weight:600;">тема 07</a>.</p>
+						</div>
+						<div style="display:flex; gap:10px; flex-wrap: wrap;">
+							<a href="./warmup-chemistry.html" class="btn btn--ghost" style="background:#fff;">Любая разминка</a>
+							<a href="./warmup-chemistry.html?topic=solutions" class="btn btn--primary">Разминка тема 06 →</a>
+						</div>
+					</div>
+				</section>
+
+				<section class="section">
+					<div class="section-title">
+						<h2>Рядом в курсе</h2>
+					</div>
+					<div class="related-row">
+						<a href="./topic-chemical-reactions.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h16M8 10h8M6 6l2 4M16 6l-2 4M6 18l2-4M16 18l-2-4"/></svg></span>
+							<div>
+								<div class="related__name">Тема 05 · Химические реакции</div>
+								<div class="related__meta">Ионный обмен в растворе</div>
+							</div>
+						</a>
+						<a href="./topic-inorganic-classes.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16M8 17V9l4-3 4 3v8"/><path d="M8 13h8M10 9h4"/></svg></span>
+							<div>
+								<div class="related__name">Тема 04 · Классы соединений</div>
+								<div class="related__meta">Кислоты, соли, основания</div>
+							</div>
+						</a>
+					</div>
+					<div class="related-row" style="margin-top:12px;">
+						<a href="./topic-chemical-bond.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h8M12 8v8"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/></svg></span>
+							<div>
+								<div class="related__name">Тема 03 · Химическая связь</div>
+								<div class="related__meta">Ионная и полярная ковалентная</div>
+							</div>
+						</a>
+						<a href="./topic-metals-compounds.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17V9M9 12l3-5 3 5"/></svg></span>
+							<div>
+								<div class="related__name">Тема 07 · Металлы</div>
+								<div class="related__meta">Ионы в солях и реакции</div>
+							</div>
+						</a>
+					</div>
+					<div class="related-row" style="margin-top:12px;">
+						<a href="./mistakes-chemistry.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/><path d="M3 9h3M3 15h3M18 9h3M18 15h3M9 3v3M15 3v3M9 18v3M15 18v3"/></svg></span>
+							<div>
+								<div class="related__name">Работа над ошибками</div>
+								<div class="related__meta">Банк личных промахов</div>
+							</div>
+						</a>
+						<a href="./subject-chemistry.html#formats" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v7L5 20a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-10V3"/><path d="M7 16h10"/></svg></span>
+							<div>
+								<div class="related__name">Форматы тестов</div>
+								<div class="related__meta">К предмету</div>
+							</div>
+						</a>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<footer class="footer">
+			<div class="container footer__row">
+				<span>© IQMO · 2026</span>
+				<span>Химия · ОГЭ · Тема 06 · Растворы и ЭДД</span>
+			</div>
+		</footer>
+
+		<script src="./iqmo-sync.js"></script>
+		<script src="./chem-progress.js"></script>
+		<script src="./mistakes-store.js"></script>
+		<script src="./chemistry-topic-map.js"></script>
+		<script>
+			(function () {
+				const SUBTOPIC_LS = 'iqmo-chem-topic06-subtopics';
+				const SUBTOPIC_ITEMS = [
+					{ name: 'Раствор: растворитель и растворённое вещество', scroll: '#why' },
+					{ name: 'Электролиты, неэлектролиты, сила электролита', scroll: '#electrolytes' },
+					{ name: 'Уравнения электролитической диссоциации', scroll: '#dissociation' },
+					{ name: 'Ионные уравнения и спектаторы', scroll: '#ionic' },
+					{ name: 'Шпаргалка и алгоритм для теста ОГЭ', scroll: '#oge-cheat' },
+					{ name: 'Фокус ОГЭ: слоты 13–14', scroll: '#oge-focus' }
+				];
+				const N_SUB = 6;
+
+				function readSubtopicState() {
+					try {
+						const raw = localStorage.getItem(SUBTOPIC_LS);
+						if (!raw) return Array(N_SUB).fill(0);
+						const a = JSON.parse(raw);
+						if (!Array.isArray(a)) return Array(N_SUB).fill(0);
+						const mapped = a.map(function (x) {
+							return x === 2 ? 2 : x === 1 ? 1 : 0;
+						});
+						if (mapped.length < N_SUB) {
+							return mapped.concat(Array(N_SUB - mapped.length).fill(0));
+						}
+						if (mapped.length > N_SUB) return mapped.slice(0, N_SUB);
+						return mapped;
+					} catch (e) {
+						return Array(N_SUB).fill(0);
+					}
+				}
+				function saveSubtopicState(st) {
+					try {
+						localStorage.setItem(SUBTOPIC_LS, JSON.stringify(st));
+					} catch (e) {}
+				}
+				function subtopicClass(st) {
+					if (st === 2) return 'is--done';
+					if (st === 1) return 'is--partial';
+					return '';
+				}
+				function renderSubtopics() {
+					const root = document.getElementById('subtopics-root');
+					if (!root) return;
+					const st = readSubtopicState();
+					root.innerHTML = SUBTOPIC_ITEMS.map(function (item, i) {
+						const status = st[i];
+						const cls = subtopicClass(status);
+						let checkInner = '';
+						if (status === 2) {
+							checkInner =
+								'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+						} else if (status === 1) {
+							checkInner =
+								'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+						}
+						const meta = status === 2 ? 'освоено' : status === 1 ? 'в процессе' : 'не отмечено';
+						return (
+							'<div class="subtopic-row">' +
+							'<button type="button" class="subtopic ' +
+							cls +
+							'" data-idx="' +
+							i +
+							'" aria-label="Статус подтемы: ' +
+							meta +
+							'. Нажмите, чтобы изменить.">' +
+							'<span class="subtopic__check">' +
+							checkInner +
+							'</span>' +
+							'<span class="subtopic__name">' +
+							item.name +
+							'</span>' +
+							'<span class="subtopic__meta">' +
+							meta +
+							'</span>' +
+							'<span class="subtopic__go" aria-hidden="true">→</span>' +
+							'</button>' +
+							'<a href="' +
+							item.scroll +
+							'" class="btn btn--ghost" style="padding:9px 14px; font-size:13px;">К разделу</a>' +
+							'</div>'
+						);
+					}).join('');
+					root.querySelectorAll('.subtopic[data-idx]').forEach(function (btn) {
+						btn.addEventListener('click', function () {
+							const idx = parseInt(btn.getAttribute('data-idx'), 10);
+							const cur = readSubtopicState();
+							cur[idx] = (cur[idx] + 1) % 3;
+							saveSubtopicState(cur);
+							renderSubtopics();
+							updateHeroFromSubtopics();
+						});
+					});
+				}
+				function updateHeroFromSubtopics() {
+					const st = readSubtopicState();
+					const done = st.filter(function (x) {
+						return x === 2;
+					}).length;
+					const partial = st.filter(function (x) {
+						return x === 1;
+					}).length;
+					const pct = Math.min(100, Math.round((done * 100 + partial * 45) / N_SUB));
+					const valEl = document.getElementById('thero-progress-value');
+					const fillEl = document.getElementById('thero-progress-fill');
+					const subEl = document.getElementById('thero-progress-sub');
+					const extraEl = document.getElementById('thero-progress-extra');
+					if (valEl) {
+						valEl.textContent =
+							done + ' из ' + N_SUB + ' освоено' + (partial ? ' · ' + partial + ' в процессе' : '');
+					}
+					if (fillEl) fillEl.style.width = pct + '%';
+					let sub = '';
+					let extra = '';
+					if (window.ChemProgress) {
+						const la = ChemProgress.getLastAttempt();
+						if (la && la.subject === 'chemistry') {
+							sub =
+								'Последний тест: ' +
+								la.correct +
+								'/' +
+								la.total +
+								' (' +
+								la.percent +
+								'%) · ' +
+								ChemProgress.formatRelativeTime(la.finishedAt);
+						}
+					}
+					if (!sub) sub = 'Пройдите разминку по теме или вариант — здесь появится сводка.';
+					if (window.MistakesStore && window.ChemTopicMap && typeof ChemTopicMap.belongsToWarmupTopic === 'function') {
+						const n = MistakesStore.list().filter(function (m) {
+							return ChemTopicMap.belongsToWarmupTopic(m.qid, 'solutions');
+						}).length;
+						if (n > 0) {
+							const m10 = n % 10,
+								m100 = n % 100;
+							const ew =
+								m10 === 1 && m100 !== 11
+									? 'ошибка'
+									: m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)
+										? 'ошибки'
+										: 'ошибок';
+							extra = 'В банке по заданиям темы 06: ' + n + ' ' + ew;
+						}
+					}
+					if (subEl) subEl.textContent = sub;
+					if (extraEl) extraEl.textContent = extra || '';
+				}
+				renderSubtopics();
+				updateHeroFromSubtopics();
+			})();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="ru" class="page">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO — Профиль (этот браузер)</title>
+		<meta name="description" content="Сводка прогресса по химии ОГЭ: стрик, темы, ошибки. Данные хранятся только в вашем браузере." />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f3f5f8;
+				--ink: #11141a;
+				--ink-2: #2a2f38;
+				--muted: #6b7280;
+				--line: #e6e9ef;
+				--accent: #4f7bd6;
+				--accent-weak: #eaf0fb;
+				--green: #3ec37a;
+				--amber: #e39b2a;
+				--red: #d65a5a;
+				--radius: 18px;
+				--shadow: 0 1px 2px rgba(17, 20, 26, 0.04), 0 8px 24px -12px rgba(17, 20, 26, 0.08);
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+				color: var(--ink);
+				background: var(--bg);
+				font-size: 16px;
+				line-height: 1.5;
+				-webkit-font-smoothing: antialiased;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+			button {
+				font-family: inherit;
+				cursor: pointer;
+			}
+			h1,
+			h2,
+			h3,
+			p {
+				margin: 0;
+			}
+			.container {
+				width: 100%;
+				max-width: 1220px;
+				margin: 0 auto;
+				padding: 0 24px;
+			}
+
+			.header {
+				background: #fff;
+				border-bottom: 1px solid var(--line);
+				padding: 18px 0;
+				position: sticky;
+				top: 0;
+				z-index: 20;
+			}
+			.header__container {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 24px;
+			}
+			.logo svg {
+				display: block;
+				height: 24px;
+			}
+			.header__btns {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				justify-content: flex-end;
+			}
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				font-weight: 600;
+				font-size: 14px;
+				padding: 10px 20px;
+				border-radius: 999px;
+				border: 1.5px solid transparent;
+				transition: transform 0.08s, filter 0.15s, border-color 0.15s;
+				white-space: nowrap;
+				cursor: pointer;
+				background: none;
+			}
+			.btn:active {
+				transform: translateY(1px);
+			}
+			.btn--primary {
+				background: linear-gradient(180deg, #44c77d, #2fa965);
+				color: #fff;
+				box-shadow: 0 8px 20px -8px rgba(62, 195, 122, 0.55);
+			}
+			.btn--primary:hover {
+				filter: brightness(1.05);
+			}
+			.btn--ghost {
+				background: #fff;
+				border-color: var(--line);
+				color: var(--ink);
+			}
+			.btn--ghost:hover {
+				border-color: var(--ink);
+			}
+			.btn--danger {
+				background: #fff;
+				border-color: #f0caca;
+				color: #b23e3e;
+			}
+			.btn--danger:hover {
+				border-color: #b23e3e;
+				background: #fff7f7;
+			}
+
+			.page__main {
+				flex: 1 0 auto;
+				padding: 8px 0 56px;
+			}
+			.crumbs {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+				font-size: 13px;
+				color: var(--muted);
+				padding: 14px 0 0;
+				flex-wrap: wrap;
+			}
+			.crumbs a:hover {
+				color: var(--accent);
+			}
+			.crumbs__sep {
+				opacity: 0.5;
+			}
+
+			.page-title {
+				margin-top: 20px;
+				font-size: clamp(24px, 3vw, 30px);
+				font-weight: 800;
+				letter-spacing: -0.02em;
+			}
+			.page-lead {
+				margin-top: 8px;
+				font-size: 15px;
+				color: var(--ink-2);
+				max-width: 720px;
+			}
+			.callout {
+				margin-top: 18px;
+				padding: 14px 18px;
+				border-radius: 14px;
+				background: var(--accent-weak);
+				border: 1px solid #d9e3f6;
+				font-size: 14px;
+				color: var(--ink-2);
+			}
+			.callout strong {
+				color: var(--ink);
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+				gap: 14px;
+				margin-top: 22px;
+			}
+			.card {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				padding: 20px 22px;
+			}
+			.card h2 {
+				font-size: 15px;
+				font-weight: 800;
+				margin-bottom: 10px;
+				letter-spacing: -0.01em;
+			}
+			.card p {
+				font-size: 14px;
+				color: var(--ink-2);
+				margin: 0 0 8px;
+			}
+			.card p:last-child {
+				margin-bottom: 0;
+			}
+			.card a.link {
+				color: var(--accent);
+				font-weight: 700;
+				text-decoration: underline;
+				text-underline-offset: 2px;
+			}
+			.mono {
+				font-family: ui-monospace, Menlo, Consolas, monospace;
+				font-size: 13px;
+				word-break: break-all;
+				color: var(--ink-2);
+				background: #f7f8fb;
+				padding: 8px 10px;
+				border-radius: 8px;
+				border: 1px solid var(--line);
+				margin-top: 8px;
+			}
+			.stat-big {
+				font-size: 28px;
+				font-weight: 800;
+				color: var(--accent);
+				letter-spacing: -0.02em;
+			}
+			.stat-label {
+				font-size: 13px;
+				color: var(--muted);
+				margin-top: 4px;
+			}
+
+			.table-wrap {
+				margin-top: 22px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				overflow: hidden;
+			}
+			.table-wrap h2 {
+				font-size: 16px;
+				font-weight: 800;
+				padding: 18px 22px 0;
+				margin: 0;
+			}
+			.table-wrap .hint {
+				font-size: 13px;
+				color: var(--muted);
+				padding: 6px 22px 14px;
+			}
+			table.prof {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 14px;
+			}
+			table.prof th,
+			table.prof td {
+				padding: 12px 16px;
+				text-align: left;
+				border-top: 1px solid var(--line);
+			}
+			table.prof th {
+				background: #f7f8fb;
+				font-weight: 700;
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: var(--muted);
+			}
+			table.prof td a {
+				color: var(--accent);
+				font-weight: 600;
+				text-decoration: underline;
+				text-underline-offset: 2px;
+			}
+			.pct {
+				font-weight: 700;
+				font-variant-numeric: tabular-nums;
+			}
+			.pct.is--ok {
+				color: var(--green);
+			}
+			.pct.is--mid {
+				color: var(--amber);
+			}
+			.pct.is--low {
+				color: var(--muted);
+			}
+
+			.actions {
+				margin-top: 22px;
+				padding: 20px 22px;
+				border-radius: var(--radius);
+				border: 1px solid #f0caca;
+				background: #fffbfb;
+			}
+			.actions h2 {
+				font-size: 15px;
+				font-weight: 800;
+				color: #8b2929;
+				margin-bottom: 8px;
+			}
+			.actions p {
+				font-size: 14px;
+				color: var(--ink-2);
+				margin-bottom: 12px;
+			}
+
+			.prof-guide ul {
+				margin: 8px 0 0;
+				padding-left: 1.15em;
+				font-size: 14px;
+				color: var(--ink-2);
+				line-height: 1.55;
+			}
+			.prof-guide li + li {
+				margin-top: 8px;
+			}
+			.prof-guide .hint {
+				margin-top: 14px;
+				font-size: 13px;
+				color: var(--muted);
+			}
+			.prof-guide > .callout {
+				margin-top: 0;
+				margin-bottom: 14px;
+			}
+
+			.prof-milestones {
+				background: #fff;
+			}
+			.prof-milestones__lead {
+				margin-bottom: 14px;
+				max-width: 52em;
+			}
+			.prof-badges {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 14px;
+				align-items: flex-start;
+				margin: 0;
+				padding: 16px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				min-height: 0;
+			}
+			.prof-badges.is--empty {
+				padding: 14px 16px;
+			}
+			.prof-badge-tile {
+				position: relative;
+				flex: 0 0 auto;
+				cursor: help;
+				-webkit-appearance: none;
+				appearance: none;
+				border: none;
+				padding: 0;
+				margin: 0;
+				background: transparent;
+				font: inherit;
+				border-radius: 14px;
+			}
+			.prof-badge-tile:focus {
+				outline: none;
+			}
+			.prof-badge-tile:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 3px;
+			}
+			.prof-badge-tile__icon {
+				display: block;
+				width: 80px;
+				height: 80px;
+				object-fit: contain;
+				border-radius: 14px;
+				background: #fff;
+				box-shadow: 0 2px 8px rgba(17, 20, 26, 0.08);
+				vertical-align: top;
+			}
+			.prof-badge-tip {
+				position: absolute;
+				left: 50%;
+				bottom: calc(100% + 10px);
+				transform: translateX(-50%);
+				width: min(280px, calc(100vw - 48px));
+				padding: 12px 14px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				box-shadow: 0 8px 28px rgba(17, 20, 26, 0.12);
+				opacity: 0;
+				visibility: hidden;
+				pointer-events: none;
+				z-index: 50;
+				transition: opacity 0.12s ease, visibility 0.12s ease;
+				text-align: left;
+			}
+			.prof-badge-tip::after {
+				content: '';
+				position: absolute;
+				left: 50%;
+				top: 100%;
+				transform: translateX(-50%);
+				border: 8px solid transparent;
+				border-top-color: #fff;
+				filter: drop-shadow(0 1px 0 var(--line));
+			}
+			.prof-badge-tile:hover .prof-badge-tip,
+			.prof-badge-tile:focus .prof-badge-tip,
+			.prof-badge-tile:focus-within .prof-badge-tip {
+				opacity: 1;
+				visibility: visible;
+				pointer-events: auto;
+			}
+			.prof-badge-tip__title {
+				display: block;
+				font-weight: 800;
+				font-size: 14px;
+				color: var(--ink);
+				margin: 0 0 6px;
+				letter-spacing: -0.01em;
+			}
+			.prof-badge-tip__text {
+				display: block;
+				font-size: 13px;
+				color: var(--ink-2);
+				margin: 0 0 8px;
+				line-height: 1.45;
+			}
+			.prof-badge-tip__date {
+				font-size: 12px;
+				color: var(--muted);
+				margin: 0;
+			}
+
+			.footer {
+				background: #fff;
+				border-top: 1px solid var(--line);
+				margin-top: auto;
+				font-size: 13px;
+				color: var(--muted);
+			}
+			.footer__inner {
+				padding: 24px;
+				display: flex;
+				justify-content: space-between;
+				gap: 16px;
+				flex-wrap: wrap;
+			}
+			.footer a:hover {
+				color: var(--accent);
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class="container header__container">
+				<a href="./index.html" class="logo" aria-label="IQMO — главная">
+					<svg width="90" height="24" viewBox="0 0 90 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<text x="0" y="19" font-family="Manrope, sans-serif" font-size="20" font-weight="800" letter-spacing="0.5" fill="#11141a">IQMO</text>
+					</svg>
+				</a>
+				<div class="header__btns">
+					<a href="./uploads/login.html" class="btn btn--ghost" id="prof-header-login">Вход</a>
+					<a href="./subject-chemistry.html" class="btn btn--ghost">Химия · ОГЭ</a>
+				</div>
+			</div>
+		</header>
+
+		<main class="page__main">
+			<div class="container">
+				<nav class="crumbs" aria-label="Навигация">
+					<a href="./index.html">Главная</a>
+					<span class="crumbs__sep">/</span>
+					<span>Профиль</span>
+				</nav>
+
+				<h1 class="page-title">Профиль</h1>
+				<p class="page-lead" id="prof-page-lead">
+					Здесь собран прогресс по химии ОГЭ. Без входа данные живут только в этом браузере; после входа на
+					<strong>серверной версии сайта</strong> прогресс синхронизируется между устройствами.
+				</p>
+				<div class="callout">
+					<strong>Идентификатор для поддержки:</strong> короткий анонимный код (не передавайте его посторонним). Нужен, если напишете в поддержку про баги в тестах.
+					<div class="mono" id="prof-anon">—</div>
+				</div>
+
+				<div class="card" id="prof-account-card" style="margin-top: 18px">
+					<h2>Аккаунт</h2>
+					<p class="stat-label" id="prof-account-line1">—</p>
+					<p class="stat-label" id="prof-account-line2" style="margin-top: 8px"></p>
+					<div id="prof-account-actions" style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px"></div>
+					<div id="prof-backups" style="margin-top: 14px; font-size: 13px; color: var(--muted); display: none"></div>
+				</div>
+
+				<div class="card prof-milestones" style="margin-top: 18px">
+					<h2>Вехи</h2>
+					<p class="stat-label prof-milestones__lead">
+						Редкие значки за отдельные события. Полного списка нет — не ради коллекции, а просто приятный знак
+						прогресса. Наведите курсор на значок, чтобы прочитать, за что он выдан.
+					</p>
+					<div class="prof-badges" id="prof-badges"></div>
+				</div>
+
+				<div class="grid" id="prof-cards">
+					<div class="card">
+						<h2>Серия дней</h2>
+						<div class="stat-big" id="prof-streak">0</div>
+						<p class="stat-label" id="prof-streak-meta">Стрик растёт за дни, когда вы выполняете дневную цель.</p>
+					</div>
+					<div class="card">
+						<h2>Время на сайте</h2>
+						<div class="stat-big" id="prof-time">0 мин</div>
+						<p class="stat-label" id="prof-time-meta">
+							Суммарно с открытой вкладкой курса на переднем плане (как для XP за активность).
+						</p>
+					</div>
+					<div class="card">
+						<h2>Завершённые попытки</h2>
+						<div class="stat-big" id="prof-attempts">0</div>
+						<p class="stat-label" id="prof-attempts-meta">Тесты и варианты, по которым засчитан прогресс.</p>
+					</div>
+					<div class="card">
+						<h2>Банк ошибок</h2>
+						<div class="stat-big" id="prof-mistakes">0</div>
+						<p class="stat-label">
+							<a class="link" href="./mistakes-chemistry.html">Открыть работу над ошибками →</a>
+						</p>
+					</div>
+					<div class="card">
+						<h2>Пробник</h2>
+						<p id="prof-trial">—</p>
+					</div>
+					<div class="card">
+						<h2>Уровень</h2>
+						<div class="stat-big" id="prof-stage">1</div>
+						<p class="stat-label" id="prof-stage-meta">50 уровней: чем выше уровень, тем больше XP нужно до следующего.</p>
+					</div>
+					<div class="card">
+						<h2>Баллы прогресса</h2>
+						<div class="stat-big" id="prof-pts">0</div>
+						<p class="stat-label" id="prof-pts-meta">За неделю: +0 · Сегодня: 0 / 10</p>
+					</div>
+					<div class="card">
+						<h2>Лига недели (личная)</h2>
+						<div class="stat-big" id="prof-league">—</div>
+						<p class="stat-label" id="prof-league-meta">Сравнение этой недели с вашими прошлыми неделями.</p>
+					</div>
+				</div>
+
+				<div class="card" style="margin-top: 14px">
+					<h2>Последняя тренировка / вариант</h2>
+					<p id="prof-last">Записей пока нет — пройдите разминку или тест.</p>
+					<p><a class="link" href="./subject-chemistry.html">Перейти к химии →</a></p>
+				</div>
+
+				<div class="table-wrap">
+					<h2>Чеклисты по темам</h2>
+					<p class="hint">Статусы подтем на страницах курса (не начато → в процессе → освоено).</p>
+					<table class="prof">
+						<thead>
+							<tr>
+								<th>Тема</th>
+								<th>Прогресс</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody id="prof-topics-body"></tbody>
+					</table>
+				</div>
+
+				<div class="actions">
+					<h2>Сбросить данные химии</h2>
+					<p id="prof-reset-desc">
+						Удаляются прогресс по темам, ошибки, пробник, стрик, черновики полных вариантов и служебные ключи с префиксом
+						<code>iqmo-chem-</code> в localStorage. Если вы вошли в аккаунт, после сброса пустое состояние отправится на сервер.
+						Действие необратимо.
+					</p>
+					<button type="button" class="btn btn--danger" id="prof-reset">Сбросить данные</button>
+				</div>
+
+				<div class="card prof-guide" style="margin-top: 22px">
+					<h2>Как прокачивать профиль: уровень и баллы</h2>
+					<div class="callout">
+						<strong>Главное на сайте — не уровни и не баллы.</strong> Они лишь дополнительная мотивация
+						держать ритм занятий. Настоящая цель — получить знания, готовиться к ОГЭ и ЕГЭ и уверенно сдать
+						экзамены: развиваться, становиться умнее. Прокачивать стоит в первую очередь себя, а не цифры в
+						профиле; не стоит гнаться за XP в ущерб глубокому пониманию тем.
+					</div>
+					<p>
+						<strong>Баллы прогресса</strong> и <strong>уровень (1–50)</strong> считаются от одной суммы XP. Уровень растёт ступенями: чем выше уровень, тем больше нужно XP до следующего. Подпись под уровнем (например, «Новичок» или «Практик») меняется по номеру уровня.
+					</p>
+					<p style="margin-top: 10px"><strong>Что добавляет XP</strong></p>
+					<ul>
+						<li>
+							<strong>Завершённые тесты</strong> — разминка, быстрый тест, пробник, полный вариант. Награда зависит от режима, числа верных ответов и качества результата (бонусы за процент; у полного варианта — отдельные бонусы за часть 1). Количество таких попыток видно в плитке «Завершённые попытки».
+						</li>
+						<li>
+							<strong>Серия дней</strong> — если за календарный день вы закрываете дневную цель (сейчас это <strong>10 заданий</strong> в учтённых попытках), день засчитывается в серию. Чем длиннее серия, тем выше множитель к XP <em>с тестов</em> в следующих попытках (до примерно <strong>+18%</strong> к сумме за попытку).
+						</li>
+						<li>
+							<strong>Первый визит за день</strong> на страницы с учётом прогресса — <strong>+10 XP</strong> (один раз в сутки).
+						</li>
+						<li>
+							<strong>Активная вкладка</strong> — если вы занимаетесь и вкладка в фокусе, примерно каждые <strong>3 минуты</strong> непрерывной активности начисляется <strong>+3 XP</strong>; в сутках не больше <strong>14</strong> таких начислений. Накопленное время с открытой вкладкой также отображается в плитке «Время на сайте».
+						</li>
+						<li>
+							<strong>Вехи</strong> — короткие названия и картинки за события: старт в браузере, 10 попыток, попытка без
+							ошибок (от 5 вопросов), 7 дней с целью подряд, тема целиком освоена, 50-й уровень. Не коллекция «на всё»,
+							а отдельные знаки успеха.
+						</li>
+					</ul>
+					<p class="hint" id="prof-guide-hint">
+						Счётчик «баллы за неделю» и лига — это накопление XP за календарную неделю для сравнения с вашими прошлыми неделями. Без входа данные только в этом браузере; после входа на серверной версии сайта они подгружаются с облака.
+					</p>
+				</div>
+			</div>
+		</main>
+
+		<footer class="footer">
+			<div class="container footer__inner">
+				<span>© IQMO · 2026</span>
+				<span><a href="./index.html">На главную</a></span>
+			</div>
+		</footer>
+
+		<script src="./iqmo-sync.js"></script>
+		<script src="./chem-progress.js"></script>
+		<script src="./mistakes-store.js"></script>
+		<script>
+			(function () {
+				const TOPICS = [
+					{ key: 'iqmo-chem-topic01-subtopics', n: 6, href: './topic-periodic-table.html', label: '01 · Периодическая система' },
+					{ key: 'iqmo-chem-topic02-subtopics', n: 6, href: './topic-atom-structure.html', label: '02 · Строение атома' },
+					{ key: 'iqmo-chem-topic03-subtopics', n: 7, href: './topic-chemical-bond.html', label: '03 · Химическая связь' },
+					{ key: 'iqmo-chem-topic04-subtopics', n: 6, href: './topic-inorganic-classes.html', label: '04 · Классы неорганики' },
+					{ key: 'iqmo-chem-topic05-subtopics', n: 6, href: './topic-chemical-reactions.html', label: '05 · Реакции' },
+					{ key: 'iqmo-chem-topic06-subtopics', n: 6, href: './topic-solutions-dissociation.html', label: '06 · Растворы' },
+					{ key: 'iqmo-chem-topic07-subtopics', n: 6, href: './topic-metals-compounds.html', label: '07 · Металлы' },
+					{ key: 'iqmo-chem-topic08-subtopics', n: 7, href: './topic-nonmetals-compounds.html', label: '08 · Неметаллы' },
+					{ key: 'iqmo-chem-topic09-subtopics', n: 7, href: './topic-organic-substances.html', label: '09 · Органика' },
+					{ key: 'iqmo-chem-topic10-subtopics', n: 7, href: './topic-life-ecology.html', label: '10 · Экология' }
+				];
+
+				function readArr(key, n) {
+					try {
+						const raw = localStorage.getItem(key);
+						if (!raw) return null;
+						const a = JSON.parse(raw);
+						if (!Array.isArray(a)) return null;
+						const mapped = a.map(function (x) {
+							return x === 2 ? 2 : x === 1 ? 1 : 0;
+						});
+						if (mapped.length < n) {
+							return mapped.concat(Array(n - mapped.length).fill(0));
+						}
+						if (mapped.length > n) return mapped.slice(0, n);
+						return mapped;
+					} catch (e) {
+						return null;
+					}
+				}
+
+				function topicPct(arr, n) {
+					if (!arr) return { pct: 0, done: 0, partial: 0, empty: true };
+					let done = 0,
+						partial = 0;
+					for (let i = 0; i < n; i++) {
+						if (arr[i] === 2) done++;
+						else if (arr[i] === 1) partial++;
+					}
+					const pct = Math.min(100, Math.round((done * 100 + partial * 45) / n));
+					return { pct, done, partial, empty: done === 0 && partial === 0 };
+				}
+
+				function pctClass(pct, empty) {
+					if (empty) return 'pct is--low';
+					if (pct >= 85) return 'pct is--ok';
+					if (pct >= 40) return 'pct is--mid';
+					return 'pct is--low';
+				}
+
+				function modeRu(mode) {
+					if (mode === 'warmup') return 'Разминка';
+					if (mode === 'trial') return 'Пробник';
+					if (mode === 'full') return 'Полный вариант';
+					if (mode === 'quick') return 'Быстрый тест';
+					return mode || 'Тренировка';
+				}
+
+				function formatAttemptBreakdown(byMode) {
+					const bm = byMode || {};
+					const order = [
+						['warmup', 'разминка'],
+						['quick', 'быстрый'],
+						['trial', 'пробник'],
+						['full', 'полный'],
+						['other', 'другое']
+					];
+					const parts = [];
+					for (let i = 0; i < order.length; i++) {
+						const n = Math.max(0, Math.floor(Number(bm[order[i][0]]) || 0));
+						if (n) parts.push(order[i][1] + ' ' + n);
+					}
+					return parts.length ? parts.join(' · ') : '';
+				}
+
+				const BADGE_ORDER = [
+					'welcome',
+					'ten_tests',
+					'perfect_run',
+					'streak7',
+					'topic_star',
+					'final_sprint'
+				];
+				const BADGE_META = {
+					welcome: {
+						title: 'Старт',
+						text: 'Вы начали пользоваться курсом в этом браузере (анонимный профиль).',
+						img: 'welcome.png'
+					},
+					ten_tests: {
+						title: 'Десятка',
+						text: 'Завершено не меньше 10 учтённых попыток (разминка, быстрый тест, пробник, полный).',
+						img: 'ten-tests.png'
+					},
+					perfect_run: {
+						title: 'Чисто',
+						text: 'Попытка без ошибок: 100% при не меньше 5 вопросах в зачёте.',
+						img: 'perfect.png'
+					},
+					streak7: {
+						title: 'Неделя ритма',
+						text: '7 дней подряд закрывалась дневная цель по заданиям.',
+						img: 'streak-7.png'
+					},
+					topic_star: {
+						title: 'Мастер темы',
+						text: 'Хотя бы одна тема курса полностью отмечена как освоенная.',
+						img: 'topic-star.png'
+					},
+					final_sprint: {
+						title: 'Финишный рывок',
+						text: 'Достигнут максимальный уровень (50) по баллам прогресса.',
+						img: 'final-sprint.png'
+					}
+				};
+
+				function renderProfBadges(snap) {
+					const el = document.getElementById('prof-badges');
+					if (!el) return;
+					const badges = (snap && snap.badges) || {};
+					const ids = BADGE_ORDER.filter(function (id) {
+						return !!badges[id];
+					});
+					if (!ids.length) {
+						el.className = 'prof-badges is--empty';
+						el.innerHTML =
+							'<p class="stat-label" style="margin:0; max-width:40em">Пока ни одной открытой вехи — это нормально. Значки появляются сами; полного списка нет и собирать коллекцию не нужно.</p>';
+						return;
+					}
+					el.className = 'prof-badges';
+					let html = '';
+					for (let i = 0; i < ids.length; i++) {
+						const id = ids[i];
+						const meta = BADGE_META[id] || { title: id, text: '', img: '' };
+						const ts = badges[id];
+						const when =
+							ts && typeof ts === 'number'
+								? new Date(ts).toLocaleDateString('ru-RU', {
+										day: 'numeric',
+										month: 'short',
+										year: 'numeric'
+									})
+								: '';
+						const aria = (
+							meta.title +
+							'. ' +
+							meta.text +
+							(when ? ' Получено: ' + when + '.' : '')
+						)
+							.replace(/&/g, '&amp;')
+							.replace(/"/g, '&quot;')
+							.replace(/</g, '&lt;');
+						const icon =
+							meta.img ?
+								'<img class="prof-badge-tile__icon" src="./badges/' +
+								meta.img +
+								'" alt="" width="80" height="80" loading="lazy" />'
+							:	'';
+						html +=
+							'<button type="button" class="prof-badge-tile" aria-label="' + aria + '">' +
+							icon +
+							'<span class="prof-badge-tip" role="tooltip">' +
+							'<span class="prof-badge-tip__title">' +
+							meta.title +
+							'</span>' +
+							'<span class="prof-badge-tip__text">' +
+							meta.text +
+							'</span>' +
+							(when ?
+								'<span class="prof-badge-tip__date">' + when + '</span>'
+							:	'') +
+							'</span>' +
+							'</button>';
+					}
+					el.innerHTML = html;
+				}
+
+				function paintProfileBody() {
+				if (window.ChemProgress) {
+					ChemProgress.ensureAnonId();
+					const id = (function () {
+						try {
+							return localStorage.getItem('iqmo-chem-anon-id') || '—';
+						} catch (e) {
+							return '—';
+						}
+					})();
+					const el = document.getElementById('prof-anon');
+					if (el) el.textContent = id.length > 24 ? id.slice(0, 10) + '…' + id.slice(-8) : id;
+				}
+
+				try {
+					const streak = JSON.parse(localStorage.getItem('iqmo-chem-streak') || 'null') || { days: 0, lastDay: null };
+					document.getElementById('prof-streak').textContent = String(streak.days || 0);
+					const ld = streak.lastDay ? 'Последний засчитанный день: ' + streak.lastDay + '.' : 'Ещё нет засчитанных дней.';
+					document.getElementById('prof-streak-meta').textContent = ld + ' Стрик растёт за дни, когда вы выполняете дневную цель.';
+				} catch (e) {}
+
+				// Soft gamification snapshot (points / stage / league / daily goal)
+				try {
+					if (window.ChemProgress && typeof ChemProgress.getGamificationSnapshot === 'function') {
+						const snap = ChemProgress.getGamificationSnapshot();
+						// level (1–50)
+						const lv = snap.level || { current: 1, xpToNext: 0, progressFrac: 0, maxLevel: 50 };
+						const maxLv = lv.maxLevel || 50;
+						document.getElementById('prof-stage').textContent = String(lv.current) + ' / ' + String(maxLv);
+						document.getElementById('prof-stage-meta').textContent =
+							lv.current >= maxLv
+								? 'Максимальный уровень. Баллы прогресса продолжают копиться.'
+								: 'До уровня ' +
+									(lv.current + 1) +
+									': ещё ' +
+									(lv.xpToNext || 0) +
+									' XP · внутри уровня ~' +
+									Math.round((lv.progressFrac || 0) * 100) +
+									'%. Название: «' +
+									(snap.levelTitle || '') +
+									'».';
+
+						// points
+						document.getElementById('prof-pts').textContent = String(snap.totalPoints || 0);
+						const tms = snap.totalActiveMs != null ? snap.totalActiveMs : 0;
+						if (typeof ChemProgress.formatActiveDurationRu === 'function') {
+							document.getElementById('prof-time').textContent = ChemProgress.formatActiveDurationRu(tms);
+						} else {
+							document.getElementById('prof-time').textContent = String(Math.round(tms / 60000)) + ' мин';
+						}
+						const ast = snap.attemptStats || { total: 0, byMode: {} };
+						document.getElementById('prof-attempts').textContent = String(ast.total != null ? ast.total : 0);
+						const br = formatAttemptBreakdown(ast.byMode);
+						document.getElementById('prof-attempts-meta').textContent = br
+							? 'По режимам: ' + br + '.'
+							: 'Пока нет — пройдите разминку, быстрый тест или вариант на странице химии.';
+						const goal = snap.goal && snap.goal.type === 'tasks' ? snap.goal.target : 10;
+						const todayDone = snap.daily ? (snap.daily.tasksDone || 0) : 0;
+						const act = snap.activity || {};
+						document.getElementById('prof-time-meta').textContent =
+							'Всего ≈ ' +
+							Math.round(tms / 60000) +
+							' мин · сегодня шагов активности: ' +
+							(act.activeChunksToday != null ? act.activeChunksToday : 0) +
+							'/' +
+							(act.activeChunksMax != null ? act.activeChunksMax : 14) +
+							' (к XP). Считается только видимая вкладка; очень длинные паузы режутся порциями.';
+						document.getElementById('prof-pts-meta').textContent =
+							'За неделю: +' +
+							(snap.week ? snap.week.points : 0) +
+							' · Сегодня задач: ' +
+							todayDone +
+							' / ' +
+							goal +
+							' · активность: ' +
+							(act.activeChunksToday != null ? act.activeChunksToday : 0) +
+							'/' +
+							(act.activeChunksMax != null ? act.activeChunksMax : 14) +
+							' (XP за время на сайте)';
+
+						// league
+						const rank = snap.league ? snap.league.rank : 1;
+						const size = snap.league ? snap.league.size : 1;
+						document.getElementById('prof-league').textContent = String(rank) + ' / ' + String(size);
+						const gap = snap.league ? snap.league.gapToPrev : 0;
+						document.getElementById('prof-league-meta').textContent =
+							rank <= 1 ? 'Лучшая неделя за выбранный период.' : 'До места выше: +' + gap + ' балл.';
+
+						renderProfBadges(snap);
+					}
+				} catch (e) {}
+
+				if (window.MistakesStore) {
+					const n = MistakesStore.list().length;
+					document.getElementById('prof-mistakes').textContent = String(n);
+				}
+
+				(function trial() {
+					const el = document.getElementById('prof-trial');
+					try {
+						const raw = localStorage.getItem('iqmo-chem-trial-v1');
+						if (!raw) {
+							el.textContent = 'Пробник ещё не начинали.';
+							return;
+						}
+						const s = JSON.parse(raw);
+						if (s.finished) {
+							el.innerHTML = 'Последний пробник <strong>завершён</strong>. <a class="link" href="./trial-chemistry.html">Пройти снова →</a>';
+							return;
+						}
+						const answered = Object.keys(s.answers || {}).length;
+						el.innerHTML =
+							'Пробник <strong>в процессе</strong>: ответов ' +
+							answered +
+							' из 10. <a class="link" href="./trial-chemistry.html">Продолжить →</a>';
+					} catch (e) {
+						el.textContent = 'Не удалось прочитать состояние пробника.';
+					}
+				})();
+
+				(function lastAttempt() {
+					const el = document.getElementById('prof-last');
+					if (!window.ChemProgress) return;
+					const la = ChemProgress.getLastAttempt();
+					if (!la || la.subject !== 'chemistry') return;
+					const when = ChemProgress.formatRelativeTime(la.finishedAt);
+					el.innerHTML =
+						'<strong>' +
+						modeRu(la.mode) +
+						'</strong> · ' +
+						(la.label ? la.label + ' · ' : '') +
+						la.correct +
+						' / ' +
+						la.total +
+						' (' +
+						la.percent +
+						'%) · ' +
+						when;
+				})();
+
+				const tbody = document.getElementById('prof-topics-body');
+				tbody.innerHTML = TOPICS.map(function (t) {
+					const arr = readArr(t.key, t.n);
+					const st = topicPct(arr, t.n);
+					const noData = arr == null;
+					const sub = noData
+						? 'нет данных'
+						: st.done + ' освоено' + (st.partial ? ', ' + st.partial + ' в процессе' : '');
+					const pc = pctClass(st.pct, noData);
+					const pctCell = noData ? '—' : st.pct + '%';
+					return (
+						'<tr><td>' +
+						t.label +
+						'</td><td><span class="' +
+						pc +
+						'">' +
+						pctCell +
+						'</span> <span style="color:var(--muted); font-size:13px">' +
+						sub +
+						'</span></td><td><a href="' +
+						t.href +
+						'">К теме</a></td></tr>'
+					);
+				}).join('');
+				}
+
+				async function loadAccountPanel() {
+					const line1 = document.getElementById('prof-account-line1');
+					const line2 = document.getElementById('prof-account-line2');
+					const actions = document.getElementById('prof-account-actions');
+					const backups = document.getElementById('prof-backups');
+					const hdrLogin = document.getElementById('prof-header-login');
+					if (!line1 || !actions) return;
+					try {
+						const r = await fetch('/api/me', { credentials: 'include' });
+						if (!r.ok) {
+							line1.textContent =
+								'Вы не вошли. Прогресс хранится только локально. Чтобы синхронизировать между устройствами, откройте сайт через сервер (папка server → npm start) и войдите.';
+							line2.textContent = '';
+							actions.innerHTML =
+								'<a class="btn btn--primary" href="./uploads/login.html">Войти или зарегистрироваться</a>';
+							backups.style.display = 'none';
+							backups.innerHTML = '';
+							if (hdrLogin) hdrLogin.style.display = '';
+							return;
+						}
+						const me = await r.json();
+						line1.textContent = 'Вы вошли как ' + me.email + '. Данные курса синхронизируются с сервером.';
+						line2.textContent =
+							'Резервные копии создаются при каждом сохранении (до ~80 точек). Можно откатиться, если что-то перезаписали.';
+						if (hdrLogin) hdrLogin.style.display = 'none';
+						actions.innerHTML =
+							'<button type="button" class="btn btn--ghost" id="prof-btn-sync">Синхронизировать сейчас</button>' +
+							'<button type="button" class="btn btn--ghost" id="prof-btn-logout">Выйти</button>';
+						document.getElementById('prof-btn-sync').addEventListener('click', async function () {
+							if (window.IqmoSync && typeof IqmoSync.pushState === 'function') await IqmoSync.pushState();
+							if (window.IqmoSync && typeof IqmoSync.pullState === 'function') await IqmoSync.pullState();
+							paintProfileBody();
+							loadAccountPanel();
+						});
+						document.getElementById('prof-btn-logout').addEventListener('click', async function () {
+							await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+							location.reload();
+						});
+						const hr = await fetch('/api/profile/history', { credentials: 'include' });
+						if (hr.ok) {
+							const hj = await hr.json();
+							const items = hj.items || [];
+							if (items.length) {
+								backups.style.display = 'block';
+								backups.innerHTML =
+									'<div style="font-weight:700; margin-bottom:6px; color:var(--ink)">Последние сохранения на сервере</div>' +
+									items
+										.map(function (it) {
+											const d = new Date(it.created_at).toLocaleString('ru-RU');
+											return (
+												'<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0">' +
+												'<span>' +
+												d +
+												' · рев. ' +
+												it.revision +
+												'</span>' +
+												'<button type="button" class="btn btn--ghost" data-restore-id="' +
+												it.id +
+												'" style="padding:6px 12px; font-size:13px">Откатить</button>' +
+												'</div>'
+											);
+										})
+										.join('');
+								backups.querySelectorAll('[data-restore-id]').forEach(function (btn) {
+									btn.addEventListener('click', async function () {
+										if (!confirm('Заменить текущий прогресс на сервере и в браузере снимком из этой точки?')) return;
+										const id = Number(btn.getAttribute('data-restore-id'));
+										const rr = await fetch('/api/profile/restore', {
+											method: 'POST',
+											credentials: 'include',
+											headers: { 'Content-Type': 'application/json' },
+											body: JSON.stringify({ historyId: id })
+										});
+										if (!rr.ok) {
+											alert('Не удалось откатить.');
+											return;
+										}
+										const rj = await rr.json();
+										if (window.IqmoSync && typeof IqmoSync.applyKeys === 'function') {
+											IqmoSync.applyKeys(rj.keys || {});
+										}
+										location.reload();
+									});
+								});
+							} else {
+								backups.style.display = 'none';
+								backups.innerHTML = '';
+							}
+						}
+					} catch (e) {
+						line1.textContent =
+							'Сервер аккаунта недоступен (откройте сайт через http://localhost:3780 после npm start в папке server). Пока работает только локальное хранилище.';
+						line2.textContent = '';
+						actions.innerHTML = '<a class="btn btn--ghost" href="./uploads/login.html">Страница входа</a>';
+						backups.style.display = 'none';
+					}
+				}
+
+				paintProfileBody();
+				loadAccountPanel();
+				window.addEventListener('iqmo-sync', function () {
+					paintProfileBody();
+				});
+				window.addEventListener('iqmo-sync-ready', function (ev) {
+					paintProfileBody();
+					loadAccountPanel();
+				});
+
+				document.getElementById('prof-reset').addEventListener('click', async function () {
+					if (
+						!confirm(
+							'Удалить все данные IQMO по химии в этом браузере (и на сервере, если вы вошли)? Отменить будет нельзя.'
+						)
+					) {
+						return;
+					}
+					const PREFIX = 'iqmo-chem-';
+					try {
+						for (let i = localStorage.length - 1; i >= 0; i--) {
+							const k = localStorage.key(i);
+							if (k && k.indexOf(PREFIX) === 0) {
+								localStorage.removeItem(k);
+							}
+						}
+					} catch (e) {
+						alert('Ошибка при очистке: ' + (e.message || e));
+						return;
+					}
+					try {
+						if (window.IqmoSync && IqmoSync.isAuthed && IqmoSync.isAuthed()) {
+							await fetch('/api/profile/state', {
+								method: 'PUT',
+								credentials: 'include',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ baseRevision: null, keys: {} })
+							});
+						}
+					} catch (e2) {}
+					location.reload();
+				});
+			})();
+		</script>
+	</body>
+</html>
