@@ -40,6 +40,22 @@ Route::get('/cabinet', function () {
     return response()->file(public_path('site/profile.html'));
 })->name('cabinet');
 
+// Root-level static files referenced by pages served at `/<page>.html`.
+// Example: `full-test-chemistry.html` includes `<script src="./exam-config.js">`,
+// which resolves to `/exam-config.js` in the browser. We serve these from `public/site/`
+// to avoid duplicating files into `public/`.
+Route::get('/{file}', function (string $file) {
+    if ($file !== basename($file) || ! preg_match('/^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(js|css|map|json)$/', $file)) {
+        abort(404);
+    }
+    $full = public_path('site/'.$file);
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return response()->file($full);
+})->where('file', '[A-Za-z0-9][A-Za-z0-9_.-]*\\.(js|css|map|json)');
+
 // Остальные страницы портала (`subject-chemistry.html`, `trial-chemistry.html`, …): ссылки от главной
 // идут с корня сайта, а файлы лежат в `public/site/` — без этого маршрута под `php artisan serve` везде 404.
 Route::get('/{html}', function (string $html) {

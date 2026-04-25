@@ -40,8 +40,6 @@ jobs:
 
             php artisan migrate --force
             php artisan optimize:clear
-
-            # Static site files are referenced as /<file> and must be in public/
-            cd "$LARAVEL_DIR/public"
-            cp -rn site/* .
+            
+            # No file copying needed: root-level `*.js`/`*.css` are served from `public/site/` via routes.
 
