@@ -68,7 +68,9 @@
 						headers: { Accept: 'application/json' }
 					});
 				} catch (e2) {}
-				location.reload();
+				var redir = logoutBtn.getAttribute('data-iqmo-after-logout');
+				if (redir) location.href = redir;
+				else location.reload();
 			});
 		}
 

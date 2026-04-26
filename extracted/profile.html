@@ -469,8 +469,11 @@
 					</svg>
 				</a>
 				<div class="header__btns">
-					<a href="/login.html" class="btn btn--ghost" id="prof-header-login">Вход</a>
-					<button type="button" class="btn btn--ghost" id="prof-header-logout" hidden>Выйти</button>
+					<a href="/login.html" class="btn btn--ghost" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="btn btn--ghost" id="iqmo-nav-profile" hidden aria-current="page">Профиль</a>
+					<button type="button" class="btn btn--ghost" id="iqmo-nav-logout" hidden data-iqmo-after-logout="./index.html">
+						Выйти
+					</button>
 				</div>
 			</div>
 		</header>
@@ -621,8 +624,8 @@
 			</div>
 		</footer>
 
-		<script src="./iqmo-nav.js"></script>
 		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
 		<script src="./chem-progress.js"></script>
 		<script src="./mistakes-store.js"></script>
 		<script>
@@ -964,39 +967,12 @@
 				}).join('');
 				}
 
-				async function syncProfileHeaderAuth() {
-					const hdrLogin = document.getElementById('prof-header-login');
-					const hdrLogout = document.getElementById('prof-header-logout');
-					try {
-						const r = await fetch('/api/me', { credentials: 'include' });
-						if (!r.ok) {
-							if (hdrLogin) hdrLogin.removeAttribute('hidden');
-							if (hdrLogout) hdrLogout.setAttribute('hidden', '');
-							return;
-						}
-						if (hdrLogin) hdrLogin.setAttribute('hidden', '');
-						if (hdrLogout) hdrLogout.removeAttribute('hidden');
-					} catch (e) {
-						if (hdrLogin) hdrLogin.removeAttribute('hidden');
-						if (hdrLogout) hdrLogout.setAttribute('hidden', '');
-					}
-				}
-
-				document.getElementById('prof-header-logout')?.addEventListener('click', async function () {
-					try {
-						await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-					} catch (e) {}
-					location.href = './index.html';
-				});
-
 				paintProfileBody();
-				syncProfileHeaderAuth();
 				window.addEventListener('iqmo-sync', function () {
 					paintProfileBody();
 				});
 				window.addEventListener('iqmo-sync-ready', function (ev) {
 					paintProfileBody();
-					syncProfileHeaderAuth();
 				});
 
 				document.getElementById('prof-reset').addEventListener('click', async function () {
