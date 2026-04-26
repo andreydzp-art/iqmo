@@ -167,6 +167,47 @@ app.get('/api/me', (req, res) => {
 	res.json({ id: p.uid, email: p.email });
 });
 
+// DELETE /api/auth/me — irreversible account deletion (ФЗ-152 right-to-be-forgotten).
+// `auth` middleware already verified the JWT and put the user id on req.user.id;
+// we never accept a client-supplied id. Best-effort deletion across all tables
+// the user could have rows in — analytics_events / profile_history / profile_state
+// would cascade via FK on a fresh schema, but legacy installs created by
+// mysql-schema.sql may lack the FK, so explicit deletes are safer.
+app.delete('/api/auth/me', auth, async (req, res) => {
+	const uid = Number(req.user && req.user.id) || 0;
+	if (uid <= 0) return res.status(401).json({ error: 'unauthorized' });
+
+	const conn = await pool.getConnection();
+	try {
+		await conn.beginTransaction();
+		try {
+			await conn.query('DELETE FROM analytics_events WHERE user_id = ?', [uid]);
+		} catch (e) {
+			// Table may not exist on very old installs; users still must be deletable.
+			if (!/(ER_NO_SUCH_TABLE|doesn't exist)/i.test(String(e && e.message))) throw e;
+		}
+		try {
+			await conn.query('DELETE FROM profile_history WHERE user_id = ?', [uid]);
+		} catch (e) {
+			if (!/(ER_NO_SUCH_TABLE|doesn't exist)/i.test(String(e && e.message))) throw e;
+		}
+		await conn.query('DELETE FROM profile_state WHERE user_id = ?', [uid]);
+		await conn.query('DELETE FROM users WHERE id = ?', [uid]);
+		await conn.commit();
+	} catch (e) {
+		try {
+			await conn.rollback();
+		} catch {}
+		console.error('[iqmo] DELETE /api/auth/me failed:', e?.message || e);
+		return res.status(500).json({ error: 'server' });
+	} finally {
+		conn.release();
+	}
+
+	res.clearCookie(COOKIE_NAME, COOKIE_CLEAR_OPTS);
+	return res.json({ ok: true });
+});
+
 app.get('/api/profile/state', auth, async (req, res) => {
 	await ensureProfileRow(req.user.id);
 	const [rows] = await pool.query('SELECT keys_json, revision, updated_at FROM profile_state WHERE user_id = ? LIMIT 1', [

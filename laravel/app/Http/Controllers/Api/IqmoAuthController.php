@@ -90,6 +90,58 @@ final class IqmoAuthController extends Controller
         return response()->json(['id' => $payload['uid'], 'email' => $payload['email']])->withHeaders($noStore);
     }
 
+    /**
+     * DELETE /api/auth/me — irreversible account deletion (ФЗ-152, право на удаление).
+     *
+     * Mounted under `iqmo.jwt` middleware: by the time we get here we already have
+     * a verified uid in request->attributes. We still defensively re-read it
+     * instead of trusting any client-supplied id.
+     *
+     * Order of deletes:
+     *   1. analytics_events (FK cascade exists, but doing it explicitly survives
+     *      legacy installs where the table was created via mysql-schema.sql
+     *      without the cascade FK).
+     *   2. profile_history, profile_state (same defence-in-depth).
+     *   3. users — last; once it's gone, the FK chains can no longer reach.
+     *
+     * Wrapped in a transaction so a failure mid-way doesn't leave us with an
+     * orphan users row whose data is half-deleted.
+     */
+    public function deleteMe(Request $request)
+    {
+        $userId = (int) $request->attributes->get('iqmo_user_id', 0);
+        if ($userId <= 0) {
+            return response()->json(['error' => 'unauthorized'], 401);
+        }
+
+        try {
+            DB::connection('iqmo')->transaction(function () use ($userId): void {
+                $iqmo = DB::connection('iqmo');
+
+                if ($iqmo->getSchemaBuilder()->hasTable('analytics_events')) {
+                    $iqmo->table('analytics_events')->where('user_id', $userId)->delete();
+                }
+                if ($iqmo->getSchemaBuilder()->hasTable('profile_history')) {
+                    $iqmo->table('profile_history')->where('user_id', $userId)->delete();
+                }
+                if ($iqmo->getSchemaBuilder()->hasTable('profile_state')) {
+                    $iqmo->table('profile_state')->where('user_id', $userId)->delete();
+                }
+                $iqmo->table('users')->where('id', $userId)->delete();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json(['error' => 'server'], 500);
+        }
+
+        $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
+        $resp = response()->json(['ok' => true]);
+        $resp->headers->clearCookie($cookieName, path: '/');
+
+        return $resp;
+    }
+
     private function issueSessionCookie(int $userId, string $email): void
     {
         $token = IqmoJwt::fromConfig()->sign(['uid' => $userId, 'email' => $email]);

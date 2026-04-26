@@ -593,6 +593,16 @@
 					<button type="button" class="btn btn--danger" id="prof-reset">Сбросить данные</button>
 				</div>
 
+				<div class="actions iqmo-only-authed" hidden style="margin-top: 14px">
+					<h2>Удалить аккаунт</h2>
+					<p>
+						Полное и безвозвратное удаление учётной записи: e-mail, пароль, прогресс на сервере и история событий аналитики. Локальные данные в этом браузере не затрагиваются — для них есть кнопка «Сбросить данные» выше. Подробнее в
+						<a href="/legal.html#privacy" target="_blank" rel="noopener">Политике конфиденциальности</a>.
+					</p>
+					<button type="button" class="btn btn--danger" id="prof-delete-account">Удалить аккаунт</button>
+					<p id="prof-delete-status" class="stat-label" style="margin-top: 8px" hidden></p>
+				</div>
+
 				<div class="card prof-guide" style="margin-top: 22px">
 					<h2>Как прокачивать профиль: уровень и баллы</h2>
 					<div class="callout">
@@ -1021,6 +1031,65 @@
 					} catch (e2) {}
 					location.reload();
 				});
+
+				// Account deletion is irreversible: double-confirm with a typed phrase so an
+				// accidental Enter on the dialog can't wipe an account.
+				var deleteBtn = document.getElementById('prof-delete-account');
+				var deleteStatus = document.getElementById('prof-delete-status');
+				if (deleteBtn) {
+					deleteBtn.addEventListener('click', async function () {
+						if (
+							!confirm(
+								'Удалить аккаунт без возможности восстановления? E-mail, пароль, прогресс на сервере и история событий будут стёрты. Локальные данные в этом браузере не затрагиваются.'
+							)
+						) {
+							return;
+						}
+						var typed = prompt('Введите слово УДАЛИТЬ заглавными буквами, чтобы подтвердить:');
+						if (typed !== 'УДАЛИТЬ') {
+							if (deleteStatus) {
+								deleteStatus.hidden = false;
+								deleteStatus.textContent = 'Подтверждение не получено — аккаунт не удалён.';
+							}
+							return;
+						}
+						deleteBtn.disabled = true;
+						if (deleteStatus) {
+							deleteStatus.hidden = false;
+							deleteStatus.textContent = 'Удаляем…';
+						}
+						try {
+							var r = await fetch('/api/auth/me', {
+								method: 'DELETE',
+								credentials: 'include',
+								headers: { Accept: 'application/json' }
+							});
+							if (!r.ok) {
+								if (deleteStatus) {
+									deleteStatus.textContent = 'Не удалось удалить (HTTP ' + r.status + '). Свяжитесь с поддержкой.';
+								}
+								deleteBtn.disabled = false;
+								return;
+							}
+						} catch (e3) {
+							if (deleteStatus) {
+								deleteStatus.textContent = 'Сеть недоступна. Попробуйте ещё раз.';
+							}
+							deleteBtn.disabled = false;
+							return;
+						}
+						try {
+							var PREFIX = 'iqmo-chem-';
+							for (var i = localStorage.length - 1; i >= 0; i--) {
+								var k = localStorage.key(i);
+								if (k && k.indexOf(PREFIX) === 0) localStorage.removeItem(k);
+							}
+							localStorage.removeItem('iqmo-cookie-consent-v1');
+							localStorage.removeItem('iqmo-analytics-queue-v1');
+						} catch (e4) {}
+						location.href = '/index.html';
+					});
+				}
 			})();
 		</script>
 	</body>

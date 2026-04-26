@@ -19,6 +19,11 @@ Route::prefix('api')->group(function (): void {
         Route::get('/profile/history', [IqmoProfileController::class, 'history']);
         Route::post('/profile/restore', [IqmoProfileController::class, 'restore']);
 
+        // Right-to-be-forgotten endpoint (ФЗ-152). DELETE on /api/auth/me
+        // because that's where /api/me already lives and the symmetry helps
+        // — clients reuse the same URL they used to identify themselves.
+        Route::delete('/auth/me', [IqmoAuthController::class, 'deleteMe']);
+
         Route::post('/analytics/events', [AnalyticsIngestController::class, 'store'])
             ->middleware('throttle:analytics-ingest');
     });
