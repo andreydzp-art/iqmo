@@ -9,32 +9,49 @@
 
 ## Laravel (если используете PHP вместо или вместе с Node)
 
-1. `cp .env.example .env` — задать `DB_*`, **`IQMO_JWT_SECRET`** (тот же секрет, что у Node).
-2. `php artisan migrate` — создаст `analytics_events` с внешним ключом на `users`.
+1. `cp .env.example .env` — задать `DB_*`, **`IQMO_JWT_SECRET`** (тот же секрет, что у Node), а также `IQMO_DB_*` (см. ниже).
+2. `php artisan migrate --force` — миграция `analytics_events` теперь жёстко привязана к connection **`iqmo`**, чтобы совпадать со схемой Node (`server/sql/mysql-schema.sql`) и кодом `IqmoAuthController` / `IqmoAdminOverviewBuilder` (они пишут/читают там же). Если таблица уже создана Node-сервером (`ensureSchema`) — миграция тихо пропустит создание.
 3. Проверить маршрут: `POST /api/analytics/events` (лимит **45 запросов/мин** на связку IP + пользователь из JWT).
 
-**Важно:** `user_id` в JWT должен существовать в таблице `users` той же БД, иначе вставка аналитики упадёт. Если портал живёт в Node с отдельной БД `iqmo`, либо используйте ту же MySQL для Laravel, либо не вызывайте Laravel-ингест.
+### Один источник правды для аккаунтов
+
+Канон таблицы **`users`** — Node-схема (`server/sql/mysql-schema.sql`, БД `iqmo`). Все рабочие IQMO-контроллеры в Laravel ходят через `DB::connection('iqmo')`. Дефолтное соединение `mysql` (Laravel Breeze) на портале не используется и хранится только под штатные миграции Breeze.
+
+В `.env` укажите две группы переменных:
+
+```env
+# Стандартный Laravel (Breeze)
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=...
+DB_PASSWORD=...
+
+# Канон IQMO (та же база, что у Node)
+IQMO_DB_HOST=127.0.0.1
+IQMO_DB_PORT=3306
+IQMO_DB_DATABASE=iqmo
+IQMO_DB_USERNAME=...
+IQMO_DB_PASSWORD=...
+```
+
+Если на сервере раньше уже выкатывалась версия, где аналитика создавалась в дефолтном `DB_DATABASE`, можно опционально убрать дубль:
+
+```sql
+-- В дефолтной Laravel-базе (DB_DATABASE), если аналитики там быть не должно:
+DROP TABLE IF EXISTS analytics_events;
+```
 
 ## Статика (один источник правды)
 
 Каноничная вёрстка лежит в **`extracted/`** — это единственное место, куда вносятся правки HTML/JS/CSS. Никогда не редактируйте файлы в `laravel/public/site/` или `laravel/public/uploads/` руками: они либо генерируются скриптом синхронизации, либо подменяются nginx.
 
-Выберите **одну** из двух стратегий деплоя и держитесь её:
+> **Текущий бой**: `.github/workflows/deploy.yml` использует **вариант B** (Laravel раздаёт `public/site/` через nginx + PHP-FPM), при этом из `public/` удаляются устаревшие копии `index.html`, `login.html`, `profile.html`, `admin/`. Перед каждым деплоем синхронизируйте `laravel/public/site/` со скриптом ниже, иначе на проде «отставшая» статика начнёт расходиться с правками в `extracted/`.
 
-### Вариант A — nginx раздаёт `extracted/` напрямую (проще)
+### Вариант B (рекомендуемый) — Laravel публикует копию `extracted/` через `laravel/public/site/`
 
-Меньше шагов, нет дубля.
-
-```nginx
-root  /var/www/iqmo/extracted;
-index index.html;
-```
-
-В этом случае `laravel/public/site/` на сервере не используется и его можно не выкатывать.
-
-### Вариант B — Laravel публикует копию `extracted/` через `laravel/public/site/`
-
-Если хочется, чтобы артефакты обслуживал PHP-FPM/Octane, перед каждым деплоем выполняется зеркалирование канона:
+Перед каждым деплоем выполняется зеркалирование канона:
 
 ```bash
 # В корне репозитория (требует Node 18+):
@@ -46,6 +63,17 @@ node scripts/sync-site.mjs
 Скрипт удаляет в `laravel/public/site/` всё, чего нет в `extracted/`, поэтому удаления тоже синхронизируются. Запускайте его в CI/CD перед `git push`/деплоем (или сразу на сервере после `git pull`).
 
 > Примечание: каталог `laravel/public/uploads/` — историческое наследие. На свежих развёртываниях его можно не использовать; держите его в синхронности только если nginx ещё ссылается на него.
+
+### Вариант A (альтернатива) — nginx раздаёт `extracted/` напрямую
+
+Если переходите на чистый nginx без PHP-FPM для статики, замените root в конфиге:
+
+```nginx
+root  /var/www/iqmo/extracted;
+index index.html;
+```
+
+В этом случае `laravel/public/site/` на сервере не нужен и его можно не выкатывать. Не сочетайте варианты A и B одновременно: получите два расходящихся источника.
 
 ## Node (локально / простой хостинг)
 

@@ -66,7 +66,9 @@ class AnalyticsIngestController extends Controller
             return response()->json(['error' => 'no_valid_events'], 400);
         }
 
-        DB::table('analytics_events')->insert($rows);
+        // Same connection as IqmoAuthController/IqmoAdminOverviewBuilder so the FK to users
+        // resolves and the admin top-questions rollup actually sees the rows.
+        DB::connection('iqmo')->table('analytics_events')->insert($rows);
 
         return response()->json(['ok' => true, 'saved' => count($rows)]);
     }
