@@ -81,11 +81,13 @@ final class IqmoAuthController extends Controller
         $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
         $token = (string) ($request->cookies->get($cookieName) ?? '');
         $payload = $jwt->verify($token);
+        $noStore = ['Cache-Control' => 'private, no-store, max-age=0, must-revalidate'];
+
         if (!$payload) {
-            return response()->json(['error' => 'unauthorized'], 401);
+            return response()->json(['error' => 'unauthorized'], 401)->withHeaders($noStore);
         }
 
-        return response()->json(['id' => $payload['uid'], 'email' => $payload['email']]);
+        return response()->json(['id' => $payload['uid'], 'email' => $payload['email']])->withHeaders($noStore);
     }
 
     private function issueSessionCookie(int $userId, string $email): void

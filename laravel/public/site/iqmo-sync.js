@@ -135,7 +135,7 @@
 
 	async function init() {
 		try {
-			const me = await fetch(API + '/api/me', { credentials: 'include' });
+			const me = await fetch(API + '/api/me', { credentials: 'include', cache: 'no-store' });
 			authed = me.ok;
 			if (!authed) return;
 
@@ -197,7 +197,7 @@
 		},
 		refreshAuth: async function () {
 			try {
-				const me = await fetch(API + '/api/me', { credentials: 'include' });
+				const me = await fetch(API + '/api/me', { credentials: 'include', cache: 'no-store' });
 				authed = me.ok;
 				return authed;
 			} catch (e) {

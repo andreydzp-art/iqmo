@@ -28,6 +28,7 @@
 			try {
 				mr = await fetch('/api/me', {
 					credentials: 'include',
+					cache: 'no-store',
 					headers: { Accept: 'application/json' },
 					signal: ac.signal
 				});
@@ -85,4 +86,14 @@
 	}
 
 	window.__iqmoAuthReady = run();
+
+	// iqmo-sync.js подтверждает сессию позже; без повторной проверки шапка могла остаться «Вход».
+	window.addEventListener('iqmo-sync-ready', function () {
+		window.__iqmoAuthReady.then(function (navAuthed) {
+			var syncAuthed = !!(window.IqmoSync && typeof window.IqmoSync.isAuthed === 'function' && window.IqmoSync.isAuthed());
+			if (navAuthed !== syncAuthed) {
+				window.__iqmoAuthReady = run();
+			}
+		});
+	});
 })();
