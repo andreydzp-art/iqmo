@@ -301,6 +301,16 @@
 					correct: false,
 					results: []
 				};
+				try {
+					if (window.ChemProgress && typeof ChemProgress.beginAttempt === 'function') {
+						ChemProgress.beginAttempt({
+							mode: 'quick',
+							subject: 'chemistry',
+							label: headerTag,
+							totalQuestions: state.questions.length
+						});
+					}
+				} catch (eA) {}
 
 				const elStage = document.getElementById('stage');
 				const elChips = document.getElementById('chips');

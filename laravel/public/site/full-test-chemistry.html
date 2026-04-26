@@ -805,7 +805,15 @@
 					const raw = localStorage.getItem(LS_KEY);
 					if (raw) {
 						const s = JSON.parse(raw);
-						if (s && typeof s === 'object') return s;
+						if (s && typeof s === 'object') {
+							if (!s.attemptId) {
+								s.attemptId =
+									(typeof crypto !== 'undefined' && crypto.randomUUID && crypto.randomUUID()) ||
+									'at-' + Date.now().toString(36);
+							}
+							if (s.startEventSent == null) s.startEventSent = false;
+							return s;
+						}
 					}
 				} catch(e) {}
 				return {
@@ -814,12 +822,35 @@
 					flagged: {},   // { 1: true }
 					selfScores: {}, // { 20: {c1:true, c2:false, __reviewed:true}, ... }
 					startedAt: Date.now(),
-					finished: false
+					finished: false,
+					attemptId:
+						(typeof crypto !== 'undefined' && crypto.randomUUID && crypto.randomUUID()) ||
+						'at-' + Date.now().toString(36),
+					startEventSent: false
 				};
 			}
 			function saveState() {
 				try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){}
 			}
+
+			(function fullAnalyticsStart() {
+				if (state.finished || state.startEventSent || !QUESTIONS.length) return;
+				try {
+					if (window.ChemProgress && typeof ChemProgress.beginAttempt === 'function') {
+						ChemProgress.beginAttempt({
+							mode: 'full',
+							subject: EXAM_SUBJECT,
+							label: 'Полный вариант · ' + ((activeVariant && activeVariant.title) || ''),
+							variantId: activeVariant && activeVariant.id != null ? activeVariant.id : null,
+							variantTitle: (activeVariant && activeVariant.title) || '',
+							totalQuestions: QUESTIONS.length,
+							attemptId: state.attemptId
+						});
+					}
+					state.startEventSent = true;
+					saveState();
+				} catch (eA) {}
+			})();
 
 			// ============================================================
 			// RENDER

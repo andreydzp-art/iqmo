@@ -301,6 +301,7 @@
 			})();
 			let lastBatchIds = [];
 			let batchNo = 1;
+			const WARMUP_TOPIC_PARAM = new URLSearchParams(window.location.search).get('topic') || '';
 
 			function startNextBatch() {
 				if (MODE === 'infinite') batchNo++;
@@ -310,6 +311,17 @@
 				state.checked = false;
 				state.correct = false;
 				state.results = [];
+				try {
+					if (window.ChemProgress && typeof ChemProgress.beginAttempt === 'function') {
+						ChemProgress.beginAttempt({
+							mode: 'warmup',
+							label: 'Разминка',
+							subject: 'chemistry',
+							totalQuestions: N,
+							topicSlug: WARMUP_TOPIC_PARAM
+						});
+					}
+				} catch (eA) {}
 				renderQuestion();
 			}
 
@@ -442,6 +454,17 @@
 				correct: false,  // was it right?
 				results: []      // [{qid, ok}]
 			};
+			try {
+				if (window.ChemProgress && typeof ChemProgress.beginAttempt === 'function') {
+					ChemProgress.beginAttempt({
+						mode: 'warmup',
+						label: 'Разминка',
+						subject: 'chemistry',
+						totalQuestions: state.questions.length,
+						topicSlug: WARMUP_TOPIC_PARAM
+					});
+				}
+			} catch (eA0) {}
 
 			// ============================================================
 			// RENDER

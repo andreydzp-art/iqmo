@@ -362,6 +362,11 @@
 							errLogin.style.display = 'block';
 							return;
 						}
+						try {
+							window.dataLayer = window.dataLayer || [];
+							window.dataLayer.push({ event: 'iqmo_login' });
+							if (typeof ym === 'function') ym(108770166, 'reachGoal', 'login');
+						} catch (eM) {}
 						window.location.href = REDIRECT;
 					} catch (err) {
 						errLogin.textContent =
@@ -402,6 +407,11 @@
 							errReg.style.display = 'block';
 							return;
 						}
+						try {
+							window.dataLayer = window.dataLayer || [];
+							window.dataLayer.push({ event: 'iqmo_register' });
+							if (typeof ym === 'function') ym(108770166, 'reachGoal', 'register');
+						} catch (eM) {}
 						window.location.href = REDIRECT;
 					} catch (err) {
 						errReg.textContent =
