@@ -121,5 +121,26 @@ jobs:
             exit 1
           fi
 
+          # Regression guard: POST /api/auth/login must reach Laravel (any 4xx/2xx is fine,
+          # but a 404 means routes/iqmo_api.php was not loaded — see bootstrap/app.php).
+          code_login=$(curl -sS -o /tmp/smoke-login.json -w "%{http_code}" -X POST \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "$BASE/api/auth/login" || true)
+          if [ "$code_login" = "404" ]; then
+            echo "POST /api/auth/login returned 404 — IQMO API routes are not registered. Check laravel/bootstrap/app.php"
+            cat /tmp/smoke-login.json || true
+            exit 1
+          fi
+          echo "Login endpoint reachable (HTTP $code_login)"
+
+          # Regression guard: /uploads/login.html must be served (now via Laravel route from public/site/uploads).
+          code_uplogin=$(curl -sS -o /tmp/smoke-uplogin.html -w "%{http_code}" "$BASE/uploads/login.html" || true)
+          if [ "$code_uplogin" != "200" ]; then
+            echo "GET /uploads/login.html expected 200, got $code_uplogin (the legacy public/uploads/ folder is gone — Laravel route should serve from public/site/uploads/)"
+            head -c 300 /tmp/smoke-uplogin.html | cat -v
+            exit 1
+          fi
+
           echo "Smoke OK"
 
