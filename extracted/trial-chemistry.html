@@ -519,6 +519,23 @@
 			})();
 			QUESTIONS = hydrateQuestions(state.qids);
 
+			(function trialAnalyticsStart() {
+				if (state.finished || state.startEventSent || !QUESTIONS.length) return;
+				try {
+					if (window.ChemProgress && typeof ChemProgress.beginAttempt === 'function') {
+						ChemProgress.beginAttempt({
+							mode: 'trial',
+							subject: EXAM_SUBJECT,
+							label: 'Пробный вариант · ' + TRIAL_MIN + ' мин',
+							totalQuestions: QUESTIONS.length,
+							attemptId: state.attemptId
+						});
+					}
+					state.startEventSent = true;
+					saveState();
+				} catch (e) {}
+			})();
+
 			function hydrateQuestions(qids) {
 				if (!Array.isArray(qids) || qids.length === 0) return [];
 				const map = new Map(ALL_QUESTIONS.map(q => [q.id, q]));
@@ -530,7 +547,15 @@
 					const raw = localStorage.getItem(LS_KEY);
 					if (raw) {
 						const s = JSON.parse(raw);
-						if (s && typeof s === 'object' && Array.isArray(s.qids)) return s;
+						if (s && typeof s === 'object' && Array.isArray(s.qids)) {
+							if (!s.attemptId) {
+								s.attemptId =
+									(typeof crypto !== 'undefined' && crypto.randomUUID && crypto.randomUUID()) ||
+									'at-' + Date.now().toString(36);
+							}
+							if (s.startEventSent == null) s.startEventSent = false;
+							return s;
+						}
 					}
 				} catch(e) {}
 				const picked = pickTrialQuestions();
@@ -539,7 +564,11 @@
 					current: 0,
 					answers: {},
 					startedAt: Date.now(),
-					finished: false
+					finished: false,
+					attemptId:
+						(typeof crypto !== 'undefined' && crypto.randomUUID && crypto.randomUUID()) ||
+						'at-' + Date.now().toString(36),
+					startEventSent: false
 				};
 			}
 			function saveState() {

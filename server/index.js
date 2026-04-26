@@ -272,6 +272,118 @@ app.post('/api/profile/restore', auth, async (req, res) => {
 	res.json({ ok: true, revision: newRev, keys });
 });
 
+// --- Analytics ingest (chem.* events, JWT session required) ---
+const ANALYTICS_RATE_MAX = Number(process.env.IQMO_ANALYTICS_RATE_PER_MIN) || 45;
+const ANALYTICS_RATE_WINDOW_MS = 60000;
+const analyticsRateBuckets = new Map();
+
+function analyticsRateOk(req) {
+	const uid = readToken(req)?.uid ?? 'anon';
+	const key = String(req.ip || '') + ':' + String(uid);
+	const now = Date.now();
+	let hits = analyticsRateBuckets.get(key) || [];
+	hits = hits.filter((t) => now - t < ANALYTICS_RATE_WINDOW_MS);
+	if (hits.length >= ANALYTICS_RATE_MAX) return false;
+	hits.push(now);
+	analyticsRateBuckets.set(key, hits);
+	return true;
+}
+
+const ALLOWED_ANALYTICS_EVENTS = new Set(['chem.attempt_start', 'chem.attempt_complete', 'chem.topic_view']);
+const ALLOWED_ANALYTICS_MODES = new Set(['full', 'trial', 'warmup', 'quick', 'other']);
+
+function clampStr(s, max) {
+	const t = String(s == null ? '' : s);
+	return t.length > max ? t.slice(0, max) : t;
+}
+
+function sanitizeTopicPayload(raw) {
+	const subject = clampStr(raw.subject, 32) || 'chemistry';
+	const topicSlug = clampStr(raw.topicSlug, 128);
+	if (!topicSlug) return null;
+	return { subject, topicSlug };
+}
+
+function sanitizeAttemptPayload(raw, allowItems) {
+	const mode = ALLOWED_ANALYTICS_MODES.has(String(raw.mode)) ? String(raw.mode) : null;
+	if (!mode) return null;
+	const subject = clampStr(raw.subject, 32) || 'chemistry';
+	const out = {
+		subject,
+		mode,
+		label: clampStr(raw.label, 256),
+		variantId: raw.variantId != null && Number.isFinite(Number(raw.variantId)) ? Number(raw.variantId) : null,
+		variantTitle: clampStr(raw.variantTitle, 256),
+		topicSlug: clampStr(raw.topicSlug, 128),
+		attemptId: clampStr(raw.attemptId, 80)
+	};
+	if (raw.totalQuestions != null && Number.isFinite(Number(raw.totalQuestions))) {
+		out.totalQuestions = Math.min(500, Math.max(0, Math.floor(Number(raw.totalQuestions))));
+	}
+	if (allowItems) {
+		out.correct = raw.correct != null ? Math.max(0, Math.floor(Number(raw.correct))) : null;
+		out.total = raw.total != null ? Math.max(0, Math.floor(Number(raw.total))) : null;
+		out.percent = raw.percent != null ? Math.min(100, Math.max(0, Math.floor(Number(raw.percent)))) : null;
+		out.passedPart1 = !!raw.passedPart1;
+		out.finishedAt = raw.finishedAt != null && Number.isFinite(Number(raw.finishedAt)) ? Number(raw.finishedAt) : Date.now();
+		const items = Array.isArray(raw.items) ? raw.items.slice(0, 200) : [];
+		out.items = items
+			.map((it) => ({
+				qid: clampStr(it && it.qid != null ? it.qid : '', 64),
+				ok: !!it.ok
+			}))
+			.filter((it) => it.qid.length > 0);
+	}
+	return out;
+}
+
+app.post('/api/analytics/events', auth, async (req, res) => {
+	if (!analyticsRateOk(req)) {
+		return res.status(429).json({ error: 'rate_limited' });
+	}
+	const body = req.body || {};
+	const list = body.events;
+	if (!Array.isArray(list) || list.length === 0) {
+		return res.status(400).json({ error: 'events_required' });
+	}
+	if (list.length > 24) {
+		return res.status(400).json({ error: 'too_many_events' });
+	}
+	const now = Date.now();
+	const rows = [];
+	for (const ev of list) {
+		if (!ev || typeof ev !== 'object') continue;
+		const name = String(ev.event || '');
+		if (!ALLOWED_ANALYTICS_EVENTS.has(name)) continue;
+		const occurredAt =
+			ev.occurredAt != null && Number.isFinite(Number(ev.occurredAt)) ? Math.floor(Number(ev.occurredAt)) : now;
+		let payload = null;
+		const rawPl = ev.payload && typeof ev.payload === 'object' ? ev.payload : {};
+		if (name === 'chem.topic_view') {
+			payload = sanitizeTopicPayload(rawPl);
+		} else if (name === 'chem.attempt_start') {
+			payload = sanitizeAttemptPayload(rawPl, false);
+		} else if (name === 'chem.attempt_complete') {
+			payload = sanitizeAttemptPayload(rawPl, true);
+		}
+		if (!payload) continue;
+		rows.push([req.user.id, occurredAt, name, JSON.stringify(payload), now]);
+	}
+	if (rows.length === 0) {
+		return res.status(400).json({ error: 'no_valid_events' });
+	}
+	try {
+		await pool.query(
+			'INSERT INTO analytics_events (user_id, occurred_at, event, payload_json, received_at) VALUES ?',
+			[rows]
+		);
+	} catch (e) {
+		console.error('analytics insert', e);
+		return res.status(500).json({ error: 'server' });
+	}
+	return res.json({ ok: true, saved: rows.length });
+});
+
 app.use(express.static(ROOT));
 
 app.listen(PORT, () => {

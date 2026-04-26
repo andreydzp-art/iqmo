@@ -42,6 +42,72 @@
 	const BEAT_INTERVAL_MS = 30000;
 	const MAX_BEAT_DELTA_MS = 120000;
 
+	/** Яндекс.Метрика (совпадает с кодом счётчика на страницах). */
+	const IQMO_METRIKA_ID = 108770166;
+	var iqmoCurrentAttemptId = null;
+
+	function newAttemptId() {
+		return (typeof crypto !== 'undefined' && crypto.randomUUID && crypto.randomUUID()) ||
+			'at-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+	}
+
+	function pushDataLayer(obj) {
+		try {
+			window.dataLayer = window.dataLayer || [];
+			window.dataLayer.push(obj);
+		} catch (e) {}
+	}
+
+	function reachMetrikaGoal(name, params) {
+		if (typeof ym !== 'function' || !name) return;
+		try {
+			if (params && typeof params === 'object') ym(IQMO_METRIKA_ID, 'reachGoal', name, params);
+			else ym(IQMO_METRIKA_ID, 'reachGoal', name);
+		} catch (e) {}
+	}
+
+	function sendAnalyticsEvents(events) {
+		if (typeof fetch !== 'function' || !Array.isArray(events) || events.length === 0) return;
+		try {
+			fetch('/api/analytics/events', {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+				body: JSON.stringify({ events: events })
+			}).catch(function () {});
+		} catch (e) {}
+	}
+
+	/**
+	 * Старт попытки (тест): серверное событие chem.attempt_start + сохранение attemptId для complete.
+	 * @param {object} o
+	 * @param {string} o.mode
+	 * @param {string} [o.attemptId] — свой id или сгенерируем
+	 */
+	function beginAttempt(o) {
+		if (!o || !o.mode) return null;
+		const attemptId = o.attemptId || newAttemptId();
+		iqmoCurrentAttemptId = attemptId;
+		const payload = {
+			subject: o.subject || 'chemistry',
+			mode: o.mode,
+			label: o.label || '',
+			variantId: o.variantId != null ? o.variantId : null,
+			variantTitle: o.variantTitle || '',
+			topicSlug: o.topicSlug || '',
+			totalQuestions: o.totalQuestions != null ? o.totalQuestions : null,
+			attemptId: attemptId
+		};
+		sendAnalyticsEvents([
+			{
+				event: 'chem.attempt_start',
+				occurredAt: Date.now(),
+				payload: payload
+			}
+		]);
+		return attemptId;
+	}
+
 	/** Минимальный суммарный XP для достижения уровня L (L от 1 до 50). LEVEL_MIN_XP[0]=0 → уровень 1. */
 	const LEVEL_MIN_XP = (function () {
 		const arr = [0];
@@ -559,6 +625,8 @@
 				: total > 0
 					? Math.round((correct / total) * 100)
 					: 0;
+		const finishedAt = Date.now();
+		const attemptId = data.attemptId != null ? String(data.attemptId) : iqmoCurrentAttemptId;
 		const payload = {
 			schemaVersion: SCHEMA_VERSION,
 			subject: data.subject || 'chemistry',
@@ -570,8 +638,9 @@
 			total,
 			percent,
 			passedPart1: !!data.passedPart1,
-			finishedAt: Date.now(),
-			items: Array.isArray(data.items) ? data.items : null
+			finishedAt: finishedAt,
+			items: Array.isArray(data.items) ? data.items : null,
+			attemptId: attemptId || null
 		};
 		try {
 			localStorage.setItem(KEY_LAST, JSON.stringify(payload));
@@ -607,35 +676,52 @@
 		} catch (e2) {}
 
 		try {
-			(function sendAttemptAnalytics() {
-				if (typeof fetch !== 'function') return;
-				var items = Array.isArray(payload.items) ? payload.items : [];
-				var body = JSON.stringify({
-					events: [
-						{
-							event: 'chem.attempt_complete',
-							occurredAt: typeof payload.finishedAt === 'number' ? payload.finishedAt : Date.now(),
-							payload: {
-								subject: payload.subject || 'chemistry',
-								mode: payload.mode,
-								correct: payload.correct,
-								total: payload.total,
-								percent: payload.percent,
-								label: payload.label || '',
-								items: items
-							}
+			(function sendAttemptCompleteAnalytics() {
+				const items = Array.isArray(payload.items) ? payload.items : [];
+				sendAnalyticsEvents([
+					{
+						event: 'chem.attempt_complete',
+						occurredAt: finishedAt,
+						payload: {
+							subject: payload.subject,
+							mode: payload.mode,
+							label: payload.label,
+							variantId: payload.variantId,
+							variantTitle: payload.variantTitle,
+							attemptId: attemptId || '',
+							correct: payload.correct,
+							total: payload.total,
+							percent: payload.percent,
+							passedPart1: payload.passedPart1,
+							finishedAt: finishedAt,
+							items: items.map(function (it) {
+								return { qid: it && it.qid != null ? String(it.qid) : '', ok: !!it.ok };
+							})
 						}
-					]
-				});
-				fetch('/api/analytics/events', {
-					method: 'POST',
-					credentials: 'include',
-					cache: 'no-store',
-					headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-					body: body
-				}).catch(function () {});
+					}
+				]);
 			})();
 		} catch (e3) {}
+
+		try {
+			pushDataLayer({
+				event: 'iqmo_test_complete',
+				iqmo: {
+					mode: payload.mode,
+					subject: payload.subject,
+					percent: payload.percent,
+					correct: payload.correct,
+					total: payload.total
+				}
+			});
+			reachMetrikaGoal('test_complete', {
+				mode: String(payload.mode),
+				percent: payload.percent,
+				subject: String(payload.subject)
+			});
+		} catch (e4) {}
+
+		iqmoCurrentAttemptId = null;
 	}
 
 	function getLastAttempt() {
@@ -667,8 +753,32 @@
 
 	scheduleStartActivityTracking();
 
+	document.addEventListener('DOMContentLoaded', function () {
+		try {
+			var slug = document.body && document.body.getAttribute('data-iqmo-topic');
+			if (!slug) return;
+			var sk = 'iqmo-topic-view-sent:' + slug;
+			try {
+				if (sessionStorage.getItem(sk)) return;
+				sessionStorage.setItem(sk, '1');
+			} catch (e0) {}
+			sendAnalyticsEvents([
+				{
+					event: 'chem.topic_view',
+					occurredAt: Date.now(),
+					payload: { subject: 'chemistry', topicSlug: String(slug) }
+				}
+			]);
+			try {
+				pushDataLayer({ event: 'iqmo_topic_view', iqmo: { topicSlug: String(slug) } });
+				reachMetrikaGoal('topic_view', { topicSlug: String(slug) });
+			} catch (e1) {}
+		} catch (e2) {}
+	});
+
 	window.ChemProgress = {
 		ensureAnonId,
+		beginAttempt,
 		recordAttempt,
 		getLastAttempt,
 		formatRelativeTime,

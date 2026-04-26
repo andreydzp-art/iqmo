@@ -41,3 +41,18 @@ CREATE TABLE IF NOT EXISTS profile_history (
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS analytics_events (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NOT NULL,
+  occurred_at BIGINT NOT NULL,
+  event VARCHAR(64) NOT NULL,
+  payload_json JSON NOT NULL,
+  received_at BIGINT NOT NULL,
+  PRIMARY KEY (id),
+  KEY idx_analytics_event_time (event, occurred_at),
+  KEY idx_analytics_user_time (user_id, occurred_at),
+  CONSTRAINT fk_analytics_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

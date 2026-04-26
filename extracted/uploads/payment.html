@@ -356,6 +356,39 @@
 		})
 	</script>
 
+	<!-- Метрика: цель «переход к оплате» + dataLayer (настройте цели в кабинете Метрики: begin_checkout) -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			var form = document.querySelector('.payment-form')
+			if (!form) return
+			form.addEventListener('submit', function () {
+				try {
+					window.dataLayer = window.dataLayer || []
+					window.dataLayer.push({
+						event: 'begin_checkout',
+						ecommerce: {
+							currencyCode: 'RUB',
+							checkout: {
+								actionField: { step: 1 },
+								products: [
+									{
+										id: 'iqmo_access',
+										name: 'Доступ IQMO (ОГЭ)',
+										price: 25,
+										quantity: 1,
+										brand: 'IQMO',
+										category: 'education'
+									}
+								]
+							}
+						}
+					})
+					if (typeof ym === 'function') ym(108770166, 'reachGoal', 'begin_checkout')
+				} catch (e) {}
+			})
+		})
+	</script>
+
 	<!-- scripts -->
 	<script defer src="./js/nav-anchors.js"></script>
 </html>

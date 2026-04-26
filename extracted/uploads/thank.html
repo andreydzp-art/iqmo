@@ -57,6 +57,41 @@
 		</main>
 		<!-- end Main -->
 
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				try {
+					if (sessionStorage.getItem('iqmo_purchase_tracked')) return
+					sessionStorage.setItem('iqmo_purchase_tracked', '1')
+				} catch (e) {
+					return
+				}
+				try {
+					window.dataLayer = window.dataLayer || []
+					window.dataLayer.push({
+						event: 'purchase',
+						ecommerce: {
+							currencyCode: 'RUB',
+							purchase: {
+								actionField: {
+									id: 'iqmo-' + String(Date.now()),
+									revenue: 25
+								},
+								products: [
+									{
+										id: 'iqmo_access',
+										name: 'Доступ IQMO (ОГЭ)',
+										price: 25,
+										quantity: 1
+									}
+								]
+							}
+						}
+					})
+					if (typeof ym === 'function') ym(108770166, 'reachGoal', 'purchase')
+				} catch (e2) {}
+			})
+		</script>
+
 		<!-- footer -->
 		<noindex>
 			<footer class="footer">
