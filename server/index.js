@@ -302,8 +302,14 @@ function analyticsRateOk(req) {
 	return true;
 }
 
-const ALLOWED_ANALYTICS_EVENTS = new Set(['chem.attempt_start', 'chem.attempt_complete', 'chem.topic_view']);
+const ALLOWED_ANALYTICS_EVENTS = new Set([
+	'chem.attempt_start',
+	'chem.attempt_complete',
+	'chem.topic_view',
+	'iqmo.purchase'
+]);
 const ALLOWED_ANALYTICS_MODES = new Set(['full', 'trial', 'warmup', 'quick', 'other']);
+const ALLOWED_PURCHASE_CURRENCIES = new Set(['RUB', 'USD', 'EUR', 'KZT']);
 
 function clampStr(s, max) {
 	const t = String(s == null ? '' : s);
@@ -350,6 +356,22 @@ function sanitizeAttemptPayload(raw, allowItems) {
 	return out;
 }
 
+function sanitizePurchasePayload(raw) {
+	const purchaseId = clampStr(raw.purchaseId, 64);
+	if (!purchaseId) return null;
+	const productId = clampStr(raw.productId, 64) || 'iqmo_access';
+	const productName = clampStr(raw.productName, 128);
+	const rawCurrency = String(raw.currency || 'RUB').toUpperCase();
+	const currency = ALLOWED_PURCHASE_CURRENCIES.has(rawCurrency) ? rawCurrency : 'RUB';
+	const revenue = raw.revenue != null && Number.isFinite(Number(raw.revenue))
+		? Math.max(0, Math.min(1_000_000, Number(raw.revenue)))
+		: 0;
+	const quantity = raw.quantity != null && Number.isFinite(Number(raw.quantity))
+		? Math.max(1, Math.min(99, Math.floor(Number(raw.quantity))))
+		: 1;
+	return { purchaseId, productId, productName, currency, revenue, quantity };
+}
+
 app.post('/api/analytics/events', auth, async (req, res) => {
 	if (!analyticsRateOk(req)) {
 		return res.status(429).json({ error: 'rate_limited' });
@@ -378,6 +400,8 @@ app.post('/api/analytics/events', auth, async (req, res) => {
 			payload = sanitizeAttemptPayload(rawPl, false);
 		} else if (name === 'chem.attempt_complete') {
 			payload = sanitizeAttemptPayload(rawPl, true);
+		} else if (name === 'iqmo.purchase') {
+			payload = sanitizePurchasePayload(rawPl);
 		}
 		if (!payload) continue;
 		rows.push([req.user.id, occurredAt, name, JSON.stringify(payload), now]);

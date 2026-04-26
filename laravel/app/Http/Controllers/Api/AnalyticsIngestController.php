@@ -9,9 +9,16 @@ use Illuminate\Support\Facades\DB;
 
 class AnalyticsIngestController extends Controller
 {
-    private const ALLOWED_EVENTS = ['chem.attempt_start', 'chem.attempt_complete', 'chem.topic_view'];
+    private const ALLOWED_EVENTS = [
+        'chem.attempt_start',
+        'chem.attempt_complete',
+        'chem.topic_view',
+        'iqmo.purchase',
+    ];
 
     private const ALLOWED_MODES = ['full', 'trial', 'warmup', 'quick', 'other'];
+
+    private const ALLOWED_PURCHASE_CURRENCIES = ['RUB', 'USD', 'EUR', 'KZT'];
 
     public function store(Request $request)
     {
@@ -48,6 +55,7 @@ class AnalyticsIngestController extends Controller
                 'chem.topic_view' => $this->sanitizeTopic($rawPl),
                 'chem.attempt_start' => $this->sanitizeAttempt($rawPl, false),
                 'chem.attempt_complete' => $this->sanitizeAttempt($rawPl, true),
+                'iqmo.purchase' => $this->sanitizePurchase($rawPl),
                 default => null,
             };
             if ($payload === null) {
@@ -133,5 +141,32 @@ class AnalyticsIngestController extends Controller
         }
 
         return $out;
+    }
+
+    private function sanitizePurchase(array $raw): ?array
+    {
+        $purchaseId = $this->clampStr($raw['purchaseId'] ?? '', 64);
+        if ($purchaseId === '') {
+            return null;
+        }
+        $productId = $this->clampStr($raw['productId'] ?? '', 64) ?: 'iqmo_access';
+        $productName = $this->clampStr($raw['productName'] ?? '', 128);
+        $currencyRaw = strtoupper((string) ($raw['currency'] ?? 'RUB'));
+        $currency = in_array($currencyRaw, self::ALLOWED_PURCHASE_CURRENCIES, true) ? $currencyRaw : 'RUB';
+        $revenue = isset($raw['revenue']) && is_numeric($raw['revenue'])
+            ? max(0.0, min(1_000_000.0, (float) $raw['revenue']))
+            : 0.0;
+        $quantity = isset($raw['quantity']) && is_numeric($raw['quantity'])
+            ? max(1, min(99, (int) $raw['quantity']))
+            : 1;
+
+        return [
+            'purchaseId' => $purchaseId,
+            'productId' => $productId,
+            'productName' => $productName,
+            'currency' => $currency,
+            'revenue' => $revenue,
+            'quantity' => $quantity,
+        ];
     }
 }

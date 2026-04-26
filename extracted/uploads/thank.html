@@ -59,36 +59,79 @@
 
 		<script>
 			document.addEventListener('DOMContentLoaded', function () {
+				var REVENUE = 25
+				var CURRENCY = 'RUB'
+				var PRODUCT_ID = 'iqmo_access'
+				var PRODUCT_NAME = 'Доступ IQMO (ОГЭ)'
+
+				var sessionDedup = false
 				try {
-					if (sessionStorage.getItem('iqmo_purchase_tracked')) return
+					if (sessionStorage.getItem('iqmo_purchase_tracked')) sessionDedup = true
 					sessionStorage.setItem('iqmo_purchase_tracked', '1')
-				} catch (e) {
-					return
-				}
+				} catch (e) {}
+
+				var dayKey = new Date().toISOString().slice(0, 10)
+				var dedupKey = 'iqmo_purchase_done_' + dayKey
+				var idKey = dedupKey + '_id'
+				var alreadyToday = false
+				var purchaseId = ''
 				try {
-					window.dataLayer = window.dataLayer || []
-					window.dataLayer.push({
-						event: 'purchase',
-						ecommerce: {
-							currencyCode: 'RUB',
-							purchase: {
-								actionField: {
-									id: 'iqmo-' + String(Date.now()),
-									revenue: 25
-								},
-								products: [
+					alreadyToday = !!localStorage.getItem(dedupKey)
+					purchaseId = localStorage.getItem(idKey) || ''
+					if (!purchaseId) {
+						purchaseId =
+							typeof crypto !== 'undefined' && crypto.randomUUID
+								? 'iqmo-' + crypto.randomUUID()
+								: 'iqmo-' + dayKey + '-' + Math.random().toString(36).slice(2, 10)
+						localStorage.setItem(idKey, purchaseId)
+					}
+				} catch (e) {
+					purchaseId = 'iqmo-' + Date.now()
+				}
+
+				if (!sessionDedup) {
+					try {
+						window.dataLayer = window.dataLayer || []
+						window.dataLayer.push({
+							event: 'purchase',
+							ecommerce: {
+								currencyCode: CURRENCY,
+								purchase: {
+									actionField: { id: purchaseId, revenue: REVENUE },
+									products: [{ id: PRODUCT_ID, name: PRODUCT_NAME, price: REVENUE, quantity: 1 }]
+								}
+							}
+						})
+						if (typeof ym === 'function') ym(108770166, 'reachGoal', 'purchase')
+					} catch (e2) {}
+				}
+
+				if (!alreadyToday) {
+					try {
+						localStorage.setItem(dedupKey, '1')
+						fetch('/api/analytics/events', {
+							method: 'POST',
+							credentials: 'include',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								events: [
 									{
-										id: 'iqmo_access',
-										name: 'Доступ IQMO (ОГЭ)',
-										price: 25,
-										quantity: 1
+										event: 'iqmo.purchase',
+										occurredAt: Date.now(),
+										payload: {
+											purchaseId: purchaseId,
+											productId: PRODUCT_ID,
+											productName: PRODUCT_NAME,
+											currency: CURRENCY,
+											revenue: REVENUE,
+											quantity: 1
+										}
 									}
 								]
-							}
-						}
-					})
-					if (typeof ym === 'function') ym(108770166, 'reachGoal', 'purchase')
-				} catch (e2) {}
+							})
+						}).catch(function () {})
+					} catch (e3) {}
+				}
 			})
 		</script>
 
