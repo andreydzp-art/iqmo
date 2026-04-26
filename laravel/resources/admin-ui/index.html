@@ -1,0 +1,1029 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO — Аналитика (админ)</title>
+		<meta name="robots" content="noindex, nofollow" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f3f5f8;
+				--ink: #11141a;
+				--ink-2: #2a2f38;
+				--muted: #6b7280;
+				--line: #e6e9ef;
+				--accent: #4f7bd6;
+				--accent-weak: #eaf0fb;
+				--green: #3ec37a;
+				--red: #d65a5a;
+				--amber: #e39b2a;
+				--radius: 18px;
+				--shadow: 0 1px 2px rgba(17, 20, 26, 0.04), 0 8px 24px -12px rgba(17, 20, 26, 0.08);
+				--sidebar-w: 252px;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+			}
+			body {
+				font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+				color: var(--ink);
+				background: var(--bg);
+				font-size: 15px;
+				line-height: 1.5;
+				min-height: 100vh;
+				-webkit-font-smoothing: antialiased;
+			}
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+			button {
+				font-family: inherit;
+				cursor: pointer;
+				border: none;
+				background: none;
+			}
+
+			.admin {
+				display: flex;
+				min-height: 100vh;
+			}
+			.admin__sidebar {
+				width: var(--sidebar-w);
+				flex-shrink: 0;
+				background: #fff;
+				border-right: 1px solid var(--line);
+				padding: 20px 0;
+				position: sticky;
+				top: 0;
+				align-self: flex-start;
+				height: 100vh;
+				overflow: auto;
+				display: flex;
+				flex-direction: column;
+			}
+			.admin__brand {
+				padding: 0 20px 20px;
+				border-bottom: 1px solid var(--line);
+				margin-bottom: 16px;
+			}
+			.admin__brand a {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-weight: 800;
+				font-size: 18px;
+				letter-spacing: 0.02em;
+			}
+			.admin__brand a svg text {
+				transition: fill 0.15s ease;
+			}
+			.admin__brand a:hover svg text {
+				fill: var(--accent);
+			}
+			.admin__badge {
+				font-size: 10px;
+				font-weight: 800;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: var(--muted);
+				margin-top: 4px;
+			}
+			.admin__nav {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				padding: 0 12px;
+				flex: 1;
+			}
+			.admin__nav button {
+				display: flex;
+				align-items: center;
+				width: 100%;
+				text-align: left;
+				padding: 10px 12px;
+				border-radius: 12px;
+				font-size: 14px;
+				font-weight: 600;
+				color: var(--ink-2);
+				transition: background 0.12s, color 0.12s;
+			}
+			.admin__nav button:hover {
+				background: #f3f5f8;
+			}
+			.admin__nav button.is--active {
+				background: var(--accent-weak);
+				color: var(--accent);
+			}
+			.admin__nav button.is--soon {
+				color: var(--ink-2);
+			}
+			.admin__nav button.is--soon::after {
+				content: 'скоро';
+				margin-left: auto;
+				font-size: 11px;
+				font-weight: 700;
+				color: var(--muted);
+				opacity: 0.85;
+			}
+			.admin__foot {
+				margin-top: auto;
+				padding: 20px 20px 0;
+				font-size: 12px;
+				color: var(--muted);
+				line-height: 1.45;
+			}
+			.admin__foot a {
+				color: var(--accent);
+				font-weight: 600;
+			}
+			.admin__foot a:hover {
+				text-decoration: underline;
+			}
+			.admin__foot .admin__auth {
+				margin-top: 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				align-items: flex-start;
+			}
+			.admin__foot button.admin__linkbtn {
+				padding: 0;
+				margin: 0;
+				font: inherit;
+				font-weight: 700;
+				color: var(--accent);
+				background: none;
+				border: none;
+				cursor: pointer;
+				text-decoration: underline;
+				text-underline-offset: 2px;
+			}
+			.admin__foot button.admin__linkbtn:hover {
+				opacity: 0.85;
+			}
+
+			.admin__main {
+				flex: 1;
+				min-width: 0;
+				padding: 24px 28px 48px;
+			}
+			.admin__top {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: 16px;
+				margin-bottom: 20px;
+			}
+			.admin__title {
+				font-size: clamp(22px, 2.4vw, 28px);
+				font-weight: 800;
+				letter-spacing: -0.02em;
+				margin: 0 0 6px;
+			}
+			.admin__lead {
+				margin: 0;
+				color: var(--ink-2);
+				font-size: 14px;
+				max-width: 560px;
+			}
+			.period-wrap {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: 8px;
+				max-width: 100%;
+			}
+			.period {
+				display: inline-flex;
+				flex-wrap: wrap;
+				justify-content: flex-end;
+				padding: 4px;
+				gap: 2px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 999px;
+				box-shadow: var(--shadow);
+			}
+			.period button {
+				padding: 8px 12px;
+				border-radius: 999px;
+				font-weight: 700;
+				font-size: 12px;
+				color: var(--muted);
+				white-space: nowrap;
+			}
+			.period button.is--on {
+				background: var(--accent);
+				color: #fff;
+			}
+			.period-range {
+				margin: 0;
+				font-size: 12px;
+				font-weight: 600;
+				color: var(--muted);
+				text-align: right;
+				line-height: 1.35;
+				max-width: 320px;
+			}
+
+			/* подвкладки обзора */
+			.dash-head {
+				margin-bottom: 16px;
+			}
+			.dash-tabs {
+				display: inline-flex;
+				flex-wrap: wrap;
+				padding: 4px;
+				gap: 2px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				box-shadow: var(--shadow);
+				margin-top: 14px;
+			}
+			.dash-tabs button {
+				padding: 10px 18px;
+				border-radius: 11px;
+				font-weight: 700;
+				font-size: 13px;
+				color: var(--muted);
+				white-space: nowrap;
+			}
+			.dash-tabs button[aria-selected='true'] {
+				background: var(--ink);
+				color: #fff;
+			}
+			.dash-tabs button:hover:not([aria-selected='true']) {
+				background: #f3f5f8;
+				color: var(--ink-2);
+			}
+			.callout--amber {
+				background: #fff8ed;
+				border-color: #f5d9a8;
+			}
+
+			.callout {
+				padding: 14px 18px;
+				border-radius: 14px;
+				background: var(--accent-weak);
+				border: 1px solid #d9e3f6;
+				font-size: 14px;
+				color: var(--ink-2);
+				margin-bottom: 22px;
+			}
+			.callout strong {
+				color: var(--ink);
+			}
+
+			.kpi-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: 12px;
+				margin-bottom: 22px;
+			}
+			.kpi {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				padding: 16px 18px;
+				min-height: 104px;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+			.kpi__label {
+				font-size: 12px;
+				font-weight: 700;
+				color: var(--muted);
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				line-height: 1.3;
+			}
+			.kpi__value {
+				font-size: 22px;
+				font-weight: 800;
+				letter-spacing: -0.02em;
+				margin-top: 8px;
+			}
+			.kpi__meta {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+				margin-top: 10px;
+				font-size: 12px;
+				font-weight: 600;
+			}
+			.kpi__delta--up {
+				color: var(--green);
+			}
+			.kpi__delta--down {
+				color: var(--red);
+			}
+			.kpi__delta--flat {
+				color: var(--muted);
+			}
+			.kpi__hint {
+				color: var(--muted);
+				font-weight: 500;
+				font-size: 11px;
+				line-height: 1.35;
+				margin-top: 6px;
+			}
+
+			.panels {
+				display: grid;
+				grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+				gap: 14px;
+				align-items: start;
+			}
+			@media (max-width: 1024px) {
+				.panels {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			.card {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				padding: 20px 22px;
+			}
+			.card h2 {
+				font-size: 16px;
+				font-weight: 800;
+				margin: 0 0 16px;
+				letter-spacing: -0.01em;
+			}
+
+			.funnel__row {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 120px 52px;
+				gap: 12px;
+				align-items: center;
+				margin-bottom: 10px;
+				font-size: 13px;
+			}
+			.funnel__row:last-child {
+				margin-bottom: 0;
+			}
+			.funnel__name {
+				font-weight: 600;
+				color: var(--ink-2);
+			}
+			.funnel__bar {
+				height: 10px;
+				background: #eef1f6;
+				border-radius: 999px;
+				overflow: hidden;
+			}
+			.funnel__fill {
+				height: 100%;
+				border-radius: 999px;
+				background: linear-gradient(90deg, var(--accent), #7a9fe8);
+			}
+			.funnel__pct {
+				font-weight: 800;
+				color: var(--accent);
+				text-align: right;
+			}
+
+			.table-wrap {
+				overflow: auto;
+				margin: 0 -6px;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 13px;
+			}
+			th,
+			td {
+				padding: 10px 12px;
+				text-align: left;
+				border-bottom: 1px solid var(--line);
+			}
+			th {
+				font-size: 11px;
+				font-weight: 800;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: var(--muted);
+			}
+			tr:last-child td {
+				border-bottom: none;
+			}
+			.tag {
+				display: inline-flex;
+				align-items: center;
+				padding: 2px 8px;
+				border-radius: 999px;
+				font-size: 11px;
+				font-weight: 700;
+			}
+			.tag--warn {
+				background: #fff4e5;
+				color: #b45309;
+			}
+			.tag--ok {
+				background: #ecfdf5;
+				color: #047857;
+			}
+
+			.subjects {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+			.subjects__row {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 10px 12px;
+				background: #f9fafb;
+				border-radius: 12px;
+				font-size: 13px;
+			}
+			.subjects__name {
+				font-weight: 700;
+				flex: 1;
+				min-width: 0;
+			}
+			.subjects__stat {
+				color: var(--muted);
+				font-weight: 600;
+				font-size: 12px;
+			}
+
+			.placeholder {
+				padding: 48px 24px;
+				text-align: center;
+				color: var(--muted);
+				font-size: 15px;
+			}
+			.placeholder strong {
+				display: block;
+				color: var(--ink);
+				font-size: 18px;
+				margin-bottom: 8px;
+			}
+
+			@media (max-width: 860px) {
+				.admin {
+					flex-direction: column;
+				}
+				.admin__sidebar {
+					width: 100%;
+					height: auto;
+					position: relative;
+					border-right: none;
+					border-bottom: 1px solid var(--line);
+				}
+				.admin__nav {
+					flex-direction: row;
+					flex-wrap: wrap;
+				}
+				.admin__nav button {
+					width: auto;
+				}
+				.admin__foot {
+					margin-top: 14px;
+					padding: 0 16px 16px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="admin">
+			<aside class="admin__sidebar" aria-label="Разделы админки">
+				<div class="admin__brand">
+					<a href="../index.html" aria-label="IQMO — на главную">
+						<svg width="90" height="24" viewBox="0 0 90 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<text x="0" y="19" font-family="Manrope, system-ui, sans-serif" font-size="20" font-weight="800" letter-spacing="0.025em" fill="#11141a">IQMO</text>
+						</svg>
+					</a>
+					<div class="admin__badge">Аналитика · MVP</div>
+				</div>
+				<nav class="admin__nav" id="nav">
+					<button type="button" class="is--active" data-section="overview">Обзор</button>
+					<button type="button" class="is--soon" data-section="users">Пользователи</button>
+					<button type="button" class="is--soon" data-section="subjects">Предметы</button>
+					<button type="button" class="is--soon" data-section="topics">Темы</button>
+					<button type="button" class="is--soon" data-section="questions">Вопросы</button>
+					<button type="button" class="is--soon" data-section="tests">Тесты</button>
+					<button type="button" class="is--soon" data-section="mistakes">Ошибки</button>
+					<button type="button" class="is--soon" data-section="funnel">Воронка</button>
+					<button type="button" class="is--soon" data-section="activity">Активность</button>
+				</nav>
+				<div class="admin__foot">
+					Графики и KPI на этой странице — демо из макета (mock-data). Аккаунты портала и API уже есть: регистрация, вход, синхронизация прогресса.
+					<br />
+					<a href="../index.html">← К порталу</a>
+					<div class="admin__auth" id="admin-auth" hidden>
+						<div id="admin-auth-line" style="font-size: 12px; color: var(--muted); line-height: 1.35"></div>
+						<button type="button" class="admin__linkbtn" id="btn-iqmo-logout" hidden>Выйти из аккаунта IQMO</button>
+						<a href="/login.html" id="link-iqmo-login" hidden>Войти в IQMO</a>
+					</div>
+				</div>
+			</aside>
+
+			<div class="admin__main">
+				<div id="panel-overview">
+					<div class="admin__top">
+						<div class="dash-head">
+							<h1 class="admin__title">Обзор</h1>
+							<p class="admin__lead">Ключевые метрики, воронка и учебная эффективность. Данные MVP — из макета, при смене периода пересчитываются.</p>
+							<div class="dash-tabs" id="dash-tabs" role="tablist" aria-label="Вкладки обзора">
+								<button type="button" role="tab" aria-selected="true" data-dash-tab="summary" id="tab-summary">Сводка</button>
+								<button type="button" role="tab" aria-selected="false" data-dash-tab="learning" id="tab-learning">
+									Учебная эффективность
+								</button>
+							</div>
+						</div>
+						<div class="period-wrap">
+							<div class="period" role="group" aria-label="Период">
+								<button type="button" class="is--on" data-days="1">Сегодня</button>
+								<button type="button" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="period-range" aria-live="polite"></p>
+						</div>
+					</div>
+
+					<div class="callout" id="callout-main">
+						<strong>Аналитика MVP:</strong> сводка ниже по-прежнему из <code style="font-size: 13px">admin/mock-data.js</code> (нет серверных агрегатов по тестам). Отдельно уже работает <strong>API портала</strong> — события с сайта можно позже стримить сюда для живых цифр.
+					</div>
+
+					<div id="dash-summary">
+						<div class="kpi-grid" id="kpi-root" aria-live="polite"></div>
+
+						<div class="panels">
+							<div class="card">
+								<h2 id="title-funnel">Воронка (доля от первого шага)</h2>
+								<div id="funnel-root"></div>
+							</div>
+							<div class="card">
+								<h2 id="title-subjects">Предметы · активность (мок)</h2>
+								<div class="subjects" id="subjects-root"></div>
+							</div>
+						</div>
+
+						<div class="card" style="margin-top: 14px">
+							<h2 id="title-questions">Сложные вопросы (топ по % ошибок)</h2>
+							<div class="table-wrap">
+								<table>
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Тема</th>
+											<th>% ошибок</th>
+											<th>Показов</th>
+											<th>Ср. время</th>
+											<th>Проверка</th>
+										</tr>
+									</thead>
+									<tbody id="questions-tbody"></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div id="dash-learning" hidden>
+						<div class="callout callout--amber" id="learn-period-hint" hidden>
+							<strong>Короткий период:</strong> метрики «повторы и рост» надёжнее при окне <b>от 7 дней</b>. Ниже — ориентировочные значения.
+						</div>
+
+						<div class="kpi-grid" id="learn-kpi-root" aria-live="polite"></div>
+
+						<div class="panels">
+							<div class="card">
+								<h2 id="title-fast-topics">Темы с быстрым ростом</h2>
+								<p style="margin: 0 0 12px; font-size: 13px; color: var(--muted)" id="lead-fast-topics"></p>
+								<div class="table-wrap">
+									<table>
+										<thead>
+											<tr>
+												<th>Тема (категория)</th>
+												<th>Прирост % верных</th>
+												<th>Сессий</th>
+												<th>Мин. n</th>
+											</tr>
+										</thead>
+										<tbody id="learn-fast-tbody"></tbody>
+									</table>
+								</div>
+							</div>
+							<div class="card">
+								<h2 id="title-stagnant-topics">Темы без улучшения</h2>
+								<p style="margin: 0 0 12px; font-size: 13px; color: var(--muted)" id="lead-stagnant-topics"></p>
+								<div class="table-wrap">
+									<table>
+										<thead>
+											<tr>
+												<th>Тема</th>
+												<th>Средний %</th>
+												<th>Δ за период</th>
+												<th>Сессий</th>
+											</tr>
+										</thead>
+										<tbody id="learn-stagnant-tbody"></tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+						<div class="card" style="margin-top: 14px">
+							<h2 id="title-mistake-fix">Ошибки: сколько попыток до исправления</h2>
+							<p style="margin: 0 0 14px; font-size: 13px; color: var(--muted)" id="lead-mistake-fix"></p>
+							<div class="kpi-grid" style="margin-bottom: 0" id="learn-mistake-kpis"></div>
+						</div>
+					</div>
+				</div>
+
+				<div id="panel-placeholder" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title" id="placeholder-title">Раздел</h1>
+							<p class="admin__lead">Заглушка MVP: контент появится после подключения API.</p>
+						</div>
+					</div>
+					<div class="placeholder">
+						<strong id="placeholder-lead">Раздел в разработке</strong>
+						Следующие этапы: таблицы, фильтры и подключение сервера.
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="./mock-data.js"></script>
+		<script>
+			(function () {
+				async function refreshIqmoAuthUi() {
+					const wrap = document.getElementById('admin-auth');
+					const line = document.getElementById('admin-auth-line');
+					const btn = document.getElementById('btn-iqmo-logout');
+					const login = document.getElementById('link-iqmo-login');
+					if (!wrap || !line || !btn || !login) return;
+
+					try {
+						const r = await fetch('/api/me', { credentials: 'include' });
+						if (r.ok) {
+							const me = await r.json().catch(function () {
+								return {};
+							});
+							wrap.hidden = false;
+							btn.hidden = false;
+							login.hidden = true;
+							line.textContent = 'Аккаунт IQMO: ' + (me.email || '—');
+						} else {
+							wrap.hidden = false;
+							btn.hidden = true;
+							login.hidden = false;
+							line.textContent = 'Вы не вошли в IQMO (синхронизация прогресса не активна).';
+						}
+					} catch (e) {
+						wrap.hidden = false;
+						btn.hidden = true;
+						login.hidden = false;
+						line.textContent = 'Не удалось проверить вход IQMO (API недоступен).';
+					}
+				}
+
+				function bindIqmoLogoutOnce() {
+					const btn = document.getElementById('btn-iqmo-logout');
+					if (!btn || btn.dataset.bound === '1') return;
+					btn.dataset.bound = '1';
+					btn.addEventListener('click', async function () {
+						try {
+							await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+						} catch (e2) {}
+						window.location.href = '../index.html';
+					});
+				}
+
+				function boot() {
+					bindIqmoLogoutOnce();
+					refreshIqmoAuthUi();
+				}
+
+				if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+				else boot();
+			})();
+		</script>
+		<script>
+			(function () {
+				const SECTION_TITLES = {
+					users: 'Пользователи',
+					subjects: 'Предметы',
+					topics: 'Темы',
+					questions: 'Вопросы',
+					tests: 'Тесты',
+					mistakes: 'Ошибки',
+					funnel: 'Воронка',
+					activity: 'Активность'
+				};
+
+				let periodDays = 1;
+				let dashTab = 'summary';
+
+				/** Календарный диапазон выбранного окна (локальное время браузера). */
+				function formatPeriodRangeRu(days) {
+					const now = new Date();
+					const end = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+					if (days === 1) {
+						return (
+							'Период: ' +
+							end.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+						);
+					}
+					const start = new Date(end);
+					start.setDate(start.getDate() - (days - 1));
+					const short = { day: 'numeric', month: 'short', year: 'numeric' };
+					return (
+						'Период: ' +
+						start.toLocaleDateString('ru-RU', short) +
+						' — ' +
+						end.toLocaleDateString('ru-RU', short) +
+						' · ' +
+						days +
+						' дн.'
+					);
+				}
+
+				function el(tag, cls, html) {
+					const n = document.createElement(tag);
+					if (cls) n.className = cls;
+					if (html != null) n.innerHTML = html;
+					return n;
+				}
+
+				function deltaClass(trend) {
+					if (trend === 'up') return 'kpi__delta--up';
+					if (trend === 'down') return 'kpi__delta--down';
+					return 'kpi__delta--flat';
+				}
+
+				function appendKpi(parent, k) {
+					const card = el('div', 'kpi');
+					card.innerHTML =
+						'<div class="kpi__label"></div><div class="kpi__value"></div><div class="kpi__meta"><span class="' +
+						deltaClass(k.trend) +
+						'"></span></div><div class="kpi__hint"></div>';
+					card.querySelector('.kpi__label').textContent = k.label;
+					card.querySelector('.kpi__value').textContent = k.value;
+					card.querySelector('.kpi__meta span').textContent = k.delta;
+					card.querySelector('.kpi__hint').textContent = k.hint;
+					parent.appendChild(card);
+				}
+
+				function setDashTab(tab) {
+					dashTab = tab;
+					document.querySelectorAll('#dash-tabs [data-dash-tab]').forEach(function (b) {
+						const on = b.getAttribute('data-dash-tab') === tab;
+						b.setAttribute('aria-selected', on ? 'true' : 'false');
+					});
+					const sumEl = document.getElementById('dash-summary');
+					const learnEl = document.getElementById('dash-learning');
+					if (sumEl) sumEl.hidden = tab !== 'summary';
+					if (learnEl) learnEl.hidden = tab !== 'learning';
+				}
+
+				function periodLabelShort(days) {
+					if (days === 1) return 'сегодня';
+					if (days === 7) return '7 дней';
+					if (days === 14) return '14 дней';
+					return '30 дней (месяц)';
+				}
+
+				function renderSummary() {
+					const pl = periodLabelShort(periodDays);
+					const tf = document.getElementById('title-funnel');
+					const ts = document.getElementById('title-subjects');
+					const tq = document.getElementById('title-questions');
+					if (tf) tf.textContent = 'Воронка · ' + pl + ' (доля от первого шага)';
+					if (ts) ts.textContent = 'Предметы · активность · ' + pl + ' (мок)';
+					if (tq) tq.textContent = 'Сложные вопросы · ' + pl + ' (топ по % ошибок)';
+
+					const data = window.ADMIN_ANALYTICS_MOCK.getDataset(periodDays);
+
+					const kpiRoot = document.getElementById('kpi-root');
+					kpiRoot.innerHTML = '';
+					data.kpis.forEach(function (k) {
+						appendKpi(kpiRoot, k);
+					});
+
+					const funnelRoot = document.getElementById('funnel-root');
+					funnelRoot.innerHTML = '';
+					data.funnel.forEach(function (row) {
+						const wrap = el('div', 'funnel__row');
+						wrap.innerHTML =
+							'<div class="funnel__name"></div><div class="funnel__bar"><div class="funnel__fill"></div></div><div class="funnel__pct"></div>';
+						wrap.querySelector('.funnel__name').textContent = row.step;
+						wrap.querySelector('.funnel__fill').style.width = Math.min(100, row.pct) + '%';
+						wrap.querySelector('.funnel__pct').textContent = row.pct.toFixed(1).replace('.', ',') + '%';
+						funnelRoot.appendChild(wrap);
+					});
+
+					const subRoot = document.getElementById('subjects-root');
+					subRoot.innerHTML = '';
+					data.subjectsSnapshot.forEach(function (s) {
+						const row = el('div', 'subjects__row');
+						row.innerHTML =
+							'<span class="subjects__name"></span><span class="subjects__stat"></span><span class="subjects__stat"></span>';
+						row.querySelector('.subjects__name').textContent = s.name;
+						row.querySelectorAll('.subjects__stat')[0].textContent = 'Ø ' + s.avgPct + '%';
+						row.querySelectorAll('.subjects__stat')[1].textContent = s.activityShare + '% сессий';
+						subRoot.appendChild(row);
+					});
+
+					const tbody = document.getElementById('questions-tbody');
+					tbody.innerHTML = '';
+					data.topQuestions.forEach(function (q) {
+						const tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td><strong>#' +
+							q.qid +
+							'</strong></td><td>' +
+							escapeHtml(q.topic) +
+							'</td><td>' +
+							q.wrongPct +
+							'%</td><td>' +
+							q.shows +
+							'</td><td>' +
+							q.avgSec +
+							' с</td><td></td>';
+						const tdFlag = tr.querySelector('td:last-child');
+						const span = document.createElement('span');
+						span.className = 'tag ' + (q.flag ? 'tag--warn' : 'tag--ok');
+						span.textContent = q.flag ? 'На проверку' : 'OK';
+						tdFlag.appendChild(span);
+						tbody.appendChild(tr);
+					});
+				}
+
+				function renderLearning() {
+					const L = window.ADMIN_ANALYTICS_MOCK.getLearningEffectiveness(periodDays);
+					const pl = periodLabelShort(periodDays);
+
+					const hintShort = document.getElementById('learn-period-hint');
+					if (hintShort) hintShort.hidden = periodDays >= 7;
+
+					const titleFast = document.getElementById('title-fast-topics');
+					const titleStag = document.getElementById('title-stagnant-topics');
+					const titleMist = document.getElementById('title-mistake-fix');
+					if (titleFast) titleFast.textContent = 'Темы с быстрым ростом · ' + pl;
+					if (titleStag) titleStag.textContent = 'Темы без улучшения · ' + pl;
+					if (titleMist) titleMist.textContent = 'Ошибки: попытки до исправления · ' + pl;
+
+					const leadFast = document.getElementById('lead-fast-topics');
+					if (leadFast) {
+						leadFast.textContent =
+							'По мок-данным: прирост % верных между первой и последней третью попыток по теме (минимальная выборка n). Период: ' +
+							L.periodLabel +
+							'.';
+					}
+					const leadStag = document.getElementById('lead-stagnant-topics');
+					if (leadStag) {
+						leadStag.textContent =
+							'Темы с ≥3 сессиями и отсутствием устойчивого роста (Δ ≤ 1 п.п. или отрицательный тренд). Мок для дашборда.';
+					}
+					const leadMist = document.getElementById('lead-mistake-fix');
+					if (leadMist) leadMist.textContent = L.mistakeFix.hint;
+
+					const learnKpi = document.getElementById('learn-kpi-root');
+					learnKpi.innerHTML = '';
+					L.kpis.forEach(function (k) {
+						appendKpi(learnKpi, k);
+					});
+
+					const fastBody = document.getElementById('learn-fast-tbody');
+					fastBody.innerHTML = '';
+					L.fastestTopics.forEach(function (row) {
+						const tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' +
+							escapeHtml(row.topic) +
+							'</td><td><strong>+' +
+							String(row.growthPct).replace('.', ',') +
+							' п.п.</strong></td><td>' +
+							row.sessions +
+							'</td><td>≥' +
+							row.minN +
+							'</td>';
+						fastBody.appendChild(tr);
+					});
+
+					const stagBody = document.getElementById('learn-stagnant-tbody');
+					stagBody.innerHTML = '';
+					L.stagnantTopics.forEach(function (row) {
+						const tr = document.createElement('tr');
+						const d = row.deltaPct;
+						const dStr = (d > 0 ? '+' : '') + String(d).replace('.', ',') + ' п.п.';
+						tr.innerHTML =
+							'<td>' +
+							escapeHtml(row.topic) +
+							'</td><td>' +
+							row.avgPct +
+							'%</td><td>' +
+							dStr +
+							'</td><td>' +
+							row.sessions +
+							'</td>';
+						stagBody.appendChild(tr);
+					});
+
+					const mk = document.getElementById('learn-mistake-kpis');
+					mk.innerHTML = '';
+					appendKpi(mk, {
+						label: 'Медиана попыток',
+						value: String(L.mistakeFix.medianAttempts),
+						delta: 'до 1-го верного',
+						trend: 'flat',
+						hint: 'После попадания вопроса в банк ошибок (мок)'
+					});
+					appendKpi(mk, {
+						label: '75-й перцентиль',
+						value: String(L.mistakeFix.p75Attempts),
+						delta: 'попыток',
+						trend: 'flat',
+						hint: 'Тяжёлые ошибки чаще требуют нескольких проходов'
+					});
+					appendKpi(mk, {
+						label: 'Не исправили за период',
+						value: L.mistakeFix.unresolvedPct + '%',
+						delta: 'от записей об ошибках',
+						trend: 'down',
+						hint: 'Нет верного ответа до конца выбранного окна'
+					});
+				}
+
+				function render() {
+					const rangeEl = document.getElementById('period-range');
+					if (rangeEl) rangeEl.textContent = formatPeriodRangeRu(periodDays);
+
+					renderSummary();
+					renderLearning();
+				}
+
+				function escapeHtml(s) {
+					const d = document.createElement('div');
+					d.textContent = s;
+					return d.innerHTML;
+				}
+
+				document.querySelector('.period').addEventListener('click', function (e) {
+					const btn = e.target.closest('button[data-days]');
+					if (!btn) return;
+					periodDays = parseInt(btn.getAttribute('data-days'), 10);
+					document.querySelectorAll('.period button').forEach(function (b) {
+						b.classList.toggle('is--on', b === btn);
+					});
+					render();
+				});
+
+				document.getElementById('dash-tabs').addEventListener('click', function (e) {
+					const btn = e.target.closest('button[data-dash-tab]');
+					if (!btn) return;
+					setDashTab(btn.getAttribute('data-dash-tab'));
+				});
+
+				document.getElementById('nav').addEventListener('click', function (e) {
+					const btn = e.target.closest('button[data-section]');
+					if (!btn) return;
+					const section = btn.getAttribute('data-section');
+					document.querySelectorAll('#nav button').forEach(function (b) {
+						b.classList.toggle('is--active', b === btn);
+					});
+					const overview = document.getElementById('panel-overview');
+					const ph = document.getElementById('panel-placeholder');
+					if (section === 'overview') {
+						overview.hidden = false;
+						ph.hidden = true;
+						setDashTab(dashTab);
+					} else {
+						const title = SECTION_TITLES[section] || section;
+						document.getElementById('placeholder-title').textContent = title;
+						document.getElementById('placeholder-lead').textContent = title + ' — в разработке';
+						overview.hidden = true;
+						ph.hidden = false;
+					}
+				});
+
+				setDashTab('summary');
+				render();
+			})();
+		</script>
+	</body>
+</html>

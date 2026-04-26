@@ -84,6 +84,7 @@
 				transition: background .15s, color .15s, border-color .15s, transform .08s;
 				white-space: nowrap;
 			}
+			[hidden] { display: none !important; }
 			.btn:active { transform: translateY(1px); }
 			.btn--primary { background: linear-gradient(180deg, #44c77d, #2fa965); color: #fff; box-shadow: 0 8px 20px -8px rgba(62,195,122,.55); }
 			.btn--primary:hover { filter: brightness(1.05); }
@@ -650,10 +651,11 @@
 					<div class="topbar__right">
 						<div class="header__btns" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
 							<a href="./index.html" class="btn btn--ghost">Главная</a>
-							<a href="./profile.html" class="btn btn--ghost">Профиль</a>
-							<a href="./login.html" class="btn btn--ghost">Войти</a>
+							<a href="/login.html" class="btn btn--ghost" id="iqmo-nav-login">Вход</a>
+							<a href="./profile.html" class="btn btn--ghost" id="iqmo-nav-profile" hidden>Профиль</a>
+							<button type="button" class="btn btn--ghost" id="iqmo-nav-logout" hidden>Выйти</button>
 						</div>
-						<button type="button" class="btn btn--ghost" id="btn-quit" style="margin-left:8px;">Выйти</button>
+						<button type="button" class="btn btn--ghost" id="btn-quit-exam" style="margin-left:8px;">Прервать</button>
 					</div>
 				</div>
 			</div>
@@ -716,6 +718,7 @@
 		<script src="./chemistry-cat16-source.js?v=9"></script>
 		<script src="./chemistry-variants.js?v=10"></script>
 		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
 		<script src="./mistakes-store.js"></script>
 		<script src="./chem-progress.js"></script>
 		<script>
@@ -1452,8 +1455,8 @@
 			}
 
 			// quit
-			document.getElementById('btn-quit').addEventListener('click', () => {
-				if (confirm('Выйти из теста? Ваши ответы сохранятся, вы сможете вернуться.')) {
+			document.getElementById('btn-quit-exam').addEventListener('click', () => {
+				if (confirm('Прервать вариант? Ответы сохранятся, вы сможете вернуться.')) {
 					window.location.href = './full-test-chemistry.html';
 				}
 			});
@@ -1541,7 +1544,7 @@
 				if (testRoot) testRoot.style.display = 'none';
 				const timerEl = document.getElementById('timer');
 				if (timerEl) timerEl.style.display = 'none';
-				const quitBtn = document.getElementById('btn-quit');
+				const quitBtn = document.getElementById('btn-quit-exam');
 				if (quitBtn) quitBtn.style.display = 'none';
 				const pb = document.getElementById('pb-fill');
 				if (pb) pb.parentElement.style.display = 'none';

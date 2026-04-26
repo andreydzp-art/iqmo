@@ -322,7 +322,20 @@
 				formPassword.setAttribute('aria-hidden', 'true');
 				formRegister.setAttribute('aria-hidden', 'true');
 
-				const REDIRECT = '/index.html';
+				function safeNextUrl() {
+					try {
+						var p = new URLSearchParams(window.location.search);
+						var n = p.get('next');
+						if (!n) return null;
+						var u = new URL(n, window.location.origin);
+						if (u.origin !== window.location.origin) return null;
+						if (u.pathname === '/login.html' || u.pathname === '/login') return null;
+						return u.pathname + u.search + u.hash;
+					} catch (e) {
+						return null;
+					}
+				}
+				const REDIRECT = safeNextUrl() || '/index.html';
 
 				formLogin.addEventListener('submit', async function (e) {
 					e.preventDefault();

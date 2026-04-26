@@ -5,6 +5,26 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>IQMO — Химия · ОГЭ</title>
+		<meta
+			name="description"
+			content="Подготовка к ОГЭ по химии: темы ФИПИ 2026, разминка, быстрый тест, полный вариант, тренировка по разделам кодификатора и банк ошибок. Тренажёр IQMO."
+		/>
+		<link rel="canonical" href="https://www.iqmoschool.ru/subject-chemistry.html" />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="IQMO" />
+		<meta property="og:locale" content="ru_RU" />
+		<meta property="og:url" content="https://www.iqmoschool.ru/subject-chemistry.html" />
+		<meta property="og:title" content="IQMO — Химия · ОГЭ 2026" />
+		<meta
+			property="og:description"
+			content="Онлайн-тренажёр: темы, задания из базы ФИПИ, разбор ошибок, пробник и экзаменационный вариант. Готовьтесь к ОГЭ по химии в своём темпе."
+		/>
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="IQMO — Химия · ОГЭ 2026" />
+		<meta
+			name="twitter:description"
+			content="Темы ФИПИ, разминка, полный вариант и банк ошибок — подготовка к ОГЭ по химии в IQMO."
+		/>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -64,6 +84,10 @@
 			.btn--dark { background: var(--dark); color: #fff; }
 			.btn--dark:hover { background: #111520; }
 			.header__btn { padding: 10px 22px; }
+			/* `.btn { display: inline-flex }` перебивает нативный `[hidden]` — без этого «Профиль» виден гостю */
+			[hidden] {
+				display: none !important;
+			}
 			.crumbs {
 				display: flex; gap: 6px; align-items: center;
 				font-size: 13px; color: var(--muted); padding: 14px 0 0;
@@ -329,6 +353,20 @@
 			}
 			.profile-card__link:hover {
 				text-decoration: underline;
+			}
+			.profile-card__sync {
+				margin-top: 10px;
+				padding: 10px 12px;
+				font-size: 12px;
+				line-height: 1.45;
+				color: var(--ink-2);
+				background: var(--accent-weak);
+				border-radius: 12px;
+				border: 1px solid rgba(79, 123, 214, 0.18);
+			}
+			.profile-card__sync a {
+				color: var(--accent);
+				font-weight: 700;
 			}
 
 			/* ---- hero (light, with side illustration) ---- */
@@ -691,8 +729,9 @@
 				</a>
 				<div class="header__btns">
 					<a href="./index.html" class="btn btn--ghost header__btn">Главная</a>
-					<a href="./profile.html" class="btn btn--ghost header__btn">Профиль</a>
-					<a href="./login.html" class="btn btn--ghost header__btn">Войти</a>
+					<a href="/login.html" class="btn btn--ghost header__btn" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="btn btn--ghost header__btn" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="btn btn--ghost header__btn" id="iqmo-nav-logout" hidden>Выйти</button>
 				</div>
 			</div>
 		</header>
@@ -811,7 +850,7 @@
 										<span class="profile-friend__name">Максим К.</span>
 										<span class="profile-friend__score">2 140</span>
 									</a>
-									<a href="./profile.html" class="profile-friend profile-friend--2 profile-friend--me">
+									<a href="./profile.html" class="profile-friend profile-friend--2 profile-friend--me iqmo-only-authed" hidden>
 										<span class="profile-friend__rank">2</span>
 										<span
 											class="profile-friend__avatar"
@@ -842,7 +881,15 @@
 								</div>
 							</div>
 
-							<a href="./profile.html" class="profile-card__link">Открыть профиль →</a>
+							<p class="profile-card__sync iqmo-only-guest">
+								Без входа прогресс и банк ошибок хранятся только в этом браузере.
+								<a href="/login.html">Войти</a> — чтобы синхронизировать данные между устройствами.
+							</p>
+							<p class="profile-card__sync iqmo-only-authed" hidden>
+								Прогресс синхронизируется с аккаунтом — можно продолжать с телефона или другого ПК.
+							</p>
+
+							<a href="./profile.html" class="profile-card__link iqmo-only-authed" hidden>Открыть профиль →</a>
 						</section>
 					</aside>
 
@@ -1249,6 +1296,7 @@
 		<script src="./chemistry-bank.js?v=10"></script>
 		<script src="./iqmo-sync.js"></script>
 		<script src="./chem-progress.js"></script>
+		<script src="./iqmo-nav.js"></script>
 		<script src="./mistakes-store.js"></script>
 		<script src="./chemistry-topic-map.js"></script>
 		<script src="./chemistry-categories.js?v=9"></script>
@@ -1329,12 +1377,15 @@
 					if (elTests) elTests.textContent = approxTests > 0 ? String(approxTests) + '+' : '0';
 				})();
 
-				const heroInner = document.getElementById('hero-last-result-inner');
-				if (heroInner && window.ChemProgress) {
+				function paintHeroLastResult(sessionLoggedIn) {
+					const heroInner = document.getElementById('hero-last-result-inner');
+					if (!heroInner || !window.ChemProgress) return;
 					const la = ChemProgress.getLastAttempt();
 					if (la && la.subject === 'chemistry') {
 						const when = ChemProgress.formatRelativeTime(la.finishedAt);
-						const label = la.label ? la.label + ' · ' : '';
+						const profileLink = sessionLoggedIn
+							? ' · <a href="./profile.html" style="color:#4f7bd6; font-weight:600; margin-left:4px;">открыть профиль →</a>'
+							: '';
 						heroInner.innerHTML =
 							'Последний результат: <b>' +
 							la.correct +
@@ -1344,10 +1395,20 @@
 							la.percent +
 							'%) · ' +
 							when +
-							' · <a href="./profile.html" style="color:#4f7bd6; font-weight:600; margin-left:4px;">открыть профиль →</a>';
+							profileLink;
 					} else {
 						heroInner.textContent = 'Пройдите разминку или вариант — здесь появится последний результат.';
 					}
+				}
+				paintHeroLastResult(false);
+				if (window.__iqmoAuthReady) {
+					window.__iqmoAuthReady
+						.then(function (ok) {
+							paintHeroLastResult(!!ok);
+						})
+						.catch(function () {
+							paintHeroLastResult(false);
+						});
 				}
 
 				// Real stats (topics / questions) for hero
@@ -1379,34 +1440,39 @@
 				})();
 
 				const weakRoot = document.getElementById('weak-spots-root');
-				if (weakRoot && window.ChemTopicMap && window.MistakesStore) {
-					const rows = ChemTopicMap.aggregateFromMistakes().slice(0, 3);
-					if (rows.length === 0) {
-						weakRoot.innerHTML =
-							'<p class="weak__empty" style="color:var(--muted); font-size:15px; padding:8px 0;">Пока нет типичных ошибок по темам — пройдите тест, и мы подскажем, что подтянуть.</p>';
+				if (weakRoot) {
+					if (window.ChemTopicMap && window.MistakesStore) {
+						const rows = ChemTopicMap.aggregateFromMistakes().slice(0, 3);
+						if (rows.length === 0) {
+							weakRoot.innerHTML =
+								'<p class="weak__empty" style="color:var(--muted); font-size:15px; padding:8px 0;">Пока нет типичных ошибок по темам — пройдите тест, и мы подскажем, что подтянуть.</p>';
+						} else {
+							const svgIcon =
+								'<span class="weak__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span>';
+							weakRoot.innerHTML = rows
+								.map(function (r) {
+									const train = './uploads/easy-test.html?topic=' + encodeURIComponent(r.trainTopic);
+									return (
+										'<div class="weak__item">' +
+										svgIcon +
+										'<div><div class="weak__name">' +
+										r.label +
+										'</div><div class="weak__info">В банке ошибок: <b>' +
+										r.count +
+										'</b> ' +
+										pluralize(r.count, 'запись', 'записи', 'записей') +
+										'</div></div><div class="weak__btns">' +
+										'<a href="./topic-periodic-table.html?v=20260422" class="weak__btn">К темам</a>' +
+										'<a href="' +
+										train +
+										'" class="weak__btn weak__btn--primary">Тренировать</a></div></div>'
+									);
+								})
+								.join('');
+						}
 					} else {
-						const svgIcon =
-							'<span class="weak__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span>';
-						weakRoot.innerHTML = rows
-							.map(function (r) {
-								const train = './uploads/easy-test.html?topic=' + encodeURIComponent(r.trainTopic);
-								return (
-									'<div class="weak__item">' +
-									svgIcon +
-									'<div><div class="weak__name">' +
-									r.label +
-									'</div><div class="weak__info">В банке ошибок: <b>' +
-									r.count +
-									'</b> ' +
-									pluralize(r.count, 'запись', 'записи', 'записей') +
-									'</div></div><div class="weak__btns">' +
-									'<a href="./topic-periodic-table.html?v=20260422" class="weak__btn">К темам</a>' +
-									'<a href="' +
-									train +
-									'" class="weak__btn weak__btn--primary">Тренировать</a></div></div>'
-								);
-							})
-							.join('');
+						weakRoot.innerHTML =
+							'<p class="weak__empty" style="color:var(--muted); font-size:15px; padding:8px 0;">Не удалось загрузить подсказки по темам. Проверьте соединение и <a href="#" onclick="location.reload();return false;" style="color:var(--accent); font-weight:700;">обновите страницу</a>.</p>';
 					}
 				}
 
@@ -1496,7 +1562,12 @@
 
 				function renderChemCategories() {
 					var grid = document.getElementById('chem-categories-grid');
-					if (!grid || !Array.isArray(window.CHEMISTRY_CATEGORIES)) return;
+					if (!grid) return;
+					if (!Array.isArray(window.CHEMISTRY_CATEGORIES)) {
+						grid.innerHTML =
+							'<p style="color:var(--muted); font-size:15px; padding:8px 0;">Не удалось загрузить категории. Проверьте соединение и <a href="#" onclick="location.reload();return false;" style="color:var(--accent); font-weight:700;">обновите страницу</a>.</p>';
+						return;
+					}
 					grid.innerHTML = window.CHEMISTRY_CATEGORIES.map(function (c) {
 						var num = String(c.id).padStart(2, '0');
 						var href = './category-chemistry.html?cat=' + encodeURIComponent(String(c.id));

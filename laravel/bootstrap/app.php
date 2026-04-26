@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'iqmo.jwt' => \App\Http\Middleware\AuthenticateIqmoJwt::class,
+            'iqmo.portal_admin' => \App\Http\Middleware\EnsureIqmoPortalAdmin::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('laravel.login'));

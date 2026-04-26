@@ -9,7 +9,8 @@ require __DIR__.'/auth.php';
 // `site/login.html` stub that meta-refreshes to `/uploads/` would otherwise loop with a redirect.
 
 // Static site assets (served by Nginx on VPS; routed here for local `php artisan serve`)
-foreach (['assets', 'img', 'uploads', 'badges', 'admin'] as $dir) {
+// `/admin/*` is not public: see protected routes below (IQMO_ADMIN_EMAILS + portal session).
+foreach (['assets', 'img', 'uploads', 'badges'] as $dir) {
     Route::get("/{$dir}/{path}", function (string $path) use ($dir) {
         // Use forward slashes for Laravel path helpers, then normalize.
         $rel = $dir.'/'.ltrim($path, '/');
@@ -38,9 +39,28 @@ Route::get('/login', function () {
     return redirect('/login.html', 302);
 })->name('iqmo.portal_login');
 
-Route::get('/admin', function () {
-    return redirect('/admin/index.html', 302);
-})->name('iqmo.admin');
+// Админ-UI лежит в resources/admin-ui (не в public), иначе Nginx отдаёт public/admin/* без PHP и middleware бессилен.
+Route::middleware('iqmo.portal_admin')->group(function (): void {
+    Route::get('/admin', function () {
+        return redirect('/admin/index.html', 302);
+    })->name('iqmo.admin');
+
+    Route::get('/admin/{path}', function (string $path) {
+        $path = ltrim($path, '/');
+        if ($path === '' || str_ends_with($path, '/')) {
+            abort(404);
+        }
+        if (str_contains($path, '..') || ! preg_match('#^[A-Za-z0-9][A-Za-z0-9_./-]*$#', $path)) {
+            abort(404);
+        }
+        $full = resource_path('admin-ui'.DIRECTORY_SEPARATOR.str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path));
+        if (! is_file($full)) {
+            abort(404);
+        }
+
+        return response()->file($full);
+    })->where('path', '.*');
+});
 
 Route::get('/cabinet', function () {
     return response()->file(public_path('site/profile.html'));

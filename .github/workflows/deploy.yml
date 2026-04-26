@@ -48,5 +48,78 @@ jobs:
               "$LARAVEL_DIR/public/login.html" \
               "$LARAVEL_DIR/public/profile.html"
 
+            # Старая копия админки в public/ обходила Laravel (Nginx отдавал файл напрямую).
+            rm -rf "$LARAVEL_DIR/public/admin"
+
             # No file copying needed: root-level `*.js`/`*.css` are served from `public/site/` via routes.
+
+  smoke:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: HTTP smoke (homepage, subject page, API, nav script)
+        env:
+          DEPLOY_SMOKE_URL: ${{ secrets.DEPLOY_SMOKE_URL }}
+        run: |
+          set -euo pipefail
+          BASE="${DEPLOY_SMOKE_URL:-https://www.iqmoschool.ru}"
+          BASE="${BASE%/}"
+
+          echo "Smoke base: $BASE"
+
+          code_home=$(curl -sS -o /tmp/smoke-home.html -w "%{http_code}" "$BASE/" || true)
+          if [ "$code_home" != "200" ]; then
+            echo "GET / expected 200, got $code_home"
+            exit 1
+          fi
+          if ! grep -q "IQMO" /tmp/smoke-home.html; then
+            echo "Homepage body missing expected marker (IQMO)"
+            head -c 400 /tmp/smoke-home.html | cat -v
+            exit 1
+          fi
+
+          code_subj=$(curl -sS -o /tmp/smoke-subj.html -w "%{http_code}" "$BASE/subject-chemistry.html" || true)
+          if [ "$code_subj" != "200" ]; then
+            echo "GET /subject-chemistry.html expected 200, got $code_subj"
+            exit 1
+          fi
+          if ! grep -qi "хими" /tmp/smoke-subj.html; then
+            echo "Subject page body missing chemistry context"
+            head -c 500 /tmp/smoke-subj.html | cat -v
+            exit 1
+          fi
+
+          curl -fsS -o /tmp/smoke-nav.js "$BASE/iqmo-nav.js"
+          if ! grep -q "__iqmoAuthReady" /tmp/smoke-nav.js; then
+            echo "iqmo-nav.js missing expected bootstrap"
+            exit 1
+          fi
+
+          code_me=$(curl -sS -o /tmp/smoke-me.json -w "%{http_code}" \
+            -H "Accept: application/json" \
+            "$BASE/api/me" || true)
+          if [ "$code_me" != "401" ]; then
+            echo "GET /api/me (guest) expected 401, got $code_me"
+            cat /tmp/smoke-me.json || true
+            exit 1
+          fi
+          if ! grep -q "unauthorized" /tmp/smoke-me.json; then
+            echo "Expected JSON error unauthorized, got:"
+            cat /tmp/smoke-me.json
+            exit 1
+          fi
+
+          code_admin=$(curl -sS -o /tmp/smoke-admin.html -w "%{http_code}" "$BASE/admin/index.html" || true)
+          if [ "$code_admin" = "200" ]; then
+            echo "GET /admin/index.html must not return 200 for anonymous (got 200 — check Nginx static bypass / public/admin)"
+            head -c 300 /tmp/smoke-admin.html | cat -v
+            exit 1
+          fi
+          if [ "$code_admin" != "302" ] && [ "$code_admin" != "403" ] && [ "$code_admin" != "503" ]; then
+            echo "GET /admin/index.html expected 302, 403 or 503 for guest, got $code_admin"
+            head -c 300 /tmp/smoke-admin.html | cat -v
+            exit 1
+          fi
+
+          echo "Smoke OK"
 
