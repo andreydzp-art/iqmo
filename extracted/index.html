@@ -448,6 +448,7 @@
 				<div class="header__btns">
 					<a href="/login.html" class="btn btn--ghost header__btn" id="home-nav-login">Вход</a>
 					<a href="./profile.html" class="btn btn--ghost header__btn" id="home-nav-profile" hidden>Профиль</a>
+					<button type="button" class="btn btn--ghost header__btn" id="home-nav-logout" hidden>Выйти</button>
 				</div>
 			</div>
 		</header>
@@ -651,11 +652,30 @@
 					}
 				} catch (e) {}
 
+				const loginBtn = document.getElementById('home-nav-login');
 				const profBtn = document.getElementById('home-nav-profile');
+				const logoutBtn = document.getElementById('home-nav-logout');
 				if (loggedIn) {
 					if (profBtn) profBtn.removeAttribute('hidden');
+					if (logoutBtn) logoutBtn.removeAttribute('hidden');
+					if (loginBtn) loginBtn.setAttribute('hidden', '');
 				} else {
 					if (profBtn) profBtn.setAttribute('hidden', '');
+					if (logoutBtn) logoutBtn.setAttribute('hidden', '');
+					if (loginBtn) loginBtn.removeAttribute('hidden');
+				}
+
+				if (logoutBtn) {
+					logoutBtn.addEventListener('click', async function () {
+						try {
+							await fetch('/api/auth/logout', {
+								method: 'POST',
+								credentials: 'include',
+								headers: { Accept: 'application/json' }
+							});
+						} catch (e) {}
+						location.reload();
+					});
 				}
 
 				const rows = [];

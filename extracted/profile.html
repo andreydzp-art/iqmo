@@ -103,6 +103,9 @@
 				cursor: pointer;
 				background: none;
 			}
+			[hidden] {
+				display: none !important;
+			}
 			.btn:active {
 				transform: translateY(1px);
 			}
@@ -467,6 +470,7 @@
 				</a>
 				<div class="header__btns">
 					<a href="/login.html" class="btn btn--ghost" id="prof-header-login">Вход</a>
+					<button type="button" class="btn btn--ghost" id="prof-header-logout" hidden>Выйти</button>
 				</div>
 			</div>
 		</header>
@@ -983,6 +987,7 @@
 					const actions = document.getElementById('prof-account-actions');
 					const backups = document.getElementById('prof-backups');
 					const hdrLogin = document.getElementById('prof-header-login');
+					const hdrLogout = document.getElementById('prof-header-logout');
 					if (!line1 || !actions) return;
 					try {
 						const r = await fetch('/api/me', { credentials: 'include' });
@@ -994,14 +999,16 @@
 								'<a class="btn btn--primary" href="/login.html">Войти или зарегистрироваться</a>';
 							backups.style.display = 'none';
 							backups.innerHTML = '';
-							if (hdrLogin) hdrLogin.style.display = '';
+							if (hdrLogin) hdrLogin.removeAttribute('hidden');
+							if (hdrLogout) hdrLogout.setAttribute('hidden', '');
 							return;
 						}
 						const me = await r.json();
 						line1.textContent = 'Вы вошли как ' + me.email + '. Данные курса синхронизируются с сервером.';
 						line2.textContent =
 							'Резервные копии создаются при каждом сохранении (до ~80 точек). Можно откатиться, если что-то перезаписали.';
-						if (hdrLogin) hdrLogin.style.display = 'none';
+						if (hdrLogin) hdrLogin.setAttribute('hidden', '');
+						if (hdrLogout) hdrLogout.removeAttribute('hidden');
 						actions.innerHTML =
 							'<button type="button" class="btn btn--ghost" id="prof-btn-sync">Синхронизировать сейчас</button>' +
 							'<button type="button" class="btn btn--ghost" id="prof-btn-logout">Выйти</button>';
@@ -1072,8 +1079,19 @@
 						line2.textContent = '';
 						actions.innerHTML = '<a class="btn btn--ghost" href="/login.html">Страница входа</a>';
 						backups.style.display = 'none';
+						const hL = document.getElementById('prof-header-login');
+						const hO = document.getElementById('prof-header-logout');
+						if (hL) hL.removeAttribute('hidden');
+						if (hO) hO.setAttribute('hidden', '');
 					}
 				}
+
+				document.getElementById('prof-header-logout')?.addEventListener('click', async function () {
+					try {
+						await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+					} catch (e) {}
+					location.href = './index.html';
+				});
 
 				paintProfileBody();
 				loadAccountPanel();
