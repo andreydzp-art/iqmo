@@ -39,3 +39,4 @@ composer-setup.php
 .gh-jobs.json
 .git_commit_msg.txt
 gh.json
+laravel/composer
