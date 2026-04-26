@@ -10,8 +10,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: PHPUnit (Unit) gate
+    # Gate: deploy is blocked if the JWT crypto invariants drift. Pure-PHP
+    # test, no .env / Laravel boot needed; ~1 minute total.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: laravel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer
+
+      # Deliberately no actions/cache here — see test.yml for rationale.
+
+      - name: Install dependencies (with dev)
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Verify phpunit binary
+        run: |
+          if [ ! -x vendor/bin/phpunit ]; then
+            echo "vendor/bin/phpunit missing after composer install"
+            ls -la vendor/bin/ || true
+            exit 1
+          fi
+          vendor/bin/phpunit --version
+
+      - name: Run Unit tests
+        run: vendor/bin/phpunit --testsuite=Unit --no-coverage
+
   deploy:
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
