@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Services\IqmoJwt;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -46,6 +48,32 @@ foreach (['assets', 'img', 'badges'] as $dir) {
         return $serveStatic($full);
     })->where('path', '.*');
 }
+
+// Server-side guard: если у пользователя уже валидная JWT-кука iqmo_session, страница
+// логина не показывается — сразу 302 на /profile.html (или на sanitized ?next=, если есть).
+// Без этого залогиненный юзер на ~200 мс видит форму, прежде чем JS делает /api/me.
+// Применяется к каноничному /login.html и к alias /uploads/login.html.
+$skipIfAuthed = function (Request $request) use ($serveStatic): \Symfony\Component\HttpFoundation\Response {
+    $uid = IqmoJwt::userIdFromCookie($request);
+    if ($uid !== null && $uid > 0) {
+        // Сюда попадает только локальный путь, начинающийся с одного `/` (не `//`, не схема).
+        // Иначе это open-redirect на чужой хост — игнорируем, отправляем в кабинет.
+        $next = (string) $request->query('next', '');
+        $safe = $next !== ''
+            && str_starts_with($next, '/')
+            && ! str_starts_with($next, '//')
+            && ! str_contains($next, "\r")
+            && ! str_contains($next, "\n");
+        $target = $safe ? $next : '/profile.html';
+
+        return redirect($target, 302);
+    }
+
+    return $serveStatic(public_path('site/login.html'));
+};
+
+Route::get('/login.html', $skipIfAuthed);
+Route::get('/uploads/login.html', $skipIfAuthed);
 
 // `/uploads/*` теперь читается из `public/site/uploads/*` — единый источник правды
 // (синхронизируется из `extracted/uploads/` через `node scripts/sync-site.mjs`).
