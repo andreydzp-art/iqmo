@@ -38,3 +38,4 @@ composer-setup.php
 # CI debugging artefacts
 .gh-jobs.json
 .git_commit_msg.txt
+gh.json
