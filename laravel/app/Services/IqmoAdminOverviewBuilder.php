@@ -266,13 +266,13 @@ final class IqmoAdminOverviewBuilder
             ->where('occurred_at', '>=', $sinceMs)
             ->orderByDesc('id')
             ->limit(12_000)
-            ->get(['payload']);
+            ->get(['payload_json']);
 
         /** @var array<string, array{n: int, w: int}> $acc */
         $acc = [];
 
         foreach ($rows as $row) {
-            $raw = $row->payload ?? null;
+            $raw = $row->payload_json ?? null;
             if (is_string($raw)) {
                 $p = json_decode($raw, true);
             } elseif (is_array($raw)) {
