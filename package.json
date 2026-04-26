@@ -1,0 +1,19 @@
+{
+	"name": "iqmo-monorepo",
+	"private": true,
+	"version": "1.0.0",
+	"description": "IQMO root: convenience scripts for the static site, Node API and Laravel app",
+	"engines": {
+		"node": ">=18"
+	},
+	"scripts": {
+		"sync": "node scripts/sync-site.mjs",
+		"server:install": "npm --prefix server install",
+		"server:start": "npm --prefix server run start",
+		"server:dev": "npm --prefix server run start",
+		"web:install": "npm --prefix laravel install",
+		"web:dev": "npm --prefix laravel run dev",
+		"web:build": "npm --prefix laravel run build",
+		"lint": "node --check scripts/sync-site.mjs && node --check server/index.js && node --check extracted/chem-progress.js && node --check extracted/iqmo-nav.js"
+	}
+}
