@@ -2,8 +2,17 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Request;
 use RuntimeException;
 
+/**
+ * HS256 JWT, совместимый с тем, что выпускает Node-сервер (`server/index.js`,
+ * jsonwebtoken, alg=HS256, expiresIn=30d), а также используется для
+ * подписи cookie `iqmo_session` из Laravel.
+ *
+ * Источник секрета: IQMO_JWT_SECRET (config('services.iqmo.jwt_secret')).
+ * Для локальной разработки допускается fallback на APP_KEY.
+ */
 final class IqmoJwt
 {
     public function __construct(private readonly string $secret)
@@ -15,12 +24,32 @@ final class IqmoJwt
 
     public static function fromConfig(): self
     {
-        $secret = (string) config('iqmo.jwt_secret', '');
-        if ($secret === '') {
-            $secret = (string) config('app.key', '');
+        return new self(self::resolveSecret());
+    }
+
+    /**
+     * Тихий хелпер для middleware/контроллеров: возвращает uid из cookie
+     * `iqmo_session` или null при любой ошибке (включая отсутствие секрета).
+     */
+    public static function userIdFromCookie(Request $request): ?int
+    {
+        $token = $request->cookie('iqmo_session');
+        if (!is_string($token) || $token === '') {
+            return null;
         }
 
-        return new self($secret);
+        $secret = self::resolveSecret();
+        if ($secret === '') {
+            return null;
+        }
+
+        try {
+            $payload = (new self($secret))->verify($token);
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        return $payload['uid'] ?? null;
     }
 
     /**
@@ -59,6 +88,16 @@ final class IqmoJwt
         }
 
         [$h, $p, $s] = $parts;
+
+        $headerJson = $this->b64urlDecode($h);
+        if (!is_string($headerJson)) {
+            return null;
+        }
+        $header = json_decode($headerJson, true);
+        if (!is_array($header) || ($header['alg'] ?? null) !== 'HS256') {
+            return null;
+        }
+
         $signingInput = $h.'.'.$p;
         $expected = hash_hmac('sha256', $signingInput, $this->secret, true);
         $sig = $this->b64urlDecode($s);
@@ -80,7 +119,8 @@ final class IqmoJwt
         $uid = isset($payload['uid']) ? (int) $payload['uid'] : 0;
         $email = isset($payload['email']) ? (string) $payload['email'] : '';
         $exp = isset($payload['exp']) ? (int) $payload['exp'] : 0;
-        if ($uid <= 0 || $email === '' || $exp <= time()) {
+        $leeway = 30;
+        if ($uid <= 0 || $email === '' || $exp + $leeway <= time()) {
             return null;
         }
 
@@ -90,6 +130,19 @@ final class IqmoJwt
             'iat' => (int) ($payload['iat'] ?? 0),
             'exp' => $exp,
         ];
+    }
+
+    private static function resolveSecret(): string
+    {
+        $secret = (string) config('services.iqmo.jwt_secret', '');
+        if ($secret === '') {
+            $secret = (string) config('iqmo.jwt_secret', '');
+        }
+        if ($secret === '') {
+            $secret = (string) config('app.key', '');
+        }
+
+        return $secret;
     }
 
     private function b64url(string $data): string

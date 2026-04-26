@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Support\IqmoJwt;
+use App\Services\IqmoJwt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
