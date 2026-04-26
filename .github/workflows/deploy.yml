@@ -38,14 +38,10 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Copy .env
-        run: cp .env.example .env
-
-      - name: Generate APP_KEY
-        run: php artisan key:generate
-
       - name: Run Unit tests
         # Gate: deploy is blocked if the JWT crypto invariants drift.
+        # IqmoJwtTest is pure PHP — no Laravel boot, no .env needed. The autoloader
+        # from composer install is enough to resolve App\Services\IqmoJwt.
         run: vendor/bin/phpunit --testsuite=Unit --no-coverage
 
   deploy:
