@@ -2,23 +2,48 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 require __DIR__.'/auth.php';
 
 // `/uploads/login.html` must remain a real page (not redirect to `/login.html`): an outdated
 // `site/login.html` stub that meta-refreshes to `/uploads/` would otherwise loop with a redirect.
 
+// PHP `finfo_file()` is unreliable for short text files: it returns `text/x-asm` for some
+// `.min.css`, `text/html` for short `.js` (e.g. `iqmo-nav.js`, `iqmo-cookies.js`), etc.
+// Combined with our `X-Content-Type-Options: nosniff` header that breaks the page
+// (browsers refuse to apply such files as CSS/JS). Force the right Content-Type by extension.
+$serveStatic = function (string $full): BinaryFileResponse {
+    $response = response()->file($full);
+    $ext = strtolower(pathinfo($full, PATHINFO_EXTENSION));
+    $mime = match ($ext) {
+        'css' => 'text/css; charset=UTF-8',
+        'js', 'mjs' => 'application/javascript; charset=UTF-8',
+        'json', 'map' => 'application/json; charset=UTF-8',
+        'webmanifest' => 'application/manifest+json; charset=UTF-8',
+        'html', 'htm' => 'text/html; charset=UTF-8',
+        'svg' => 'image/svg+xml',
+        'xml' => 'application/xml; charset=UTF-8',
+        'txt' => 'text/plain; charset=UTF-8',
+        default => null,
+    };
+    if ($mime !== null) {
+        $response->headers->set('Content-Type', $mime);
+    }
+    return $response;
+};
+
 // Static site assets (served by Nginx on VPS; routed here for local `php artisan serve`)
 // `/admin/*` is not public: see protected routes below (IQMO_ADMIN_EMAILS + portal session).
 foreach (['assets', 'img', 'badges'] as $dir) {
-    Route::get("/{$dir}/{path}", function (string $path) use ($dir) {
+    Route::get("/{$dir}/{path}", function (string $path) use ($dir, $serveStatic) {
         // Use forward slashes for Laravel path helpers, then normalize.
         $rel = $dir.'/'.ltrim($path, '/');
         $full = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, public_path($rel));
         if (!is_file($full)) {
             abort(404);
         }
-        return response()->file($full);
+        return $serveStatic($full);
     })->where('path', '.*');
 }
 
@@ -26,26 +51,26 @@ foreach (['assets', 'img', 'badges'] as $dir) {
 // (синхронизируется из `extracted/uploads/` через `node scripts/sync-site.mjs`).
 // Старая папка `public/uploads/` удалена из git: nginx с дефолтным `try_files`
 // просто прокинет запрос в Laravel, и эта route отдаст файл из site/uploads.
-Route::get('/uploads/{path}', function (string $path) {
+Route::get('/uploads/{path}', function (string $path) use ($serveStatic) {
     $rel = 'site/uploads/'.ltrim($path, '/');
     $full = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, public_path($rel));
     if (! is_file($full)) {
         abort(404);
     }
 
-    return response()->file($full);
+    return $serveStatic($full);
 })->where('path', '.*');
 
-Route::get('/', function () {
-    return response()->file(public_path('site/index.html'));
+Route::get('/', function () use ($serveStatic) {
+    return $serveStatic(public_path('site/index.html'));
 })->name('home');
 
-Route::get('/index.html', function () {
-    return response()->file(public_path('site/index.html'));
+Route::get('/index.html', function () use ($serveStatic) {
+    return $serveStatic(public_path('site/index.html'));
 })->name('iqmo.site_index');
 
-Route::get('/profile.html', function () {
-    return response()->file(public_path('site/profile.html'));
+Route::get('/profile.html', function () use ($serveStatic) {
+    return $serveStatic(public_path('site/profile.html'));
 })->name('iqmo.profile_html');
 
 Route::get('/login', function () {
@@ -54,12 +79,12 @@ Route::get('/login', function () {
 })->name('iqmo.portal_login');
 
 // Админ-UI лежит в resources/admin-ui (не в public), иначе Nginx отдаёт public/admin/* без PHP и middleware бессилен.
-Route::middleware('iqmo.portal_admin')->group(function (): void {
+Route::middleware('iqmo.portal_admin')->group(function () use ($serveStatic): void {
     Route::get('/admin', function () {
         return redirect('/admin/index.html', 302);
     })->name('iqmo.admin');
 
-    Route::get('/admin/{path}', function (string $path) {
+    Route::get('/admin/{path}', function (string $path) use ($serveStatic) {
         $path = ltrim($path, '/');
         if ($path === '' || str_ends_with($path, '/')) {
             abort(404);
@@ -72,19 +97,19 @@ Route::middleware('iqmo.portal_admin')->group(function (): void {
             abort(404);
         }
 
-        return response()->file($full);
+        return $serveStatic($full);
     })->where('path', '.*');
 });
 
-Route::get('/cabinet', function () {
-    return response()->file(public_path('site/profile.html'));
+Route::get('/cabinet', function () use ($serveStatic) {
+    return $serveStatic(public_path('site/profile.html'));
 })->name('cabinet');
 
 // Root-level static files referenced by pages served at `/<page>.html`.
 // Example: `full-test-chemistry.html` includes `<script src="./exam-config.js">`,
 // which resolves to `/exam-config.js` in the browser. We serve these from `public/site/`
 // to avoid duplicating files into `public/`.
-Route::get('/{file}', function (string $file) {
+Route::get('/{file}', function (string $file) use ($serveStatic) {
     if ($file !== basename($file) || ! preg_match('/^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(js|css|map|json)$/', $file)) {
         abort(404);
     }
@@ -93,12 +118,12 @@ Route::get('/{file}', function (string $file) {
         abort(404);
     }
 
-    return response()->file($full);
+    return $serveStatic($full);
 })->where('file', '[A-Za-z0-9][A-Za-z0-9_.-]*\\.(js|css|map|json)');
 
 // Остальные страницы портала (`subject-chemistry.html`, `trial-chemistry.html`, …): ссылки от главной
 // идут с корня сайта, а файлы лежат в `public/site/` — без этого маршрута под `php artisan serve` везде 404.
-Route::get('/{html}', function (string $html) {
+Route::get('/{html}', function (string $html) use ($serveStatic) {
     if ($html !== basename($html) || ! preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*\\.html$/', $html)) {
         abort(404);
     }
@@ -107,7 +132,7 @@ Route::get('/{html}', function (string $html) {
         abort(404);
     }
 
-    return response()->file($full);
+    return $serveStatic($full);
 })->where('html', '[A-Za-z0-9][A-Za-z0-9_-]*\\.html');
 
 Route::get('/dashboard', function () {

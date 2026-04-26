@@ -209,5 +209,24 @@ jobs:
             exit 1
           fi
 
+          # Static asset Content-Type guard: PHP finfo is unreliable for short text files
+          # and historically returned `text/x-asm` for .min.css, `text/html` for short .js.
+          # Combined with `X-Content-Type-Options: nosniff`, browsers refuse such files —
+          # the public login form rendered "naked" because main.min.css was rejected.
+          # We force the right MIME by extension in routes/web.php; this guard catches a regression.
+          assert_ct() {
+            local url="$1"
+            local expect="$2"
+            local got
+            got=$(curl -sS -o /dev/null -w "%{content_type}" "$url" || true)
+            if ! echo "$got" | grep -qi "$expect"; then
+              echo "Content-Type smoke FAIL: $url -> '$got' (expected to contain '$expect')"
+              exit 1
+            fi
+          }
+          assert_ct "$BASE/uploads/css/main.min.css" "text/css"
+          assert_ct "$BASE/iqmo-nav.js" "application/javascript"
+          assert_ct "$BASE/iqmo-cookies.js" "application/javascript"
+
           echo "Smoke OK"
 
