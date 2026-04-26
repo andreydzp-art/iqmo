@@ -442,9 +442,9 @@
 					</svg>
 				</a>
 				<div class="header__btns">
-					<a href="/login.html" class="btn btn--ghost header__btn">Вход</a>
+					<a href="/login.html" class="btn btn--ghost header__btn" id="home-nav-login">Вход</a>
 					<a href="./subject-chemistry.html" class="btn btn--ghost header__btn">Химия · ОГЭ</a>
-					<a href="./profile.html" class="btn btn--ghost header__btn">Профиль</a>
+					<a href="./profile.html" class="btn btn--ghost header__btn" id="home-nav-profile" hidden>Профиль</a>
 				</div>
 			</div>
 		</header>
@@ -544,7 +544,7 @@
 		<script src="./iqmo-sync.js"></script>
 		<script src="./chem-progress.js"></script>
 		<script>
-			(function () {
+			(async function () {
 				const TOPIC_PARTIAL = [
 					{ key: 'iqmo-chem-topic02-subtopics', href: './topic-atom-structure.html', label: 'Тема 02 · Строение атома' },
 					{ key: 'iqmo-chem-topic03-subtopics', href: './topic-chemical-bond.html', label: 'Тема 03 · Химическая связь' },
@@ -601,8 +601,8 @@
 					return mode || 'Тренировка';
 				}
 
-				function lastAttemptRow() {
-					if (!window.ChemProgress) return null;
+				function lastAttemptRow(loggedIn) {
+					if (!loggedIn || !window.ChemProgress) return null;
 					const la = ChemProgress.getLastAttempt();
 					if (!la || la.subject !== 'chemistry') return null;
 					const when = ChemProgress.formatRelativeTime(la.finishedAt);
@@ -633,12 +633,28 @@
 				const wrap = document.getElementById('home-continue');
 				if (!root || !wrap) return;
 
+				let loggedIn = false;
+				try {
+					const mr = await fetch('/api/me', { credentials: 'include' });
+					loggedIn = mr.ok;
+				} catch (e) {}
+
+				const loginBtn = document.getElementById('home-nav-login');
+				const profBtn = document.getElementById('home-nav-profile');
+				if (loggedIn) {
+					if (profBtn) profBtn.removeAttribute('hidden');
+					if (loginBtn) loginBtn.setAttribute('hidden', '');
+				} else {
+					if (profBtn) profBtn.setAttribute('hidden', '');
+					if (loginBtn) loginBtn.removeAttribute('hidden');
+				}
+
 				const rows = [];
 				const t = trialContinue();
 				if (t) rows.push(t);
 				const p = partialTopicContinue();
 				if (p) rows.push(p);
-				const l = lastAttemptRow();
+				const l = lastAttemptRow(loggedIn);
 				if (l) rows.push(l);
 
 				if (rows.length === 0) {
