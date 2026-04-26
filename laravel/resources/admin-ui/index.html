@@ -497,6 +497,370 @@
 				margin-bottom: 8px;
 			}
 
+			/* ─── users panel ─── */
+			.users-toolbar {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				align-items: center;
+				margin-bottom: 14px;
+			}
+			.users-search {
+				flex: 1 1 260px;
+				min-width: 0;
+				display: flex;
+				align-items: center;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				padding: 0 12px;
+				box-shadow: var(--shadow);
+			}
+			.users-search input {
+				flex: 1;
+				border: none;
+				outline: none;
+				background: transparent;
+				padding: 10px 0;
+				font: inherit;
+				font-size: 13px;
+				color: var(--ink);
+			}
+			.users-chips {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 4px;
+				padding: 4px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				box-shadow: var(--shadow);
+			}
+			.users-chips button {
+				padding: 7px 12px;
+				border-radius: 999px;
+				font-weight: 700;
+				font-size: 12px;
+				color: var(--muted);
+				white-space: nowrap;
+			}
+			.users-chips button.is--on {
+				background: var(--ink);
+				color: #fff;
+			}
+			.users-chips button:hover:not(.is--on) {
+				background: #f3f5f8;
+				color: var(--ink-2);
+			}
+
+			th.is-sort {
+				cursor: pointer;
+				user-select: none;
+			}
+			th.is-sort:hover {
+				color: var(--ink);
+			}
+			th.is-sort.is-active {
+				color: var(--accent);
+			}
+			th.is-sort .arrow {
+				display: inline-block;
+				margin-left: 4px;
+				opacity: 0.4;
+				font-size: 9px;
+				vertical-align: middle;
+			}
+			th.is-sort.is-active .arrow {
+				opacity: 1;
+			}
+
+			.users-table tr.is-clickable {
+				cursor: pointer;
+			}
+			.users-table tr.is-clickable:hover {
+				background: #fafbfd;
+			}
+			.users-table td.email {
+				font-family: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+				font-size: 12px;
+				word-break: break-all;
+			}
+			.users-table td.email .uid {
+				color: var(--muted);
+				font-size: 11px;
+				margin-left: 4px;
+			}
+			.users-table td.num {
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+			}
+			.users-table td.dim {
+				color: var(--muted);
+				font-size: 12px;
+			}
+
+			.status-pill {
+				display: inline-flex;
+				align-items: center;
+				padding: 2px 8px;
+				border-radius: 999px;
+				font-size: 11px;
+				font-weight: 700;
+				line-height: 1.5;
+				white-space: nowrap;
+			}
+			.status-pill--active {
+				background: #ecfdf5;
+				color: #047857;
+			}
+			.status-pill--idle {
+				background: #fef3c7;
+				color: #92400e;
+			}
+			.status-pill--sleeping {
+				background: #f3f4f6;
+				color: #4b5563;
+			}
+			.status-pill--new {
+				background: #ddeefa;
+				color: #0b67b2;
+			}
+			.status-pill--admin {
+				background: #f5e9ff;
+				color: #6b21a8;
+			}
+			.status-pill--never {
+				background: #fff1f2;
+				color: #9f1239;
+			}
+
+			.users-pager {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-top: 14px;
+				font-size: 13px;
+				color: var(--muted);
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+			.users-pager-buttons {
+				display: inline-flex;
+				gap: 4px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				box-shadow: var(--shadow);
+				padding: 3px;
+			}
+			.users-pager-buttons button {
+				padding: 6px 12px;
+				border-radius: 9px;
+				font-weight: 700;
+				font-size: 12px;
+				color: var(--ink-2);
+			}
+			.users-pager-buttons button:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
+			.users-pager-buttons button:hover:not(:disabled) {
+				background: #f3f5f8;
+			}
+
+			.spark-card {
+				margin-top: 14px;
+			}
+			.spark-svg {
+				width: 100%;
+				height: 80px;
+				display: block;
+			}
+			.spark-axis {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 6px;
+				font-size: 11px;
+				color: var(--muted);
+				gap: 12px;
+			}
+			.spark-axis span {
+				white-space: nowrap;
+			}
+
+			/* ─── drawer (карточка пользователя) ─── */
+			.drawer-overlay {
+				position: fixed;
+				inset: 0;
+				background: rgba(17, 20, 26, 0.42);
+				z-index: 50;
+				display: none;
+			}
+			.drawer-overlay.is--open {
+				display: block;
+				animation: drawerFadeIn 0.16s ease-out;
+			}
+			@keyframes drawerFadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+			.drawer {
+				position: fixed;
+				top: 0;
+				right: 0;
+				height: 100%;
+				width: min(100%, 560px);
+				background: #fff;
+				box-shadow: -8px 0 32px -8px rgba(17, 20, 26, 0.18);
+				overflow: auto;
+				transform: translateX(100%);
+				transition: transform 0.2s ease-out;
+			}
+			.drawer-overlay.is--open .drawer {
+				transform: translateX(0);
+			}
+			.drawer__head {
+				position: sticky;
+				top: 0;
+				background: #fff;
+				border-bottom: 1px solid var(--line);
+				padding: 16px 22px 14px;
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: 12px;
+				z-index: 1;
+			}
+			.drawer__title {
+				font-size: 15px;
+				font-weight: 800;
+				margin: 0 0 4px;
+				word-break: break-all;
+				font-family: 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+			}
+			.drawer__sub {
+				font-size: 12px;
+				color: var(--muted);
+				margin: 0;
+				display: flex;
+				gap: 6px;
+				align-items: center;
+				flex-wrap: wrap;
+			}
+			.drawer__close {
+				flex-shrink: 0;
+				padding: 6px 10px;
+				border-radius: 8px;
+				font-weight: 700;
+				color: var(--muted);
+				font-size: 16px;
+				line-height: 1;
+			}
+			.drawer__close:hover {
+				background: #f3f5f8;
+				color: var(--ink);
+			}
+			.drawer__body {
+				padding: 18px 22px 28px;
+			}
+			.drawer__section {
+				margin-bottom: 22px;
+			}
+			.drawer__section h3 {
+				font-size: 11px;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				font-weight: 800;
+				color: var(--muted);
+				margin: 0 0 10px;
+			}
+			.drawer__grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px;
+			}
+			.drawer__cell {
+				background: #f9fafb;
+				border-radius: 10px;
+				padding: 10px 12px;
+			}
+			.drawer__cell-label {
+				font-size: 10px;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: var(--muted);
+				font-weight: 700;
+				margin-bottom: 4px;
+			}
+			.drawer__cell-value {
+				font-size: 14px;
+				font-weight: 700;
+				color: var(--ink);
+			}
+			.drawer__timeline {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				max-height: 360px;
+				overflow: auto;
+				padding-right: 4px;
+			}
+			.drawer__tl-row {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				padding: 8px 10px;
+				background: #f9fafb;
+				border-radius: 10px;
+				font-size: 12px;
+			}
+			.drawer__tl-when {
+				flex-shrink: 0;
+				color: var(--muted);
+				width: 90px;
+				line-height: 1.4;
+			}
+			.drawer__tl-event {
+				font-weight: 700;
+				color: var(--ink);
+				word-break: break-word;
+			}
+			.drawer__tl-meta {
+				color: var(--muted);
+				margin-top: 2px;
+				word-break: break-word;
+			}
+			.drawer__counts {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+			}
+			.drawer__count {
+				background: #eef1f6;
+				border-radius: 8px;
+				padding: 5px 10px;
+				font-size: 12px;
+				color: var(--ink-2);
+			}
+			.drawer__count strong {
+				color: var(--ink);
+				margin-right: 6px;
+				font-weight: 800;
+			}
+
+			@media (max-width: 480px) {
+				.drawer__grid {
+					grid-template-columns: 1fr;
+				}
+				.users-table td.email {
+					font-size: 11px;
+				}
+			}
+
 			@media (max-width: 860px) {
 				.admin {
 					flex-direction: column;
@@ -535,7 +899,7 @@
 				</div>
 				<nav class="admin__nav" id="nav">
 					<button type="button" class="is--active" data-section="overview">Обзор</button>
-					<button type="button" class="is--soon" data-section="users">Пользователи</button>
+					<button type="button" data-section="users">Пользователи</button>
 					<button type="button" class="is--soon" data-section="subjects">Предметы</button>
 					<button type="button" class="is--soon" data-section="topics">Темы</button>
 					<button type="button" class="is--soon" data-section="questions">Вопросы</button>
@@ -670,6 +1034,92 @@
 					</div>
 				</div>
 
+				<div id="panel-users" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Пользователи</h1>
+							<p class="admin__lead" id="users-lead">Загрузка списка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" id="users-period" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="users-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+
+					<div class="callout" id="users-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size: 13px">/api/admin/users</code>
+					</div>
+
+					<div class="kpi-grid" id="users-kpi-root" aria-live="polite"></div>
+
+					<div class="card spark-card">
+						<h2>Регистрации за 30 дней</h2>
+						<svg
+							class="spark-svg"
+							id="users-spark"
+							viewBox="0 0 600 80"
+							preserveAspectRatio="none"
+							role="img"
+							aria-label="График регистраций по дням"
+						></svg>
+						<div class="spark-axis" id="users-spark-axis"></div>
+					</div>
+
+					<div class="card" style="margin-top: 14px">
+						<h2 id="users-table-title">Аккаунты</h2>
+
+						<div class="users-toolbar">
+							<label class="users-search" aria-label="Поиск по email или ID">
+								<span aria-hidden="true" style="color: var(--muted); margin-right: 8px; font-size: 14px">⌕</span>
+								<input
+									id="users-search-input"
+									type="search"
+									autocomplete="off"
+									placeholder="Email или ID…"
+								/>
+							</label>
+							<div class="users-chips" id="users-chips" role="group" aria-label="Фильтры">
+								<button type="button" class="is--on" data-filter="all">Все</button>
+								<button type="button" data-filter="new24">Новые 24 ч</button>
+								<button type="button" data-filter="active7">Активные 7 дн.</button>
+								<button type="button" data-filter="sleeping14">Спящие 14+</button>
+								<button type="button" data-filter="no_attempts">Без попыток</button>
+								<button type="button" data-filter="admins">Админы</button>
+							</div>
+						</div>
+
+						<div class="table-wrap">
+							<table class="users-table">
+								<thead>
+									<tr id="users-thead-row">
+										<th class="is-sort" data-sort="email">Email <span class="arrow"></span></th>
+										<th class="is-sort" data-sort="created_at">Регистрация <span class="arrow"></span></th>
+										<th class="is-sort" data-sort="last_event">Последняя активность <span class="arrow"></span></th>
+										<th class="is-sort" data-sort="attempts" style="text-align: right">Попытки <span class="arrow"></span></th>
+										<th style="text-align: right">Средн. %</th>
+										<th>Профиль</th>
+										<th>Статус</th>
+									</tr>
+								</thead>
+								<tbody id="users-tbody"></tbody>
+							</table>
+						</div>
+
+						<div class="users-pager">
+							<div id="users-pager-info">—</div>
+							<div class="users-pager-buttons">
+								<button type="button" id="users-prev">‹ Назад</button>
+								<button type="button" id="users-next">Вперёд ›</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<div id="panel-placeholder" hidden>
 					<div class="admin__top">
 						<div>
@@ -683,6 +1133,21 @@
 					</div>
 				</div>
 			</div>
+		</div>
+
+		<div class="drawer-overlay" id="user-drawer" role="dialog" aria-modal="true" aria-hidden="true">
+			<aside class="drawer" id="user-drawer-panel" tabindex="-1">
+				<div class="drawer__head">
+					<div>
+						<h2 class="drawer__title" id="drawer-title">user@example.com</h2>
+						<p class="drawer__sub" id="drawer-sub">ID — · регистрация —</p>
+					</div>
+					<button type="button" class="drawer__close" id="drawer-close" aria-label="Закрыть карточку">✕</button>
+				</div>
+				<div class="drawer__body" id="drawer-body">
+					<div class="placeholder"><strong>Загрузка…</strong></div>
+				</div>
+			</aside>
 		</div>
 
 		<script src="./mock-data.js"></script>
@@ -1140,6 +1605,567 @@
 					setDashTab(btn.getAttribute('data-dash-tab'));
 				});
 
+				// ─── раздел «Пользователи» ───────────────────────────────────────
+				const usersState = {
+					days: 7,
+					page: 1,
+					perPage: 50,
+					sort: 'created_at',
+					dir: 'desc',
+					filter: 'all',
+					q: '',
+				};
+				let usersFetchSeq = 0;
+				let drawerSeq = 0;
+				let usersInitialized = false;
+
+				const STATUS_LABELS = {
+					active: 'активен',
+					idle: 'был недавно',
+					sleeping: 'спящий',
+					new: 'новый',
+					admin: 'админ',
+					never: 'без активности',
+				};
+
+				async function fetchUsersJson() {
+					// Тот же 12-секундный таймаут, что и в overview: спиннер не должен зависать,
+					// если на сервере зацепился медленный JOIN или сеть отвалилась.
+					const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+					const timer = ctl ? setTimeout(function () { ctl.abort(); }, 12000) : null;
+					const params = new URLSearchParams({
+						days: String(usersState.days),
+						page: String(usersState.page),
+						perPage: String(usersState.perPage),
+						sort: usersState.sort,
+						dir: usersState.dir,
+						filter: usersState.filter,
+					});
+					if (usersState.q) params.set('q', usersState.q);
+					try {
+						const r = await fetch('/api/admin/users?' + params.toString(), {
+							credentials: 'same-origin',
+							cache: 'no-store',
+							headers: { Accept: 'application/json' },
+							signal: ctl ? ctl.signal : undefined,
+						});
+						if (!r.ok) {
+							let detail = '';
+							try {
+								const body = await r.json();
+								if (body && body.meta) {
+									const m = body.meta;
+									detail = [m.errorMessage, m.errorClass, m.errorAt].filter(Boolean).join(' · ');
+								}
+							} catch (_) { /* не json */ }
+							const err = new Error('users_http_' + r.status);
+							err.httpStatus = r.status;
+							err.serverDetail = detail;
+							throw err;
+						}
+						return await r.json();
+					} finally {
+						if (timer) clearTimeout(timer);
+					}
+				}
+
+				function escapeAttr(s) {
+					return String(s)
+						.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+						.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+				}
+
+				function statusPill(s) {
+					const label = STATUS_LABELS[s] || s;
+					return '<span class="status-pill status-pill--' + escapeAttr(s) + '">' + escapeHtml(label) + '</span>';
+				}
+
+				function formatRelativeRu(ms) {
+					if (!ms) return '—';
+					const diff = Date.now() - ms;
+					if (diff < 0 || diff < 60_000) return 'только что';
+					if (diff < 3_600_000) return Math.floor(diff / 60_000) + ' мин назад';
+					if (diff < 86_400_000) return Math.floor(diff / 3_600_000) + ' ч назад';
+					if (diff < 30 * 86_400_000) return Math.floor(diff / 86_400_000) + ' дн. назад';
+					if (diff < 365 * 86_400_000) return Math.floor(diff / (30 * 86_400_000)) + ' мес. назад';
+					return Math.floor(diff / (365 * 86_400_000)) + ' г. назад';
+				}
+
+				function formatDateRu(ms) {
+					if (!ms) return '—';
+					return new Date(ms).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+				}
+
+				function formatSparkAxisDate(iso) {
+					const months = {
+						'01': 'янв','02':'фев','03':'мар','04':'апр','05':'мая','06':'июн',
+						'07':'июл','08':'авг','09':'сен','10':'окт','11':'ноя','12':'дек',
+					};
+					const mm = String(iso).slice(5, 7);
+					const dd = String(iso).slice(8, 10);
+					return parseInt(dd, 10) + ' ' + (months[mm] || mm);
+				}
+
+				function renderUsersKpis(kpis) {
+					const root = document.getElementById('users-kpi-root');
+					root.innerHTML = '';
+					(kpis || []).forEach(function (k) { appendKpi(root, k); });
+				}
+
+				function renderUsersSpark(daily) {
+					const svg = document.getElementById('users-spark');
+					const axis = document.getElementById('users-spark-axis');
+					if (!svg) return;
+					svg.innerHTML = '';
+					if (axis) axis.innerHTML = '';
+					if (!daily || daily.length === 0) return;
+
+					const w = 600;
+					const h = 80;
+					const max = Math.max(1, ...daily.map(function (d) { return d.count; }));
+					const barW = w / daily.length;
+					const ns = 'http://www.w3.org/2000/svg';
+					daily.forEach(function (d, i) {
+						const bh = max > 0 ? Math.round((d.count / max) * (h - 14)) : 0;
+						const r = document.createElementNS(ns, 'rect');
+						r.setAttribute('x', String(Math.round(i * barW + 1)));
+						r.setAttribute('y', String(h - bh));
+						r.setAttribute('width', String(Math.max(1, Math.floor(barW - 2))));
+						r.setAttribute('height', String(bh));
+						r.setAttribute('rx', '2');
+						r.setAttribute('fill', d.count > 0 ? '#4f7bd6' : '#e6e9ef');
+						const title = document.createElementNS(ns, 'title');
+						title.textContent = d.date + ': ' + d.count;
+						r.appendChild(title);
+						svg.appendChild(r);
+					});
+
+					if (axis) {
+						const sumLast7 = daily.slice(-7).reduce(function (a, d) { return a + d.count; }, 0);
+						const sumPrev7 = daily.slice(-14, -7).reduce(function (a, d) { return a + d.count; }, 0);
+						const sumTotal = daily.reduce(function (a, d) { return a + d.count; }, 0);
+						const left = document.createElement('span');
+						left.textContent = formatSparkAxisDate(daily[0].date);
+						const mid = document.createElement('span');
+						const sumPart = 'за 7 дн.: ' + sumLast7 + (sumPrev7 > 0 ? ' (было ' + sumPrev7 + ')' : '');
+						mid.textContent = 'всего ' + sumTotal + ' · ' + sumPart;
+						const right = document.createElement('span');
+						right.textContent = formatSparkAxisDate(daily[daily.length - 1].date) + ' (сегодня)';
+						axis.appendChild(left);
+						axis.appendChild(mid);
+						axis.appendChild(right);
+					}
+				}
+
+				function renderUsersTable(data) {
+					const tbody = document.getElementById('users-tbody');
+					const items = data.items || [];
+					tbody.innerHTML = '';
+					if (items.length === 0) {
+						const tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td colspan="7" style="color:var(--muted); padding:24px; text-align:center;">' +
+							'Никого не нашли по выбранным фильтрам.</td>';
+						tbody.appendChild(tr);
+					} else {
+						items.forEach(function (u) {
+							const tr = document.createElement('tr');
+							tr.className = 'is-clickable';
+							tr.setAttribute('data-uid', String(u.id));
+							tr.setAttribute('tabindex', '0');
+							tr.setAttribute('role', 'button');
+							tr.setAttribute('aria-label', 'Открыть карточку пользователя ' + u.email);
+							const lastActStr = u.lastActivity ? formatRelativeRu(u.lastActivity) : '—';
+							const avgPctStr =
+								u.avgPct !== null && u.avgPct !== undefined
+									? String(u.avgPct).replace('.', ',') + '%'
+									: '—';
+							const profileStr = u.hasProfile
+								? Math.max(1, Math.round(u.profileSize / 1024)) + ' КБ · rev ' + u.profileRevision
+								: 'нет';
+							tr.innerHTML =
+								'<td class="email">' + escapeHtml(u.email) + ' <span class="uid">#' + u.id + '</span></td>' +
+								'<td>' + escapeHtml(formatDateRu(u.createdAt)) + '</td>' +
+								'<td>' + escapeHtml(lastActStr) + '</td>' +
+								'<td class="num">' + (u.attempts || 0) + '</td>' +
+								'<td class="num">' + escapeHtml(avgPctStr) + '</td>' +
+								'<td class="dim">' + escapeHtml(profileStr) + '</td>' +
+								'<td>' + statusPill(u.status) + '</td>';
+							tbody.appendChild(tr);
+						});
+					}
+
+					const p = data.pagination || { page: 1, perPage: usersState.perPage, total: 0, totalPages: 1 };
+					const info = document.getElementById('users-pager-info');
+					if (info) {
+						if (p.total === 0) {
+							info.textContent = '0 аккаунтов';
+						} else {
+							const from = (p.page - 1) * p.perPage + 1;
+							const to = Math.min(p.total, p.page * p.perPage);
+							info.textContent = from + '–' + to + ' из ' + p.total + ' (стр. ' + p.page + '/' + p.totalPages + ')';
+						}
+					}
+					const prev = document.getElementById('users-prev');
+					const next = document.getElementById('users-next');
+					if (prev) prev.disabled = p.page <= 1;
+					if (next) next.disabled = p.page >= p.totalPages;
+					usersState.page = p.page;
+				}
+
+				function updateUsersSortIndicators() {
+					document.querySelectorAll('#panel-users th[data-sort]').forEach(function (th) {
+						const key = th.getAttribute('data-sort');
+						const arrow = th.querySelector('.arrow');
+						const active = key === usersState.sort;
+						th.classList.toggle('is-active', active);
+						if (arrow) arrow.textContent = active ? (usersState.dir === 'asc' ? '▲' : '▼') : '↕';
+					});
+				}
+
+				async function renderUsers() {
+					const seq = ++usersFetchSeq;
+					const lead = document.getElementById('users-lead');
+					const co = document.getElementById('users-callout');
+					const rangeEl = document.getElementById('users-period-range');
+					if (rangeEl) rangeEl.textContent = formatPeriodRangeRu(usersState.days);
+
+					let data;
+					try {
+						data = await fetchUsersJson();
+						if (seq !== usersFetchSeq) return;
+						if (lead) {
+							lead.textContent =
+								'Список аккаунтов из MySQL (users + profile_state + analytics_events). Окно для KPI: ' +
+								periodLabelShort(usersState.days) + '.';
+						}
+						if (co) {
+							co.className = 'callout callout--live';
+							co.innerHTML =
+								'<strong>Живой список:</strong> агрегация на сервере. Кликни по строке — откроется карточка пользователя.';
+						}
+					} catch (err) {
+						if (seq !== usersFetchSeq) return;
+						if (lead) lead.textContent = 'Не удалось загрузить /api/admin/users.';
+						if (co) {
+							co.className = 'callout';
+							const status = err && err.httpStatus ? err.httpStatus : '?';
+							const detail = err && err.serverDetail ? err.serverDetail : '';
+							let body = '<strong>Ошибка:</strong> API <code>/api/admin/users</code> вернул ' + status + '.';
+							if (detail) {
+								body += ' Причина: <code style="font-size:13px">' + escapeAttr(detail) + '</code>';
+							} else if (status === 401 || status === 403) {
+								body += ' Проверьте вход в IQMO и <code>IQMO_ADMIN_EMAILS</code>.';
+							} else if (err && err.name === 'AbortError') {
+								body =
+									'<strong>Ошибка:</strong> запрос <code>/api/admin/users</code> превысил 12 сек (timeout).';
+							}
+							co.innerHTML = body;
+						}
+						renderUsersKpis([]);
+						renderUsersSpark([]);
+						renderUsersTable({
+							items: [],
+							pagination: { page: 1, perPage: usersState.perPage, total: 0, totalPages: 1 },
+						});
+						return;
+					}
+
+					renderUsersKpis(data.kpis || []);
+					renderUsersSpark(data.dailyRegistrations || []);
+					renderUsersTable(data);
+					updateUsersSortIndicators();
+				}
+
+				async function openUserDrawer(uid) {
+					if (!uid) return;
+					const drawer = document.getElementById('user-drawer');
+					const body = document.getElementById('drawer-body');
+					const title = document.getElementById('drawer-title');
+					const sub = document.getElementById('drawer-sub');
+					if (!drawer) return;
+					drawer.classList.add('is--open');
+					drawer.setAttribute('aria-hidden', 'false');
+					if (title) title.textContent = '#' + uid;
+					if (sub) sub.textContent = 'Загрузка карточки…';
+					if (body) body.innerHTML = '<div class="placeholder"><strong>Загрузка…</strong></div>';
+
+					const seq = ++drawerSeq;
+					try {
+						const r = await fetch('/api/admin/users/' + uid, {
+							credentials: 'same-origin',
+							cache: 'no-store',
+							headers: { Accept: 'application/json' },
+						});
+						if (!r.ok) {
+							let detail = '';
+							try {
+								const errBody = await r.json();
+								if (errBody && errBody.meta) {
+									const m = errBody.meta;
+									detail = [m.errorMessage, m.errorClass, m.errorAt].filter(Boolean).join(' · ');
+								}
+							} catch (_) { /* not json */ }
+							throw new Error('HTTP ' + r.status + (detail ? ' · ' + detail : ''));
+						}
+						const data = await r.json();
+						if (seq !== drawerSeq) return;
+						renderUserDrawer(data);
+					} catch (err) {
+						if (seq !== drawerSeq) return;
+						if (body) {
+							body.innerHTML =
+								'<div class="callout"><strong>Не удалось загрузить:</strong> ' +
+								escapeHtml(err.message || 'unknown error') + '</div>';
+						}
+						if (sub) sub.textContent = 'ошибка загрузки';
+					}
+				}
+
+				function closeUserDrawer() {
+					const drawer = document.getElementById('user-drawer');
+					if (!drawer) return;
+					drawer.classList.remove('is--open');
+					drawer.setAttribute('aria-hidden', 'true');
+					drawerSeq++;
+				}
+
+				function formatTimelineMeta(e) {
+					const p = e.payload || {};
+					const parts = [];
+					if (p.mode) parts.push('mode=' + escapeHtml(String(p.mode)));
+					if (p.percent !== undefined && p.percent !== null) parts.push(p.percent + '%');
+					if (p.itemsCount) parts.push(p.itemsCount + ' вопр.');
+					if (p.topic || p.topicId) parts.push(escapeHtml(String(p.topic || p.topicId)));
+					if (p.qid) parts.push('qid=' + escapeHtml(String(p.qid)));
+					if (p.sku) parts.push(escapeHtml(String(p.sku)));
+					if (p.sum) parts.push(p.sum + '₽');
+					return parts.join(' · ');
+				}
+
+				function renderUserDrawer(data) {
+					const title = document.getElementById('drawer-title');
+					const sub = document.getElementById('drawer-sub');
+					const body = document.getElementById('drawer-body');
+					const u = data.user || {};
+					if (title) title.textContent = u.email || ('#' + u.id);
+					if (sub) {
+						const adminBadge = u.isAdmin ? ' ' + statusPill('admin') : '';
+						sub.innerHTML =
+							'ID #' + escapeHtml(String(u.id)) +
+							' · регистрация ' + escapeHtml(formatDateRu(u.createdAt)) +
+							adminBadge;
+					}
+					if (!body) return;
+
+					const a = data.attempts || {};
+					const ev = data.events || {};
+					const profile = data.profile;
+					const tl = data.timeline || [];
+
+					let html = '';
+
+					html += '<div class="drawer__section">';
+					html += '<h3>Метрики</h3>';
+					html += '<div class="drawer__grid">';
+					html += '<div class="drawer__cell"><div class="drawer__cell-label">Попыток (всего)</div>' +
+						'<div class="drawer__cell-value">' + (a.total || 0) + '</div></div>';
+					html += '<div class="drawer__cell"><div class="drawer__cell-label">Средний % (trial/full)</div>' +
+						'<div class="drawer__cell-value">' +
+						(a.avgPct !== null && a.avgPct !== undefined ? String(a.avgPct).replace('.', ',') + '%' : '—') +
+						'</div></div>';
+					html += '<div class="drawer__cell"><div class="drawer__cell-label">Событий всего</div>' +
+						'<div class="drawer__cell-value">' + (ev.total || 0) + '</div></div>';
+					html += '<div class="drawer__cell"><div class="drawer__cell-label">Последнее событие</div>' +
+						'<div class="drawer__cell-value">' + (ev.lastAt ? formatRelativeRu(ev.lastAt) : '—') + '</div></div>';
+					html += '</div></div>';
+
+					if (a.breakdown) {
+						const labels = { warmup: 'разминка', quick: 'быстрый', trial: 'пробник', full: 'полный', other: 'прочее' };
+						html += '<div class="drawer__section">';
+						html += '<h3>Разбивка попыток (из профиля)</h3>';
+						html += '<div class="drawer__counts">';
+						Object.keys(a.breakdown).forEach(function (k) {
+							html += '<span class="drawer__count"><strong>' +
+								(a.breakdown[k] || 0) + '</strong>' + escapeHtml(labels[k] || k) + '</span>';
+						});
+						if (a.hasMistakes) {
+							html += '<span class="drawer__count" style="background:#fff4e5;color:#b45309;">' +
+								'<strong>•</strong>есть банк ошибок</span>';
+						}
+						html += '</div></div>';
+					}
+
+					if (profile) {
+						html += '<div class="drawer__section">';
+						html += '<h3>Профиль</h3>';
+						html += '<div class="drawer__grid">';
+						html += '<div class="drawer__cell"><div class="drawer__cell-label">Размер</div>' +
+							'<div class="drawer__cell-value">' +
+							Math.max(1, Math.round((profile.sizeBytes || 0) / 1024)) + ' КБ</div></div>';
+						html += '<div class="drawer__cell"><div class="drawer__cell-label">Ревизия</div>' +
+							'<div class="drawer__cell-value">' + (profile.revision || 0) + '</div></div>';
+						html += '<div class="drawer__cell"><div class="drawer__cell-label">Ключей</div>' +
+							'<div class="drawer__cell-value">' + (profile.keysCount || 0) + '</div></div>';
+						html += '<div class="drawer__cell"><div class="drawer__cell-label">Обновлён</div>' +
+							'<div class="drawer__cell-value">' + formatRelativeRu(profile.updatedAt) + '</div></div>';
+						html += '</div>';
+						const hist = data.history || {};
+						if (hist.revisions > 0) {
+							html += '<p style="margin:8px 0 0; font-size:12px; color:var(--muted)">' +
+								'История ревизий: ' + hist.revisions + ' записей в profile_history.</p>';
+						}
+						html += '</div>';
+					} else {
+						html += '<div class="drawer__section"><h3>Профиль</h3>' +
+							'<p style="color:var(--muted); font-size:13px; margin:0;">Не сохранён.</p></div>';
+					}
+
+					if (ev.byType && Object.keys(ev.byType).length > 0) {
+						html += '<div class="drawer__section">';
+						html += '<h3>События по типам</h3>';
+						html += '<div class="drawer__counts">';
+						Object.keys(ev.byType).forEach(function (k) {
+							html += '<span class="drawer__count"><strong>' +
+								ev.byType[k] + '</strong>' + escapeHtml(k) + '</span>';
+						});
+						html += '</div></div>';
+					}
+
+					if (tl.length > 0) {
+						html += '<div class="drawer__section">';
+						html += '<h3>Лента (последние ' + tl.length + ')</h3>';
+						html += '<div class="drawer__timeline">';
+						tl.forEach(function (e) {
+							const meta = formatTimelineMeta(e);
+							html += '<div class="drawer__tl-row">';
+							html += '<div class="drawer__tl-when">' + escapeHtml(formatRelativeRu(e.occurredAt)) + '</div>';
+							html += '<div><div class="drawer__tl-event">' + escapeHtml(e.event) + '</div>';
+							if (meta) html += '<div class="drawer__tl-meta">' + meta + '</div>';
+							html += '</div></div>';
+						});
+						html += '</div></div>';
+					} else if (data.meta && data.meta.hasAnalytics === false) {
+						html += '<div class="drawer__section"><h3>Лента</h3>' +
+							'<p style="color:var(--muted); font-size:13px; margin:0;">' +
+							'Таблица analytics_events отсутствует — лента событий недоступна.</p></div>';
+					}
+
+					body.innerHTML = html;
+				}
+
+				function bindUsersUi() {
+					if (usersInitialized) return;
+					usersInitialized = true;
+
+					let searchTimer = null;
+					const searchInput = document.getElementById('users-search-input');
+					if (searchInput) {
+						searchInput.addEventListener('input', function () {
+							clearTimeout(searchTimer);
+							const v = searchInput.value;
+							searchTimer = setTimeout(function () {
+								usersState.q = v.trim();
+								usersState.page = 1;
+								renderUsers().catch(function () {});
+							}, 240);
+						});
+					}
+
+					const chips = document.getElementById('users-chips');
+					if (chips) {
+						chips.addEventListener('click', function (e) {
+							const btn = e.target.closest('button[data-filter]');
+							if (!btn) return;
+							chips.querySelectorAll('button').forEach(function (b) {
+								b.classList.toggle('is--on', b === btn);
+							});
+							usersState.filter = btn.getAttribute('data-filter');
+							usersState.page = 1;
+							renderUsers().catch(function () {});
+						});
+					}
+
+					const thead = document.getElementById('users-thead-row');
+					if (thead) {
+						thead.addEventListener('click', function (e) {
+							const th = e.target.closest('th[data-sort]');
+							if (!th) return;
+							const key = th.getAttribute('data-sort');
+							if (usersState.sort === key) {
+								usersState.dir = usersState.dir === 'asc' ? 'desc' : 'asc';
+							} else {
+								usersState.sort = key;
+								usersState.dir = key === 'email' ? 'asc' : 'desc';
+							}
+							usersState.page = 1;
+							renderUsers().catch(function () {});
+						});
+					}
+
+					const period = document.getElementById('users-period');
+					if (period) {
+						period.addEventListener('click', function (e) {
+							const btn = e.target.closest('button[data-days]');
+							if (!btn) return;
+							period.querySelectorAll('button').forEach(function (b) {
+								b.classList.toggle('is--on', b === btn);
+							});
+							usersState.days = parseInt(btn.getAttribute('data-days'), 10);
+							usersState.page = 1;
+							renderUsers().catch(function () {});
+						});
+					}
+
+					const prev = document.getElementById('users-prev');
+					const next = document.getElementById('users-next');
+					if (prev) {
+						prev.addEventListener('click', function () {
+							if (usersState.page > 1) {
+								usersState.page--;
+								renderUsers().catch(function () {});
+							}
+						});
+					}
+					if (next) {
+						next.addEventListener('click', function () {
+							usersState.page++;
+							renderUsers().catch(function () {});
+						});
+					}
+
+					const tbody = document.getElementById('users-tbody');
+					if (tbody) {
+						tbody.addEventListener('click', function (e) {
+							const tr = e.target.closest('tr[data-uid]');
+							if (!tr) return;
+							openUserDrawer(parseInt(tr.getAttribute('data-uid'), 10));
+						});
+						tbody.addEventListener('keydown', function (e) {
+							if (e.key !== 'Enter' && e.key !== ' ') return;
+							const tr = e.target.closest('tr[data-uid]');
+							if (!tr) return;
+							e.preventDefault();
+							openUserDrawer(parseInt(tr.getAttribute('data-uid'), 10));
+						});
+					}
+
+					const close = document.getElementById('drawer-close');
+					if (close) close.addEventListener('click', closeUserDrawer);
+					const drawer = document.getElementById('user-drawer');
+					if (drawer) {
+						drawer.addEventListener('click', function (e) {
+							if (e.target === drawer) closeUserDrawer();
+						});
+					}
+					document.addEventListener('keydown', function (e) {
+						if (e.key !== 'Escape') return;
+						const d = document.getElementById('user-drawer');
+						if (d && d.classList.contains('is--open')) closeUserDrawer();
+					});
+				}
+
+				// ─── переключение разделов ───────────────────────────────────────
 				document.getElementById('nav').addEventListener('click', function (e) {
 					const btn = e.target.closest('button[data-section]');
 					if (!btn) return;
@@ -1148,17 +2174,21 @@
 						b.classList.toggle('is--active', b === btn);
 					});
 					const overview = document.getElementById('panel-overview');
+					const users = document.getElementById('panel-users');
 					const ph = document.getElementById('panel-placeholder');
+					overview.hidden = section !== 'overview';
+					users.hidden = section !== 'users';
+					ph.hidden = section === 'overview' || section === 'users';
+
 					if (section === 'overview') {
-						overview.hidden = false;
-						ph.hidden = true;
 						setDashTab(dashTab);
+					} else if (section === 'users') {
+						bindUsersUi();
+						renderUsers().catch(function () {});
 					} else {
 						const title = SECTION_TITLES[section] || section;
 						document.getElementById('placeholder-title').textContent = title;
 						document.getElementById('placeholder-lead').textContent = title + ' — в разработке';
-						overview.hidden = true;
-						ph.hidden = false;
 					}
 				});
 

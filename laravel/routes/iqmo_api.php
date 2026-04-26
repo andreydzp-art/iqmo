@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminOverviewController;
+use App\Http\Controllers\Api\AdminUsersController;
 use App\Http\Controllers\Api\AnalyticsIngestController;
 use App\Http\Controllers\Api\IqmoAuthController;
 use App\Http\Controllers\Api\IqmoProfileController;
@@ -30,5 +31,8 @@ Route::prefix('api')->group(function (): void {
 
     Route::middleware(['iqmo.portal_admin'])->group(function (): void {
         Route::get('/admin/overview', [AdminOverviewController::class, 'overview']);
+        Route::get('/admin/users', [AdminUsersController::class, 'index']);
+        Route::get('/admin/users/{id}', [AdminUsersController::class, 'show'])
+            ->whereNumber('id');
     });
 });
