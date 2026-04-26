@@ -22,14 +22,37 @@ const cookieParser = require('cookie-parser');
 const { buildPoolFromEnv, ensureSchema } = require('./db/mysql');
 
 const PORT = Number(process.env.PORT) || 3780;
-const JWT_SECRET = process.env.IQMO_JWT_SECRET || 'dev-only-change-IQMO_JWT_SECRET';
+const IS_PROD = process.env.NODE_ENV === 'production';
+const JWT_SECRET = (() => {
+	const v = process.env.IQMO_JWT_SECRET;
+	if (!v || v.length < 16) {
+		if (IS_PROD) {
+			console.error('FATAL: IQMO_JWT_SECRET is missing or too short (require >=16 chars).');
+			process.exit(1);
+		}
+		console.warn('[iqmo] IQMO_JWT_SECRET is empty/short — using DEV fallback. Do NOT run this in production.');
+		return 'dev-only-change-IQMO_JWT_SECRET';
+	}
+	return v;
+})();
 const COOKIE_NAME = 'iqmo_session';
 const ROOT = path.join(__dirname, '..', 'extracted');
 const pool = buildPoolFromEnv();
 
 const app = express();
+// Behind nginx/HTTPS terminator: trust the first hop so req.secure/req.ip reflect the client.
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
+
+const COOKIE_OPTS = {
+	httpOnly: true,
+	sameSite: 'lax',
+	path: '/',
+	secure: IS_PROD,
+	maxAge: 30 * 86400000
+};
+const COOKIE_CLEAR_OPTS = { path: '/', sameSite: 'lax', secure: IS_PROD };
 
 // Ensure DB schema exists at startup (best-effort).
 ensureSchema(pool).catch((e) => {
@@ -106,12 +129,7 @@ app.post('/api/auth/register', async (req, res) => {
 		const userId = Number(result.insertId);
 		const user = { id: userId, email };
 		const token = signToken(user);
-		res.cookie(COOKIE_NAME, token, {
-			httpOnly: true,
-			sameSite: 'lax',
-			path: '/',
-			maxAge: 30 * 86400000
-		});
+		res.cookie(COOKIE_NAME, token, COOKIE_OPTS);
 		await ensureProfileRow(user.id);
 		return res.json({ ok: true, email: user.email });
 	} catch (e) {
@@ -133,18 +151,13 @@ app.post('/api/auth/login', async (req, res) => {
 		return res.status(401).json({ error: 'invalid_credentials' });
 	}
 	const token = signToken({ id: row.id, email: row.email });
-	res.cookie(COOKIE_NAME, token, {
-		httpOnly: true,
-		sameSite: 'lax',
-		path: '/',
-		maxAge: 30 * 86400000
-	});
+	res.cookie(COOKIE_NAME, token, COOKIE_OPTS);
 	await ensureProfileRow(row.id);
 	return res.json({ ok: true, email: row.email });
 });
 
 app.post('/api/auth/logout', (req, res) => {
-	res.clearCookie(COOKIE_NAME, { path: '/' });
+	res.clearCookie(COOKIE_NAME, COOKIE_CLEAR_OPTS);
 	res.json({ ok: true });
 });
 
