@@ -90,6 +90,22 @@ jobs:
 
             # No file copying needed: root-level `*.js`/`*.css` are served from `public/site/` via routes.
 
+            # PHP-FPM keeps the old bytecode in OPcache after `git reset --hard`.
+            # `php artisan optimize:clear` only flushes Laravel caches (config/route/view),
+            # not the FPM-side OPcache. Without a reload, controller fixes silently
+            # don't take effect until opcache.revalidate_freq elapses (60–300s on most
+            # bitrix-style configs, sometimes never if validate_timestamps=0).
+            # `reload` is a graceful USR2 signal — no dropped requests.
+            # Requires NOPASSWD sudo for this exact command (see docs/DEPLOY.md).
+            if sudo -n systemctl reload php8.3-fpm 2>/tmp/fpm-reload.err; then
+              echo "php8.3-fpm reloaded"
+            else
+              echo "WARN: php8.3-fpm reload skipped: $(cat /tmp/fpm-reload.err)"
+              # Best-effort opcache invalidation via touch — works only if validate_timestamps=1.
+              find "$LARAVEL_DIR/app" "$LARAVEL_DIR/bootstrap" "$LARAVEL_DIR/routes" \
+                -name '*.php' -exec touch {} + || true
+            fi
+
   smoke:
     runs-on: ubuntu-latest
     needs: deploy
