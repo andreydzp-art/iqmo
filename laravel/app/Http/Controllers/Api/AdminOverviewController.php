@@ -31,12 +31,17 @@ final class AdminOverviewController extends Controller
             ]);
             report($e);
 
+            // Эндпоинт защищён middleware `iqmo.portal_admin` (только администраторы),
+            // поэтому возвращаем подробное сообщение даже при APP_DEBUG=false — это
+            // self-service диагностика на проде, а не утечка внутренностей наружу.
             return response()->json([
                 'meta' => [
                     'source' => 'error',
                     'days' => $days,
                     'error' => 'build_failed',
-                    'errorMessage' => config('app.debug') ? $e->getMessage() : 'internal',
+                    'errorMessage' => $e->getMessage(),
+                    'errorClass' => get_class($e),
+                    'errorAt' => basename($e->getFile()).':'.$e->getLine(),
                 ],
                 'kpis' => [],
                 'funnel' => [],

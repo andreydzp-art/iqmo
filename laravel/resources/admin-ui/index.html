@@ -773,7 +773,22 @@
 							signal: ctl ? ctl.signal : undefined
 						});
 						if (!r.ok) {
-							throw new Error('overview_http_' + r.status);
+							// Backend may have returned a structured error JSON (see AdminOverviewController):
+							// surface its `meta.errorMessage` to the demo-mode callout instead of a generic HTTP code.
+							let detail = '';
+							try {
+								const body = await r.json();
+								if (body && body.meta) {
+									const m = body.meta;
+									detail = [m.errorMessage, m.errorClass, m.errorAt]
+										.filter(Boolean)
+										.join(' · ');
+								}
+							} catch (_) { /* not json */ }
+							const err = new Error('overview_http_' + r.status);
+							err.httpStatus = r.status;
+							err.serverDetail = detail;
+							throw err;
 						}
 						return await r.json();
 					} finally {
@@ -891,8 +906,22 @@
 						}
 						if (co) {
 							co.className = 'callout';
-							co.innerHTML =
-								'<strong>Демо-режим:</strong> API недоступен или нет прав. Проверьте вход в IQMO и <code>IQMO_ADMIN_EMAILS</code>.';
+							const status = err && err.httpStatus ? err.httpStatus : '?';
+							const detail = err && err.serverDetail ? err.serverDetail : '';
+							const escape = function (s) {
+								return String(s)
+									.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+									.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+							};
+							let body = '<strong>Демо-режим:</strong> API <code>/api/admin/overview</code> вернул ' + status + '.';
+							if (detail) {
+								body += ' Причина: <code style="font-size:13px">' + escape(detail) + '</code>';
+							} else if (status === 401 || status === 403) {
+								body += ' Проверьте вход в IQMO и <code>IQMO_ADMIN_EMAILS</code>.';
+							} else if (err && err.name === 'AbortError') {
+								body = '<strong>Демо-режим:</strong> запрос <code>/api/admin/overview</code> превысил 12 сек (timeout). Проверьте логи Laravel.';
+							}
+							co.innerHTML = body;
 						}
 						if (ts) ts.textContent = 'Предметы · активность · ' + pl + ' (мок)';
 						if (tq) tq.textContent = 'Сложные вопросы · ' + pl + ' (мок)';
