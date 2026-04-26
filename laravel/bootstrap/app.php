@@ -28,6 +28,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'iqmo.portal_admin' => \App\Http\Middleware\EnsureIqmoPortalAdmin::class,
         ]);
 
+        // Append, not prepend: security headers should run after the response
+        // body is built so they apply uniformly even when controllers return
+        // file responses (e.g. /admin/{path} → response()->file()).
+        $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
+        ]);
+
         $middleware->redirectGuestsTo(fn () => route('laravel.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {

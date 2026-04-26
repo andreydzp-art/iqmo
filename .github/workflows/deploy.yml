@@ -142,5 +142,35 @@ jobs:
             exit 1
           fi
 
+          # Security headers smoke: SecurityHeaders middleware must fire on the public site.
+          # X-Content-Type-Options is the cheapest invariant — present on every web response.
+          # If nginx is serving the homepage statically and bypassing PHP, this header
+          # is the canary that tells us so.
+          headers_home=$(curl -sSI "$BASE/" || true)
+          if ! echo "$headers_home" | grep -qi "^x-content-type-options:"; then
+            echo "Homepage missing X-Content-Type-Options — SecurityHeaders middleware did not run (nginx static bypass?)"
+            echo "$headers_home"
+            exit 1
+          fi
+          if ! echo "$headers_home" | grep -qi "^referrer-policy:"; then
+            echo "Homepage missing Referrer-Policy"
+            echo "$headers_home"
+            exit 1
+          fi
+
+          # /admin must enforce stricter policy: X-Frame-Options + CSP, even on the
+          # 302/403/503 the middleware sees before auth fires.
+          headers_admin=$(curl -sSI "$BASE/admin/index.html" || true)
+          if ! echo "$headers_admin" | grep -qi "^x-frame-options:.*DENY"; then
+            echo "/admin missing X-Frame-Options: DENY"
+            echo "$headers_admin"
+            exit 1
+          fi
+          if ! echo "$headers_admin" | grep -qi "^content-security-policy:.*frame-ancestors"; then
+            echo "/admin missing Content-Security-Policy with frame-ancestors"
+            echo "$headers_admin"
+            exit 1
+          fi
+
           echo "Smoke OK"
 
