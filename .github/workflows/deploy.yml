@@ -56,17 +56,18 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script_stop: true
+          # script_stop is intentionally false: we run our own `set -e`, and the
+          # external one masked the actual failure line in the runner log.
+          script_stop: false
           script: |
-            set -euo pipefail
+            # `-x` keeps the actual failure line visible in the runner log
+            # (the previous `script_stop: true` swallowed it).
+            set -Eeuxo pipefail
 
             APP_DIR="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app"
             LARAVEL_DIR="${APP_DIR}/laravel"
 
-            if [ ! -d "$APP_DIR/.git" ]; then
-              echo "ERROR: $APP_DIR is not a git repo on server"
-              exit 1
-            fi
+            test -d "$APP_DIR/.git" || { echo "ERROR: $APP_DIR is not a git repo on server"; exit 1; }
 
             cd "$APP_DIR"
             git fetch --all --prune
@@ -90,21 +91,27 @@ jobs:
 
             # No file copying needed: root-level `*.js`/`*.css` are served from `public/site/` via routes.
 
-            # PHP-FPM keeps the old bytecode in OPcache after `git reset --hard`.
-            # `php artisan optimize:clear` only flushes Laravel caches (config/route/view),
-            # not the FPM-side OPcache. Without a reload, controller fixes silently
-            # don't take effect until opcache.revalidate_freq elapses (60–300s on most
-            # bitrix-style configs, sometimes never if validate_timestamps=0).
-            # `reload` is a graceful USR2 signal — no dropped requests.
-            # Requires NOPASSWD sudo for this exact command (see docs/DEPLOY.md).
-            if sudo -n systemctl reload php8.3-fpm 2>/tmp/fpm-reload.err; then
-              echo "php8.3-fpm reloaded"
-            else
-              echo "WARN: php8.3-fpm reload skipped: $(cat /tmp/fpm-reload.err)"
-              # Best-effort opcache invalidation via touch — works only if validate_timestamps=1.
-              find "$LARAVEL_DIR/app" "$LARAVEL_DIR/bootstrap" "$LARAVEL_DIR/routes" \
-                -name '*.php' -exec touch {} + || true
-            fi
+            # OPcache invalidation. Two strategies, both wrapped in `|| true` so
+            # the deploy never fails just because we couldn't bump bytecode:
+            #
+            #   1) touch *.php — works whenever `opcache.validate_timestamps=1`
+            #      (the typical default on bitrix/fastpanel hosts). USR2-free.
+            #   2) sudo -n systemctl reload php8.3-fpm — graceful FPM reload,
+            #      requires NOPASSWD sudo for this exact command (see docs/DEPLOY.md).
+            #      If NOPASSWD isn't configured, sudo exits 1 and we just log it.
+            #
+            # The reload step used to be a structured `if sudo ...; then ... else ...; fi`
+            # block, but combined with `script_stop: true` that block was killing
+            # the *whole* SSH script in some environments before the deploy could
+            # even reach `git fetch`. We now keep them separate, both `|| true`.
+            find "$LARAVEL_DIR/app" "$LARAVEL_DIR/bootstrap" "$LARAVEL_DIR/routes" \
+              -name '*.php' -exec touch {} + 2>&1 || echo "WARN: touch step failed (non-fatal)"
+
+            sudo -n systemctl reload php8.3-fpm 2>&1 \
+              && echo "php8.3-fpm reloaded" \
+              || echo "WARN: php8.3-fpm reload skipped (need NOPASSWD sudo on the server)"
+
+            echo "DEPLOY OK"
 
   smoke:
     runs-on: ubuntu-latest
