@@ -643,8 +643,17 @@
 
 				let loggedIn = false;
 				try {
-					const mr = await fetch('/api/me', { credentials: 'include' });
-					loggedIn = mr.ok;
+					const mr = await fetch('/api/me', {
+						credentials: 'include',
+						headers: { Accept: 'application/json' }
+					});
+					if (mr.ok) {
+						const ct = (mr.headers.get('content-type') || '').toLowerCase();
+						if (ct.includes('application/json')) {
+							const j = await mr.json();
+							loggedIn = typeof j.email === 'string' && j.email.length > 0;
+						}
+					}
 				} catch (e) {}
 
 				const loginBtn = document.getElementById('home-nav-login');
