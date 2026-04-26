@@ -98,6 +98,34 @@ final class IqmoAdminOverviewBuilder
             ? round(100.0 * $sumTrialFull / $sumAttempts, 1)
             : null;
 
+        $hasAnalytics = Schema::connection('iqmo')->hasTable('analytics_events');
+        $avgScoreCur = $hasAnalytics ? $this->computeAvgScore($sinceMs, null) : ['avg' => null, 'count' => 0];
+        $avgScorePrev = $hasAnalytics ? $this->computeAvgScore($prevStartMs, $sinceMs) : ['avg' => null, 'count' => 0];
+
+        $avgScoreVal = $avgScoreCur['avg'] !== null ? round((float) $avgScoreCur['avg'], 1) : null;
+        $avgScorePrevVal = $avgScorePrev['avg'] !== null ? round((float) $avgScorePrev['avg'], 1) : null;
+
+        $avgScoreTrend = 'flat';
+        $avgScoreDelta = 'н/д';
+        $avgScoreHint = 'AVG(payload_json.percent) по chem.attempt_complete с mode IN (trial, full) за окно';
+
+        if ($avgScoreVal !== null && $avgScorePrevVal !== null) {
+            $diff = $avgScoreVal - $avgScorePrevVal;
+            if ($diff > 0.5) {
+                $avgScoreTrend = 'up';
+            } elseif ($diff < -0.5) {
+                $avgScoreTrend = 'down';
+            }
+            $sign = $diff >= 0 ? '+' : '−';
+            $avgScoreDelta = $sign.str_replace('.', ',', (string) round(abs($diff), 1)).' п.п. к прошл. окну';
+        } elseif ($avgScoreVal !== null) {
+            $avgScoreDelta = $this->fmtInt($avgScoreCur['count']).' попыток (trial/full)';
+        } elseif (! $hasAnalytics) {
+            $avgScoreHint = 'Таблица analytics_events отсутствует на этой БД';
+        } else {
+            $avgScoreDelta = 'нет завершённых попыток';
+        }
+
         $kpis = [
             [
                 'id' => 'dau',
@@ -158,10 +186,10 @@ final class IqmoAdminOverviewBuilder
             [
                 'id' => 'avg_score',
                 'label' => 'Средний результат',
-                'value' => '—',
-                'delta' => 'н/д',
-                'trend' => 'flat',
-                'hint' => 'Нет серверных сводок по баллам попыток',
+                'value' => $avgScoreVal !== null ? str_replace('.', ',', (string) $avgScoreVal).'%' : '—',
+                'delta' => $avgScoreDelta,
+                'trend' => $avgScoreTrend,
+                'hint' => $avgScoreHint,
             ],
             [
                 'id' => 'session',
@@ -219,10 +247,7 @@ final class IqmoAdminOverviewBuilder
 
         $learning = $this->stubLearning($days);
 
-        $topQuestions = [];
-        if (Schema::connection('iqmo')->hasTable('analytics_events')) {
-            $topQuestions = $this->rollupTopQuestions($sinceMs, $days);
-        }
+        $topQuestions = $hasAnalytics ? $this->rollupTopQuestions($sinceMs, $days) : [];
 
         $flagged = 0;
         foreach ($topQuestions as $q) {
@@ -252,6 +277,46 @@ final class IqmoAdminOverviewBuilder
             'topQuestions' => $topQuestions,
             'learning' => $learning,
         ];
+    }
+
+    /**
+     * Среднее значение payload_json.percent по событиям chem.attempt_complete
+     * за окно [$sinceMs, $untilMs) — только для режимов trial/full.
+     *
+     * @return array{avg: float|null, count: int}
+     */
+    private function computeAvgScore(int $sinceMs, ?int $untilMs): array
+    {
+        try {
+            $q = DB::connection('iqmo')->table('analytics_events')
+                ->where('event', 'chem.attempt_complete')
+                ->where('occurred_at', '>=', $sinceMs)
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.mode')) IN ('trial','full')");
+
+            if ($untilMs !== null) {
+                $q->where('occurred_at', '<', $untilMs);
+            }
+
+            $row = $q
+                ->selectRaw(
+                    'AVG(CAST(JSON_EXTRACT(payload_json, "$.percent") AS DECIMAL(10,2))) AS avg_pct, COUNT(*) AS cnt'
+                )
+                ->first();
+
+            if ($row === null) {
+                return ['avg' => null, 'count' => 0];
+            }
+
+            $avg = $row->avg_pct ?? null;
+            $cnt = (int) ($row->cnt ?? 0);
+
+            return [
+                'avg' => $avg !== null ? (float) $avg : null,
+                'count' => $cnt,
+            ];
+        } catch (\Throwable $e) {
+            return ['avg' => null, 'count' => 0];
+        }
     }
 
     /**
