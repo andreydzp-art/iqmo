@@ -18,7 +18,9 @@ Route::prefix('api')->group(function (): void {
         Route::put('/profile/state', [IqmoProfileController::class, 'statePut']);
         Route::get('/profile/history', [IqmoProfileController::class, 'history']);
         Route::post('/profile/restore', [IqmoProfileController::class, 'restore']);
-        Route::post('/analytics/events', [AnalyticsIngestController::class, 'ingest']);
+
+        Route::post('/analytics/events', [AnalyticsIngestController::class, 'store'])
+            ->middleware('throttle:analytics-ingest');
     });
 
     Route::middleware(['iqmo.portal_admin'])->group(function (): void {
