@@ -39,7 +39,8 @@
 				var ct = (mr.headers.get('content-type') || '').toLowerCase();
 				if (ct.indexOf('application/json') !== -1) {
 					var j = await mr.json();
-					loggedIn = typeof j.email === 'string' && j.email.length > 0;
+					// Должно совпадать с iqmo-sync.js (там authed = me.ok): иначе шапка «Вход» при живой сессии.
+					loggedIn = !(j && j.error);
 				}
 			}
 		} catch (e) {}
