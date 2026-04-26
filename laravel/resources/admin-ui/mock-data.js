@@ -16,20 +16,18 @@
 			{ id: 'completed', label: 'Тестов завершено', value: '3 881', delta: '+3%', trend: 'up', hint: 'Успешное завершение' },
 			{ id: 'completion', label: 'Completion rate', value: '78,9%', delta: '−0,4 п.п.', trend: 'down', hint: 'Завершено / начато' },
 			{ id: 'avg_score', label: 'Средний результат', value: '64%', delta: '+1,1 п.п.', trend: 'up', hint: 'По всем завершённым попыткам' },
-			{ id: 'session', label: 'Средняя сессия', value: '18 мин', delta: '+40 сек', trend: 'up', hint: 'Активное время' },
-			{ id: 'top_subject', label: 'Топ предмет', value: 'Химия', delta: '42% сессий', trend: 'flat', hint: 'Доля активности' },
+			{ id: 'session', label: 'Средняя сессия', value: '18 мин', delta: '124 сессий', trend: 'up', hint: 'Медиана длительности сессии (события одного пользователя с разрывом ≤ 30 мин)' },
+			{ id: 'time_in_test', label: 'Время в тесте', value: '12 мин 30 с', delta: '38 тестов', trend: 'up', hint: 'Медиана интервала (chem.attempt_complete − chem.attempt_start) по совпавшим attemptId' },
 			{ id: 'funnel_drop', label: 'Узкое место воронки', value: 'Начало → конец теста', delta: '−34%', trend: 'down', hint: 'Максимальный отвал за неделю' },
 			{ id: 'review_flag', label: 'Вопросов на проверку', value: '14', delta: '+2', trend: 'up', hint: 'Правило: высокий % ошибок при n≥50' },
 			{ id: 'mistakes_users', label: 'Работа над ошибками', value: '612', delta: '+8%', trend: 'up', hint: 'Уникальные пользователи (за базовый период)' }
 		],
 		funnel: [
-			{ step: 'Зашли на сайт', users: 10000, pct: 100 },
-			{ step: 'Открыли предмет', users: 6200, pct: 62 },
+			{ step: 'Аккаунтов в базе', users: 10000, pct: 100 },
+			{ step: 'Просмотрели тему', users: 6200, pct: 62 },
 			{ step: 'Начали тест', users: 4100, pct: 41 },
 			{ step: 'Завершили тест', users: 3180, pct: 31.8 },
-			{ step: 'Открыли результат', users: 2850, pct: 28.5 },
-			{ step: 'Работа над ошибками', users: 980, pct: 9.8 },
-			{ step: 'Вернулись на след. день', users: 420, pct: 4.2 }
+			{ step: 'С непустым банком ошибок', users: 980, pct: 9.8 }
 		],
 		topQuestions: [
 			{ qid: 10042, topic: 'Атомы и молекулы', wrongPct: 78, shows: 1240, avgSec: 145, flag: true },
@@ -125,7 +123,7 @@
 			if (k.id === 'online') return copy;
 			if (k.id === 'review_flag') return copy;
 			if (k.id === 'completion' || k.id === 'avg_score') return copy;
-			if (k.id === 'funnel_drop' || k.id === 'top_subject') return copy;
+			if (k.id === 'funnel_drop' || k.id === 'time_in_test' || k.id === 'session') return copy;
 
 			const num = String(copy.value).replace(/\u202f/g, ' ').replace(/\s/g, '');
 			if (/^\d+$/.test(num)) {

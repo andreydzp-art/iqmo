@@ -102,6 +102,14 @@ final class IqmoAdminOverviewBuilder
         $avgScoreCur = $hasAnalytics ? $this->computeAvgScore($sinceMs, null) : ['avg' => null, 'count' => 0];
         $avgScorePrev = $hasAnalytics ? $this->computeAvgScore($prevStartMs, $sinceMs) : ['avg' => null, 'count' => 0];
 
+        $timeInTestCur = $hasAnalytics ? $this->computeTimeInTest($sinceMs, null) : ['median' => null, 'count' => 0];
+        $timeInTestPrev = $hasAnalytics ? $this->computeTimeInTest($prevStartMs, $sinceMs) : ['median' => null, 'count' => 0];
+
+        $sessionCur = $hasAnalytics ? $this->computeAvgSession($sinceMs, $nowMs) : ['median' => null, 'count' => 0];
+        $sessionPrev = $hasAnalytics ? $this->computeAvgSession($prevStartMs, $sinceMs) : ['median' => null, 'count' => 0];
+
+        $eventFunnel = $hasAnalytics ? $this->computeEventFunnel($sinceMs) : ['view' => 0, 'start' => 0, 'complete' => 0];
+
         $dauMau = $hasAnalytics ? $this->computeDauMau($nowMs) : ['dau' => 0, 'mau' => 0];
         $dauMauValue = '—';
         $dauMauDelta = 'нет событий';
@@ -137,6 +145,61 @@ final class IqmoAdminOverviewBuilder
             $avgScoreHint = 'Таблица analytics_events отсутствует на этой БД';
         } else {
             $avgScoreDelta = 'нет завершённых попыток';
+        }
+
+        // Среднее время в тесте: медиана (complete - start) по совпавшим attemptId
+        // — устойчивее к выбросам (одна-две зависших попытки не утянут метрику).
+        $timeInTestVal = $timeInTestCur['median'];
+        $timeInTestPrevVal = $timeInTestPrev['median'];
+        $timeInTestKpi = [
+            'value' => '—',
+            'delta' => 'н/д',
+            'trend' => 'flat',
+            'hint' => 'Медиана интервала (chem.attempt_complete − chem.attempt_start) по совпавшим attemptId за окно',
+        ];
+        if ($timeInTestVal !== null) {
+            $timeInTestKpi['value'] = $this->fmtDuration((int) $timeInTestVal);
+            $timeInTestKpi['delta'] = $this->fmtInt($timeInTestCur['count']).' тестов';
+            if ($timeInTestPrevVal !== null) {
+                $diff = $timeInTestVal - $timeInTestPrevVal;
+                if ($diff < -1000) {
+                    $timeInTestKpi['trend'] = 'up'; // быстрее — лучше
+                } elseif ($diff > 1000) {
+                    $timeInTestKpi['trend'] = 'down';
+                }
+            }
+        } elseif (! $hasAnalytics) {
+            $timeInTestKpi['hint'] = 'Таблица analytics_events отсутствует на этой БД';
+        } else {
+            $timeInTestKpi['delta'] = 'нет связных пар start↔complete';
+        }
+
+        // Средняя сессия: события одного user_id с разрывами ≤ 30 мин.
+        // Берём только сессии с ≥ 2 событиями — синглы дают «0 секунд» и сильно
+        // занижают медиану.
+        $sessionVal = $sessionCur['median'];
+        $sessionPrevVal = $sessionPrev['median'];
+        $sessionKpi = [
+            'value' => '—',
+            'delta' => 'н/д',
+            'trend' => 'flat',
+            'hint' => 'Медиана длительности сессии (события одного пользователя с разрывом ≤ 30 мин) за окно',
+        ];
+        if ($sessionVal !== null) {
+            $sessionKpi['value'] = $this->fmtDuration((int) $sessionVal);
+            $sessionKpi['delta'] = $this->fmtInt($sessionCur['count']).' сессий';
+            if ($sessionPrevVal !== null) {
+                $diff = $sessionVal - $sessionPrevVal;
+                if ($diff > 5000) {
+                    $sessionKpi['trend'] = 'up';
+                } elseif ($diff < -5000) {
+                    $sessionKpi['trend'] = 'down';
+                }
+            }
+        } elseif (! $hasAnalytics) {
+            $sessionKpi['hint'] = 'Таблица analytics_events отсутствует на этой БД';
+        } else {
+            $sessionKpi['delta'] = 'нет событий в окне';
         }
 
         $kpis = [
@@ -207,18 +270,18 @@ final class IqmoAdminOverviewBuilder
             [
                 'id' => 'session',
                 'label' => 'Средняя сессия',
-                'value' => '—',
-                'delta' => 'н/д',
-                'trend' => 'flat',
-                'hint' => 'Нет агрегации времени по пользователям',
+                'value' => $sessionKpi['value'],
+                'delta' => $sessionKpi['delta'],
+                'trend' => $sessionKpi['trend'],
+                'hint' => $sessionKpi['hint'],
             ],
             [
-                'id' => 'top_subject',
-                'label' => 'Предмет',
-                'value' => 'Химия ОГЭ',
-                'delta' => 'портал',
-                'trend' => 'flat',
-                'hint' => 'Сейчас в облаке только химия',
+                'id' => 'time_in_test',
+                'label' => 'Время в тесте',
+                'value' => $timeInTestKpi['value'],
+                'delta' => $timeInTestKpi['delta'],
+                'trend' => $timeInTestKpi['trend'],
+                'hint' => $timeInTestKpi['hint'],
             ],
             [
                 'id' => 'funnel_drop',
@@ -246,7 +309,10 @@ final class IqmoAdminOverviewBuilder
             ],
         ];
 
-        $funnel = $this->buildFunnel($totalUsers, $profilesTotal, $activeSync, $withAttempts, $mistakeUsers, $days);
+        $hasFunnelEvents = $eventFunnel['view'] + $eventFunnel['start'] + $eventFunnel['complete'] > 0;
+        $funnel = $hasFunnelEvents
+            ? $this->buildEventFunnel($totalUsers, $eventFunnel, $mistakeUsers, $days)
+            : $this->buildFunnel($totalUsers, $profilesTotal, $activeSync, $withAttempts, $mistakeUsers, $days);
 
         $subjectsSnapshot = [
             [
@@ -468,6 +534,221 @@ final class IqmoAdminOverviewBuilder
             ['step' => 'С попытками в данных', 'users' => $withAttempts, 'pct' => $pct($withAttempts)],
             ['step' => 'С непустым банком ошибок', 'users' => $mistakeUsers, 'pct' => $pct($mistakeUsers)],
         ];
+    }
+
+    /**
+     * Воронка по событиям. Шаги:
+     *   total → topic_view → attempt_start → attempt_complete → mistakes
+     *
+     * @param  array{view: int, start: int, complete: int}  $ev
+     * @return list<array{step: string, users: int, pct: float}>
+     */
+    private function buildEventFunnel(int $totalUsers, array $ev, int $mistakeUsers, int $days): array
+    {
+        if ($totalUsers < 1) {
+            return [['step' => 'Пока нет пользователей', 'users' => 0, 'pct' => 0.0]];
+        }
+
+        $pct = static fn (int $n): float => round(100.0 * $n / max(1, $totalUsers), 1);
+        $win = $days === 1 ? '24 ч' : $days.' дн.';
+
+        return [
+            ['step' => 'Аккаунтов в базе', 'users' => $totalUsers, 'pct' => 100.0],
+            ['step' => 'Просмотрели тему ('.$win.')', 'users' => $ev['view'], 'pct' => $pct($ev['view'])],
+            ['step' => 'Начали тест ('.$win.')', 'users' => $ev['start'], 'pct' => $pct($ev['start'])],
+            ['step' => 'Завершили тест ('.$win.')', 'users' => $ev['complete'], 'pct' => $pct($ev['complete'])],
+            ['step' => 'С непустым банком ошибок', 'users' => $mistakeUsers, 'pct' => $pct($mistakeUsers)],
+        ];
+    }
+
+    /**
+     * Уникальные user_id по типу события за окно [$sinceMs, ∞).
+     *
+     * @return array{view: int, start: int, complete: int}
+     */
+    private function computeEventFunnel(int $sinceMs): array
+    {
+        try {
+            $row = DB::connection('iqmo')->table('analytics_events')
+                ->where('occurred_at', '>=', $sinceMs)
+                ->selectRaw(
+                    "COUNT(DISTINCT CASE WHEN event = 'chem.topic_view' THEN user_id END) AS u_view,"
+                    ."COUNT(DISTINCT CASE WHEN event = 'chem.attempt_start' THEN user_id END) AS u_start,"
+                    ."COUNT(DISTINCT CASE WHEN event = 'chem.attempt_complete' THEN user_id END) AS u_complete"
+                )
+                ->first();
+
+            return [
+                'view' => (int) ($row->u_view ?? 0),
+                'start' => (int) ($row->u_start ?? 0),
+                'complete' => (int) ($row->u_complete ?? 0),
+            ];
+        } catch (\Throwable $e) {
+            return ['view' => 0, 'start' => 0, 'complete' => 0];
+        }
+    }
+
+    /**
+     * Медианное время прохождения теста: разница (complete.occurred_at − start.occurred_at)
+     * по событиям с одинаковым attemptId и одного пользователя.
+     *
+     * Капы:
+     *  - окно: [$sinceMs, $untilMs);
+     *  - sane-cap длительности: 4 часа (исключаем зависшие/брошенные тесты).
+     *
+     * @return array{median: float|null, count: int}
+     */
+    private function computeTimeInTest(int $sinceMs, ?int $untilMs): array
+    {
+        try {
+            $params = [$sinceMs];
+            $sql = "SELECT (c.occurred_at - s.occurred_at) AS dur_ms
+                    FROM analytics_events s
+                    INNER JOIN analytics_events c
+                      ON c.user_id = s.user_id
+                     AND c.event = 'chem.attempt_complete'
+                     AND JSON_UNQUOTE(JSON_EXTRACT(c.payload_json, '$.attemptId')) =
+                         JSON_UNQUOTE(JSON_EXTRACT(s.payload_json, '$.attemptId'))
+                     AND c.occurred_at > s.occurred_at
+                     AND c.occurred_at <= s.occurred_at + 14400000
+                    WHERE s.event = 'chem.attempt_start'
+                      AND s.occurred_at >= ?";
+            if ($untilMs !== null) {
+                $sql .= ' AND s.occurred_at < ?';
+                $params[] = $untilMs;
+            }
+            $sql .= " AND JSON_UNQUOTE(JSON_EXTRACT(s.payload_json, '$.attemptId')) <> ''
+                      ORDER BY s.id DESC LIMIT 5000";
+
+            $rows = DB::connection('iqmo')->select($sql, $params);
+            $durations = [];
+            foreach ($rows as $r) {
+                $d = (int) ($r->dur_ms ?? 0);
+                if ($d > 0 && $d <= 14_400_000) {
+                    $durations[] = $d;
+                }
+            }
+            $median = $this->medianFloat($durations);
+
+            return [
+                'median' => $median,
+                'count' => count($durations),
+            ];
+        } catch (\Throwable $e) {
+            return ['median' => null, 'count' => 0];
+        }
+    }
+
+    /**
+     * Сессии: события одного user_id, упорядоченные по времени, с разрывом ≤ 30 мин.
+     * Возвращаем медиану длительностей сессий с ≥ 2 событиями (одиночные ивенты
+     * дают 0 c и сильно занижают медиану — нам нужен индикатор «реального»
+     * учебного промежутка).
+     *
+     * @return array{median: float|null, count: int}
+     */
+    private function computeAvgSession(int $sinceMs, int $untilMs): array
+    {
+        try {
+            $rows = DB::connection('iqmo')->table('analytics_events')
+                ->where('occurred_at', '>=', $sinceMs)
+                ->where('occurred_at', '<', $untilMs)
+                ->orderBy('user_id')
+                ->orderBy('occurred_at')
+                ->limit(50_000)
+                ->get(['user_id', 'occurred_at']);
+
+            $gap = 30 * 60_000; // 30 минут — стандартный порог сессии (как у GA).
+            $minSessionMs = 5_000; // защита от случайных дубликатов в одну секунду
+            /** @var list<int> $durations */
+            $durations = [];
+
+            $curUid = null;
+            $curStart = 0;
+            $curLast = 0;
+            $curEvents = 0;
+
+            $flush = static function () use (&$curStart, &$curLast, &$curEvents, &$durations, $minSessionMs): void {
+                if ($curEvents >= 2) {
+                    $d = $curLast - $curStart;
+                    if ($d >= $minSessionMs) {
+                        $durations[] = $d;
+                    }
+                }
+                $curStart = 0;
+                $curLast = 0;
+                $curEvents = 0;
+            };
+
+            foreach ($rows as $row) {
+                $uid = (int) $row->user_id;
+                $ts = (int) $row->occurred_at;
+
+                if ($curUid !== $uid) {
+                    $flush();
+                    $curUid = $uid;
+                    $curStart = $ts;
+                    $curLast = $ts;
+                    $curEvents = 1;
+                    continue;
+                }
+                if ($ts - $curLast > $gap) {
+                    $flush();
+                    $curStart = $ts;
+                    $curLast = $ts;
+                    $curEvents = 1;
+                    continue;
+                }
+                $curLast = $ts;
+                $curEvents++;
+            }
+            $flush();
+
+            $median = $this->medianFloat($durations);
+
+            return [
+                'median' => $median,
+                'count' => count($durations),
+            ];
+        } catch (\Throwable $e) {
+            return ['median' => null, 'count' => 0];
+        }
+    }
+
+    /**
+     * @param  list<int>|list<float>  $values
+     */
+    private function medianFloat(array $values): ?float
+    {
+        $n = count($values);
+        if ($n === 0) {
+            return null;
+        }
+        sort($values);
+        $mid = (int) floor($n / 2);
+        if ($n % 2 === 1) {
+            return (float) $values[$mid];
+        }
+
+        return ((float) $values[$mid - 1] + (float) $values[$mid]) / 2.0;
+    }
+
+    private function fmtDuration(int $ms): string
+    {
+        $s = max(0, (int) round($ms / 1000));
+        if ($s < 60) {
+            return $s.' с';
+        }
+        if ($s < 3600) {
+            $m = (int) floor($s / 60);
+            $sr = $s - $m * 60;
+
+            return $sr === 0 ? $m.' мин' : $m.' мин '.$sr.' с';
+        }
+        $h = (int) floor($s / 3600);
+        $m = (int) floor(($s - $h * 3600) / 60);
+
+        return $m === 0 ? $h.' ч' : $h.' ч '.$m.' мин';
     }
 
     /** @return array<string, mixed> */
