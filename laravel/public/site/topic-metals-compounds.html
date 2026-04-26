@@ -51,6 +51,7 @@
 			.btn--primary:hover { filter: brightness(1.05); }
 			.btn--ghost { background: #fff; border-color: var(--line); color: var(--ink); }
 			.btn--ghost:hover { border-color: var(--ink); }
+			[hidden] { display: none !important; }
 
 			.crumbs { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); padding: 16px 0 0; flex-wrap: wrap; }
 			.crumbs a:hover { color: var(--accent); }
@@ -213,8 +214,11 @@
 		<header class="header">
 			<div class="container header__container">
 				<a href="./index.html" class="logo">IQMO</a>
-				<div style="display:flex; gap:10px;">
+				<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
 					<a href="./subject-chemistry.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;">← К предмету</a>
+					<a href="/login.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;" id="iqmo-nav-logout" hidden>Выйти</button>
 				</div>
 			</div>
 		</header>
@@ -527,6 +531,7 @@
 		</footer>
 
 		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
 		<script src="./chem-progress.js"></script>
 		<script src="./mistakes-store.js"></script>
 		<script src="./chemistry-topic-map.js"></script>

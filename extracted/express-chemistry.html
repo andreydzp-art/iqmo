@@ -93,6 +93,7 @@
 			@media (max-width: 720px) {
 				.controls { grid-template-columns: 1fr; }
 			}
+			[hidden] { display: none !important; }
 		</style>
 	</head>
 	<body class="page__body">
@@ -103,7 +104,10 @@
 						<text x="0" y="19" font-family="Manrope, system-ui, sans-serif" font-size="20" font-weight="800" letter-spacing="0.025em" fill="#11141a">IQMO</text>
 					</svg>
 				</a>
-				<div class="header__btns">
+				<div class="header__btns" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+					<a href="/login.html" class="header__btn" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="header__btn" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="header__btn" id="iqmo-nav-logout" hidden>Выйти</button>
 					<a href="./subject-chemistry.html#formats" class="header__btn">← К форматам</a>
 				</div>
 			</div>
@@ -177,6 +181,8 @@
 				syncLinks();
 			})();
 		</script>
+		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
 	</body>
 </html>
 

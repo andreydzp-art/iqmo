@@ -4,8 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>IQMO — Профиль (этот браузер)</title>
-		<meta name="description" content="Сводка прогресса по химии ОГЭ: стрик, темы, ошибки. Данные хранятся только в вашем браузере." />
+		<title>IQMO — Профиль</title>
+		<meta name="description" content="Прогресс по химии ОГЭ: темы, попытки, вехи и банк ошибок." />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -489,20 +489,8 @@
 					<a href="/login.html">Войдите</a>, чтобы сохранять и подтягивать прогресс с сервера.
 				</p>
 				<p class="page-lead iqmo-only-authed" hidden>
-					Здесь собран прогресс по химии ОГЭ. Вы вошли: сводка и ключевые данные курса синхронизируются с сервером (см. блок «Аккаунт» ниже).
+					Здесь собран прогресс по химии ОГЭ. Вы вошли — прогресс подтягивается на этом устройстве с вашего аккаунта.
 				</p>
-				<div class="callout">
-					<strong>Идентификатор для поддержки:</strong> короткий анонимный код (не передавайте его посторонним). Нужен, если напишете в поддержку про баги в тестах.
-					<div class="mono" id="prof-anon">—</div>
-				</div>
-
-				<div class="card" id="prof-account-card" style="margin-top: 18px">
-					<h2>Аккаунт</h2>
-					<p class="stat-label" id="prof-account-line1">—</p>
-					<p class="stat-label" id="prof-account-line2" style="margin-top: 8px"></p>
-					<div id="prof-account-actions" style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px"></div>
-					<div id="prof-backups" style="margin-top: 14px; font-size: 13px; color: var(--muted); display: none"></div>
-				</div>
 
 				<div class="card prof-milestones" style="margin-top: 18px">
 					<h2>Вехи</h2>
@@ -583,9 +571,7 @@
 				<div class="actions">
 					<h2>Сбросить данные химии</h2>
 					<p id="prof-reset-desc">
-						Удаляются прогресс по темам, ошибки, пробник, стрик, черновики полных вариантов и служебные ключи с префиксом
-						<code>iqmo-chem-</code> в localStorage. Если вы вошли в аккаунт, после сброса пустое состояние отправится на сервер.
-						Действие необратимо.
+						Удаляется весь прогресс по химии в этом браузере: темы, ошибки, пробник, варианты, серия дней. Если вы вошли в аккаунт, на сервере тоже сохранится пустое состояние. Отменить нельзя.
 					</p>
 					<button type="button" class="btn btn--danger" id="prof-reset">Сбросить данные</button>
 				</div>
@@ -821,16 +807,9 @@
 
 				function paintProfileBody() {
 				if (window.ChemProgress) {
-					ChemProgress.ensureAnonId();
-					const id = (function () {
-						try {
-							return localStorage.getItem('iqmo-chem-anon-id') || '—';
-						} catch (e) {
-							return '—';
-						}
-					})();
-					const el = document.getElementById('prof-anon');
-					if (el) el.textContent = id.length > 24 ? id.slice(0, 10) + '…' + id.slice(-8) : id;
+					try {
+						ChemProgress.ensureAnonId();
+					} catch (e) {}
 				}
 
 				try {
@@ -985,108 +964,21 @@
 				}).join('');
 				}
 
-				async function loadAccountPanel() {
-					const line1 = document.getElementById('prof-account-line1');
-					const line2 = document.getElementById('prof-account-line2');
-					const actions = document.getElementById('prof-account-actions');
-					const backups = document.getElementById('prof-backups');
+				async function syncProfileHeaderAuth() {
 					const hdrLogin = document.getElementById('prof-header-login');
 					const hdrLogout = document.getElementById('prof-header-logout');
-					if (!line1 || !actions) return;
 					try {
 						const r = await fetch('/api/me', { credentials: 'include' });
 						if (!r.ok) {
-							line1.textContent =
-								'Вы не вошли. Прогресс хранится только локально. Чтобы синхронизировать между устройствами, откройте сайт через сервер (папка server → npm start) и войдите.';
-							line2.textContent = '';
-							actions.innerHTML =
-								'<a class="btn btn--primary" href="/login.html">Войти или зарегистрироваться</a>';
-							backups.style.display = 'none';
-							backups.innerHTML = '';
 							if (hdrLogin) hdrLogin.removeAttribute('hidden');
 							if (hdrLogout) hdrLogout.setAttribute('hidden', '');
 							return;
 						}
-						const me = await r.json();
-						line1.textContent = 'Вы вошли как ' + me.email + '. Данные курса синхронизируются с сервером.';
-						line2.textContent =
-							'Резервные копии создаются при каждом сохранении (до ~80 точек). Можно откатиться, если что-то перезаписали.';
 						if (hdrLogin) hdrLogin.setAttribute('hidden', '');
 						if (hdrLogout) hdrLogout.removeAttribute('hidden');
-						actions.innerHTML =
-							'<button type="button" class="btn btn--ghost" id="prof-btn-sync">Синхронизировать сейчас</button>' +
-							'<button type="button" class="btn btn--ghost" id="prof-btn-logout">Выйти</button>';
-						document.getElementById('prof-btn-sync').addEventListener('click', async function () {
-							if (window.IqmoSync && typeof IqmoSync.pushState === 'function') await IqmoSync.pushState();
-							if (window.IqmoSync && typeof IqmoSync.pullState === 'function') await IqmoSync.pullState();
-							paintProfileBody();
-							loadAccountPanel();
-						});
-						document.getElementById('prof-btn-logout').addEventListener('click', async function () {
-							await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-							location.reload();
-						});
-						const hr = await fetch('/api/profile/history', { credentials: 'include' });
-						if (hr.ok) {
-							const hj = await hr.json();
-							const items = hj.items || [];
-							if (items.length) {
-								backups.style.display = 'block';
-								backups.innerHTML =
-									'<div style="font-weight:700; margin-bottom:6px; color:var(--ink)">Последние сохранения на сервере</div>' +
-									items
-										.map(function (it) {
-											const d = new Date(it.created_at).toLocaleString('ru-RU');
-											return (
-												'<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0">' +
-												'<span>' +
-												d +
-												' · рев. ' +
-												it.revision +
-												'</span>' +
-												'<button type="button" class="btn btn--ghost" data-restore-id="' +
-												it.id +
-												'" style="padding:6px 12px; font-size:13px">Откатить</button>' +
-												'</div>'
-											);
-										})
-										.join('');
-								backups.querySelectorAll('[data-restore-id]').forEach(function (btn) {
-									btn.addEventListener('click', async function () {
-										if (!confirm('Заменить текущий прогресс на сервере и в браузере снимком из этой точки?')) return;
-										const id = Number(btn.getAttribute('data-restore-id'));
-										const rr = await fetch('/api/profile/restore', {
-											method: 'POST',
-											credentials: 'include',
-											headers: { 'Content-Type': 'application/json' },
-											body: JSON.stringify({ historyId: id })
-										});
-										if (!rr.ok) {
-											alert('Не удалось откатить.');
-											return;
-										}
-										const rj = await rr.json();
-										if (window.IqmoSync && typeof IqmoSync.applyKeys === 'function') {
-											IqmoSync.applyKeys(rj.keys || {});
-										}
-										location.reload();
-									});
-								});
-							} else {
-								backups.style.display = 'none';
-								backups.innerHTML = '';
-							}
-						}
 					} catch (e) {
-						line1.textContent =
-							'Сервер аккаунта недоступен (откройте сайт через http://localhost:3780 после npm start в папке server). Пока работает только локальное хранилище.';
-						line2.textContent = '';
-						actions.innerHTML = '<a class="btn btn--ghost" href="/login.html">Страница входа</a>';
-						backups.style.display = 'none';
-						const hL = document.getElementById('prof-header-login');
-						const hO = document.getElementById('prof-header-logout');
-						if (hL) hL.removeAttribute('hidden');
-						if (hO) hO.setAttribute('hidden', '');
+						if (hdrLogin) hdrLogin.removeAttribute('hidden');
+						if (hdrLogout) hdrLogout.setAttribute('hidden', '');
 					}
 				}
 
@@ -1098,13 +990,13 @@
 				});
 
 				paintProfileBody();
-				loadAccountPanel();
+				syncProfileHeaderAuth();
 				window.addEventListener('iqmo-sync', function () {
 					paintProfileBody();
 				});
 				window.addEventListener('iqmo-sync-ready', function (ev) {
 					paintProfileBody();
-					loadAccountPanel();
+					syncProfileHeaderAuth();
 				});
 
 				document.getElementById('prof-reset').addEventListener('click', async function () {

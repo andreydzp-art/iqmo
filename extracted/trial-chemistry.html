@@ -85,6 +85,8 @@
 			.btn--blue { background: var(--accent); color: #fff; }
 			.btn--blue:hover { background: #3e64b6; }
 			.btn[disabled] { opacity: .4; cursor: not-allowed; }
+			[hidden] { display: none !important; }
+			.topbar__right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
 			/* ---- progress bar ---- */
 			.progressbar {
@@ -388,7 +390,10 @@
 					</div>
 				</div>
 				<div class="topbar__right">
-					<button type="button" class="btn btn--ghost" id="btn-quit">Выйти</button>
+					<a href="/login.html" class="btn btn--ghost" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="btn btn--ghost" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="btn btn--ghost" id="iqmo-nav-logout" hidden>Выйти</button>
+					<button type="button" class="btn btn--ghost" id="btn-quit">К курсу</button>
 				</div>
 			</div>
 			<div class="progressbar"><div class="progressbar__fill" id="pb-fill"></div></div>
@@ -445,6 +450,7 @@
 		<script src="./chemistry-cat15-source.js?v=9"></script>
 		<script src="./chemistry-cat16-source.js?v=9"></script>
 		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
 		<script src="./mistakes-store.js"></script>
 		<script src="./chem-progress.js"></script>
 		<script>

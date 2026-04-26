@@ -60,6 +60,17 @@
 				transition: background .15s;
 			}
 			.btn-quit:hover { background: rgba(255,255,255,.22); }
+			.topbar__nav {
+				display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end;
+			}
+			.topbar__nav .nav-pill {
+				padding: 9px 14px; border-radius: 10px;
+				background: rgba(255,255,255,.12); color: #fff; font-weight: 600; font-size: 14px;
+				transition: background .15s;
+				border: 0; cursor: pointer; font-family: inherit; text-decoration: none;
+				display: inline-flex; align-items: center; justify-content: center;
+			}
+			.topbar__nav .nav-pill:hover { background: rgba(255,255,255,.22); }
 
 			/* ---- progress chips ---- */
 			.chips {
@@ -218,7 +229,12 @@
 						<div class="topbar__subj">Разминка</div>
 					</div>
 				</div>
-				<a href="./subject-chemistry.html" class="btn-quit">Выйти</a>
+				<div class="topbar__nav">
+					<a href="/login.html" class="nav-pill" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="nav-pill" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="nav-pill" id="iqmo-nav-logout" hidden>Выйти</button>
+					<a href="./subject-chemistry.html" class="btn-quit">К курсу</a>
+				</div>
 			</div>
 			<div class="container">
 				<div class="chips" id="chips"></div>
@@ -250,6 +266,7 @@
 		<script src="./chemistry-categories.js?v=9"></script>
 		<script src="./chemistry-topic-map.js"></script>
 		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
 		<script src="./mistakes-store.js"></script>
 		<script src="./chem-progress.js"></script>
 		<script>
