@@ -356,12 +356,17 @@
 		})
 	</script>
 
-	<!-- Метрика: цель «переход к оплате» + dataLayer (настройте цели в кабинете Метрики: begin_checkout) -->
+	<!-- Метрика: цель «переход к оплате» + dataLayer (настройте цели в кабинете Метрики: begin_checkout). Дедуп: одна цель на сессию. -->
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
 			var form = document.querySelector('.payment-form')
 			if (!form) return
+			var DEDUP_KEY = 'iqmo_begin_checkout_tracked'
 			form.addEventListener('submit', function () {
+				try {
+					if (sessionStorage.getItem(DEDUP_KEY)) return
+					sessionStorage.setItem(DEDUP_KEY, '1')
+				} catch (eDedup) {}
 				try {
 					window.dataLayer = window.dataLayer || []
 					window.dataLayer.push({
