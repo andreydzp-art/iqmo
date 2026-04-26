@@ -27,6 +27,9 @@ final class EnsureIqmoPortalAdmin
         $payload = $jwt->verify($token);
 
         if (! $payload) {
+            if ($request->expectsJson() || str_starts_with($request->path(), 'api/admin')) {
+                return response()->json(['error' => 'unauthorized'], 401);
+            }
             $target = '/login.html?next='.rawurlencode($request->fullUrl());
 
             return redirect($target, 302);

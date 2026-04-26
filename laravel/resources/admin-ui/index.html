@@ -270,6 +270,10 @@
 				background: #fff8ed;
 				border-color: #f5d9a8;
 			}
+			.callout--live {
+				background: #e8f6ee;
+				border-color: #a8dcc0;
+			}
 
 			.callout {
 				padding: 14px 18px;
@@ -527,7 +531,7 @@
 					<button type="button" class="is--soon" data-section="activity">Активность</button>
 				</nav>
 				<div class="admin__foot">
-					Графики и KPI на этой странице — демо из макета (mock-data). Аккаунты портала и API уже есть: регистрация, вход, синхронизация прогресса.
+					Сводка «Обзор» подгружается из БД; при сбое API показывается демо из mock-data.js.
 					<br />
 					<a href="../index.html">← К порталу</a>
 					<div class="admin__auth" id="admin-auth" hidden>
@@ -543,7 +547,7 @@
 					<div class="admin__top">
 						<div class="dash-head">
 							<h1 class="admin__title">Обзор</h1>
-							<p class="admin__lead">Ключевые метрики, воронка и учебная эффективность. Данные MVP — из макета, при смене периода пересчитываются.</p>
+							<p class="admin__lead">Загрузка сводки с сервера…</p>
 							<div class="dash-tabs" id="dash-tabs" role="tablist" aria-label="Вкладки обзора">
 								<button type="button" role="tab" aria-selected="true" data-dash-tab="summary" id="tab-summary">Сводка</button>
 								<button type="button" role="tab" aria-selected="false" data-dash-tab="learning" id="tab-learning">
@@ -563,7 +567,7 @@
 					</div>
 
 					<div class="callout" id="callout-main">
-						<strong>Аналитика MVP:</strong> сводка ниже по-прежнему из <code style="font-size: 13px">admin/mock-data.js</code> (нет серверных агрегатов по тестам). Отдельно уже работает <strong>API портала</strong> — события с сайта можно позже стримить сюда для живых цифр.
+						<strong>Загрузка…</strong> запрос <code style="font-size: 13px">/api/admin/overview</code>
 					</div>
 
 					<div id="dash-summary">
@@ -737,6 +741,20 @@
 
 				let periodDays = 1;
 				let dashTab = 'summary';
+				let overviewPayload = null;
+				let lastOverviewLive = false;
+
+				async function fetchOverviewJson() {
+					const r = await fetch('/api/admin/overview?days=' + periodDays, {
+						credentials: 'same-origin',
+						cache: 'no-store',
+						headers: { Accept: 'application/json' }
+					});
+					if (!r.ok) {
+						throw new Error('overview_http_' + r.status);
+					}
+					return r.json();
+				}
 
 				/** Календарный диапазон выбранного окна (локальное время браузера). */
 				function formatPeriodRangeRu(days) {
@@ -807,16 +825,53 @@
 					return '30 дней (месяц)';
 				}
 
-				function renderSummary() {
+				async function renderSummary() {
 					const pl = periodLabelShort(periodDays);
 					const tf = document.getElementById('title-funnel');
 					const ts = document.getElementById('title-subjects');
 					const tq = document.getElementById('title-questions');
-					if (tf) tf.textContent = 'Воронка · ' + pl + ' (доля от первого шага)';
-					if (ts) ts.textContent = 'Предметы · активность · ' + pl + ' (мок)';
-					if (tq) tq.textContent = 'Сложные вопросы · ' + pl + ' (топ по % ошибок)';
+					const lead = document.querySelector('#panel-overview .dash-head .admin__lead');
+					const co = document.getElementById('callout-main');
 
-					const data = window.ADMIN_ANALYTICS_MOCK.getDataset(periodDays);
+					if (tf) tf.textContent = 'Воронка · доля от аудитории в базе · ' + pl;
+
+					let data;
+					try {
+						overviewPayload = await fetchOverviewJson();
+						lastOverviewLive = !!(overviewPayload.meta && overviewPayload.meta.source === 'db');
+						data = {
+							kpis: overviewPayload.kpis,
+							funnel: overviewPayload.funnel,
+							subjectsSnapshot: overviewPayload.subjectsSnapshot,
+							topQuestions: overviewPayload.topQuestions || []
+						};
+						if (lead) {
+							lead.textContent =
+								'Показатели из MySQL (users, profile_state). Окно: ' + pl + ' — обновляется при смене периода.';
+						}
+						if (co) {
+							co.className = 'callout callout--live';
+							co.innerHTML =
+								'<strong>Живая сводка:</strong> агрегация на сервере. «Учебная эффективность» — часть блоков заглушка до событий по попыткам.';
+						}
+						if (ts) ts.textContent = 'Предметы · ' + pl + ' (химия)';
+						if (tq) tq.textContent = 'Сложные вопросы · ' + pl;
+					} catch (err) {
+						overviewPayload = null;
+						lastOverviewLive = false;
+						data = window.ADMIN_ANALYTICS_MOCK.getDataset(periodDays);
+						if (lead) {
+							lead.textContent =
+								'Не удалось загрузить /api/admin/overview — показан демо-набор из mock-data.js.';
+						}
+						if (co) {
+							co.className = 'callout';
+							co.innerHTML =
+								'<strong>Демо-режим:</strong> API недоступен или нет прав. Проверьте вход в IQMO и <code>IQMO_ADMIN_EMAILS</code>.';
+						}
+						if (ts) ts.textContent = 'Предметы · активность · ' + pl + ' (мок)';
+						if (tq) tq.textContent = 'Сложные вопросы · ' + pl + ' (мок)';
+					}
 
 					const kpiRoot = document.getElementById('kpi-root');
 					kpiRoot.innerHTML = '';
@@ -831,8 +886,9 @@
 						wrap.innerHTML =
 							'<div class="funnel__name"></div><div class="funnel__bar"><div class="funnel__fill"></div></div><div class="funnel__pct"></div>';
 						wrap.querySelector('.funnel__name').textContent = row.step;
-						wrap.querySelector('.funnel__fill').style.width = Math.min(100, row.pct) + '%';
-						wrap.querySelector('.funnel__pct').textContent = row.pct.toFixed(1).replace('.', ',') + '%';
+						const pct = typeof row.pct === 'number' ? row.pct : 0;
+						wrap.querySelector('.funnel__fill').style.width = Math.min(100, pct) + '%';
+						wrap.querySelector('.funnel__pct').textContent = pct.toFixed(1).replace('.', ',') + '%';
 						funnelRoot.appendChild(wrap);
 					});
 
@@ -843,38 +899,50 @@
 						row.innerHTML =
 							'<span class="subjects__name"></span><span class="subjects__stat"></span><span class="subjects__stat"></span>';
 						row.querySelector('.subjects__name').textContent = s.name;
-						row.querySelectorAll('.subjects__stat')[0].textContent = 'Ø ' + s.avgPct + '%';
-						row.querySelectorAll('.subjects__stat')[1].textContent = s.activityShare + '% сессий';
+						const avgEl = row.querySelectorAll('.subjects__stat')[0];
+						const shareEl = row.querySelectorAll('.subjects__stat')[1];
+						avgEl.textContent = s.avgPct === '—' || s.avgPct === undefined ? 'ср. % —' : 'Ø ' + s.avgPct + '%';
+						shareEl.textContent = (s.activityShare != null ? s.activityShare : 0) + '% активности';
 						subRoot.appendChild(row);
 					});
 
 					const tbody = document.getElementById('questions-tbody');
 					tbody.innerHTML = '';
-					data.topQuestions.forEach(function (q) {
+					if (!data.topQuestions || data.topQuestions.length === 0) {
 						const tr = document.createElement('tr');
 						tr.innerHTML =
-							'<td><strong>#' +
-							q.qid +
-							'</strong></td><td>' +
-							escapeHtml(q.topic) +
-							'</td><td>' +
-							q.wrongPct +
-							'%</td><td>' +
-							q.shows +
-							'</td><td>' +
-							q.avgSec +
-							' с</td><td></td>';
-						const tdFlag = tr.querySelector('td:last-child');
-						const span = document.createElement('span');
-						span.className = 'tag ' + (q.flag ? 'tag--warn' : 'tag--ok');
-						span.textContent = q.flag ? 'На проверку' : 'OK';
-						tdFlag.appendChild(span);
+							'<td colspan="6" style="color:var(--muted); padding:14px;">Нет серверной статистики по вопросам (нужны события или отдельная агрегация).</td>';
 						tbody.appendChild(tr);
-					});
+					} else {
+						data.topQuestions.forEach(function (q) {
+							const tr = document.createElement('tr');
+							tr.innerHTML =
+								'<td><strong>#' +
+								q.qid +
+								'</strong></td><td>' +
+								escapeHtml(q.topic) +
+								'</td><td>' +
+								q.wrongPct +
+								'%</td><td>' +
+								q.shows +
+								'</td><td>' +
+								q.avgSec +
+								' с</td><td></td>';
+							const tdFlag = tr.querySelector('td:last-child');
+							const span = document.createElement('span');
+							span.className = 'tag ' + (q.flag ? 'tag--warn' : 'tag--ok');
+							span.textContent = q.flag ? 'На проверку' : 'OK';
+							tdFlag.appendChild(span);
+							tbody.appendChild(tr);
+						});
+					}
 				}
 
 				function renderLearning() {
-					const L = window.ADMIN_ANALYTICS_MOCK.getLearningEffectiveness(periodDays);
+					const L =
+						lastOverviewLive && overviewPayload && overviewPayload.learning
+							? overviewPayload.learning
+							: window.ADMIN_ANALYTICS_MOCK.getLearningEffectiveness(periodDays);
 					const pl = periodLabelShort(periodDays);
 
 					const hintShort = document.getElementById('learn-period-hint');
@@ -889,15 +957,17 @@
 
 					const leadFast = document.getElementById('lead-fast-topics');
 					if (leadFast) {
-						leadFast.textContent =
-							'По мок-данным: прирост % верных между первой и последней третью попыток по теме (минимальная выборка n). Период: ' +
-							L.periodLabel +
-							'.';
+						leadFast.textContent = lastOverviewLive
+							? 'Пока нет серверных когорт по темам — нужны события или история попыток.'
+							: 'По мок-данным: прирост % верных между первой и последней третью попыток по теме. Период: ' +
+							  L.periodLabel +
+							  '.';
 					}
 					const leadStag = document.getElementById('lead-stagnant-topics');
 					if (leadStag) {
-						leadStag.textContent =
-							'Темы с ≥3 сессиями и отсутствием устойчивого роста (Δ ≤ 1 п.п. или отрицательный тренд). Мок для дашборда.';
+						leadStag.textContent = lastOverviewLive
+							? 'Метрики «застревания» на сервере пока не строятся.'
+							: 'Темы с ≥3 сессиями и отсутствием устойчивого роста. Мок для дашборда.';
 					}
 					const leadMist = document.getElementById('lead-mistake-fix');
 					if (leadMist) leadMist.textContent = L.mistakeFix.hint;
@@ -910,70 +980,87 @@
 
 					const fastBody = document.getElementById('learn-fast-tbody');
 					fastBody.innerHTML = '';
-					L.fastestTopics.forEach(function (row) {
+					if (!L.fastestTopics || L.fastestTopics.length === 0) {
 						const tr = document.createElement('tr');
 						tr.innerHTML =
-							'<td>' +
-							escapeHtml(row.topic) +
-							'</td><td><strong>+' +
-							String(row.growthPct).replace('.', ',') +
-							' п.п.</strong></td><td>' +
-							row.sessions +
-							'</td><td>≥' +
-							row.minN +
-							'</td>';
+							'<td colspan="4" style="color:var(--muted); padding:14px;">Нет данных для отображения.</td>';
 						fastBody.appendChild(tr);
-					});
+					} else {
+						L.fastestTopics.forEach(function (row) {
+							const tr = document.createElement('tr');
+							tr.innerHTML =
+								'<td>' +
+								escapeHtml(row.topic) +
+								'</td><td><strong>+' +
+								String(row.growthPct).replace('.', ',') +
+								' п.п.</strong></td><td>' +
+								row.sessions +
+								'</td><td>≥' +
+								row.minN +
+								'</td>';
+							fastBody.appendChild(tr);
+						});
+					}
 
 					const stagBody = document.getElementById('learn-stagnant-tbody');
 					stagBody.innerHTML = '';
-					L.stagnantTopics.forEach(function (row) {
+					if (!L.stagnantTopics || L.stagnantTopics.length === 0) {
 						const tr = document.createElement('tr');
-						const d = row.deltaPct;
-						const dStr = (d > 0 ? '+' : '') + String(d).replace('.', ',') + ' п.п.';
 						tr.innerHTML =
-							'<td>' +
-							escapeHtml(row.topic) +
-							'</td><td>' +
-							row.avgPct +
-							'%</td><td>' +
-							dStr +
-							'</td><td>' +
-							row.sessions +
-							'</td>';
+							'<td colspan="4" style="color:var(--muted); padding:14px;">Нет данных для отображения.</td>';
 						stagBody.appendChild(tr);
-					});
+					} else {
+						L.stagnantTopics.forEach(function (row) {
+							const tr = document.createElement('tr');
+							const d = row.deltaPct;
+							const dStr = (d > 0 ? '+' : '') + String(d).replace('.', ',') + ' п.п.';
+							tr.innerHTML =
+								'<td>' +
+								escapeHtml(row.topic) +
+								'</td><td>' +
+								row.avgPct +
+								'%</td><td>' +
+								dStr +
+								'</td><td>' +
+								row.sessions +
+								'</td>';
+							stagBody.appendChild(tr);
+						});
+					}
 
 					const mk = document.getElementById('learn-mistake-kpis');
 					mk.innerHTML = '';
+					const med = L.mistakeFix.medianAttempts;
+					const p75 = L.mistakeFix.p75Attempts;
+					const un = L.mistakeFix.unresolvedPct;
 					appendKpi(mk, {
 						label: 'Медиана попыток',
-						value: String(L.mistakeFix.medianAttempts),
+						value: med == null ? '—' : String(med),
 						delta: 'до 1-го верного',
 						trend: 'flat',
-						hint: 'После попадания вопроса в банк ошибок (мок)'
+						hint: lastOverviewLive ? 'Серверная медиана не считается' : 'После попадания вопроса в банк (мок)'
 					});
 					appendKpi(mk, {
 						label: '75-й перцентиль',
-						value: String(L.mistakeFix.p75Attempts),
+						value: p75 == null ? '—' : String(p75),
 						delta: 'попыток',
 						trend: 'flat',
-						hint: 'Тяжёлые ошибки чаще требуют нескольких проходов'
+						hint: lastOverviewLive ? '—' : 'Тяжёлые ошибки (мок)'
 					});
 					appendKpi(mk, {
 						label: 'Не исправили за период',
-						value: L.mistakeFix.unresolvedPct + '%',
+						value: un == null ? '—' : un + '%',
 						delta: 'от записей об ошибках',
 						trend: 'down',
-						hint: 'Нет верного ответа до конца выбранного окна'
+						hint: lastOverviewLive ? '—' : 'Нет верного ответа до конца окна (мок)'
 					});
 				}
 
-				function render() {
+				async function render() {
 					const rangeEl = document.getElementById('period-range');
 					if (rangeEl) rangeEl.textContent = formatPeriodRangeRu(periodDays);
 
-					renderSummary();
+					await renderSummary();
 					renderLearning();
 				}
 
@@ -990,7 +1077,7 @@
 					document.querySelectorAll('.period button').forEach(function (b) {
 						b.classList.toggle('is--on', b === btn);
 					});
-					render();
+					render().catch(function () {});
 				});
 
 				document.getElementById('dash-tabs').addEventListener('click', function (e) {
@@ -1022,7 +1109,7 @@
 				});
 
 				setDashTab('summary');
-				render();
+				render().catch(function () {});
 			})();
 		</script>
 	</body>
