@@ -39,19 +39,28 @@ jobs:
           coverage: none
           tools: composer
 
-      - name: Cache composer
-        uses: actions/cache@v4
-        with:
-          path: laravel/vendor
-          key: composer-${{ runner.os }}-php83-${{ hashFiles('laravel/composer.lock') }}
-          restore-keys: |
-            composer-${{ runner.os }}-php83-
+      # NB: deliberately no actions/cache here. A stale vendor/ from a
+      # previous run (e.g. one that ran `composer install --no-dev`) made
+      # composer install a no-op, leaving vendor/bin/phpunit missing
+      # → exit 127 "phpunit: not found". Reinstalling from scratch every
+      # run takes ~30s and removes that whole class of failure.
 
       - name: Use upstream Packagist (composer.json pins a regional mirror)
         run: composer config -g repos.packagist composer https://repo.packagist.org
 
-      - name: Install dependencies
+      - name: Install dependencies (with dev)
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Verify phpunit is present
+        # Defence-in-depth: fail fast with a clear message if --no-dev ever
+        # sneaks back in (e.g. via COMPOSER_NO_DEV env in a hosted runner).
+        run: |
+          if [ ! -x vendor/bin/phpunit ]; then
+            echo "vendor/bin/phpunit missing after composer install — dev deps not installed"
+            ls -la vendor/bin/ || true
+            exit 1
+          fi
+          vendor/bin/phpunit --version
 
       - name: Run Unit tests
         # Pure PHP test — no Laravel boot, no .env needed.
