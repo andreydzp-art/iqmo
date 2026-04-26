@@ -303,6 +303,12 @@ final class IqmoAdminUsersBuilder
                 fourteenDaysAgo: $fourteenDaysAgo,
             );
 
+            // PHP 8: `$ev['avg_pct'] !== null` напрямую (без `??`) обращается к
+            // несуществующему ключу на null-массиве и роняет весь эндпоинт
+            // через ErrorException("Trying to access array offset on null").
+            // Делаем доступ через `??`, который оператором языка обходит это поведение.
+            $avgPctRaw = $ev['avg_pct'] ?? null;
+
             $items[] = [
                 'id' => $uid,
                 'email' => $email,
@@ -311,7 +317,7 @@ final class IqmoAdminUsersBuilder
                 'lastSync' => $lastSync > 0 ? $lastSync : null,
                 'lastEvent' => $lastEvent > 0 ? $lastEvent : null,
                 'attempts' => $attempts,
-                'avgPct' => $ev['avg_pct'] !== null ? round((float) $ev['avg_pct'], 1) : null,
+                'avgPct' => $avgPctRaw !== null ? round((float) $avgPctRaw, 1) : null,
                 'eventsTotal' => $ev['events_total'] ?? 0,
                 'hasProfile' => $hasProfile,
                 'profileSize' => $pr['profile_size'] ?? 0,
