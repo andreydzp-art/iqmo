@@ -43,6 +43,9 @@ jobs:
           restore-keys: |
             composer-${{ runner.os }}-php83-
 
+      - name: Use upstream Packagist (composer.json pins a regional mirror)
+        run: composer config -g repos.packagist composer https://repo.packagist.org
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 

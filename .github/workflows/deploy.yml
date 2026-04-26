@@ -35,6 +35,13 @@ jobs:
           restore-keys: |
             composer-${{ runner.os }}-php83-
 
+      - name: Use upstream Packagist (composer.json pins a regional mirror)
+        # composer.json declares a Tencent Cloud Packagist mirror as a convenience
+        # for the maintainer's local network. GitHub Actions runners can't always
+        # reach it reliably, so we override at the global config level — this does
+        # not modify composer.json or composer.lock.
+        run: composer config -g repos.packagist composer https://repo.packagist.org
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
