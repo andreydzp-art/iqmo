@@ -79,12 +79,11 @@ jobs:
             php artisan migrate --force
             php artisan optimize:clear
 
-            # Nginx often does `try_files $uri ... /index.php`. Stale HTML copies here bypass Laravel
-            # routes — old /index.html (меню) и /login.html (редирект-петля). Источник правды: public/site/*.html
-            rm -f \
-              "$LARAVEL_DIR/public/index.html" \
-              "$LARAVEL_DIR/public/login.html" \
-              "$LARAVEL_DIR/public/profile.html"
+            # Nginx делает `try_files $uri ... /index.php`. Любая залежавшаяся .html-копия в
+            # `laravel/public/` обходит Laravel-роуты, и пользователь видит версию от прошлого
+            # деплоя (без Метрики, со старой вёрсткой и т.п.). Источник правды — `public/site/*.html`,
+            # а в `laravel/public/` корневых .html в git нет вовсе. Поэтому смело сносим всё, что там есть.
+            find "$LARAVEL_DIR/public" -maxdepth 1 -type f -name '*.html' -print -delete || true
 
             # Старая копия админки в public/ обходила Laravel (Nginx отдавал файл напрямую).
             rm -rf "$LARAVEL_DIR/public/admin"
@@ -146,6 +145,12 @@ jobs:
           if ! grep -qi "хими" /tmp/smoke-subj.html; then
             echo "Subject page body missing chemistry context"
             head -c 500 /tmp/smoke-subj.html | cat -v
+            exit 1
+          fi
+          # Регрессия: stale-копии в laravel/public/*.html nginx-ом отдавались без Метрики
+          # (counter id 108770166). Источник правды — public/site/*.html через Laravel-роуты.
+          if ! grep -q "108770166" /tmp/smoke-subj.html; then
+            echo "Subject page missing Yandex Metrika counter (108770166) — likely a stale laravel/public/subject-chemistry.html bypassing Laravel"
             exit 1
           fi
 
