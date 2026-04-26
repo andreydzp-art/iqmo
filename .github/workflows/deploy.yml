@@ -10,8 +10,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: PHPUnit (Unit) gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: laravel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: laravel/vendor
+          key: composer-${{ runner.os }}-php83-${{ hashFiles('laravel/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php83-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Generate APP_KEY
+        run: php artisan key:generate
+
+      - name: Run Unit tests
+        # Gate: deploy is blocked if the JWT crypto invariants drift.
+        run: vendor/bin/phpunit --testsuite=Unit --no-coverage
+
   deploy:
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
