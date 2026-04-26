@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Сводка для админ-дашборда из БД IQMO (users, profile_state).
- * Попытки и ошибки — из JSON-ключей синхронизации iqmo-chem-*.
+ * Попытки: снимки profile_state + события analytics_events (chem.attempt_complete).
  */
 final class IqmoAdminOverviewBuilder
 {
@@ -218,6 +219,27 @@ final class IqmoAdminOverviewBuilder
 
         $learning = $this->stubLearning($days);
 
+        $topQuestions = [];
+        if (Schema::connection('iqmo')->hasTable('analytics_events')) {
+            $topQuestions = $this->rollupTopQuestions($sinceMs, $days);
+        }
+
+        $flagged = 0;
+        foreach ($topQuestions as $q) {
+            if (! empty($q['flag'])) {
+                $flagged++;
+            }
+        }
+        foreach ($kpis as $idx => $k) {
+            if (($k['id'] ?? '') === 'review_flag') {
+                $kpis[$idx]['value'] = $topQuestions === [] ? '—' : $this->fmtInt($flagged);
+                $kpis[$idx]['delta'] = $topQuestions === [] ? 'нет событий' : 'по ответам';
+                $kpis[$idx]['hint'] =
+                    'Высокий % ошибок при достаточном числе показов (события chem.attempt_complete за период)';
+                break;
+            }
+        }
+
         return [
             'meta' => [
                 'source' => 'db',
@@ -227,9 +249,85 @@ final class IqmoAdminOverviewBuilder
             'kpis' => $kpis,
             'funnel' => $funnel,
             'subjectsSnapshot' => $subjectsSnapshot,
-            'topQuestions' => [],
+            'topQuestions' => $topQuestions,
             'learning' => $learning,
         ];
+    }
+
+    /**
+     * @return list<array{qid: string, topic: string, wrongPct: int, shows: int, avgSec: string, flag: bool}>
+     */
+    private function rollupTopQuestions(int $sinceMs, int $days): array
+    {
+        $minShows = $days <= 1 ? 3 : ($days >= 14 ? 3 : 4);
+
+        $rows = DB::connection('iqmo')->table('analytics_events')
+            ->where('event', 'chem.attempt_complete')
+            ->where('occurred_at', '>=', $sinceMs)
+            ->orderByDesc('id')
+            ->limit(12_000)
+            ->get(['payload']);
+
+        /** @var array<string, array{n: int, w: int}> $acc */
+        $acc = [];
+
+        foreach ($rows as $row) {
+            $raw = $row->payload ?? null;
+            if (is_string($raw)) {
+                $p = json_decode($raw, true);
+            } elseif (is_array($raw)) {
+                $p = $raw;
+            } else {
+                continue;
+            }
+            if (! is_array($p) || empty($p['items']) || ! is_array($p['items'])) {
+                continue;
+            }
+            foreach ($p['items'] as $it) {
+                if (! is_array($it) || ! isset($it['qid'])) {
+                    continue;
+                }
+                $qid = (string) $it['qid'];
+                if ($qid === '' || strlen($qid) > 64) {
+                    continue;
+                }
+                if (! isset($acc[$qid])) {
+                    $acc[$qid] = ['n' => 0, 'w' => 0];
+                }
+                $acc[$qid]['n']++;
+                if (empty($it['ok'])) {
+                    $acc[$qid]['w']++;
+                }
+            }
+        }
+
+        $out = [];
+        foreach ($acc as $qid => $st) {
+            $n = $st['n'];
+            if ($n < $minShows) {
+                continue;
+            }
+            $w = $st['w'];
+            $wrongPct = $n > 0 ? (int) round(100.0 * $w / $n) : 0;
+            $out[] = [
+                'qid' => $qid,
+                'topic' => 'Химия ОГЭ',
+                'wrongPct' => $wrongPct,
+                'shows' => $n,
+                'avgSec' => '—',
+                'flag' => $wrongPct >= 55 && $n >= $minShows,
+            ];
+        }
+
+        usort($out, function (array $a, array $b): int {
+            if ($a['wrongPct'] !== $b['wrongPct']) {
+                return $b['wrongPct'] <=> $a['wrongPct'];
+            }
+
+            return $b['shows'] <=> $a['shows'];
+        });
+
+        return array_slice($out, 0, 15);
     }
 
     /**
@@ -264,7 +362,7 @@ final class IqmoAdminOverviewBuilder
     {
         $periodLabel = $days === 1 ? 'сегодня' : ($days === 7 ? '7 дней' : ($days === 14 ? '14 дней' : '30 дней'));
 
-        $stubHint = 'Нужны серверные события или тяжёлая агрегация истории попыток; сейчас только снимки profile_state.';
+        $stubHint = 'Расширенные когорты и медианы по темам — следующий этап; топ вопросов уже считается из событий chem.attempt_complete.';
 
         return [
             'days' => $days,

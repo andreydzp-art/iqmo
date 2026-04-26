@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminOverviewController;
+use App\Http\Controllers\Api\AnalyticsIngestController;
 use App\Http\Controllers\Api\IqmoAuthController;
 use App\Http\Controllers\Api\IqmoProfileController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ Route::prefix('api')->group(function (): void {
         Route::put('/profile/state', [IqmoProfileController::class, 'statePut']);
         Route::get('/profile/history', [IqmoProfileController::class, 'history']);
         Route::post('/profile/restore', [IqmoProfileController::class, 'restore']);
+        Route::post('/analytics/events', [AnalyticsIngestController::class, 'ingest']);
     });
 
     Route::middleware(['iqmo.portal_admin'])->group(function (): void {

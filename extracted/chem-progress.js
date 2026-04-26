@@ -605,6 +605,37 @@
 			});
 			awardXp(pts, 'test_' + payload.mode, itemsCount);
 		} catch (e2) {}
+
+		try {
+			(function sendAttemptAnalytics() {
+				if (typeof fetch !== 'function') return;
+				var items = Array.isArray(payload.items) ? payload.items : [];
+				var body = JSON.stringify({
+					events: [
+						{
+							event: 'chem.attempt_complete',
+							occurredAt: typeof payload.finishedAt === 'number' ? payload.finishedAt : Date.now(),
+							payload: {
+								subject: payload.subject || 'chemistry',
+								mode: payload.mode,
+								correct: payload.correct,
+								total: payload.total,
+								percent: payload.percent,
+								label: payload.label || '',
+								items: items
+							}
+						}
+					]
+				});
+				fetch('/api/analytics/events', {
+					method: 'POST',
+					credentials: 'include',
+					cache: 'no-store',
+					headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+					body: body
+				}).catch(function () {});
+			})();
+		} catch (e3) {}
 	}
 
 	function getLastAttempt() {
