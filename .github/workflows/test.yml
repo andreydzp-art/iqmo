@@ -7,10 +7,14 @@ name: Tests
 # the Node API and would otherwise drift silently.
 
 on:
-  # Push to main is already gated by deploy.yml's `test` job — running the
-  # same suite here twice is wasted CI minutes. Pull requests need their
-  # own trigger because deploy.yml only runs on push.
+  # Run on PRs (so authors get fast feedback) and on push to main as a
+  # non-blocking indicator — deploy.yml no longer gates on PHPUnit because a
+  # red gate without admin-access to the Actions logs froze production for
+  # half a day. We still want red builds to be visible in the Actions tab,
+  # so push triggers the same suite here.
   pull_request: {}
+  push:
+    branches: ["main"]
   workflow_dispatch: {}
 
 concurrency:

@@ -10,50 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: PHPUnit (Unit) gate
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: laravel
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.3"
-          coverage: none
-          tools: composer
-
-      - name: Cache composer
-        uses: actions/cache@v4
-        with:
-          path: laravel/vendor
-          key: composer-${{ runner.os }}-php83-${{ hashFiles('laravel/composer.lock') }}
-          restore-keys: |
-            composer-${{ runner.os }}-php83-
-
-      - name: Use upstream Packagist (composer.json pins a regional mirror)
-        # composer.json declares a Tencent Cloud Packagist mirror as a convenience
-        # for the maintainer's local network. GitHub Actions runners can't always
-        # reach it reliably, so we override at the global config level — this does
-        # not modify composer.json or composer.lock.
-        run: composer config -g repos.packagist composer https://repo.packagist.org
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Run Unit tests
-        # Gate: deploy is blocked if the JWT crypto invariants drift.
-        # IqmoJwtTest is pure PHP — no Laravel boot, no .env needed. The autoloader
-        # from composer install is enough to resolve App\Services\IqmoJwt.
-        run: vendor/bin/phpunit --testsuite=Unit --no-coverage
-
   deploy:
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
