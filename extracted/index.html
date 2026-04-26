@@ -656,14 +656,11 @@
 					}
 				} catch (e) {}
 
-				const loginBtn = document.getElementById('home-nav-login');
 				const profBtn = document.getElementById('home-nav-profile');
 				if (loggedIn) {
 					if (profBtn) profBtn.removeAttribute('hidden');
-					if (loginBtn) loginBtn.setAttribute('hidden', '');
 				} else {
 					if (profBtn) profBtn.setAttribute('hidden', '');
-					if (loginBtn) loginBtn.removeAttribute('hidden');
 				}
 
 				const rows = [];
