@@ -99,4 +99,17 @@
 			}
 		});
 	});
+
+	// Cookie-consent banner: piggy-back on iqmo-nav.js so we don't have to add a
+	// second <script> tag to all 19 page templates. Loaded lazily and once.
+	(function loadCookieBanner() {
+		try {
+			if (window.__iqmoCookiesLoaded) return;
+			window.__iqmoCookiesLoaded = true;
+			var s = document.createElement('script');
+			s.src = '/iqmo-cookies.js';
+			s.defer = true;
+			(document.head || document.documentElement).appendChild(s);
+		} catch (e) {}
+	})();
 })();
