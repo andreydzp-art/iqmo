@@ -102,6 +102,19 @@ final class IqmoAdminOverviewBuilder
         $avgScoreCur = $hasAnalytics ? $this->computeAvgScore($sinceMs, null) : ['avg' => null, 'count' => 0];
         $avgScorePrev = $hasAnalytics ? $this->computeAvgScore($prevStartMs, $sinceMs) : ['avg' => null, 'count' => 0];
 
+        $dauMau = $hasAnalytics ? $this->computeDauMau($nowMs) : ['dau' => 0, 'mau' => 0];
+        $dauMauValue = '—';
+        $dauMauDelta = 'нет событий';
+        $dauMauHint = 'COUNT(DISTINCT user_id) из analytics_events: DAU=24ч, MAU=30 дней.';
+        if ($dauMau['mau'] > 0) {
+            $stickiness = round(100.0 * $dauMau['dau'] / $dauMau['mau'], 1);
+            $dauMauValue = $this->fmtInt($dauMau['dau']).' / '.$this->fmtInt($dauMau['mau']);
+            $dauMauDelta = 'sticky '.str_replace('.', ',', (string) $stickiness).'%';
+            $dauMauHint .= ' Stickiness = DAU/MAU. У образовательных сервисов хороший ориентир — ≥ 20 %.';
+        } elseif ($dauMau['dau'] > 0) {
+            $dauMauValue = $this->fmtInt($dauMau['dau']).' / '.$this->fmtInt($dauMau['mau']);
+        }
+
         $avgScoreVal = $avgScoreCur['avg'] !== null ? round((float) $avgScoreCur['avg'], 1) : null;
         $avgScorePrevVal = $avgScorePrev['avg'] !== null ? round((float) $avgScorePrev['avg'], 1) : null;
 
@@ -137,11 +150,11 @@ final class IqmoAdminOverviewBuilder
             ],
             [
                 'id' => 'mau_dau',
-                'label' => 'MAU / DAU',
-                'value' => '—',
-                'delta' => 'н/д',
+                'label' => 'DAU / MAU',
+                'value' => $dauMauValue,
+                'delta' => $dauMauDelta,
                 'trend' => 'flat',
-                'hint' => 'Нужны дневные срезы; пока только окно '.$days.' дн.',
+                'hint' => $dauMauHint,
             ],
             [
                 'id' => 'new_users',
@@ -277,6 +290,41 @@ final class IqmoAdminOverviewBuilder
             'topQuestions' => $topQuestions,
             'learning' => $learning,
         ];
+    }
+
+    /**
+     * DAU = уникальные user_id с любым событием за последние 24 ч.
+     * MAU = уникальные user_id с любым событием за последние 30 дней.
+     *
+     * Считаем «на лету», без отдельной таблицы daily_user_stats, потому что
+     * при текущем объёме (≤ десятки тысяч строк/день) это ~100 ms по индексам.
+     * Когда таблица перевалит за миллион строк — стоит переключиться на
+     * ежедневный snapshot через `php artisan schedule:run` (см. DEPLOY.md).
+     *
+     * @return array{dau: int, mau: int}
+     */
+    private function computeDauMau(int $nowMs): array
+    {
+        try {
+            $oneDayAgo = $nowMs - 86_400_000;
+            $thirtyDaysAgo = $nowMs - 30 * 86_400_000;
+
+            $iqmo = DB::connection('iqmo');
+
+            $dau = (int) ($iqmo->table('analytics_events')
+                ->where('occurred_at', '>=', $oneDayAgo)
+                ->distinct()
+                ->count('user_id'));
+
+            $mau = (int) ($iqmo->table('analytics_events')
+                ->where('occurred_at', '>=', $thirtyDaysAgo)
+                ->distinct()
+                ->count('user_id'));
+
+            return ['dau' => $dau, 'mau' => $mau];
+        } catch (\Throwable $e) {
+            return ['dau' => 0, 'mau' => 0];
+        }
     }
 
     /**
