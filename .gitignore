@@ -10,6 +10,12 @@ laravel/storage/framework/cache/
 laravel/storage/framework/sessions/
 laravel/storage/framework/views/
 
+# Legacy mirror — actual content lives in `extracted/uploads/` and is served
+# from `laravel/public/site/uploads/` (see `routes/web.php` and DEPLOY.md).
+# Locally on Windows this can be a junction to `extracted/uploads/`, which
+# we don't want to track again.
+laravel/public/uploads/
+
 # OS / IDE
 Thumbs.db
 .DS_Store

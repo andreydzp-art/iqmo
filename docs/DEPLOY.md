@@ -45,9 +45,18 @@ DROP TABLE IF EXISTS analytics_events;
 
 ## Статика (один источник правды)
 
-Каноничная вёрстка лежит в **`extracted/`** — это единственное место, куда вносятся правки HTML/JS/CSS. Никогда не редактируйте файлы в `laravel/public/site/` или `laravel/public/uploads/` руками: они либо генерируются скриптом синхронизации, либо подменяются nginx.
+Каноничная вёрстка лежит в **`extracted/`** — это единственное место, куда вносятся правки HTML/JS/CSS. Никогда не редактируйте файлы в `laravel/public/site/` руками: они генерируются скриптом синхронизации.
 
 > **Текущий бой**: `.github/workflows/deploy.yml` использует **вариант B** (Laravel раздаёт `public/site/` через nginx + PHP-FPM), при этом из `public/` удаляются устаревшие копии `index.html`, `login.html`, `profile.html`, `admin/`. Перед каждым деплоем синхронизируйте `laravel/public/site/` со скриптом ниже, иначе на проде «отставшая» статика начнёт расходиться с правками в `extracted/`.
+
+### Папка `laravel/public/uploads/` удалена из репозитория
+
+Раньше канонические страницы оплаты лежали в двух местах сразу: `extracted/uploads/` **и** `laravel/public/uploads/`. Это размазывало правки и приводило к расхождениям. Теперь:
+
+- Правда живёт только в `extracted/uploads/` → синкается в `laravel/public/site/uploads/`.
+- Запросы вида `/uploads/payment.html`, `/uploads/thank.html` и т.п. отдаются Laravel-маршрутом из `public/site/uploads/` (см. `routes/web.php`).
+- На VPS после очередного `git pull` папка `laravel/public/uploads/` исчезнет. **Это нормально**: nginx с дефолтным `try_files $uri $uri/ /index.php?$query_string;` пробросит запрос в Laravel, и страница откроется через site/uploads.
+- Если на сервере nginx настроен **жёстко** на `location /uploads/ { root .../laravel/public; }` без fallback в Laravel — добавьте `try_files $uri @laravel;` или замените root на `.../laravel/public/site` (чтобы отдавать сразу из site/uploads без участия PHP).
 
 ### Вариант B (рекомендуемый) — Laravel публикует копию `extracted/` через `laravel/public/site/`
 
@@ -61,8 +70,6 @@ node scripts/sync-site.mjs
 ```
 
 Скрипт удаляет в `laravel/public/site/` всё, чего нет в `extracted/`, поэтому удаления тоже синхронизируются. Запускайте его в CI/CD перед `git push`/деплоем (или сразу на сервере после `git pull`).
-
-> Примечание: каталог `laravel/public/uploads/` — историческое наследие. На свежих развёртываниях его можно не использовать; держите его в синхронности только если nginx ещё ссылается на него.
 
 ### Вариант A (альтернатива) — nginx раздаёт `extracted/` напрямую
 

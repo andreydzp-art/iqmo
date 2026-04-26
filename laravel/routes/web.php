@@ -10,7 +10,7 @@ require __DIR__.'/auth.php';
 
 // Static site assets (served by Nginx on VPS; routed here for local `php artisan serve`)
 // `/admin/*` is not public: see protected routes below (IQMO_ADMIN_EMAILS + portal session).
-foreach (['assets', 'img', 'uploads', 'badges'] as $dir) {
+foreach (['assets', 'img', 'badges'] as $dir) {
     Route::get("/{$dir}/{path}", function (string $path) use ($dir) {
         // Use forward slashes for Laravel path helpers, then normalize.
         $rel = $dir.'/'.ltrim($path, '/');
@@ -21,6 +21,20 @@ foreach (['assets', 'img', 'uploads', 'badges'] as $dir) {
         return response()->file($full);
     })->where('path', '.*');
 }
+
+// `/uploads/*` теперь читается из `public/site/uploads/*` — единый источник правды
+// (синхронизируется из `extracted/uploads/` через `node scripts/sync-site.mjs`).
+// Старая папка `public/uploads/` удалена из git: nginx с дефолтным `try_files`
+// просто прокинет запрос в Laravel, и эта route отдаст файл из site/uploads.
+Route::get('/uploads/{path}', function (string $path) {
+    $rel = 'site/uploads/'.ltrim($path, '/');
+    $full = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, public_path($rel));
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return response()->file($full);
+})->where('path', '.*');
 
 Route::get('/', function () {
     return response()->file(public_path('site/index.html'));
