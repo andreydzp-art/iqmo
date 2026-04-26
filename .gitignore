@@ -34,3 +34,7 @@ laravel/storage/iqmo_cookies*.txt
 # Composer artefacts (use `composer` globally or `php composer.phar` locally)
 composer.phar
 composer-setup.php
+
+# CI debugging artefacts
+.gh-jobs.json
+.git_commit_msg.txt
