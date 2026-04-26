@@ -66,15 +66,108 @@
 		} catch (e) {}
 	}
 
-	function sendAnalyticsEvents(events) {
-		if (typeof fetch !== 'function' || !Array.isArray(events) || events.length === 0) return;
+	const ANALYTICS_QUEUE_KEY = 'iqmo-analytics-queue-v1';
+	const ANALYTICS_QUEUE_MAX = 200;
+	const ANALYTICS_BATCH_MAX = 24;
+	const ANALYTICS_TTL_MS = 7 * 86400000;
+	let iqmoAnalyticsFlushing = false;
+
+	function loadAnalyticsQueue() {
+		try {
+			const raw = localStorage.getItem(ANALYTICS_QUEUE_KEY);
+			if (!raw) return [];
+			const arr = JSON.parse(raw);
+			if (!Array.isArray(arr)) return [];
+			const cutoff = Date.now() - ANALYTICS_TTL_MS;
+			return arr.filter(function (ev) {
+				return ev && typeof ev === 'object' && Number.isFinite(ev.occurredAt) && ev.occurredAt >= cutoff;
+			});
+		} catch (e) {
+			return [];
+		}
+	}
+
+	function saveAnalyticsQueue(arr) {
+		try {
+			if (!arr || arr.length === 0) {
+				localStorage.removeItem(ANALYTICS_QUEUE_KEY);
+				return;
+			}
+			const trimmed = arr.length > ANALYTICS_QUEUE_MAX ? arr.slice(arr.length - ANALYTICS_QUEUE_MAX) : arr;
+			localStorage.setItem(ANALYTICS_QUEUE_KEY, JSON.stringify(trimmed));
+		} catch (e) {}
+	}
+
+	function flushAnalyticsQueue() {
+		if (iqmoAnalyticsFlushing || typeof fetch !== 'function') return;
+		const queue = loadAnalyticsQueue();
+		if (queue.length === 0) return;
+		const batch = queue.slice(0, ANALYTICS_BATCH_MAX);
+		const rest = queue.slice(batch.length);
+		iqmoAnalyticsFlushing = true;
+		saveAnalyticsQueue(rest);
 		try {
 			fetch('/api/analytics/events', {
 				method: 'POST',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-				body: JSON.stringify({ events: events })
-			}).catch(function () {});
+				body: JSON.stringify({ events: batch })
+			})
+				.then(function (r) {
+					if (!r.ok && r.status >= 500) {
+						const back = loadAnalyticsQueue();
+						saveAnalyticsQueue(batch.concat(back));
+					}
+				})
+				.catch(function () {
+					const back = loadAnalyticsQueue();
+					saveAnalyticsQueue(batch.concat(back));
+				})
+				.finally(function () {
+					iqmoAnalyticsFlushing = false;
+					if (rest.length > 0) {
+						setTimeout(flushAnalyticsQueue, 250);
+					}
+				});
+		} catch (e) {
+			iqmoAnalyticsFlushing = false;
+			const back = loadAnalyticsQueue();
+			saveAnalyticsQueue(batch.concat(back));
+		}
+	}
+
+	function sendAnalyticsEvents(events) {
+		if (!Array.isArray(events) || events.length === 0) return;
+		const queue = loadAnalyticsQueue();
+		const merged = queue.concat(events);
+		saveAnalyticsQueue(merged);
+		flushAnalyticsQueue();
+	}
+
+	function flushAnalyticsBeacon() {
+		const queue = loadAnalyticsQueue();
+		if (queue.length === 0) return;
+		const batch = queue.slice(0, ANALYTICS_BATCH_MAX);
+		try {
+			if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+				const blob = new Blob([JSON.stringify({ events: batch })], { type: 'application/json' });
+				const ok = navigator.sendBeacon('/api/analytics/events', blob);
+				if (ok) {
+					const rest = queue.slice(batch.length);
+					saveAnalyticsQueue(rest);
+				}
+			}
+		} catch (e) {}
+	}
+
+	if (typeof window !== 'undefined') {
+		try {
+			window.addEventListener('pagehide', flushAnalyticsBeacon);
+			document.addEventListener('visibilitychange', function () {
+				if (document.visibilityState === 'hidden') flushAnalyticsBeacon();
+			});
+			window.addEventListener('online', flushAnalyticsQueue);
+			setTimeout(flushAnalyticsQueue, 1000);
 		} catch (e) {}
 	}
 
