@@ -110,6 +110,14 @@ final class IqmoAdminOverviewBuilder
 
         $eventFunnel = $hasAnalytics ? $this->computeEventFunnel($sinceMs) : ['view' => 0, 'start' => 0, 'complete' => 0];
 
+        // Диагностическая шторка: одна строка-сводка по сырому ингесту за окно.
+        // Когда KPI «н/д», админ открывает дашборд и за секунду видит, где обрыв
+        // (фронт не пишет события / нет авторизованных / прилетают только view).
+        $eventsHealth = $hasAnalytics
+            ? $this->computeEventsHealth($sinceMs, $nowMs)
+            : ['total' => 0, 'distinctUsers' => 0, 'lastEventMs' => null,
+               'byType' => ['view' => 0, 'start' => 0, 'complete' => 0]];
+
         $dauMau = $hasAnalytics ? $this->computeDauMau($nowMs) : ['dau' => 0, 'mau' => 0];
         $dauMauValue = '—';
         $dauMauDelta = 'нет событий';
@@ -355,6 +363,7 @@ final class IqmoAdminOverviewBuilder
             'subjectsSnapshot' => $subjectsSnapshot,
             'topQuestions' => $topQuestions,
             'learning' => $learning,
+            'eventsHealth' => $eventsHealth,
         ];
     }
 
@@ -559,6 +568,58 @@ final class IqmoAdminOverviewBuilder
             ['step' => 'Завершили тест ('.$win.')', 'users' => $ev['complete'], 'pct' => $pct($ev['complete'])],
             ['step' => 'С непустым банком ошибок', 'users' => $mistakeUsers, 'pct' => $pct($mistakeUsers)],
         ];
+    }
+
+    /**
+     * Сырая «шторка здоровья» аналитики за окно: сколько вообще пришло строк,
+     * сколько уникальных авторизованных юзеров, когда последний ивент, и
+     * разбивка по трём ключевым типам. Это диагностика, а не KPI: цель —
+     * за один взгляд понять, кончились ли в кабинете цифры из-за того, что:
+     *   - фронт ничего не пишет (total = 0),
+     *   - никто не залогинен (distinctUsers = 0, total = 0),
+     *   - юзеры открывают темы, но не запускают тесты (start = 0),
+     *   - запускают, но не завершают (complete = 0 → «Время в тесте» пусто).
+     *
+     * Один SQL-запрос, агрегаты считаются на стороне БД, никакой выгрузки строк.
+     *
+     * @return array{total:int, distinctUsers:int, lastEventMs:?int, byType: array{view:int, start:int, complete:int}}
+     */
+    private function computeEventsHealth(int $sinceMs, int $untilMs): array
+    {
+        try {
+            $row = DB::connection('iqmo')->table('analytics_events')
+                ->where('occurred_at', '>=', $sinceMs)
+                ->where('occurred_at', '<', $untilMs)
+                ->selectRaw(
+                    'COUNT(*) AS total_cnt,'
+                    .'COUNT(DISTINCT user_id) AS distinct_users,'
+                    .'MAX(occurred_at) AS last_ms,'
+                    ."SUM(CASE WHEN event = 'chem.topic_view' THEN 1 ELSE 0 END) AS cnt_view,"
+                    ."SUM(CASE WHEN event = 'chem.attempt_start' THEN 1 ELSE 0 END) AS cnt_start,"
+                    ."SUM(CASE WHEN event = 'chem.attempt_complete' THEN 1 ELSE 0 END) AS cnt_complete"
+                )
+                ->first();
+
+            $lastMs = isset($row->last_ms) ? (int) $row->last_ms : 0;
+
+            return [
+                'total' => (int) ($row->total_cnt ?? 0),
+                'distinctUsers' => (int) ($row->distinct_users ?? 0),
+                'lastEventMs' => $lastMs > 0 ? $lastMs : null,
+                'byType' => [
+                    'view' => (int) ($row->cnt_view ?? 0),
+                    'start' => (int) ($row->cnt_start ?? 0),
+                    'complete' => (int) ($row->cnt_complete ?? 0),
+                ],
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'total' => 0,
+                'distinctUsers' => 0,
+                'lastEventMs' => null,
+                'byType' => ['view' => 0, 'start' => 0, 'complete' => 0],
+            ];
+        }
     }
 
     /**

@@ -359,6 +359,94 @@
 				margin-top: 6px;
 			}
 
+			.events-health {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 8px 14px;
+				padding: 10px 14px;
+				margin: 0 0 14px;
+				background: var(--card);
+				border: 1px solid var(--line);
+				border-left: 3px solid var(--muted);
+				border-radius: 10px;
+				font-size: 13px;
+				color: var(--ink-2);
+			}
+			.events-health--ok {
+				border-left-color: var(--green);
+			}
+			.events-health--warn {
+				border-left-color: #e5a64a;
+			}
+			.events-health--silent {
+				border-left-color: var(--red);
+			}
+			.events-health__title {
+				font-weight: 700;
+				color: var(--ink);
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				min-width: 0;
+			}
+			.events-health__dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background: var(--muted);
+				flex: 0 0 8px;
+			}
+			.events-health--ok .events-health__dot {
+				background: var(--green);
+			}
+			.events-health--warn .events-health__dot {
+				background: #e5a64a;
+			}
+			.events-health--silent .events-health__dot {
+				background: var(--red);
+			}
+			.events-health__pill {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 6px;
+				padding: 3px 10px;
+				border-radius: 999px;
+				background: var(--accent-weak);
+				color: var(--accent);
+				font-weight: 600;
+				white-space: nowrap;
+			}
+			.events-health__pill b {
+				font-weight: 800;
+				font-variant-numeric: tabular-nums;
+			}
+			.events-health__pill--zero {
+				background: #f4f5f8;
+				color: var(--muted);
+			}
+			.events-health__sep {
+				width: 1px;
+				align-self: stretch;
+				background: var(--line);
+			}
+			.events-health__fact {
+				color: var(--muted);
+				font-weight: 500;
+			}
+			.events-health__fact b {
+				color: var(--ink-2);
+				font-weight: 700;
+			}
+			.events-health__hint {
+				flex-basis: 100%;
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 500;
+				line-height: 1.4;
+				margin-top: 4px;
+			}
+
 			.panels {
 				display: grid;
 				grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
@@ -949,6 +1037,7 @@
 					</div>
 
 					<div id="dash-summary">
+						<div class="events-health" id="events-health" role="status" aria-live="polite" hidden></div>
 						<div class="kpi-grid" id="kpi-root" aria-live="polite"></div>
 
 						<div class="panels">
@@ -1311,6 +1400,98 @@
 					parent.appendChild(card);
 				}
 
+				function fmtAgoMs(ms) {
+					if (typeof ms !== 'number' || !isFinite(ms) || ms <= 0) return '—';
+					const diff = Date.now() - ms;
+					if (diff < 0) return 'только что';
+					const sec = Math.floor(diff / 1000);
+					if (sec < 60) return sec + ' с назад';
+					const min = Math.floor(sec / 60);
+					if (min < 60) return min + ' мин назад';
+					const hr = Math.floor(min / 60);
+					if (hr < 24) return hr + ' ч назад';
+					const day = Math.floor(hr / 24);
+					return day + ' дн назад';
+				}
+
+				function fmtIntRu(n) {
+					if (typeof n !== 'number' || !isFinite(n)) n = 0;
+					return String(Math.max(0, Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+				}
+
+				function renderEventsHealth(health, periodLabel, isLive) {
+					const root = document.getElementById('events-health');
+					if (!root) return;
+					if (!health || typeof health !== 'object') {
+						root.hidden = true;
+						return;
+					}
+					const total = Number(health.total || 0);
+					const users = Number(health.distinctUsers || 0);
+					const by = health.byType || { view: 0, start: 0, complete: 0 };
+					const view = Number(by.view || 0);
+					const start = Number(by.start || 0);
+					const complete = Number(by.complete || 0);
+					const lastMs = typeof health.lastEventMs === 'number' ? health.lastEventMs : null;
+
+					// Light-weight diagnostic: green when whole funnel is alive,
+					// orange when ingest exists but no completions (=> «Время в тесте» будет пустым),
+					// red when no events at all (фронт молчит / никто не залогинен).
+					let cls = 'events-health';
+					let status = 'нет данных';
+					if (total === 0) {
+						cls += ' events-health--silent';
+						status = 'нет событий';
+					} else if (complete === 0) {
+						cls += ' events-health--warn';
+						status = 'нет завершений';
+					} else {
+						cls += ' events-health--ok';
+						status = 'события идут';
+					}
+					root.className = cls;
+
+					const periodTxt = periodLabel ? ' · ' + periodLabel : '';
+					const sourceTag = isLive ? '' : ' · мок';
+
+					root.innerHTML =
+						'<span class="events-health__title">' +
+						'<span class="events-health__dot"></span>' +
+						'<span>Аналитика' + periodTxt + ': ' + status + sourceTag + '</span>' +
+						'</span>' +
+						'<span class="events-health__sep" aria-hidden="true"></span>' +
+						pillHtml('topic_view', view) +
+						pillHtml('attempt_start', start) +
+						pillHtml('attempt_complete', complete) +
+						'<span class="events-health__sep" aria-hidden="true"></span>' +
+						'<span class="events-health__fact">всего <b>' + fmtIntRu(total) + '</b></span>' +
+						'<span class="events-health__fact">авторизованных <b>' + fmtIntRu(users) + '</b></span>' +
+						'<span class="events-health__fact">последнее: <b>' + fmtAgoMs(lastMs) + '</b></span>' +
+						hintHtml(total, view, start, complete);
+					root.hidden = false;
+				}
+
+				function pillHtml(label, n) {
+					const cls = n > 0 ? 'events-health__pill' : 'events-health__pill events-health__pill--zero';
+					return '<span class="' + cls + '">' + label + ' <b>' + fmtIntRu(n) + '</b></span>';
+				}
+
+				function hintHtml(total, view, start, complete) {
+					if (total === 0) {
+						return '<span class="events-health__hint">Нет ни одного события за окно. Проверьте: (1) на сайте идут события под авторизованными пользователями, (2) `/api/analytics/events` отвечает 204 на корректный POST, (3) MySQL `analytics_events` индекс `occurred_at` есть.</span>';
+					}
+					if (complete === 0 && start === 0 && view === 0) {
+						return '<span class="events-health__hint">События есть, но не из тех трёх типов, что используют KPI. Возможно, фронт-токенайзер не пишет `chem.topic_view / attempt_start / attempt_complete` после релиза.</span>';
+					}
+					if (complete === 0 && start > 0) {
+						return '<span class="events-health__hint">Тесты начинают, но не завершают: «Время в тесте» и event-воронка остаются пустыми. Стоит посмотреть, не падает ли клиент на финальном `recordAttempt()`.</span>';
+					}
+					if (complete === 0 && view > 0 && start === 0) {
+						return '<span class="events-health__hint">Заходят на темы, но тесты не запускают. Проверьте кнопки старта на /trial-, /warmup-, /full-test- страницах.</span>';
+					}
+					return '';
+				}
+
 				function setDashTab(tab) {
 					dashTab = tab;
 					document.querySelectorAll('#dash-tabs [data-dash-tab]').forEach(function (b) {
@@ -1348,7 +1529,8 @@
 							kpis: overviewPayload.kpis,
 							funnel: overviewPayload.funnel,
 							subjectsSnapshot: overviewPayload.subjectsSnapshot,
-							topQuestions: overviewPayload.topQuestions || []
+							topQuestions: overviewPayload.topQuestions || [],
+							eventsHealth: overviewPayload.eventsHealth || null
 						};
 						if (lead) {
 							lead.textContent =
@@ -1391,6 +1573,8 @@
 						if (ts) ts.textContent = 'Предметы · активность · ' + pl + ' (мок)';
 						if (tq) tq.textContent = 'Сложные вопросы · ' + pl + ' (мок)';
 					}
+
+					renderEventsHealth(data.eventsHealth, pl, lastOverviewLive);
 
 					const kpiRoot = document.getElementById('kpi-root');
 					kpiRoot.innerHTML = '';

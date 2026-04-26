@@ -42,7 +42,13 @@
 			{ key: 'physics', name: 'Физика', users: 1500, avgPct: 55, activityShare: 15 },
 			{ key: 'math', name: 'Математика', users: 1200, avgPct: 52, activityShare: 12 },
 			{ key: 'russian', name: 'Русский', users: 900, avgPct: 61, activityShare: 9 }
-		]
+		],
+		eventsHealth: {
+			total: 18420,
+			distinctUsers: 1842,
+			lastEventMs: Date.now() - 4 * 60 * 1000,
+			byType: { view: 9210, start: 4520, complete: 3360 }
+		}
 	};
 
 	function fmtInt(n) {
@@ -146,6 +152,20 @@
 			...s,
 			users: Math.max(1, Math.round(s.users * volMul))
 		}));
+
+		if (out.eventsHealth) {
+			const eh = out.eventsHealth;
+			out.eventsHealth = {
+				total: Math.max(0, Math.round(eh.total * volMul)),
+				distinctUsers: Math.max(0, Math.round(eh.distinctUsers * Math.min(1.4, volMul))),
+				lastEventMs: eh.lastEventMs,
+				byType: {
+					view: Math.max(0, Math.round(eh.byType.view * volMul)),
+					start: Math.max(0, Math.round(eh.byType.start * volMul)),
+					complete: Math.max(0, Math.round(eh.byType.complete * volMul))
+				}
+			};
+		}
 
 		return out;
 	}
