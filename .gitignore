@@ -2,6 +2,14 @@
 server/node_modules/
 server/data/
 
+# Laravel
+laravel/vendor/
+laravel/node_modules/
+laravel/storage/logs/
+laravel/storage/framework/cache/
+laravel/storage/framework/sessions/
+laravel/storage/framework/views/
+
 # OS / IDE
 Thumbs.db
 .DS_Store
@@ -9,8 +17,14 @@ Thumbs.db
 .env
 .env.*
 
-# Optional: secrets (never commit)
+# Secrets (never commit)
 *.pem
+*.key
+*.cookies
+*.cookies.txt
+iqmo_cookies*.txt
+laravel/storage/iqmo_cookies*.txt
 
-# Local Composer binary (use `composer` globally or `php composer.phar` locally)
+# Composer artefacts (use `composer` globally or `php composer.phar` locally)
 composer.phar
+composer-setup.php
