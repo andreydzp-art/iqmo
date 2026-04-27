@@ -19,6 +19,12 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- Тестовый APP_KEY: фиксированный, потому что в CI нет `.env`, и без него
+             EncryptionServiceProvider бросает MissingAppKeyException ещё на boot
+             фреймворка — все Feature-тесты падают до первой assertion. Ключ
+             сгенерирован специально для тестов и нигде не используется кроме
+             phpunit-окружения; реальные prod/dev ключи живут в `.env`. -->
+        <env name="APP_KEY" value="base64:AHtOZMnmItTQ2GRxcCTJjaBbetKUDdFBxunDekQs77Y="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
