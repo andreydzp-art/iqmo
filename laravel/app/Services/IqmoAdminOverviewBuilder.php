@@ -214,16 +214,34 @@ final class IqmoAdminOverviewBuilder
             $sessionKpi['delta'] = 'нет событий в окне';
         }
 
-        $metrikaUsers = $this->yandexMetrika->uniqueUsersForLastCalendarDays($days);
+        $metrika = $this->yandexMetrika->fetchUniqueUsersReport($days);
+        $metrikaUsers = $metrika['users'];
+        $appTz = (string) config('app.timezone', 'UTC');
+
         $metrikaDelta = $days === 1
             ? 'уникальные за сегодня'
             : 'уникальные за '.$days.' дн.';
-        $metrikaHint = 'ym:s:users (API Метрики) за выбранный календарный период в таймзоне '
-            .config('app.timezone', 'UTC')
-            .'. Задайте YANDEX_METRIKA_OAUTH_TOKEN (metrika:read) и при необходимости YANDEX_METRIKA_COUNTER_ID.';
-        if ($metrikaUsers === null) {
+        $metrikaHint = 'ym:s:users (отчёт Метрики) за выбранные календарные сутки в таймзоне '
+            .$appTz.'.';
+
+        if ($metrika['code'] === 'ok') {
+            // delta остаётся пояснением к периоду
+        } elseif ($metrika['code'] === 'not_configured') {
+            $metrikaDelta = 'не настроено';
+            $metrikaHint =
+                'В .env задайте YANDEX_METRIKA_OAUTH_TOKEN (OAuth, право metrika:read) и при необходимости YANDEX_METRIKA_COUNTER_ID. '
+                .'После изменения на сервере выполните: php artisan config:clear (или перезапуск PHP-FPM), иначе Laravel может держать старый null в кэше конфига.';
+        } elseif ($metrika['code'] === 'http_error') {
             $metrikaDelta = 'н/д';
-            $metrikaHint .= ' Сейчас цифра не получена: нет токена/счётчика или ответ API неуспешен (см. лог).';
+            $st = (string) ($metrika['httpStatus'] ?? '?');
+            $tail = $metrika['message'] ? ' — '.$metrika['message'] : '';
+            $metrikaHint = 'Запрос к API Метрики завершился с HTTP '.$st.$tail.'. Проверьте токен, доступ к счётчику и сеть с сервера до api-metrika.yandex.net.';
+        } elseif ($metrika['code'] === 'empty_metrics') {
+            $metrikaDelta = 'н/д';
+            $metrikaHint = 'Ответ 200, но нет метрик. Проверьте YANDEX_METRIKA_COUNTER_ID (id счётчика в кабинете Метрики).';
+        } else {
+            $metrikaDelta = 'н/д';
+            $metrikaHint = 'Не удалось запросить Метрику: '.($metrika['message'] ?? 'ошибка').'.';
         }
 
         $kpis = [
@@ -381,6 +399,11 @@ final class IqmoAdminOverviewBuilder
                 'source' => 'db',
                 'generatedAt' => $nowMs,
                 'days' => $days,
+                'yandexMetrika' => [
+                    'status' => $metrika['code'],
+                    'httpStatus' => $metrika['httpStatus'],
+                    'message' => $metrika['message'],
+                ],
             ],
             'kpis' => $kpis,
             'funnel' => $funnel,

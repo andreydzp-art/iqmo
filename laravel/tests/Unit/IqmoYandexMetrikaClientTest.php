@@ -21,6 +21,9 @@ final class IqmoYandexMetrikaClientTest extends TestCase
 
         $c = new IqmoYandexMetrikaClient;
         $this->assertNull($c->uniqueUsersForLastCalendarDays(1));
+        $r = $c->fetchUniqueUsersReport(1);
+        $this->assertSame('not_configured', $r['code']);
+        $this->assertNull($r['users']);
     }
 
     #[Test]
@@ -43,6 +46,9 @@ final class IqmoYandexMetrikaClientTest extends TestCase
         $c = new IqmoYandexMetrikaClient;
         $n = $c->uniqueUsersForLastCalendarDays(7);
         $this->assertSame(42, $n);
+        $r = $c->fetchUniqueUsersReport(7);
+        $this->assertSame('ok', $r['code']);
+        $this->assertSame(42, $r['users']);
     }
 
     #[Test]
