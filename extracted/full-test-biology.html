@@ -699,8 +699,8 @@
 		</main>
 
 		<script src="./exam-config.js"></script>
-		<script src="./biology-bank.js?v=1"></script>
-		<script src="./biology-variants.js?v=1"></script>
+		<script src="./biology-bank.js?v=2"></script>
+		<script src="./biology-variants.js?v=2"></script>
 		<script src="./iqmo-sync.js"></script>
 		<script src="./iqmo-nav.js"></script>
 		<script src="./iqmo-regnudge.js?v=3"></script>
@@ -905,9 +905,10 @@
 				}
 				else if (q.type === 'input') {
 					const v = state.answers[q.id] || '';
+					const isText = q.textAnswer === true;
 					inputHtml = `<div class="answer-input" data-role="input">
 						<label for="ans-input">Ответ:</label>
-						<input id="ans-input" type="text" inputmode="numeric" autocomplete="off" value="${escapeAttr(v)}" placeholder="${q.placeholder || 'введите число'}" />
+						<input id="ans-input" type="text" inputmode="${isText ? 'text' : 'numeric'}" autocomplete="off" value="${escapeAttr(v)}" placeholder="${q.placeholder || (isText ? 'введите ответ' : 'введите число')}" />
 					</div>`;
 					// подсказка (q.hint) скрыта во время теста и будет показана на странице результатов
 				}
@@ -970,7 +971,7 @@
 				switch(q.type) {
 					case 'single': return 'один ответ';
 					case 'multi': return q.pickCount ? `выбор ${q.pickCount}-х` : 'несколько ответов';
-					case 'input': return 'число';
+					case 'input': return q.textAnswer ? 'текст' : 'число';
 					case 'match': return 'соответствие';
 					case 'open': return 'развёрнутый ответ';
 					case 'written': return `развёрнутый ответ · до ${q.maxPoints || 3} баллов`;
