@@ -1,0 +1,9 @@
+# Жёстко фиксируем LF для shell-скриптов и YAML, иначе Windows-разработчик
+# случайно закоммитит CRLF, и `bash backup-mysql.sh` упадёт на VPS с
+# "/bin/bash^M: bad interpreter".
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# .env-примеры тоже всегда LF — их часто грузят как есть на сервер.
+*.env text eol=lf

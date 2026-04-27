@@ -118,3 +118,16 @@ index index.html;
 2. Пройти разминку или тест.
 3. В MySQL: `SELECT * FROM analytics_events ORDER BY id DESC LIMIT 20;`
 4. Ожидаются события `chem.attempt_start`, `chem.attempt_complete`, при открытии тем — `chem.topic_view`.
+
+## Бэкапы MySQL и аварийное восстановление
+
+Установка ежедневного бэкапа БД `iqmo` на VPS — отдельный одноразовый шаг,
+описан в [`BACKUPS.md`](./BACKUPS.md): создание `iqmo_dump` user в MySQL,
+`~/.my.cnf`, cron на 04:00, проверка восстановления в тестовую БД,
+оффсайт-синхронизация (S3 или rsync). Скрипты в `scripts/`:
+
+- [`backup-mysql.sh`](../scripts/backup-mysql.sh) — потоковый дамп с gzip, ротацией 14 дней и smoke-check на размер;
+- [`restore-mysql.sh`](../scripts/restore-mysql.sh) — восстановление с предохранителем `--yes-i-have-a-fresh-backup`.
+
+Сценарии аварийного реагирования (502, не пускает в админку, всё нули в KPI,
+откат кривого деплоя) — в [`RUNBOOK.md`](./RUNBOOK.md).
