@@ -254,7 +254,6 @@ jobs:
           }
           assert_ct "$BASE/uploads/css/main.min.css" "text/css"
           assert_ct "$BASE/iqmo-nav.js" "application/javascript"
-          assert_ct "$BASE/iqmo-cookies.js" "application/javascript"
 
           echo "Smoke OK"
 

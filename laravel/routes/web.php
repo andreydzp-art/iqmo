@@ -12,7 +12,7 @@ require __DIR__.'/auth.php';
 // `site/login.html` stub that meta-refreshes to `/uploads/` would otherwise loop with a redirect.
 
 // PHP `finfo_file()` is unreliable for short text files: it returns `text/x-asm` for some
-// `.min.css`, `text/html` for short `.js` (e.g. `iqmo-nav.js`, `iqmo-cookies.js`), etc.
+// `.min.css`, `text/html` for short `.js` (e.g. `iqmo-nav.js`), etc.
 // Combined with our `X-Content-Type-Options: nosniff` header that breaks the page
 // (browsers refuse to apply such files as CSS/JS). Force the right Content-Type by extension.
 $serveStatic = function (string $full): BinaryFileResponse {
