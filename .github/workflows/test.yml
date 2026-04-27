@@ -1,10 +1,16 @@
 name: Tests
 
-# Cheap pre-deploy gate: PHPUnit Unit suite only — Feature tests need a real
-# MySQL connection (the iqmo schema uses JSON / JSON_EXTRACT and is wired to a
-# named `iqmo` connection), so they live elsewhere until we add a service
-# container here. Unit tests cover the JWT crypto invariants we share with
-# the Node API and would otherwise drift silently.
+# Cheap pre-deploy gate: PHPUnit Unit suite + a curated subset of Feature tests
+# that don't require a real MySQL connection. Most Feature tests use Breeze's
+# RefreshDatabase + run our `analytics_events` migration which is pinned to the
+# `iqmo` connection (config/database.php) — that connection points at a real
+# MySQL host that we don't have in CI. Until we add a MySQL service container,
+# we only run Feature tests that don't go through the full migrate-fresh:
+#   - LoginRedirectTest: pure HTTP-level redirect contract, no DB writes.
+#   - AnalyticsIngestTest: swaps `iqmo` → in-memory sqlite in setUp() and
+#     creates only the analytics_events table by hand, so it exercises our
+#     ingest controller end-to-end without touching MySQL.
+# Unit tests cover the JWT crypto invariants we share with the Node API.
 
 on:
   # Run on PRs (so authors get fast feedback) and on push to main as a
@@ -65,3 +71,10 @@ jobs:
       - name: Run Unit tests
         # Pure PHP test — no Laravel boot, no .env needed.
         run: vendor/bin/phpunit --testsuite=Unit --no-coverage
+
+      - name: Run Feature tests (sqlite-only subset)
+        # AnalyticsIngestTest swaps the `iqmo` connection to in-memory sqlite,
+        # LoginRedirectTest doesn't touch the DB at all. Both run without any
+        # external service. shivammathur/setup-php@v2 ships pdo_sqlite by
+        # default, so no extra extension wiring is needed.
+        run: vendor/bin/phpunit --filter='AnalyticsIngestTest|LoginRedirectTest' --no-coverage

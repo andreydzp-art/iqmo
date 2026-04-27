@@ -11,7 +11,14 @@
 
 1. `cp .env.example .env` — задать `DB_*`, **`IQMO_JWT_SECRET`** (тот же секрет, что у Node), а также `IQMO_DB_*` (см. ниже).
 2. `php artisan migrate --force` — миграция `analytics_events` теперь жёстко привязана к connection **`iqmo`**, чтобы совпадать со схемой Node (`server/sql/mysql-schema.sql`) и кодом `IqmoAuthController` / `IqmoAdminOverviewBuilder` (они пишут/читают там же). Если таблица уже создана Node-сервером (`ensureSchema`) — миграция тихо пропустит создание.
-3. Проверить маршрут: `POST /api/analytics/events` (лимит **45 запросов/мин** на связку IP + пользователь из JWT).
+3. Проверить маршрут: `POST /api/analytics/events`. Контроль входа:
+   - аутентификация: middleware `iqmo.jwt` → 401 без валидной куки `iqmo_session`;
+   - rate-limit: **45 запросов/мин** на связку IP + пользователь из JWT;
+   - размер тела: `Content-Length` > **64 KB** → 413, до парсинга JSON;
+   - размер батча: > **24** событий → 400 `too_many_events`;
+   - whitelist `event`: `chem.topic_view` / `chem.attempt_start` / `chem.attempt_complete` / `iqmo.purchase` (остальные тихо отбрасываются);
+   - `occurredAt` нормализуется в окно `[now − 7д, now + 5мин]` — что вне окна, перетирается на `now` (защита от ботов, которые пытаются «бэкфиллить» прошлое или будущее);
+   - инвариант `correct ≤ total` принудительно: иначе админка показывала бы конверсию > 100 %.
 
 ### Один источник правды для аккаунтов
 
