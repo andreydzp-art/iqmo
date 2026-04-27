@@ -176,6 +176,11 @@
 			.q-body .chem { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 15px; }
 			.q-body sub { font-size: 0.75em; }
 			.q-body sup { font-size: 0.75em; }
+			.q-body .q-figure { margin: 0 0 16px; max-width: min(100%, 720px); }
+			.q-body .q-figure__img {
+				display: block; width: 100%; height: auto; border-radius: 12px;
+				box-shadow: 0 8px 28px -12px rgba(20, 28, 44, 0.35);
+			}
 
 			/* options */
 			.options { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
@@ -699,7 +704,7 @@
 		</main>
 
 		<script src="./exam-config.js"></script>
-		<script src="./biology-bank.js?v=2"></script>
+		<script src="./biology-bank.js?v=3"></script>
 		<script src="./biology-variants.js?v=2"></script>
 		<script src="./iqmo-sync.js"></script>
 		<script src="./iqmo-nav.js"></script>

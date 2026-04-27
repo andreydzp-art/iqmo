@@ -27,6 +27,11 @@ $serveStatic = function (string $full): BinaryFileResponse {
         'svg' => 'image/svg+xml',
         'xml' => 'application/xml; charset=UTF-8',
         'txt' => 'text/plain; charset=UTF-8',
+        'png' => 'image/png',
+        'jpg', 'jpeg' => 'image/jpeg',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+        'ico' => 'image/x-icon',
         default => null,
     };
     if ($mime !== null) {
@@ -40,7 +45,7 @@ $serveStatic = function (string $full): BinaryFileResponse {
 
 // Static site assets (served by Nginx on VPS; routed here for local `php artisan serve`)
 // `/admin/*` is not public: see protected routes below (IQMO_ADMIN_EMAILS + portal session).
-foreach (['assets', 'img', 'badges'] as $dir) {
+foreach (['assets', 'badges'] as $dir) {
     Route::get("/{$dir}/{path}", function (string $path) use ($dir, $serveStatic) {
         // Use forward slashes for Laravel path helpers, then normalize.
         $rel = $dir.'/'.ltrim($path, '/');
@@ -51,6 +56,24 @@ foreach (['assets', 'img', 'badges'] as $dir) {
         return $serveStatic($full);
     })->where('path', '.*');
 }
+
+// Иллюстрации к заданиям: `extracted/img/` → `public/site/img/` (sync-site). URL `/img/...` — тот же префикс, что в HTML.
+Route::get('/img/{path}', function (string $path) use ($serveStatic) {
+    $path = ltrim($path, '/');
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+    if (! preg_match('#^[A-Za-z0-9][A-Za-z0-9_./-]*$#', $path)) {
+        abort(404);
+    }
+    $rel = 'site/img/'.$path;
+    $full = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, public_path($rel));
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+})->where('path', '.*');
 
 // Server-side guard: если у пользователя уже валидная JWT-кука iqmo_session, страница
 // логина не показывается — сразу 302 на /profile.html (или на sanitized ?next=, если есть).
