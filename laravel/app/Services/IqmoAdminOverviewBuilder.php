@@ -214,6 +214,18 @@ final class IqmoAdminOverviewBuilder
             $sessionKpi['delta'] = 'нет событий в окне';
         }
 
+        $metrikaUsers = $this->yandexMetrika->uniqueUsersForLastCalendarDays($days);
+        $metrikaDelta = $days === 1
+            ? 'уникальные за сегодня'
+            : 'уникальные за '.$days.' дн.';
+        $metrikaHint = 'ym:s:users (API Метрики) за выбранный календарный период в таймзоне '
+            .config('app.timezone', 'UTC')
+            .'. Задайте YANDEX_METRIKA_OAUTH_TOKEN (metrika:read) и при необходимости YANDEX_METRIKA_COUNTER_ID.';
+        if ($metrikaUsers === null) {
+            $metrikaDelta = 'н/д';
+            $metrikaHint .= ' Сейчас цифра не получена: нет токена/счётчика или ответ API неуспешен (см. лог).';
+        }
+
         $kpis = [
             [
                 'id' => 'dau',
