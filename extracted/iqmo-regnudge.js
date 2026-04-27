@@ -1,7 +1,7 @@
 /**
  * IQMO Registration Nudge — карточка-предложение зарегистрироваться.
  *
- * Подключение: <script defer src="./iqmo-regnudge.js?v=1"></script>
+ * Подключение: <script defer src="./iqmo-regnudge.js?v=2"></script>
  * перед </body>. На странице ничего больше не нужно: скрипт сам
  * инжектит и стиль, и markup.
  *
@@ -9,6 +9,7 @@
  *   - Запускает 30-секундный таймер только после того, как
  *     `window.__iqmoAuthReady` подтвердил, что пользователь — гость
  *     (см. iqmo-nav.js). Авторизованным попап не показываем вообще.
+ *   - Модалка по центру экрана, полупрозрачный фон на весь вьюпорт.
  *   - После «Позже» / × — не показываем ещё 24 часа (localStorage).
  *   - Шлёт цели в Я.Метрику: regnudge_show / regnudge_click /
  *     regnudge_dismiss. Если целей в кабинете ещё нет — события всё
@@ -24,6 +25,7 @@
 	var SUPPRESS_HOURS = 24;
 	var LS_KEY = 'iqmo-regnudge-dismissed-at';
 	var YM_COUNTER = 108770166;
+	var BODY_NO_SCROLL = 'regnudge-noscroll';
 
 	if (document.getElementById('regnudge')) return;
 
@@ -33,16 +35,28 @@
 	function injectStyle() {
 		if (document.getElementById('regnudge-style')) return;
 		var css = ''
-			+ '.regnudge{position:fixed;right:24px;bottom:24px;width:360px;max-width:calc(100vw - 32px);'
+			+ 'body.' + BODY_NO_SCROLL + '{overflow:hidden;}'
+			+ '.regnudge-wrap{position:fixed;inset:0;z-index:9999;box-sizing:border-box;'
+			+ 'display:flex;align-items:center;justify-content:center;'
+			+ 'padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right))'
+			+ ' max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));'
+			+ 'opacity:0;visibility:hidden;pointer-events:none;'
+			+ 'transition:opacity .32s ease,visibility .32s;}'
+			+ '.regnudge-wrap.is--visible{opacity:1;visibility:visible;pointer-events:auto;}'
+			+ '.regnudge__backdrop{position:absolute;inset:0;background:rgba(17,20,26,.5);z-index:0;}'
+			+ '.regnudge{position:relative;z-index:1;'
+			+ 'width:100%;max-width:400px;'
 			+ 'background:#fff;border:1px solid var(--line,#e5e7eb);border-radius:16px;'
-			+ 'box-shadow:0 12px 40px -8px rgba(17,20,26,.18),0 4px 12px -4px rgba(17,20,26,.08);'
-			+ 'padding:20px 22px 18px;z-index:9999;transform:translateY(120%);opacity:0;'
-			+ 'transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .35s ease;pointer-events:none;'
-			+ 'font-family:inherit}'
-			+ '.regnudge.is--visible{transform:translateY(0);opacity:1;pointer-events:auto}'
+			+ 'box-shadow:0 24px 64px -16px rgba(17,20,26,.25),0 8px 24px -8px rgba(17,20,26,.12);'
+			+ 'padding:20px 22px 18px;'
+			+ 'transform:scale(.96) translateY(10px);opacity:0;'
+			+ 'transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .35s ease;'
+			+ 'font-family:inherit;max-height:min(90vh,720px);overflow-y:auto;'
+			+ '-webkit-overflow-scrolling:touch;}'
+			+ '.regnudge-wrap.is--visible .regnudge{transform:scale(1) translateY(0);opacity:1;}'
 			+ '.regnudge__close{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:8px;'
 			+ 'background:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;'
-			+ 'color:var(--muted,#7a8696);transition:background .15s,color .15s}'
+			+ 'color:var(--muted,#7a8696);transition:background .15s,color .15s;z-index:2}'
 			+ '.regnudge__close:hover{background:#f3f5f8;color:var(--ink,#11141a)}'
 			+ '.regnudge__close svg{width:16px;height:16px}'
 			+ '.regnudge__head{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-right:28px}'
@@ -54,17 +68,19 @@
 			+ '.regnudge__perks{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}'
 			+ '.regnudge__perk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2,#3c4858)}'
 			+ '.regnudge__perk svg{width:14px;height:14px;color:var(--green,#3ec37a);flex:0 0 auto}'
-			+ '.regnudge__cta-row{display:flex;align-items:center;gap:10px}'
-			+ '.regnudge__cta{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;'
+			+ '.regnudge__cta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}'
+			+ '.regnudge__cta{flex:1;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;'
 			+ 'background:var(--green,#3ec37a);color:#fff;padding:11px 16px;border-radius:10px;'
 			+ 'font-weight:700;font-size:14px;text-decoration:none;'
-			+ 'box-shadow:0 4px 12px -4px rgba(62,195,122,.45);transition:transform .15s,box-shadow .15s;white-space:nowrap}'
+			+ 'box-shadow:0 4px 12px -4px rgba(62,195,122,.45);transition:transform .15s,box-shadow .15s;'
+			+ 'white-space:nowrap;}'
 			+ '.regnudge__cta:hover{transform:translateY(-1px);box-shadow:0 8px 20px -4px rgba(62,195,122,.55)}'
 			+ '.regnudge__later{background:none;border:0;cursor:pointer;font-size:13px;font-weight:600;'
-			+ 'color:var(--muted,#7a8696);padding:10px 8px;transition:color .15s}'
+			+ 'color:var(--muted,#7a8696);padding:10px 8px;transition:color .15s;}'
 			+ '.regnudge__later:hover{color:var(--ink,#11141a)}'
-			+ '@media (max-width:480px){.regnudge{left:12px;right:12px;bottom:12px;width:auto;padding:16px 18px 14px}'
-			+ '.regnudge__cta{padding:10px 14px;font-size:13px}}';
+			+ '@media (max-width:480px){.regnudge-wrap{padding:12px;}'
+			+ '.regnudge{max-width:none;padding:16px 18px 14px;}'
+			+ '.regnudge__cta{flex:1 1 100%;}}';
 		var style = document.createElement('style');
 		style.id = 'regnudge-style';
 		style.appendChild(document.createTextNode(css));
@@ -72,14 +88,17 @@
 	}
 
 	function buildElement() {
-		var aside = document.createElement('aside');
-		aside.className = 'regnudge iqmo-only-guest';
-		aside.id = 'regnudge';
-		aside.hidden = true;
-		aside.setAttribute('role', 'dialog');
-		aside.setAttribute('aria-labelledby', 'regnudge-title');
-		aside.setAttribute('aria-describedby', 'regnudge-body');
-		aside.innerHTML = ''
+		var wrap = document.createElement('div');
+		wrap.className = 'regnudge-wrap iqmo-only-guest';
+		wrap.id = 'regnudge';
+		wrap.hidden = true;
+		wrap.setAttribute('role', 'dialog');
+		wrap.setAttribute('aria-modal', 'true');
+		wrap.setAttribute('aria-labelledby', 'regnudge-title');
+		wrap.setAttribute('aria-describedby', 'regnudge-body');
+		wrap.innerHTML = ''
+			+ '<div class="regnudge__backdrop" aria-hidden="true"></div>'
+			+ '<aside class="regnudge" role="document">'
 			+ '<button type="button" class="regnudge__close" id="regnudge-close" aria-label="Закрыть">'
 			+ '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">'
 			+ '<path d="M6 6l12 12M18 6L6 18"/></svg></button>'
@@ -105,9 +124,10 @@
 			+ '<a href="./login.html?next=/profile.html" class="regnudge__cta" id="regnudge-go">'
 			+ 'Зарегистрироваться →</a>'
 			+ '<button type="button" class="regnudge__later" id="regnudge-later">Позже</button>'
-			+ '</div>';
-		document.body.appendChild(aside);
-		return aside;
+			+ '</div>'
+			+ '</aside>';
+		document.body.appendChild(wrap);
+		return wrap;
 	}
 
 	function reachGoal(name) {
@@ -131,12 +151,20 @@
 		try { localStorage.setItem(LS_KEY, String(Date.now())); } catch (e) { /* noop */ }
 	}
 
+	function setBodyLock(on) {
+		try {
+			if (on) document.body.classList.add(BODY_NO_SCROLL);
+			else document.body.classList.remove(BODY_NO_SCROLL);
+		} catch (e) { /* noop */ }
+	}
+
 	function init() {
 		injectStyle();
 		var el = buildElement();
 		var btnClose = el.querySelector('#regnudge-close');
 		var btnLater = el.querySelector('#regnudge-later');
 		var btnGo = el.querySelector('#regnudge-go');
+		var backdrop = el.querySelector('.regnudge__backdrop');
 
 		var shownAlready = false;
 		var timerId = null;
@@ -144,13 +172,17 @@
 		function dismiss() {
 			rememberDismiss();
 			el.classList.remove('is--visible');
-			setTimeout(function () { el.hidden = true; }, 500);
+			setTimeout(function () {
+				el.hidden = true;
+				setBodyLock(false);
+			}, 500);
 			reachGoal('regnudge_dismiss');
 		}
 		function show() {
 			if (shownAlready || !shouldShow()) return;
 			shownAlready = true;
 			el.hidden = false;
+			setBodyLock(true);
 			requestAnimationFrame(function () {
 				requestAnimationFrame(function () { el.classList.add('is--visible'); });
 			});
@@ -162,14 +194,17 @@
 				timerId = null;
 			}
 			if (!shownAlready && el.parentNode) {
+				setBodyLock(false);
 				el.parentNode.removeChild(el);
 			}
 		}
 
 		if (btnClose) btnClose.addEventListener('click', dismiss);
 		if (btnLater) btnLater.addEventListener('click', dismiss);
+		if (backdrop) backdrop.addEventListener('click', dismiss);
 		if (btnGo) btnGo.addEventListener('click', function () {
 			rememberDismiss();
+			setBodyLock(false);
 			reachGoal('regnudge_click');
 		});
 
