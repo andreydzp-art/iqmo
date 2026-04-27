@@ -50,44 +50,38 @@ IQMO_DB_PASSWORD=...
 DROP TABLE IF EXISTS analytics_events;
 ```
 
-## Статика (один источник правды)
+## Статика — единственный источник правды
 
-Каноничная вёрстка лежит в **`extracted/`** — это единственное место, куда вносятся правки HTML/JS/CSS. Никогда не редактируйте файлы в `laravel/public/site/` руками: они генерируются скриптом синхронизации.
+Все HTML/JS/CSS/изображения сайта лежат в **`extracted/`** (75 файлов в git). Это единственное место, куда вносятся правки. Папка `laravel/public/site/` — **сгенерированная** копия, в `.gitignore`, в репозитории её нет.
 
-> **Текущий бой**: `.github/workflows/deploy.yml` использует **вариант B** (Laravel раздаёт `public/site/` через nginx + PHP-FPM), при этом из `public/` удаляются устаревшие копии `index.html`, `login.html`, `profile.html`, `admin/`. Перед каждым деплоем синхронизируйте `laravel/public/site/` со скриптом ниже, иначе на проде «отставшая» статика начнёт расходиться с правками в `extracted/`.
+### Как это работает
 
-### Папка `laravel/public/uploads/` удалена из репозитория
+- **Источник:** `extracted/` (commits to git)
+- **Цель (рантайм):** `laravel/public/site/` — её читают Laravel-маршруты (`routes/web.php`).
+- **Преобразование:** `node scripts/sync-site.mjs` зеркалит первое во второе и **удаляет в target всё, чего нет в source** (так что `git rm` в `extracted/` тоже распространяется).
 
-Раньше канонические страницы оплаты лежали в двух местах сразу: `extracted/uploads/` **и** `laravel/public/uploads/`. Это размазывало правки и приводило к расхождениям. Теперь:
+### На деплое (автоматически)
 
-- Правда живёт только в `extracted/uploads/` → синкается в `laravel/public/site/uploads/`.
-- Запросы вида `/uploads/payment.html`, `/uploads/thank.html` и т.п. отдаются Laravel-маршрутом из `public/site/uploads/` (см. `routes/web.php`).
-- На VPS после очередного `git pull` папка `laravel/public/uploads/` исчезнет. **Это нормально**: nginx с дефолтным `try_files $uri $uri/ /index.php?$query_string;` пробросит запрос в Laravel, и страница откроется через site/uploads.
-- Если на сервере nginx настроен **жёстко** на `location /uploads/ { root .../laravel/public; }` без fallback в Laravel — добавьте `try_files $uri @laravel;` или замените root на `.../laravel/public/site` (чтобы отдавать сразу из site/uploads без участия PHP).
+`.github/workflows/deploy.yml` после `git reset --hard origin/main` сам выполняет `node scripts/sync-site.mjs` (нужен Node ≥18 в PATH). Если node не найден — деплой громко падает с понятной ошибкой. Никаких ручных синков перед `git push` больше делать не нужно.
 
-### Вариант B (рекомендуемый) — Laravel публикует копию `extracted/` через `laravel/public/site/`
-
-Перед каждым деплоем выполняется зеркалирование канона:
+### Локально (если правите HTML и хотите проверить через `php artisan serve`)
 
 ```bash
-# В корне репозитория (требует Node 18+):
-node scripts/sync-site.mjs
-# или (Windows): powershell -ExecutionPolicy Bypass -File scripts/sync-site-html.ps1
-# или (через npm):                                    npm --prefix server run sync:site
+npm run sync              # = node scripts/sync-site.mjs
+php artisan serve         # дальше как обычно
 ```
 
-Скрипт удаляет в `laravel/public/site/` всё, чего нет в `extracted/`, поэтому удаления тоже синхронизируются. Запускайте его в CI/CD перед `git push`/деплоем (или сразу на сервере после `git pull`).
+Без `npm run sync` локальный Laravel-сервер вернёт 404 на `/subject-chemistry.html` — `laravel/public/site/` пустая, Laravel не из чего отдавать.
 
-### Вариант A (альтернатива) — nginx раздаёт `extracted/` напрямую
+### Что НЕ надо делать
 
-Если переходите на чистый nginx без PHP-FPM для статики, замените root в конфиге:
+- ❌ Никогда не редактировать файлы в `laravel/public/site/` — при следующем синке всё перетрётся.
+- ❌ Не коммитить `laravel/public/site/` обратно в git (она в `.gitignore` ровно ради этого).
+- ❌ Не добавлять `laravel/public/uploads/` — её больше нет, маршрут `/uploads/*` отдаётся Laravel-роутом из `public/site/uploads/`.
 
-```nginx
-root  /var/www/iqmo/extracted;
-index index.html;
-```
+### История раздвоений
 
-В этом случае `laravel/public/site/` на сервере не нужен и его можно не выкатывать. Не сочетайте варианты A и B одновременно: получите два расходящихся источника.
+До 2026-04-27 в репозитории одновременно жили **обе** копии (`extracted/` и `laravel/public/site/`, ~140 файлов-дубликатов), и держать их в синхроне приходилось руками: пропускаешь `npm run sync` перед коммитом — и pages в проде разъезжаются. Именно по этой схеме месяц назад на `subject-chemistry.html` пропадала Метрика. С PR «HTML consolidation» дубль убран, sync встроен в deploy — этот класс ошибок закрыт.
 
 ## Node (локально / простой хостинг)
 

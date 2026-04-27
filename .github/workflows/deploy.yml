@@ -73,6 +73,16 @@ jobs:
             git fetch --all --prune
             git reset --hard origin/main
 
+            # Регенерация статики из `extracted/` в `laravel/public/site/`.
+            # Источник правды — `extracted/` (75 файлов в git); `laravel/public/site/`
+            # с этого PR в .gitignore и поэтому НЕ переносится через `git reset --hard`.
+            # Sync пишет туда свежие копии всех страниц, JS, CSS, картинок и удаляет
+            # из target всё, чего нет в source — закрывая «pre-existing stale-HTML»
+            # класс ошибок, из-за которого месяц назад пропадала Метрика.
+            command -v node >/dev/null 2>&1 \
+              || { echo "ERROR: node не найден в PATH — нужен Node.js >=18 (см. docs/DEPLOY.md)"; exit 1; }
+            node scripts/sync-site.mjs
+
             cd "$LARAVEL_DIR"
             composer install --no-dev --optimize-autoloader --no-interaction
 
@@ -81,14 +91,15 @@ jobs:
 
             # Nginx делает `try_files $uri ... /index.php`. Любая залежавшаяся .html-копия в
             # `laravel/public/` обходит Laravel-роуты, и пользователь видит версию от прошлого
-            # деплоя (без Метрики, со старой вёрсткой и т.п.). Источник правды — `public/site/*.html`,
+            # деплоя (без Метрики, со старой вёрсткой и т.п.). Источник правды — `extracted/`,
             # а в `laravel/public/` корневых .html в git нет вовсе. Поэтому смело сносим всё, что там есть.
             find "$LARAVEL_DIR/public" -maxdepth 1 -type f -name '*.html' -print -delete || true
 
-            # Старая копия админки в public/ обходила Laravel (Nginx отдавал файл напрямую).
+            # `laravel/public/admin/` (без `site/`) больше не в git и не в `extracted/`,
+            # значит `git reset --hard` сам удаляет её при первом проходе. Прежний
+            # `rm -rf` оставлен на одну поставку для подстраховки на случай, если на
+            # VPS была тень от предыдущего ручного копирования.
             rm -rf "$LARAVEL_DIR/public/admin"
-
-            # No file copying needed: root-level `*.js`/`*.css` are served from `public/site/` via routes.
 
             # OPcache invalidation. Two strategies, both wrapped in `|| true` so
             # the deploy never fails just because we couldn't bump bytecode:
