@@ -30,6 +30,8 @@ jobs:
           tools: composer
 
       # Deliberately no actions/cache here — see test.yml for rationale.
+      - name: Use upstream Packagist
+        run: composer config -g repos.packagist composer https://repo.packagist.org
 
       - name: Install dependencies (with dev)
         run: composer install --prefer-dist --no-interaction --no-progress
@@ -50,13 +52,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: SSH — git + sync-site (static)
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Статикой управляет `node scripts/sync-site.mjs`. На VPS Node часто
+      # не в PATH у non-interactive SSH (nvm и т.д.) — гоняем sync на runner'е
+      # и копируем `laravel/public/site/` через rsync (см. docs/DEPLOY.md).
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build static (sync-site)
+        run: node scripts/sync-site.mjs
+
+      - name: SSH — git to origin/main
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script_stop: false
+          script_stop: true
           script: |
             set -Eeuxo pipefail
             APP_DIR="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app"
@@ -65,11 +81,24 @@ jobs:
             cd "$APP_DIR"
             git fetch --all --prune
             git reset --hard origin/main
-            command -v node >/dev/null 2>&1 \
-              || { echo "ERROR: node не найден в PATH — нужен Node.js >=18 (см. docs/DEPLOY.md)"; exit 1; }
-            echo "=== DEPLOY: node scripts/sync-site.mjs (extracted → laravel/public/site) ==="
-            node scripts/sync-site.mjs
-            echo "=== DEPLOY: static layer OK ==="
+            echo "=== DEPLOY: git OK ==="
+
+      - name: Rsync public/site → VPS
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          REMOTE="${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}"
+          DEST="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app/laravel/public/site/"
+          install -d -m 700 ~/.ssh
+          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/iqmo_deploy
+          chmod 600 ~/.ssh/iqmo_deploy
+          echo "=== DEPLOY: rsync laravel/public/site/ → $DEST ==="
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/iqmo_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
+            "laravel/public/site/" \
+            "$REMOTE:$DEST"
+          echo "=== DEPLOY: rsync OK ==="
 
       - name: SSH — Laravel (composer, migrate, cleanup, fpm)
         uses: appleboy/ssh-action@v1.2.0
@@ -77,21 +106,22 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script_stop: false
+          script_stop: true
           script: |
             set -Eeuxo pipefail
             APP_DIR="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app"
             LARAVEL_DIR="${APP_DIR}/laravel"
             # К этому моменту static-слой уже зеркален к origin/main; при сбое composer
             # `laravel/public/site/` остаётся с актуальной статикой.
+            echo "=== DEPLOY: remove stray public admin + root *.html (nginx must not beat PHP) ==="
+            find "$LARAVEL_DIR/public" -maxdepth 1 -type f -name '*.html' -print -delete || true
+            rm -rf "$LARAVEL_DIR/public/admin" || true
             echo "=== DEPLOY: composer install (Laravel) ==="
             cd "$LARAVEL_DIR"
             composer install --no-dev --optimize-autoloader --no-interaction
             echo "=== DEPLOY: php artisan migrate + optimize:clear ==="
             php artisan migrate --force
             php artisan optimize:clear
-            find "$LARAVEL_DIR/public" -maxdepth 1 -type f -name '*.html' -print -delete || true
-            rm -rf "$LARAVEL_DIR/public/admin"
             echo "=== DEPLOY: opcache touch + optional php-fpm reload (non-fatal) ==="
             find "$LARAVEL_DIR/app" "$LARAVEL_DIR/bootstrap" "$LARAVEL_DIR/routes" \
               -name '*.php' -exec touch {} + 2>&1 || echo "WARN: touch step failed (non-fatal)"

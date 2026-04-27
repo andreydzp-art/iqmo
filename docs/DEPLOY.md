@@ -7,11 +7,11 @@
 | Workflow | Файл | Задача |
 | --- | --- | --- |
 | **Tests** | `.github/workflows/test.yml` | PHPUnit `Unit` + небольшой набор `Feature` (без MySQL), для PR и для `main`. **На сервер ничего не копирует.** |
-| **Deploy to VPS** | `.github/workflows/deploy.yml` | Свой `PHPUnit (Unit) gate` → **SSH** на VPS → `git reset` + `node scripts/sync-site.mjs` → `composer` / миграции → **smoke** по HTTP. **Это** единственный шаг, который обновляет `laravel/public/site/` из репозитория. |
+| **Deploy to VPS** | `.github/workflows/deploy.yml` | `PHPUnit (Unit) gate` → **на runner'е** `node scripts/sync-site.mjs` → **rsync** `laravel/public/site/` на VPS → **SSH** `git reset` + `composer` / миграции → **smoke** по HTTP. Node **на сервере не обязателен**. |
 
 Список run’ов на один коммит обычно выглядит как `Tests #N` и `Deploy to VPS #M` — нормально. Если **Deploy to VPS** красный, раскройте job **deploy** (не `smoke` — он не запустится, если упал `deploy`).
 
-**Где смотреть причину:** шаг *Deploy over SSH* → в логе ищите строки `=== DEPLOY: … ===`. Последняя **успешно начатая** фаза + следующая **не** выведенная = место сбоя. Чаще всего: **`composer install`** (сеть, PHP-расширения, `composer` не в PATH для non-interactive SSH) или **`php artisan migrate`** (БД, миграция, `.env` на сервере). Сообщения об ошибке сразу под выводом `composer` / `artisan`.
+**Где смотреть причину:** шаги *SSH* / *Rsync* / *smoke* → в логе ищите `=== DEPLOY: … ===`. Чаще всего: **rsync** (SSH-ключ, права на `laravel/public/site`, на сервере должен быть `rsync` в PATH), **`composer install`**, **`php artisan migrate`**. Сообщения об ошибке сразу под выводом шага.
 
 ## База данных
 
@@ -76,7 +76,7 @@ DROP TABLE IF EXISTS analytics_events;
 
 ### На деплое (автоматически)
 
-`.github/workflows/deploy.yml` после `git reset --hard origin/main` сам выполняет `node scripts/sync-site.mjs` (нужен Node ≥18 в PATH). Если node не найден — деплой громко падает с понятной ошибкой. Никаких ручных синков перед `git push` больше делать не нужно.
+`deploy.yml` прогоняет **`node scripts/sync-site.mjs` на GitHub runner** (Node 20, см. `actions/setup-node`), затем **rsync** с `--delete` в `…/app/laravel/public/site/` и только потом **SSH** с `git reset` + `composer` / миграциями. На **VPS Node не требуется** (раньше sync шёл по SSH, и nvm/node не был в PATH — деплой падал). Пакет **`openssh-server` + `rsync`** на сервере обычно уже есть. Никаких ручных синков перед `git push` не нужно.
 
 ### Локально (если правите HTML и хотите проверить через `php artisan serve`)
 
@@ -103,7 +103,7 @@ php artisan serve         # дальше как обычно
 
 `APP_DIR=/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app`
 
-Там он делает `git reset --hard origin/main` и `node scripts/sync-site.mjs`, и уже **там** обновляется `laravel/public/site/subject-chemistry.html`.
+Статика `laravel/public/site/` в прод попадает **через rsync из CI**; на сервере в `APP_DIR` делается `git reset` к `origin/main` (Laravel, `extracted/`, `routes/`, `resources/`, т.д.).
 
 В **файловом менеджере** FastPanel иногда открывается **другой** путь — например `/var/www/iqmoschool.ru/app/...` (без `.../iqmoschool_r_usr/data/.../`). Это может быть **не та** копия репозитория: старые файлы, ручные правки прошлых лет, пустой `git`. Тогда в редакторе по-прежнему `href="./index.html"` у «Биологии», хотя **живой** сайт уже отдаётся из `APP_DIR` и после успешного деплоя в HTML должна быть ссылка на биологию.
 
@@ -112,8 +112,7 @@ php artisan serve         # дальше как обычно
 1. Убедиться, что [Deploy to VPS] на последнем коммите в `main` **зелёный**.
 2. Проверить не редактором, а факт: `curl -sS https://www.iqmoschool.ru/subject-chemistry.html | findstr /i subject-biology` (или в Linux `grep subject-biology`).
 3. Править статику **только** в `extracted/` в репозитории, не вручную в `laravel/public/site/` на сервере (следующий sync перетрёт).
-4. Если нужно вручную обновить именно **ту** папку, с которой работает сайт, зайдите по SSH в **`APP_DIR`** (как в `RUNBOOK.md`) и выполните:
-   `cd "$APP_DIR" && git fetch && git reset --hard origin/main && node scripts/sync-site.mjs`
+4. Вручную: с машины, где установлен **Node ≥18** — `cd` в корень репозитория, `node scripts/sync-site.mjs`, затем скопируйте `laravel/public/site/` на сервер (или `git pull` в `APP_DIR` и `sync` на той же машине, если репозиторий один).
 5. Чтобы путь в панели совпадал с продом, уточните у хостинга, не ссылка ли `/var/www/iqmoschool.ru/...` на `.../iqmoschool_r_usr/data/...` (`readlink -f` / сравнение inodes).
 
 ## Node (локально / простой хостинг)
