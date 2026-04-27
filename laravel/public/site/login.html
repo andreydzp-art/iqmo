@@ -336,6 +336,11 @@
 				formPassword.setAttribute('aria-hidden', 'true');
 				formRegister.setAttribute('aria-hidden', 'true');
 
+				try {
+					var regQ = new URLSearchParams(window.location.search).get('register');
+					if (regQ === '1' || regQ === 'true') showRegister();
+				} catch (e) { /* noop */ }
+
 				function safeNextUrl() {
 					try {
 						var p = new URLSearchParams(window.location.search);
@@ -343,7 +348,7 @@
 						if (!n) return null;
 						var u = new URL(n, window.location.origin);
 						if (u.origin !== window.location.origin) return null;
-						if (u.pathname === '/login.html' || u.pathname === '/login') return null;
+						if (u.pathname === '/login.html' || u.pathname === '/login' || u.pathname === '/uploads/login.html') return null;
 						return u.pathname + u.search + u.hash;
 					} catch (e) {
 						return null;
