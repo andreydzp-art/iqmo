@@ -163,6 +163,25 @@ Route::get('/{html}', function (string $html) use ($serveStatic) {
         abort(404);
     }
 
+    // Старые копии `subject-chemistry.html` вели «Биология» на index.html. Пока `sync-site` на VPS
+    // не прогнали, подменяем ссылку при отдаче через Laravel (запрос должен дойти до index.php).
+    if ($html === 'subject-chemistry.html') {
+        $raw = @file_get_contents($full);
+        if ($raw !== false) {
+            $patched = preg_replace(
+                '/<a\\s+href="[^"]*index\\.html"\\s+class="subjects__item\\s+tone-bio"/',
+                '<a href="/subject-biology.html" class="subjects__item tone-bio"',
+                $raw,
+                1
+            );
+            if ($patched !== $raw) {
+                return response($patched, 200)
+                    ->header('Content-Type', 'text/html; charset=UTF-8')
+                    ->header('Cache-Control', 'private, no-cache');
+            }
+        }
+    }
+
     return $serveStatic($full);
 })->where('html', '[A-Za-z0-9][A-Za-z0-9_-]*\\.html');
 
