@@ -914,7 +914,7 @@
 								</h1>
 								<p class="hero__subtitle">
 									<span id="bio-hero-subtitle"
-										>Разделы и тесты наполняем по мере готовности: тут — та же структура, что и в курсе по химии. Как только задания появятся в банке, откроются разминка, варианты и темы.</span>
+										>Уже доступен <b>полный вариант ОГЭ №1</b> (21 задание с автопроверкой). Разминка, быстрый тест и темы по разделам — по мере наполнения банка.</span>
 								</p>
 
 								<div class="hero__stats">
@@ -932,12 +932,11 @@
 									</div>
 								</div>
 
-								<div class="hero__cta" aria-label="Скоро">
-									<span class="btn btn--primary" style="opacity: 0.72; cursor: default; pointer-events: none" role="text">
-										Тесты в разработке
+								<div class="hero__cta" aria-label="Действия">
+									<a href="./full-test-biology.html?v=1" class="btn btn--primary">Полный вариант ОГЭ — вариант 1
 										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-									</span>
-									<span class="btn btn--ghost" style="opacity: 0.72; cursor: default; pointer-events: none" role="text">Пробник и полный вариант — скоро</span>
+									</a>
+									<span class="btn btn--ghost" style="opacity: 0.7; cursor: default; pointer-events: none" role="text">Разминка и быстрый тест — скоро</span>
 								</div>
 
 								<div class="hero__last" id="hero-last-result">
@@ -1406,7 +1405,8 @@
 					const elQ = document.getElementById('bio-stat-questions');
 					const n = grid ? grid.querySelectorAll('.topic').length : 0;
 					if (elT) elT.textContent = String(n);
-					if (elQ) elQ.textContent = '0';
+					// В банке — вариант 1, 21 задание (см. biology-bank.js)
+					if (elQ) elQ.textContent = '21';
 				})();
 			})();
 		</script>
