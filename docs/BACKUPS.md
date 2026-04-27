@@ -6,7 +6,9 @@
 
 ## Что бэкапим и зачем
 
-Источник правды портала — БД `iqmo` на MySQL/MariaDB. Там лежат:
+Источник правды портала — БД **`iqmo_app`** на MySQL/MariaDB (имя по
+умолчанию из `config/database.php`, переопределяется через
+`IQMO_DB_DATABASE` в `.env`). Там лежат:
 
 - **`users`** — учётки и пароль-хеши;
 - **`profile_state`** — снепшоты прогресса (то, что синхронизируется через
@@ -14,17 +16,23 @@
 - **`analytics_events`** — телеметрия событий (`chem.topic_view`,
   `chem.attempt_*`, `iqmo.purchase`).
 
-Без этих данных портал бессмысленнен: пользователи не залогинятся, прогресс
+Без этих данных портал бессмыслен: пользователи не залогинятся, прогресс
 не подтянется, в админке исчезнут все воронки и средние.
 
-Дефолтная база Laravel-Breeze (`iqmoschool` или `mysql`-connection) почти
-пустая и не несёт критичных данных, поэтому в бэкап не включена. Если
-кто-то начнёт ей пользоваться — добавить в скрипт второй `mysqldump`.
+Соседняя база `iqmo_laravel` — служебная для Laravel-Breeze (sessions,
+cache, password_resets), почти пустая, потеря не критична. Если когда-то
+начнёт использоваться по-серьёзному — добавить вторым `mysqldump`-ом.
 
 ## Установка на VPS (5 минут)
 
-Шаги ниже для FastPanel-инсталла, пользователь `iqmoschool_r_usr`.
-Если у вас другой хостинг — поправьте пути и имена сервисов.
+Шаги ниже — для FastPanel-инсталла. Есть две схемы, выбирайте одну:
+
+- **Схема А — «через SSH»** (классическая, см. § 1–5 ниже). Подходит, если
+  у вас есть SSH-доступ под системным юзером (например `iqmoschool_r_usr`).
+- **Схема Б — «через FastPanel UI»** (см. § «Установка через FastPanel UI»
+  в самом конце документа). Подходит, если SSH закрыт key-only и быстро
+  его открыть не получается. Все те же файлы создаются через файловый
+  менеджер, cron — через «Планировщик», запуск — от `fastuser`.
 
 ### 1. Доступ к MySQL без пароля в командной строке
 
@@ -55,24 +63,34 @@ chmod 600 ~/.my.cnf
 
 > Используйте отдельного MySQL-пользователя `iqmo_dump`, не `root`.
 > Минимально-необходимые привилегии: `SELECT, LOCK TABLES, SHOW VIEW,
-> EVENT, TRIGGER` на БД `iqmo`. Создание (под root):
+> EVENT, TRIGGER` на БД `iqmo_app`. Создание (под root):
 >
 > ```sql
 > CREATE USER 'iqmo_dump'@'localhost' IDENTIFIED BY '<сильный_пароль>';
-> GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON `iqmo`.*
+> GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON `iqmo_app`.*
 >   TO 'iqmo_dump'@'localhost';
 > FLUSH PRIVILEGES;
 > ```
+>
+> Если SSH-доступа к root нет — те же привилегии раздаст FastPanel при
+> создании MySQL-юзера, привязанного к базе `iqmo_app` (UI-путь:
+> «Базы данных → iqmo_app → Пользователи → Добавить»). FastPanel выдаст
+> «все привилегии в этой БД», что чуть шире наших минимальных, но
+> ограничено одной БД, поэтому приемлемо.
 
 ### 2. Папка для дампов
 
 ```bash
-mkdir -p /var/www/iqmoschool_r_usr/data/backups/iqmo
-chmod 700 /var/www/iqmoschool_r_usr/data/backups/iqmo
+mkdir -p ~/backups/iqmo
+chmod 700 ~/backups/iqmo
 ```
 
 `chmod 700` — критично: бэкап содержит хеши паролей, не давайте никому
 другому даже на чтение.
+
+> Дефолт скрипта — `${HOME}/backups/iqmo`. Если хотите положить дампы в
+> другое место (например, на отдельный smount-овый диск), задайте
+> `IQMO_BACKUP_DIR=/mnt/backups/iqmo` в crontab.
 
 ### 3. Прогон руками — убедиться, что дамп получается
 
@@ -82,14 +100,14 @@ chmod +x scripts/backup-mysql.sh
 scripts/backup-mysql.sh
 ```
 
-Ожидаемый вывод: `OK: /var/www/iqmoschool_r_usr/data/backups/iqmo/iqmo-YYYY-MM-DD-HHMMSS.sql.gz (NNNN bytes)`.
+Ожидаемый вывод: `OK: ~/backups/iqmo/iqmo-YYYY-MM-DD-HHMMSS.sql.gz (NNNN bytes)`.
 
 Если получили `ERROR: backup too small` — значит mysqldump молча провалился
-(чаще всего: нет прав у `iqmo_dump`, или БД называется не `iqmo`).
+(чаще всего: нет прав у `iqmo_dump`, или БД называется не `iqmo_app`).
 Запустите вручную с `--verbose` и посмотрите stderr:
 
 ```bash
-mysqldump --single-transaction --quick iqmo > /tmp/check.sql
+mysqldump --single-transaction --quick iqmo_app > /tmp/check.sql
 ls -l /tmp/check.sql
 ```
 
@@ -120,14 +138,15 @@ MAILTO=ops@example.com
 На следующий день:
 
 ```bash
-ls -lh /var/www/iqmoschool_r_usr/data/backups/iqmo/
+ls -lh ~/backups/iqmo/
 # Ожидаем: iqmo-YYYY-MM-DD-040000.sql.gz, размер не нулевой.
 ```
 
 Если файла нет — `journalctl -u cron --since today | grep iqmo`. Чаще
 всего проблема в правах: cron запускается под другим shell/окружением,
-без `~/.my.cnf`. Решение — указать `HOME=/var/www/iqmoschool_r_usr`
-в первой строке crontab.
+без `~/.my.cnf`. Решение — указать `HOME=/var/www/<sysuser>`
+в первой строке crontab (cron должен видеть `$HOME`, иначе скрипт
+поднимет понятную ошибку «HOME must be set»).
 
 ## Тест восстановления (важно сделать хотя бы раз)
 
@@ -144,16 +163,16 @@ mysql -e "DROP DATABASE IF EXISTS iqmo_restore_test;
           CREATE DATABASE iqmo_restore_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 # 3. Восстанавливаем туда последний дамп.
-src=$(ls -1t /var/www/iqmoschool_r_usr/data/backups/iqmo/iqmo-*.sql.gz | head -n 1)
+src=$(ls -1t ~/backups/iqmo/iqmo-*.sql.gz | head -n 1)
 gunzip -c "$src" | mysql iqmo_restore_test
 
 # 4. Сравниваем размеры с прод-БД.
 mysql -N -B -e "SELECT
-  (SELECT COUNT(*) FROM iqmo.users) AS prod_users,
+  (SELECT COUNT(*) FROM iqmo_app.users) AS prod_users,
   (SELECT COUNT(*) FROM iqmo_restore_test.users) AS bk_users,
-  (SELECT COUNT(*) FROM iqmo.profile_state) AS prod_states,
+  (SELECT COUNT(*) FROM iqmo_app.profile_state) AS prod_states,
   (SELECT COUNT(*) FROM iqmo_restore_test.profile_state) AS bk_states,
-  (SELECT COUNT(*) FROM iqmo.analytics_events) AS prod_events,
+  (SELECT COUNT(*) FROM iqmo_app.analytics_events) AS prod_events,
   (SELECT COUNT(*) FROM iqmo_restore_test.analytics_events) AS bk_events;"
 
 # 5. Удаляем тестовую базу.
@@ -199,10 +218,10 @@ sudo systemctl start php8.3-fpm
 
 ```
 30 4 * * * /usr/local/bin/aws --endpoint-url=https://storage.yandexcloud.net s3 sync \
-  /var/www/iqmoschool_r_usr/data/backups/iqmo/ \
+  $HOME/backups/iqmo/ \
   s3://iqmo-backups/iqmo/ \
   --exclude '*.partial' \
-  --no-progress >> /var/log/iqmo-s3-sync.log 2>&1
+  --no-progress >> $HOME/logs/iqmo-s3-sync.log 2>&1
 ```
 
 `--exclude '*.partial'` важен: иначе sync подхватит наполовину готовый
@@ -214,7 +233,7 @@ sudo systemctl start php8.3-fpm
 
 ```
 30 4 * * * rsync -az --delete-after \
-  /var/www/iqmoschool_r_usr/data/backups/iqmo/ \
+  $HOME/backups/iqmo/ \
   backup-user@nas.local:/srv/iqmo-backups/
 ```
 
@@ -260,10 +279,56 @@ sudo systemctl start php8.3-fpm
 ## Чек-лист «всё ли я сделал»
 
 - [ ] `~/.my.cnf` создан, `chmod 600`, mysql `iqmo_dump` user работает.
-- [ ] `/var/www/iqmoschool_r_usr/data/backups/iqmo/` существует, `chmod 700`.
+- [ ] `~/backups/iqmo/` существует, `chmod 700`.
 - [ ] Ручной запуск `scripts/backup-mysql.sh` создаёт файл и печатает `OK:`.
 - [ ] Cron-запись добавлена, `MAILTO=` настроен.
 - [ ] Через сутки лежит файл с датой/временем cron-запуска.
 - [ ] Хотя бы раз сделали тест восстановления в `iqmo_restore_test`.
 - [ ] Настроена оффсайт-синхронизация (S3 / rsync / эквивалент).
 - [ ] `.env` с `IQMO_JWT_SECRET` лежит отдельно от БД-дампов.
+
+## Установка через FastPanel UI (без SSH)
+
+Пошаговая шпаргалка для случая, когда SSH закрыт key-only и быстро его
+открывать не хочется. Все действия — только в веб-кабинете FastPanel,
+на правах админа (пользователь `fastuser`). Cron в итоге будет крутиться
+от `fastuser` — это нормально, `mysqldump` подключается к БД своим
+MySQL-логином (`iqmo_dump`), а не от имени запускающего OS-юзера.
+
+1. **MySQL-юзер `iqmo_dump`** — «Базы данных → `iqmo_app` → Пользователи →
+   Добавить пользователя». Логин `iqmo_dump`, сильный пароль (запишите!),
+   привилегии — те, что предлагает FastPanel по умолчанию (привязаны к
+   одной БД, этого достаточно).
+
+2. **`~/.my.cnf` для `fastuser`** — «Файловый менеджер», перейти в
+   `/var/www/fastuser/data/` (там лежат `.bashrc`, `.bash_profile` —
+   значит это и есть `$HOME` для `fastuser`). Включить «показ скрытых
+   файлов». Создать файл `.my.cnf` с содержимым из § 1 («Доступ к MySQL»),
+   подставив реальный пароль `iqmo_dump`. Через «Изменить права»
+   выставить **`600`** (только владелец читает/пишет).
+
+3. **Скрипт и папка под бэкапы** — там же, в `/var/www/fastuser/data/`:
+   - создать папку `scripts`, в ней файл `backup-mysql.sh`, вставить
+     содержимое из репозитория (`scripts/backup-mysql.sh`), права `755`;
+   - создать папку `backups/iqmo` (она появится сама после первого
+     запуска скрипта, но можно и руками — права `700`).
+
+4. **Тестовый запуск** — FastPanel «Планировщик → Добавить задачу»:
+   - команда: `bash /var/www/fastuser/data/scripts/backup-mysql.sh`
+   - расписание: «один раз через 2 минуты» (или ближайший возможный
+     паттерн — `* * * * *` с последующим удалением);
+   - сохранить, дождаться запуска. Через ~3 минуты в `backups/iqmo/`
+     должен появиться `iqmo-YYYY-MM-DD-HHMMSS.sql.gz` размером не
+     меньше пары килобайт.
+
+5. **Постоянный cron** — после успешной проверки той же записи в
+   «Планировщике» меняем расписание на `0 4 * * *` (ежедневно в 04:00).
+   В поле «MAILTO» (если есть) вписываем рабочую почту — FastPanel
+   при ошибке cron пришлёт письмо.
+
+6. **Усиление**: смените пароль `iqmo_dump`, который вы вводили в чат
+   при установке, на свежий через тот же UI; обновите его в `.my.cnf`.
+   Это закрывает возможный лог-leak в средах разработки.
+
+После успеха — отметьте чек-лист выше: пути в нём абсолютные через
+`~/`/`$HOME`, поэтому корректны и для FastPanel-схемы тоже.

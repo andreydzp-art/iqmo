@@ -2,16 +2,23 @@
 # IQMO: ежедневный бэкап MySQL.
 #
 # Где запускать: на VPS, под пользователем, у которого есть `~/.my.cnf`
-# с правами SELECT/LOCK TABLES/SHOW VIEW/EVENT/TRIGGER на БД `iqmo`.
+# с правами SELECT/LOCK TABLES/SHOW VIEW/EVENT/TRIGGER на БД `iqmo_app`.
 # Конфигурация — через переменные окружения, не через флаги (так удобнее
 # в cron/systemd-таймере), все имеют разумные дефолты для FastPanel-инсталла:
 #
-#   IQMO_DB_NAME              имя БД                   (default: iqmo)
+#   IQMO_DB_NAME              имя БД                   (default: iqmo_app — совпадает с config/database.php)
 #   IQMO_DB_HOST              хост MySQL               (default: 127.0.0.1)
 #   IQMO_DB_USER              пользователь, если не из ~/.my.cnf  (default: empty)
-#   IQMO_BACKUP_DIR           куда складывать дампы    (default: /var/www/iqmoschool_r_usr/data/backups/iqmo)
+#   IQMO_BACKUP_DIR           куда складывать дампы    (default: $HOME/backups/iqmo)
 #   IQMO_BACKUP_RETAIN_DAYS   сколько хранить          (default: 14)
 #   IQMO_BACKUP_MIN_BYTES     пол ниже которого считаем дамп подозрительным (default: 2048)
+#
+# Почему имя по умолчанию `iqmo_app`: на FastPanel-инсталле БД называется
+# `iqmo_app` (см. `config/database.php`), а не «логическое» `iqmo`. Если у
+# вас другое имя — переопределите через `IQMO_DB_NAME=...` в cron-команде.
+# Почему BACKUP_DIR по умолчанию относительно $HOME: cron от любого
+# пользователя гарантированно может писать в свой домашний каталог,
+# а абсолютный путь типа `/var/www/<user>/...` ломается при смене юзера.
 #
 # Что в дампе:
 #   --single-transaction        — снимок без блокировки таблиц на запись
@@ -38,10 +45,12 @@ set -Eeuo pipefail
 export LC_ALL=C                               # стабильное форматирование дат, числовой сортировки
 umask 077                                     # бэкапы — только для владельца
 
-DB_NAME="${IQMO_DB_NAME:-iqmo}"
+DB_NAME="${IQMO_DB_NAME:-iqmo_app}"
 DB_HOST="${IQMO_DB_HOST:-127.0.0.1}"
 DB_USER="${IQMO_DB_USER:-}"
-BACKUP_DIR="${IQMO_BACKUP_DIR:-/var/www/iqmoschool_r_usr/data/backups/iqmo}"
+# `${HOME:?HOME must be set}` — на cron-инсталлах HOME иногда не выставлен,
+# тогда мы лучше упадём с понятной ошибкой, чем создадим `/backups/iqmo` от рута.
+BACKUP_DIR="${IQMO_BACKUP_DIR:-${HOME:?HOME must be set in cron/env}/backups/iqmo}"
 RETAIN_DAYS="${IQMO_BACKUP_RETAIN_DAYS:-14}"
 MIN_BYTES="${IQMO_BACKUP_MIN_BYTES:-2048}"
 

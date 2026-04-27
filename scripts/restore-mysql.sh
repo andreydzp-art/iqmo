@@ -47,9 +47,10 @@ USAGE
 fi
 shift
 
-DB_NAME="${IQMO_DB_NAME:-iqmo}"
+DB_NAME="${IQMO_DB_NAME:-iqmo_app}"
 DB_HOST="${IQMO_DB_HOST:-127.0.0.1}"
-BACKUP_DIR="${IQMO_BACKUP_DIR:-/var/www/iqmoschool_r_usr/data/backups/iqmo}"
+# По умолчанию ищем дампы в $HOME/backups/iqmo (там их кладёт `backup-mysql.sh`).
+BACKUP_DIR="${IQMO_BACKUP_DIR:-${HOME:?HOME must be set}/backups/iqmo}"
 
 if [ -n "${1:-}" ]; then
   src="$1"
