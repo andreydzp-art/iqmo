@@ -1,5 +1,16 @@
 # Чеклист деплоя IQMO
 
+### Почему в GitHub Actions «два прогона» на один push
+
+На `push` в `main` запускаются **два разных** workflow — это **не** «деплой дважды»:
+
+| Workflow | Файл | Задача |
+| --- | --- | --- |
+| **Tests** | `.github/workflows/test.yml` | PHPUnit `Unit` + небольшой набор `Feature` (без MySQL), для PR и для `main`. **На сервер ничего не копирует.** |
+| **Deploy to VPS** | `.github/workflows/deploy.yml` | Свой `PHPUnit (Unit) gate` → **SSH** на VPS → `git reset` + `node scripts/sync-site.mjs` → `composer` / миграции → **smoke** по HTTP. **Это** единственный шаг, который обновляет `laravel/public/site/` из репозитория. |
+
+Список run’ов на один коммит обычно выглядит как `Tests #N` и `Deploy to VPS #M` — нормально. Если **Deploy to VPS** красный, раскройте job **deploy** и **smoke** и смотрите, на каком шаге остановка.
+
 ## База данных
 
 1. Применить схему MySQL (аккаунты + профиль + аналитика):
