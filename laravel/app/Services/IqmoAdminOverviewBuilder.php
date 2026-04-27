@@ -15,6 +15,10 @@ final class IqmoAdminOverviewBuilder
 {
     private const ALLOWED_DAYS = [1, 7, 14, 30];
 
+    public function __construct(
+        private readonly IqmoYandexMetrikaClient $yandexMetrika,
+    ) {}
+
     /** @return array<string, mixed> */
     public function build(int $days): array
     {
@@ -116,7 +120,7 @@ final class IqmoAdminOverviewBuilder
         $eventsHealth = $hasAnalytics
             ? $this->computeEventsHealth($sinceMs, $nowMs)
             : ['total' => 0, 'distinctUsers' => 0, 'lastEventMs' => null,
-               'byType' => ['view' => 0, 'start' => 0, 'complete' => 0]];
+                'byType' => ['view' => 0, 'start' => 0, 'complete' => 0]];
 
         $dauMau = $hasAnalytics ? $this->computeDauMau($nowMs) : ['dau' => 0, 'mau' => 0];
         $dauMauValue = '—';
@@ -228,6 +232,14 @@ final class IqmoAdminOverviewBuilder
                 'hint' => $dauMauHint,
             ],
             [
+                'id' => 'metrika_users',
+                'label' => 'Посетители · Я.Метрика',
+                'value' => $metrikaUsers !== null ? $this->fmtInt($metrikaUsers) : '—',
+                'delta' => $metrikaDelta,
+                'trend' => 'flat',
+                'hint' => $metrikaHint,
+            ],
+            [
                 'id' => 'new_users',
                 'label' => 'Новые регистрации',
                 'value' => $this->fmtInt($newUsers),
@@ -319,8 +331,8 @@ final class IqmoAdminOverviewBuilder
 
         $hasFunnelEvents = $eventFunnel['view'] + $eventFunnel['start'] + $eventFunnel['complete'] > 0;
         $funnel = $hasFunnelEvents
-            ? $this->buildEventFunnel($totalUsers, $eventFunnel, $mistakeUsers, $days)
-            : $this->buildFunnel($totalUsers, $profilesTotal, $activeSync, $withAttempts, $mistakeUsers, $days);
+            ? IqmoAdminOverviewMath::buildEventFunnel($totalUsers, $eventFunnel, $mistakeUsers, $days)
+            : IqmoAdminOverviewMath::buildLegacyFunnel($totalUsers, $profilesTotal, $activeSync, $withAttempts, $mistakeUsers, $days);
 
         $subjectsSnapshot = [
             [
@@ -447,7 +459,7 @@ final class IqmoAdminOverviewBuilder
      */
     private function rollupTopQuestions(int $sinceMs, int $days): array
     {
-        $minShows = $days <= 1 ? 3 : ($days >= 14 ? 3 : 4);
+        $minShows = IqmoAdminOverviewMath::topQuestionsMinShows($days);
 
         $rows = DB::connection('iqmo')->table('analytics_events')
             ->where('event', 'chem.attempt_complete')
@@ -456,118 +468,7 @@ final class IqmoAdminOverviewBuilder
             ->limit(12_000)
             ->get(['payload_json']);
 
-        /** @var array<string, array{n: int, w: int}> $acc */
-        $acc = [];
-
-        foreach ($rows as $row) {
-            $raw = $row->payload_json ?? null;
-            if (is_string($raw)) {
-                $p = json_decode($raw, true);
-            } elseif (is_array($raw)) {
-                $p = $raw;
-            } else {
-                continue;
-            }
-            if (! is_array($p) || empty($p['items']) || ! is_array($p['items'])) {
-                continue;
-            }
-            foreach ($p['items'] as $it) {
-                if (! is_array($it) || ! isset($it['qid'])) {
-                    continue;
-                }
-                $qid = (string) $it['qid'];
-                if ($qid === '' || strlen($qid) > 64) {
-                    continue;
-                }
-                if (! isset($acc[$qid])) {
-                    $acc[$qid] = ['n' => 0, 'w' => 0];
-                }
-                $acc[$qid]['n']++;
-                if (empty($it['ok'])) {
-                    $acc[$qid]['w']++;
-                }
-            }
-        }
-
-        $out = [];
-        foreach ($acc as $qid => $st) {
-            $n = $st['n'];
-            if ($n < $minShows) {
-                continue;
-            }
-            $w = $st['w'];
-            $wrongPct = $n > 0 ? (int) round(100.0 * $w / $n) : 0;
-            $out[] = [
-                'qid' => $qid,
-                'topic' => 'Химия ОГЭ',
-                'wrongPct' => $wrongPct,
-                'shows' => $n,
-                'avgSec' => '—',
-                'flag' => $wrongPct >= 55 && $n >= $minShows,
-            ];
-        }
-
-        usort($out, function (array $a, array $b): int {
-            if ($a['wrongPct'] !== $b['wrongPct']) {
-                return $b['wrongPct'] <=> $a['wrongPct'];
-            }
-
-            return $b['shows'] <=> $a['shows'];
-        });
-
-        return array_slice($out, 0, 15);
-    }
-
-    /**
-     * @return list<array{step: string, users: int, pct: float}>
-     */
-    private function buildFunnel(
-        int $totalUsers,
-        int $profilesTotal,
-        int $activeSync,
-        int $withAttempts,
-        int $mistakeUsers,
-        int $days,
-    ): array {
-        if ($totalUsers < 1) {
-            return [['step' => 'Пока нет пользователей', 'users' => 0, 'pct' => 0.0]];
-        }
-
-        $pct = static fn (int $n): float => round(100.0 * $n / max(1, $totalUsers), 1);
-        $labelAct = $days === 1 ? 'Активность синхронизации (24 ч)' : 'Активность синхронизации ('.$days.' дн.)';
-
-        return [
-            ['step' => 'Аккаунтов в базе', 'users' => $totalUsers, 'pct' => 100.0],
-            ['step' => 'С сохранённым профилем', 'users' => $profilesTotal, 'pct' => $pct($profilesTotal)],
-            ['step' => $labelAct, 'users' => $activeSync, 'pct' => $pct($activeSync)],
-            ['step' => 'С попытками в данных', 'users' => $withAttempts, 'pct' => $pct($withAttempts)],
-            ['step' => 'С непустым банком ошибок', 'users' => $mistakeUsers, 'pct' => $pct($mistakeUsers)],
-        ];
-    }
-
-    /**
-     * Воронка по событиям. Шаги:
-     *   total → topic_view → attempt_start → attempt_complete → mistakes
-     *
-     * @param  array{view: int, start: int, complete: int}  $ev
-     * @return list<array{step: string, users: int, pct: float}>
-     */
-    private function buildEventFunnel(int $totalUsers, array $ev, int $mistakeUsers, int $days): array
-    {
-        if ($totalUsers < 1) {
-            return [['step' => 'Пока нет пользователей', 'users' => 0, 'pct' => 0.0]];
-        }
-
-        $pct = static fn (int $n): float => round(100.0 * $n / max(1, $totalUsers), 1);
-        $win = $days === 1 ? '24 ч' : $days.' дн.';
-
-        return [
-            ['step' => 'Аккаунтов в базе', 'users' => $totalUsers, 'pct' => 100.0],
-            ['step' => 'Просмотрели тему ('.$win.')', 'users' => $ev['view'], 'pct' => $pct($ev['view'])],
-            ['step' => 'Начали тест ('.$win.')', 'users' => $ev['start'], 'pct' => $pct($ev['start'])],
-            ['step' => 'Завершили тест ('.$win.')', 'users' => $ev['complete'], 'pct' => $pct($ev['complete'])],
-            ['step' => 'С непустым банком ошибок', 'users' => $mistakeUsers, 'pct' => $pct($mistakeUsers)],
-        ];
+        return IqmoAdminOverviewMath::aggregateTopQuestions($rows, $minShows);
     }
 
     /**
@@ -685,11 +586,11 @@ final class IqmoAdminOverviewBuilder
             $durations = [];
             foreach ($rows as $r) {
                 $d = (int) ($r->dur_ms ?? 0);
-                if ($d > 0 && $d <= 14_400_000) {
+                if ($d > 0 && $d <= IqmoAdminOverviewMath::TIME_IN_TEST_MAX_MS) {
                     $durations[] = $d;
                 }
             }
-            $median = $this->medianFloat($durations);
+            $median = IqmoAdminOverviewMath::median($durations);
 
             return [
                 'median' => $median,
@@ -719,53 +620,8 @@ final class IqmoAdminOverviewBuilder
                 ->limit(50_000)
                 ->get(['user_id', 'occurred_at']);
 
-            $gap = 30 * 60_000; // 30 минут — стандартный порог сессии (как у GA).
-            $minSessionMs = 5_000; // защита от случайных дубликатов в одну секунду
-            /** @var list<int> $durations */
-            $durations = [];
-
-            $curUid = null;
-            $curStart = 0;
-            $curLast = 0;
-            $curEvents = 0;
-
-            $flush = static function () use (&$curStart, &$curLast, &$curEvents, &$durations, $minSessionMs): void {
-                if ($curEvents >= 2) {
-                    $d = $curLast - $curStart;
-                    if ($d >= $minSessionMs) {
-                        $durations[] = $d;
-                    }
-                }
-                $curStart = 0;
-                $curLast = 0;
-                $curEvents = 0;
-            };
-
-            foreach ($rows as $row) {
-                $uid = (int) $row->user_id;
-                $ts = (int) $row->occurred_at;
-
-                if ($curUid !== $uid) {
-                    $flush();
-                    $curUid = $uid;
-                    $curStart = $ts;
-                    $curLast = $ts;
-                    $curEvents = 1;
-                    continue;
-                }
-                if ($ts - $curLast > $gap) {
-                    $flush();
-                    $curStart = $ts;
-                    $curLast = $ts;
-                    $curEvents = 1;
-                    continue;
-                }
-                $curLast = $ts;
-                $curEvents++;
-            }
-            $flush();
-
-            $median = $this->medianFloat($durations);
+            $durations = IqmoAdminOverviewMath::groupSessionDurations($rows);
+            $median = IqmoAdminOverviewMath::median($durations);
 
             return [
                 'median' => $median,
@@ -774,42 +630,6 @@ final class IqmoAdminOverviewBuilder
         } catch (\Throwable $e) {
             return ['median' => null, 'count' => 0];
         }
-    }
-
-    /**
-     * @param  list<int>|list<float>  $values
-     */
-    private function medianFloat(array $values): ?float
-    {
-        $n = count($values);
-        if ($n === 0) {
-            return null;
-        }
-        sort($values);
-        $mid = (int) floor($n / 2);
-        if ($n % 2 === 1) {
-            return (float) $values[$mid];
-        }
-
-        return ((float) $values[$mid - 1] + (float) $values[$mid]) / 2.0;
-    }
-
-    private function fmtDuration(int $ms): string
-    {
-        $s = max(0, (int) round($ms / 1000));
-        if ($s < 60) {
-            return $s.' с';
-        }
-        if ($s < 3600) {
-            $m = (int) floor($s / 60);
-            $sr = $s - $m * 60;
-
-            return $sr === 0 ? $m.' мин' : $m.' мин '.$sr.' с';
-        }
-        $h = (int) floor($s / 3600);
-        $m = (int) floor(($s - $h * 3600) / 60);
-
-        return $m === 0 ? $h.' ч' : $h.' ч '.$m.' мин';
     }
 
     /** @return array<string, mixed> */
@@ -867,11 +687,18 @@ final class IqmoAdminOverviewBuilder
         ];
     }
 
+    /**
+     * Тонкие делегаты — чтобы call-site'ы выше не торчали `IqmoAdminOverviewMath::...`
+     * на каждой строке. Реальная логика и unit-тесты — в `IqmoAdminOverviewMath`.
+     */
     private function fmtInt(int $n): string
     {
-        $n = max(0, $n);
+        return IqmoAdminOverviewMath::formatInt($n);
+    }
 
-        return (string) number_format($n, 0, ',', "\u{202f}");
+    private function fmtDuration(int $ms): string
+    {
+        return IqmoAdminOverviewMath::formatDuration($ms);
     }
 
     /**
@@ -879,20 +706,6 @@ final class IqmoAdminOverviewBuilder
      */
     private function decodeKeys(mixed $raw): array
     {
-        if ($raw === null || $raw === '') {
-            return [];
-        }
-        if (is_array($raw)) {
-            return $raw;
-        }
-        if ($raw instanceof \stdClass) {
-            $raw = json_encode($raw);
-        }
-        if (! is_string($raw)) {
-            return [];
-        }
-        $decoded = json_decode($raw, true);
-
-        return is_array($decoded) ? $decoded : [];
+        return IqmoAdminOverviewMath::decodeKeys($raw);
     }
 }

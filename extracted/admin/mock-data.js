@@ -10,6 +10,7 @@
 		kpis: [
 			{ id: 'dau', label: 'DAU', value: '1 842', delta: '+6,2%', trend: 'up', hint: 'Уникальные пользователи за вчера' },
 			{ id: 'mau_dau', label: 'MAU / DAU', value: '4,1', delta: 'стабильно', trend: 'flat', hint: 'Отношение месячной и дневной аудитории' },
+			{ id: 'metrika_users', label: 'Посетители · Я.Метрика (мок)', value: '2 340', delta: 'уникальные за 7 дн. (демо)', trend: 'flat', hint: 'В бою: ym:s:users по API. Здесь — заглушка без API' },
 			{ id: 'new_users', label: 'Новые за период', value: '3 105', delta: '+12%', trend: 'up', hint: 'Первый визит / регистрация' },
 			{ id: 'online', label: 'Онлайн сейчас', value: '127', delta: 'оценка', trend: 'flat', hint: 'Активность за последние 3 мин (мок)' },
 			{ id: 'started', label: 'Тестов начато', value: '4 920', delta: '+4%', trend: 'up', hint: 'Все типы тестов' },
@@ -101,6 +102,21 @@
 					copy.delta = m.delta;
 					copy.trend = m.trend;
 					copy.hint = m.hint;
+				}
+				return copy;
+			}
+
+			if (k.id === 'metrika_users') {
+				copy.label = 'Посетители · Я.Метрика (мок)';
+				if (days === 1) {
+					copy.value = fmtInt(340);
+					copy.delta = 'уникальные за сегодня (демо)';
+					copy.hint = 'Счётчик с сайта (мок: живые данные через YANDEX_METRIKA_OAUTH_TOKEN в Laravel)';
+				} else {
+					const baseM = 2340 * (days / 7);
+					copy.value = fmtInt(Math.max(1, Math.round(baseM)));
+					copy.delta = 'уникальные за ' + days + ' дн. (мок)';
+					copy.hint = 'Уникальные посетители за период (мок; в бою — API Метрики)';
 				}
 				return copy;
 			}

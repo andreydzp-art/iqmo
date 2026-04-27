@@ -44,4 +44,14 @@ return [
         'jwt_secret' => env('IQMO_JWT_SECRET'),
     ],
 
+    /*
+    | Источник «Посетители · Метрика» в /api/admin/overview (счётчик с сайта).
+    | Токен: OAuth Яндекса с правом metrika:read.
+    | @see https://yandex.com/dev/metrika/doc/api2/intro/authorization.html
+    */
+    'yandex_metrika' => [
+        'counter_id' => env('YANDEX_METRIKA_COUNTER_ID', '108770166'),
+        'oauth_token' => env('YANDEX_METRIKA_OAUTH_TOKEN'),
+    ],
+
 ];
