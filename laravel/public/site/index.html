@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="ru" class="page">
+	<head>
+		<meta charset="UTF-8" />
+		<!-- Yandex.Metrika counter -->
+		<script type="text/javascript">
+		    (function(m,e,t,r,i,k,a){
+		        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+		        m[i].l=1*new Date();
+		        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+		        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+		    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108770166', 'ym');
+
+		    ym(108770166, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+		</script>
+		<noscript><div><img src="https://mc.yandex.ru/watch/108770166" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+		<!-- /Yandex.Metrika counter -->
+
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO — подготовка к ОГЭ онлайн</title>
+		<meta
+			name="description"
+			content="IQMO: темы по ФИПИ, разминка по слотам, пробный и полный вариант. Химия ОГЭ уже в тренажёре."
+		/>
+		<link rel="canonical" href="https://www.iqmoschool.ru/" />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="IQMO" />
+		<meta property="og:locale" content="ru_RU" />
+		<meta property="og:url" content="https://www.iqmoschool.ru/" />
+		<meta property="og:title" content="IQMO — подготовка к ОГЭ онлайн" />
+		<meta
+			property="og:description"
+			content="Темы по ФИПИ, разминка по номерам билета, банк ошибок, пробник и полный вариант. Сейчас в тренажёре — химия ОГЭ."
+		/>
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="IQMO — подготовка к ОГЭ онлайн" />
+		<meta
+			name="twitter:description"
+			content="Темы по ФИПИ, разминка, пробник и полный вариант. Химия ОГЭ в тренажёре IQMO."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f3f5f8;
+				--ink: #11141a;
+				--ink-2: #2a2f38;
+				--muted: #6b7280;
+				--line: #e6e9ef;
+				--card: #ffffff;
+				--dark: #1f2430;
+				--accent: #4f7bd6;
+				--accent-weak: #eaf0fb;
+				--green: #3ec37a;
+				--radius: 18px;
+				--shadow: 0 1px 2px rgba(17, 20, 26, 0.04), 0 8px 24px -12px rgba(17, 20, 26, 0.08);
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+				color: var(--ink);
+				background: var(--bg);
+				font-size: 16px;
+				line-height: 1.5;
+				-webkit-font-smoothing: antialiased;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+			button {
+				font-family: inherit;
+				cursor: pointer;
+				border: 0;
+				background: none;
+			}
+			h1,
+			h2,
+			h3,
+			p {
+				margin: 0;
+			}
+			.container {
+				width: 100%;
+				max-width: 1220px;
+				margin: 0 auto;
+				padding: 0 24px;
+			}
+
+			.header {
+				background: #fff;
+				border-bottom: 1px solid var(--line);
+				padding: 18px 0;
+				position: sticky;
+				top: 0;
+				z-index: 20;
+			}
+			.header__container {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 24px;
+			}
+			.logo svg {
+				display: block;
+				height: 24px;
+			}
+			.header__btns {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				justify-content: flex-end;
+			}
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				font-weight: 600;
+				font-size: 15px;
+				padding: 12px 22px;
+				border-radius: 999px;
+				transition: transform 0.08s, background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+				border: 1.5px solid transparent;
+				white-space: nowrap;
+				cursor: pointer;
+			}
+			/* `.btn { display: inline-flex }` иначе перебивает нативный `[hidden]` */
+			[hidden] {
+				display: none !important;
+			}
+			.btn:active {
+				transform: translateY(1px);
+			}
+			.btn--primary {
+				background: linear-gradient(180deg, #44c77d, #2fa965);
+				color: #fff;
+				box-shadow: 0 8px 20px -8px rgba(62, 195, 122, 0.55);
+			}
+			.btn--primary:hover {
+				filter: brightness(1.05);
+			}
+			.btn--ghost {
+				background: #fff;
+				border-color: var(--line);
+				color: var(--ink);
+			}
+			.btn--ghost:hover {
+				border-color: var(--ink);
+			}
+			.header__btn {
+				padding: 10px 20px;
+				font-size: 14px;
+			}
+
+			.page__main {
+				flex: 1 0 auto;
+				padding: 8px 0 56px;
+			}
+
+			.crumbs {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+				font-size: 13px;
+				color: var(--muted);
+				padding: 14px 0 0;
+			}
+			.crumbs a:hover {
+				color: var(--accent);
+			}
+			.crumbs__sep {
+				opacity: 0.5;
+			}
+
+			.home-hero {
+				margin-top: 20px;
+				padding: 36px 38px;
+				background:
+					radial-gradient(circle at 88% 18%, rgba(79, 123, 214, 0.18), transparent 45%),
+					radial-gradient(circle at 12% 88%, rgba(62, 195, 122, 0.10), transparent 50%),
+					linear-gradient(140deg, #f4f7fc 0%, #eaf0fb 100%);
+				color: var(--ink);
+				position: relative;
+				overflow: hidden;
+				border-radius: var(--radius);
+				border: 1px solid #dde5f1;
+			}
+			.home-hero::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background-image: radial-gradient(circle at 88% 18%, rgba(79, 123, 214, 0.10), transparent 42%);
+				pointer-events: none;
+			}
+			.home-hero__tag {
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: 0.12em;
+				color: var(--accent);
+				font-weight: 800;
+				position: relative;
+				z-index: 1;
+			}
+			.home-hero__title {
+				margin-top: 12px;
+				font-size: clamp(26px, 4vw, 38px);
+				line-height: 1.12;
+				font-weight: 800;
+				letter-spacing: -0.02em;
+				max-width: 640px;
+				color: var(--ink);
+				position: relative;
+				z-index: 1;
+			}
+			.home-hero__title em {
+				font-style: normal;
+				color: var(--accent);
+			}
+			.home-hero__sub {
+				margin-top: 14px;
+				max-width: 560px;
+				font-size: 15px;
+				color: var(--ink-2);
+				line-height: 1.55;
+				position: relative;
+				z-index: 1;
+			}
+			.home-hero__cta {
+				display: flex;
+				gap: 10px;
+				margin-top: 24px;
+				flex-wrap: wrap;
+				position: relative;
+				z-index: 1;
+			}
+			.home-hero__cta .btn--ghost {
+				background: #fff;
+				color: var(--ink);
+				border-color: var(--line);
+			}
+			.home-hero__cta .btn--ghost:hover {
+				border-color: var(--ink);
+				background: #fff;
+			}
+
+			.home-continue {
+				margin-top: 20px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				padding: 22px 24px;
+			}
+			.home-continue h2 {
+				font-size: 17px;
+				font-weight: 800;
+				letter-spacing: -0.01em;
+				margin-bottom: 12px;
+			}
+			.home-continue__list {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+			.home-continue__row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 14px;
+				flex-wrap: wrap;
+				padding: 12px 14px;
+				border-radius: 12px;
+				background: #f7f8fb;
+				border: 1px solid var(--line);
+			}
+			.home-continue__row p {
+				font-size: 14px;
+				color: var(--ink-2);
+				margin: 0;
+			}
+			.home-continue__row a {
+				color: var(--accent);
+				font-weight: 700;
+				font-size: 14px;
+				text-decoration: underline;
+				text-underline-offset: 3px;
+			}
+			.home-continue__row a:hover {
+				color: #3d63b8;
+			}
+			.home-continue.is--empty .home-continue__list {
+				color: var(--muted);
+				font-size: 14px;
+			}
+
+
+			/* ---- home pitch (sales block) ---- */
+			.home-pitch {
+				margin-top: 28px;
+				background:
+					radial-gradient(circle at 88% 18%, rgba(79, 123, 214, 0.18), transparent 45%),
+					radial-gradient(circle at 12% 88%, rgba(62, 195, 122, 0.10), transparent 50%),
+					linear-gradient(140deg, #f4f7fc 0%, #eaf0fb 100%);
+				border: 1px solid #dde5f1;
+				border-radius: var(--radius);
+				padding: 36px 44px;
+				display: grid;
+				grid-template-columns: 1.15fr 1fr;
+				gap: 36px;
+				align-items: center;
+				position: relative;
+				overflow: hidden;
+			}
+			.home-pitch__eyebrow {
+				display: inline-block;
+				font-size: 11px; font-weight: 800; letter-spacing: .12em;
+				text-transform: uppercase; color: var(--accent);
+				background: rgba(79, 123, 214, 0.12); padding: 6px 12px; border-radius: 999px;
+				margin-bottom: 14px;
+				white-space: nowrap;
+			}
+			.home-pitch__title {
+				font-size: 34px; font-weight: 800; line-height: 1.08;
+				letter-spacing: -.02em; color: var(--ink); margin: 0 0 12px;
+			}
+			.home-pitch__title em {
+				color: var(--green); font-style: normal; white-space: nowrap;
+			}
+			.home-pitch__sub {
+				font-size: 15px; line-height: 1.55; color: var(--ink-2);
+				margin: 0 0 18px; max-width: 480px;
+			}
+			.home-pitch__benefits {
+				display: flex; flex-direction: column; gap: 9px;
+				margin-bottom: 22px;
+			}
+			.home-pitch__benefit {
+				display: flex; align-items: center; gap: 10px;
+				font-size: 14px; color: var(--ink-2);
+			}
+			.home-pitch__check {
+				width: 22px; height: 22px; border-radius: 50%;
+				background: var(--green); color: #fff;
+				display: inline-flex; align-items: center; justify-content: center;
+				flex: 0 0 auto;
+			}
+			.home-pitch__check svg { width: 13px; height: 13px; }
+			.home-pitch__cta-row {
+				display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+			}
+			.home-pitch__cta {
+				display: inline-flex; align-items: center; gap: 8px;
+				background: var(--green); color: #fff;
+				padding: 14px 26px; border-radius: 12px;
+				font-weight: 700; font-size: 15px;
+				text-decoration: none;
+				box-shadow: 0 4px 14px -4px rgba(62,195,122,.45);
+				transition: transform .15s, box-shadow .15s;
+			}
+			.home-pitch__cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -4px rgba(62,195,122,.55); }
+			.home-pitch__cta-secondary {
+				font-size: 14px; font-weight: 600; color: var(--ink-2);
+				text-decoration: none; padding: 6px 4px;
+			}
+			.home-pitch__cta-secondary:hover { color: var(--accent); }
+			.home-pitch__trust {
+				margin-top: 14px; font-size: 12.5px; color: var(--muted);
+				display: flex; gap: 18px; flex-wrap: wrap;
+			}
+			.home-pitch__trust b { color: var(--ink-2); font-weight: 700; }
+
+			/* Right column: big stat */
+			.home-pitch__stat {
+				text-align: center; position: relative;
+				display: flex; flex-direction: column; align-items: center; justify-content: center;
+			}
+			.home-pitch__stat-num {
+				font-size: 200px; font-weight: 900;
+				line-height: .85; letter-spacing: -.06em;
+				background: linear-gradient(180deg, #1f2430 0%, #4f7bd6 80%);
+				-webkit-background-clip: text; background-clip: text;
+				-webkit-text-fill-color: transparent;
+				margin: 0 0 8px;
+			}
+			.home-pitch__stat-unit {
+				font-size: 18px; font-weight: 800; color: var(--ink);
+				margin-bottom: 8px;
+				white-space: nowrap;
+			}
+			.home-pitch__stat-label {
+				font-size: 13px; color: var(--muted); max-width: 220px;
+				line-height: 1.4;
+			}
+
+			@media (max-width: 768px) {
+				.home-pitch { grid-template-columns: 1fr; padding: 26px 22px; gap: 22px; }
+				.home-pitch__title { font-size: 25px; }
+				.home-pitch__sub { font-size: 14px; }
+				.home-pitch__stat-num { font-size: 130px; }
+				.home-pitch__stat-unit { font-size: 17px; }
+				.home-pitch__stat { order: -1; }
+				.home-pitch__cta { width: 100%; justify-content: center; }
+				.home-pitch__cta-row { flex-direction: column; align-items: stretch; }
+				.home-pitch__cta-secondary { text-align: center; }
+			}
+
+/* ---- new outline/ghost CTAs in pitch ---- */
+			.home-pitch__cta-outline {
+				display: inline-flex; align-items: center; gap: 8px;
+				background: #fff; color: var(--accent);
+				padding: 13px 22px; border-radius: 12px;
+				border: 1.5px solid var(--accent);
+				font-weight: 700; font-size: 14px;
+				text-decoration: none;
+				transition: background .15s, transform .15s;
+			}
+			.home-pitch__cta-outline:hover { background: var(--accent-weak); transform: translateY(-1px); }
+			.home-pitch__cta-ghost {
+				display: inline-flex; align-items: center; gap: 8px;
+				background: transparent; color: var(--ink-2);
+				padding: 13px 18px; border-radius: 12px;
+				border: 1.5px solid var(--line);
+				font-weight: 600; font-size: 14px;
+				text-decoration: none;
+				transition: border-color .15s, color .15s;
+			}
+			.home-pitch__cta-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+			/* ---- exam countdown bar ---- */
+			.exam-countdown {
+				margin-top: 20px;
+				display: flex; align-items: center; justify-content: space-between;
+				gap: 16px; flex-wrap: wrap;
+				padding: 14px 22px;
+				background: linear-gradient(90deg, rgba(255,99,71,0.10) 0%, rgba(255,165,0,0.08) 100%);
+				border: 1px solid rgba(255,140,0,0.22);
+				border-radius: 14px;
+			}
+			.exam-countdown__left { display: flex; align-items: center; gap: 12px; }
+			.exam-countdown__icon {
+				width: 36px; height: 36px; border-radius: 10px;
+				background: linear-gradient(135deg, #ff7a59 0%, #ff5b3a 100%);
+				color: #fff;
+				display: flex; align-items: center; justify-content: center;
+				font-size: 18px;
+				flex: 0 0 auto;
+			}
+			.exam-countdown__text { font-size: 14px; color: var(--ink-2); line-height: 1.4; }
+			.exam-countdown__text b { color: var(--ink); font-weight: 800; }
+			.exam-countdown__date { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+			/* ---- "Сегодня" stats dashboard ---- */
+			.stats-grid {
+				margin-top: 20px;
+				display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+			}
+			.stat-tile {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				padding: 18px 18px 16px;
+				display: flex; flex-direction: column; gap: 6px;
+				position: relative; overflow: hidden;
+				transition: border-color .15s, transform .15s;
+			}
+			.stat-tile:hover { border-color: var(--accent); transform: translateY(-1px); }
+			.stat-tile__icon {
+				width: 32px; height: 32px; border-radius: 9px;
+				display: flex; align-items: center; justify-content: center;
+				font-size: 16px;
+				margin-bottom: 4px;
+			}
+			.stat-tile__icon.is--fire { background: #fff1e8; }
+			.stat-tile__icon.is--bolt { background: #eaf3ff; }
+			.stat-tile__icon.is--target { background: #e9f8ee; }
+			.stat-tile__icon.is--clock { background: #fde9e4; }
+			.stat-tile__num {
+				font-size: 26px; font-weight: 800; color: var(--ink);
+				letter-spacing: -.02em; line-height: 1.05;
+			}
+			.stat-tile__num small { font-size: 14px; color: var(--muted); font-weight: 700; }
+			.stat-tile__label {
+				font-size: 12.5px; color: var(--muted);
+				text-transform: uppercase; letter-spacing: 0.04em;
+				font-weight: 700;
+			}
+			.stat-tile__hint { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+			/* ---- challenge of the week ---- */
+			.challenge {
+				margin-top: 20px;
+				display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px;
+				align-items: center;
+				padding: 28px 32px;
+				background:
+					radial-gradient(circle at 100% 100%, rgba(255,255,255,.18), transparent 50%),
+					linear-gradient(120deg, #ff7a59 0%, #ff9559 50%, #ffb86c 100%);
+				color: #fff;
+				border-radius: var(--radius);
+				position: relative; overflow: hidden;
+				box-shadow: 0 8px 24px -10px rgba(255, 100, 60, .35);
+			}
+			.challenge::before {
+				content: ''; position: absolute; right: -40px; top: -60px;
+				width: 220px; height: 220px; border-radius: 50%;
+				background: rgba(255,255,255,.10);
+				pointer-events: none;
+			}
+			.challenge__badge {
+				display: inline-block;
+				font-size: 11px; font-weight: 800; letter-spacing: .12em;
+				text-transform: uppercase; color: #fff;
+				background: rgba(255,255,255,.22); padding: 5px 11px; border-radius: 999px;
+				margin-bottom: 12px;
+				backdrop-filter: blur(4px);
+			}
+			.challenge__title {
+				font-size: 24px; font-weight: 800; line-height: 1.15;
+				letter-spacing: -.01em; color: #fff; margin: 0 0 10px;
+			}
+			.challenge__sub {
+				font-size: 14.5px; color: rgba(255,255,255,.92);
+				margin: 0 0 18px; line-height: 1.5;
+			}
+			.challenge__reward {
+				font-size: 13.5px; color: #fff;
+				display: inline-flex; align-items: center; gap: 8px;
+				background: rgba(255,255,255,.16);
+				padding: 8px 14px; border-radius: 999px;
+				margin-bottom: 18px;
+				font-weight: 600;
+			}
+			.challenge__bar {
+				width: 100%; max-width: 360px;
+				height: 8px; border-radius: 999px;
+				background: rgba(255,255,255,.22);
+				overflow: hidden; margin-bottom: 12px;
+			}
+			.challenge__bar-fill {
+				height: 100%; background: #fff; border-radius: 999px;
+				width: 0%;
+				transition: width .4s ease;
+			}
+			.challenge__progress-text {
+				font-size: 12.5px; color: rgba(255,255,255,.85); margin-bottom: 18px;
+				font-weight: 600;
+			}
+			.challenge__cta {
+				display: inline-flex; align-items: center; gap: 8px;
+				background: #fff; color: #d65a2c;
+				padding: 13px 24px; border-radius: 12px;
+				font-weight: 800; font-size: 14px;
+				text-decoration: none;
+				transition: transform .15s, box-shadow .15s;
+				box-shadow: 0 4px 14px -4px rgba(0,0,0,.15);
+			}
+			.challenge__cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -4px rgba(0,0,0,.2); }
+			.challenge__visual {
+				display: flex; align-items: center; justify-content: center;
+				position: relative; z-index: 1;
+			}
+			.challenge__big-num {
+				font-size: 140px; font-weight: 900; line-height: 1; letter-spacing: -.06em;
+				color: rgba(255,255,255,.95);
+				text-shadow: 0 8px 30px rgba(0,0,0,.15);
+			}
+			.challenge__big-label {
+				display: block; font-size: 14px; font-weight: 700;
+				color: rgba(255,255,255,.92); letter-spacing: .04em;
+				text-transform: uppercase; margin-top: 4px; text-align: center;
+			}
+
+			/* ---- subject card progress ring ---- */
+			.subject-card__progress {
+				margin-top: 14px;
+				display: flex; align-items: center; gap: 12px;
+				padding-top: 12px;
+				border-top: 1px dashed var(--line);
+			}
+			.progress-ring {
+				--size: 44px; --stroke: 5px; --pct: 0;
+				width: var(--size); height: var(--size);
+				border-radius: 50%;
+				background:
+					conic-gradient(var(--accent) calc(var(--pct) * 1%), var(--accent-weak) 0);
+				display: flex; align-items: center; justify-content: center;
+				flex: 0 0 auto;
+				position: relative;
+			}
+			.progress-ring::before {
+				content: ''; position: absolute;
+				inset: var(--stroke);
+				background: #fff; border-radius: 50%;
+			}
+			.progress-ring__text {
+				position: relative; z-index: 1;
+				font-size: 11px; font-weight: 800; color: var(--ink);
+				letter-spacing: -.02em;
+			}
+			.subject-card__progress-text { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+			.subject-card__progress-text b { color: var(--ink); font-weight: 700; }
+			.subject-card__progress-text small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+
+			@media (max-width: 768px) {
+				.stats-grid { grid-template-columns: repeat(2, 1fr); }
+				.challenge { grid-template-columns: 1fr; padding: 22px; gap: 18px; }
+				.challenge__visual { order: -1; }
+				.challenge__big-num { font-size: 90px; }
+				.challenge__title { font-size: 20px; }
+				.exam-countdown { padding: 12px 16px; }
+			}
+
+						.section-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 12px;
+				margin: 32px 0 14px;
+			}
+			.section-head h2 {
+				font-size: 20px;
+				font-weight: 800;
+				letter-spacing: -0.01em;
+			}
+			.section-head p {
+				font-size: 13px;
+				color: var(--muted);
+			}
+
+			.subjects-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+				gap: 14px;
+			}
+			.subject-card {
+				background: #fff;
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				border: 1.5px solid var(--line);
+				padding: 22px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				transition: border-color 0.15s, transform 0.12s;
+			}
+			.subject-card:hover {
+				border-color: var(--accent);
+				transform: translateY(-2px);
+			}
+			.subject-card.is--soon {
+				opacity: 0.72;
+				pointer-events: none;
+			}
+			.subject-card__icon {
+				width: 44px;
+				height: 44px;
+				border-radius: 12px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: var(--accent-weak);
+				color: var(--accent);
+			}
+			.subject-card__icon svg {
+				width: 22px;
+				height: 22px;
+				stroke: currentColor;
+				fill: none;
+				stroke-width: 2;
+			}
+			.subject-card__title {
+				font-size: 17px;
+				font-weight: 800;
+			}
+			.subject-card__meta {
+				font-size: 12px;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: var(--green);
+			}
+			.subject-card__meta.is--muted {
+				color: var(--muted);
+			}
+			.subject-card__desc {
+				font-size: 14px;
+				color: var(--ink-2);
+				line-height: 1.5;
+				flex: 1;
+			}
+			.subject-card__link {
+				margin-top: 4px;
+				font-size: 14px;
+				font-weight: 700;
+				color: var(--accent);
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+			}
+			.subject-card a.subject-card__hit {
+				color: inherit;
+				display: contents;
+			}
+
+			.steps {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 14px;
+			}
+			.step {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 16px;
+				padding: 20px;
+				box-shadow: var(--shadow);
+			}
+			.step__num {
+				width: 28px;
+				height: 28px;
+				border-radius: 8px;
+				background: var(--accent-weak);
+				color: var(--accent);
+				font-weight: 800;
+				font-size: 14px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				margin-bottom: 10px;
+			}
+			.step h3 {
+				font-size: 15px;
+				font-weight: 800;
+				margin-bottom: 6px;
+			}
+			.step p {
+				font-size: 13px;
+				color: var(--ink-2);
+				line-height: 1.5;
+			}
+			.step a {
+				color: var(--accent);
+				font-weight: 600;
+				text-decoration: underline;
+				text-underline-offset: 2px;
+			}
+
+			.footer {
+				background: #fff;
+				border-top: 1px solid var(--line);
+				margin-top: auto;
+				font-size: 13px;
+				color: var(--muted);
+			}
+			.footer__inner {
+				padding: 24px;
+				display: flex;
+				justify-content: space-between;
+				gap: 16px;
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			.footer a:hover {
+				color: var(--accent);
+			}
+
+			.sync-hint {
+				font-size: 13px;
+				line-height: 1.5;
+				color: var(--ink-2);
+				padding: 12px 14px;
+				background: var(--accent-weak);
+				border-radius: 14px;
+				border: 1px solid rgba(79, 123, 214, 0.18);
+				margin: 0 0 20px;
+			}
+			.sync-hint a {
+				color: var(--accent);
+				font-weight: 700;
+			}
+
+			@media (max-width: 900px) {
+				.steps {
+					grid-template-columns: 1fr;
+				}
+				.home-hero {
+					padding: 28px 22px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class="container header__container">
+				<a href="./index.html" class="logo" aria-label="IQMO — главная">
+					<svg width="90" height="24" viewBox="0 0 90 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<text x="0" y="19" font-family="Manrope, sans-serif" font-size="20" font-weight="800" letter-spacing="0.5" fill="#11141a">
+							IQMO
+						</text>
+					</svg>
+				</a>
+				<div class="header__btns">
+					<a href="/login.html" class="btn btn--ghost header__btn" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="btn btn--ghost header__btn" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="btn btn--ghost header__btn" id="iqmo-nav-logout" hidden>Выйти</button>
+				</div>
+			</div>
+		</header>
+
+		<main class="page__main">
+			<div class="container">
+				<nav class="crumbs" aria-label="Навигация">
+					<span>Главная</span>
+				</nav>
+
+				<!-- Sales pitch block -->
+				<section class="home-pitch" aria-label="Преимущества IQMO">
+					<div class="home-pitch__copy">
+						<span class="home-pitch__eyebrow">⚡ Быстрая подготовка</span>
+						<h2 class="home-pitch__title">30 минут в день — <em>и ОГЭ на 5</em></h2>
+						<p class="home-pitch__sub">Без зубрёжки и многочасовых занятий. Короткие тренировки по темам ФИПИ — каждый день немного, и за месяц вы готовы к экзамену.</p>
+						<div class="home-pitch__benefits">
+							<div class="home-pitch__benefit">
+								<span class="home-pitch__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"></polyline></svg></span>
+								Только реальные задания ФИПИ — те же, что на экзамене
+							</div>
+							<div class="home-pitch__benefit">
+								<span class="home-pitch__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"></polyline></svg></span>
+								Автоматический разбор ошибок и работа над слабыми местами
+							</div>
+							<div class="home-pitch__benefit">
+								<span class="home-pitch__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"></polyline></svg></span>
+								Серия дней и рейтинг друзей — учиться вместе веселее
+							</div>
+						</div>
+						<div class="home-pitch__cta-row">
+							<a href="./login.html" class="home-pitch__cta">Начать бесплатно →</a>
+							<a href="./subject-chemistry.html" class="home-pitch__cta-outline">Химия ОГЭ — к темам</a>
+							<a href="./trial-chemistry.html" class="home-pitch__cta-ghost">Пробник 10 заданий</a>
+						</div>
+						<div class="home-pitch__trust">
+							<span>✓ Без карты</span>
+							<span>✓ <b>7 дней</b> пробного доступа</span>
+							<span>✓ Уже занимаются <b>2 000+</b> учеников</span>
+						</div>
+					</div>
+					<div class="home-pitch__stat" aria-hidden="true">
+						<div class="home-pitch__stat-num">30</div>
+						<div class="home-pitch__stat-unit">минут в день</div>
+						<div class="home-pitch__stat-label">хватит, чтобы дойти до пятёрки на ОГЭ</div>
+					</div>
+				</section>
+
+				<aside class="exam-countdown" id="exam-countdown" data-date="2026-06-02" aria-label="Сколько дней до ОГЭ">
+					<div class="exam-countdown__left">
+						<span class="exam-countdown__icon" aria-hidden="true">⏰</span>
+						<div class="exam-countdown__text">
+							До ОГЭ — <b id="exam-countdown-days">…</b>
+						</div>
+					</div>
+					<div class="exam-countdown__date" id="exam-countdown-date">основной период · 2 июня 2026</div>
+				</aside>
+
+				<section class="home-continue" id="home-continue" aria-live="polite">
+					<h2>Продолжить</h2>
+					<div class="home-continue__list" id="home-continue-root">
+						<p style="margin: 0; color: var(--muted); font-size: 14px">Загрузка…</p>
+					</div>
+				</section>
+
+				<div class="section-head">
+					<h2>Предметы</h2>
+					<p>Выберите направление</p>
+				</div>
+				<div class="subjects-grid">
+					<a href="./subject-chemistry.html" class="subject-card subject-card__hit">
+						<span class="subject-card__icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24">
+								<path d="M9 3h6M10 3v7L5 20a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-10V3M7 16h10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+						<span class="subject-card__meta">Доступно</span>
+						<div class="subject-card__title">Химия</div>
+						<p class="subject-card__desc">10 тем, разминка по номерам билета, банк ошибок, пробный и полный вариант.</p>
+						<span class="subject-card__link">Перейти →</span>
+					</a>
+
+					<div class="subject-card is--soon">
+						<span class="subject-card__icon" style="background: #e7f6ec; color: #2fa968" aria-hidden="true">
+							<svg viewBox="0 0 24 24">
+								<path d="M7 21c0-6 4-8 5-9M17 3c0 6-4 8-5 9M7 21c7 0 10-4 10-10M17 3C10 3 7 7 7 13" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+						<span class="subject-card__meta is--muted">Скоро</span>
+						<div class="subject-card__title">Биология</div>
+						<p class="subject-card__desc">Отдельный поток в разработке. Следите за обновлениями.</p>
+					</div>
+				</div>
+
+				<div class="section-head">
+					<h2>Как это устроено</h2>
+					<p>Три шага</p>
+				</div>
+				<div class="steps">
+					<div class="step">
+						<div class="step__num">1</div>
+						<h3>Тема и теория</h3>
+						<p>Откройте нужный блок в <a href="./subject-chemistry.html">курсе по химии</a>, читайте с фокусом на слоты ОГЭ.</p>
+					</div>
+					<div class="step">
+						<div class="step__num">2</div>
+						<h3>Разминка</h3>
+						<p>Закрепите материал в <a href="./warmup-chemistry.html">короткой тренировке</a> по выбранной теме или номерам части 1.</p>
+					</div>
+					<div class="step">
+						<div class="step__num">3</div>
+						<h3>Вариант</h3>
+						<p>
+							Проверьте себя в
+							<a href="./trial-chemistry.html">пробнике</a>
+							или полноформатном
+							<a href="./full-test-chemistry.html">тесте</a>
+							— результат сохранится локально.
+						</p>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<footer class="footer">
+			<div class="container footer__inner">
+				<span>© IQMO · 2026</span>
+				<span><a href="mailto:support@iqmo.ru">support@iqmo.ru</a> · <a href="./subject-chemistry.html">Химия ОГЭ</a></span>
+			</div>
+		</footer>
+
+		<script src="./iqmo-sync.js"></script>
+		<script src="./chem-progress.js"></script>
+		<script src="./iqmo-nav.js"></script>
+		<script>
+			(function () {
+				const TOPIC_PARTIAL = [
+					{ key: 'iqmo-chem-topic02-subtopics', href: './topic-atom-structure.html', label: 'Тема 02 · Строение атома' },
+					{ key: 'iqmo-chem-topic03-subtopics', href: './topic-chemical-bond.html', label: 'Тема 03 · Химическая связь' },
+					{ key: 'iqmo-chem-topic04-subtopics', href: './topic-inorganic-classes.html', label: 'Тема 04 · Классы неорганики' },
+					{ key: 'iqmo-chem-topic05-subtopics', href: './topic-chemical-reactions.html', label: 'Тема 05 · Реакции' },
+					{ key: 'iqmo-chem-topic06-subtopics', href: './topic-solutions-dissociation.html', label: 'Тема 06 · Растворы' },
+					{ key: 'iqmo-chem-topic07-subtopics', href: './topic-metals-compounds.html', label: 'Тема 07 · Металлы' },
+					{ key: 'iqmo-chem-topic08-subtopics', href: './topic-nonmetals-compounds.html', label: 'Тема 08 · Неметаллы' },
+					{ key: 'iqmo-chem-topic09-subtopics', href: './topic-organic-substances.html', label: 'Тема 09 · Органика' },
+					{ key: 'iqmo-chem-topic10-subtopics', href: './topic-life-ecology.html', label: 'Тема 10 · Экология' }
+				];
+
+				function trialContinue() {
+					try {
+						const raw = localStorage.getItem('iqmo-chem-trial-v1');
+						if (!raw) return null;
+						const s = JSON.parse(raw);
+						if (!s || s.finished) return null;
+						const nAns = Object.keys(s.answers || {}).length;
+						if ((s.current || 0) > 0 || nAns > 0) {
+							return {
+								href: './trial-chemistry.html',
+								text: 'Пробник: вопрос ' + Math.min(10, (s.current || 0) + 1) + ' из 10',
+								link: 'Продолжить'
+							};
+						}
+					} catch (e) {}
+					return null;
+				}
+
+				function partialTopicContinue() {
+					for (let i = 0; i < TOPIC_PARTIAL.length; i++) {
+						const t = TOPIC_PARTIAL[i];
+						try {
+							const raw = localStorage.getItem(t.key);
+							if (!raw) continue;
+							const a = JSON.parse(raw);
+							if (Array.isArray(a) && a.some(function (x) { return x === 1; })) {
+								return {
+									href: t.href,
+									text: t.label + ' — есть разделы «в процессе»',
+									link: 'Открыть тему'
+								};
+							}
+						} catch (e) {}
+					}
+					return null;
+				}
+
+				function modeRu(mode) {
+					if (mode === 'warmup') return 'Разминка';
+					if (mode === 'trial') return 'Пробник';
+					if (mode === 'full') return 'Полный вариант';
+					return mode || 'Тренировка';
+				}
+
+				function lastAttemptRow(loggedIn) {
+					if (!loggedIn || !window.ChemProgress) return null;
+					const la = ChemProgress.getLastAttempt();
+					if (!la || la.subject !== 'chemistry') return null;
+					const when = ChemProgress.formatRelativeTime(la.finishedAt);
+					const bit = (la.label ? la.label + ' · ' : '') + la.correct + ' / ' + la.total + ' (' + la.percent + '%) · ' + when;
+					return {
+						href: './profile.html',
+						text: modeRu(la.mode) + ': ' + bit,
+						link: 'Профиль'
+					};
+				}
+
+				function rowEl(item) {
+					return (
+						'<div class="home-continue__row">' +
+						'<p>' +
+						item.text +
+						'</p>' +
+						'<a href="' +
+						item.href +
+						'">' +
+						item.link +
+						'</a>' +
+						'</div>'
+					);
+				}
+
+				const root = document.getElementById('home-continue-root');
+				const wrap = document.getElementById('home-continue');
+				if (!root || !wrap) return;
+
+				function paintHomeContinue(loggedIn) {
+					const rows = [];
+					const t = trialContinue();
+					if (t) rows.push(t);
+					const p = partialTopicContinue();
+					if (p) rows.push(p);
+					const l = lastAttemptRow(loggedIn);
+					if (l) rows.push(l);
+
+					if (rows.length === 0) {
+						wrap.classList.add('is--empty');
+						root.innerHTML =
+							'<p style="margin:0">Пока нет сохранённого прогресса в этом браузере. Начните с курса по химии или пробника — тогда здесь появятся быстрые ссылки.</p>';
+					} else {
+						wrap.classList.remove('is--empty');
+						root.innerHTML = rows.map(rowEl).join('');
+					}
+				}
+
+				paintHomeContinue(false);
+				if (window.__iqmoAuthReady) {
+					window.__iqmoAuthReady
+						.then(function (ok) {
+							paintHomeContinue(!!ok);
+						})
+						.catch(function () {
+							paintHomeContinue(false);
+						});
+				}
+			})();
+		</script>
+		<script>
+			(function () {
+				var el = document.getElementById('exam-countdown');
+				var out = document.getElementById('exam-countdown-days');
+				if (!el || !out) return;
+				var raw = el.getAttribute('data-date') || '';
+				var target = new Date(raw + 'T08:00:00+03:00');
+				if (isNaN(target.getTime())) {
+					el.hidden = true;
+					return;
+				}
+				var now = new Date();
+				var diffMs = target.getTime() - now.getTime();
+				var days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+				if (days < 0) {
+					out.textContent = 'экзамен прошёл';
+					return;
+				}
+				function plural(n, forms) {
+					var n10 = n % 10, n100 = n % 100;
+					if (n10 === 1 && n100 !== 11) return forms[0];
+					if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return forms[1];
+					return forms[2];
+				}
+				out.textContent = days + ' ' + plural(days, ['день', 'дня', 'дней']);
+			})();
+		</script>
+	</body>
+</html>

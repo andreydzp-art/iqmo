@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<!-- Yandex.Metrika counter -->
+		<script type="text/javascript">
+		    (function(m,e,t,r,i,k,a){
+		        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+		        m[i].l=1*new Date();
+		        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+		        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+		    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108770166', 'ym');
+
+		    ym(108770166, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+		</script>
+		<noscript><div><img src="https://mc.yandex.ru/watch/108770166" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+		<!-- /Yandex.Metrika counter -->
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO — Работа над ошибками · Химия</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f3f5f8;
+				--ink: #11141a;
+				--ink-2: #2a2f38;
+				--muted: #6b7280;
+				--line: #e6e9ef;
+				--card: #ffffff;
+				--dark: #1f2430;
+				--accent: #4f7bd6;
+				--green: #3ec37a;
+				--green-dk: #2fa968;
+				--green-bg: #e7f6ec;
+				--red: #d65a5a;
+				--red-dk: #b64141;
+				--red-bg: #fbe8e8;
+				--amber: #e39b2a;
+				--amber-dk: #b57212;
+				--amber-bg: #fbf0d9;
+				--radius: 18px;
+				--shadow: 0 1px 2px rgba(17,20,26,.04), 0 8px 24px -12px rgba(17,20,26,.08);
+			}
+			* { box-sizing: border-box; }
+			html, body { margin: 0; padding: 0; }
+			body {
+				font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+				color: var(--ink); background: var(--bg);
+				font-size: 16px; line-height: 1.55;
+				-webkit-font-smoothing: antialiased;
+				min-height: 100vh; display: flex; flex-direction: column;
+			}
+			a { color: inherit; text-decoration: none; }
+			button { font-family: inherit; cursor: pointer; border: 0; background: none; }
+			p { margin: 0; }
+			h1, h2, h3 { margin: 0; }
+
+			.container { width: 100%; max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+			/* ---- top ---- */
+			.topbar {
+				background: linear-gradient(135deg, #e39b2a 0%, #c77d13 100%);
+				color: #fff; padding: 18px 0;
+			}
+			.topbar__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+			.topbar__left { display: flex; align-items: center; gap: 14px; }
+			.topbar__icon {
+				width: 40px; height: 40px; border-radius: 12px;
+				background: rgba(255,255,255,.15); display: inline-flex; align-items: center; justify-content: center;
+			}
+			.topbar__title { font-size: 15px; opacity: .85; letter-spacing: .02em; }
+			.topbar__subj { font-size: 18px; font-weight: 800; }
+			.btn-quit {
+				padding: 9px 14px; border-radius: 10px;
+				background: rgba(255,255,255,.12); color: #fff; font-weight: 600; font-size: 14px;
+				transition: background .15s;
+			}
+			.btn-quit:hover { background: rgba(255,255,255,.22); }
+			.topbar__nav {
+				display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end;
+			}
+			.topbar__nav .nav-pill {
+				padding: 9px 14px; border-radius: 10px;
+				background: rgba(255,255,255,.12); color: #fff; font-weight: 600; font-size: 14px;
+				transition: background .15s;
+				border: 0; cursor: pointer; font-family: inherit; text-decoration: none;
+				display: inline-flex; align-items: center; justify-content: center;
+			}
+			.topbar__nav .nav-pill:hover { background: rgba(255,255,255,.22); }
+
+			/* ---- progress chips ---- */
+			.chips {
+				display: flex; gap: 6px; padding: 18px 0 0;
+				justify-content: center; flex-wrap: wrap;
+			}
+			.chip {
+				width: 30px; height: 6px; border-radius: 999px; background: rgba(255,255,255,.25);
+				transition: background .25s;
+			}
+			.chip.is--current { background: #fff; }
+			.chip.is--ok { background: var(--green); }
+			.chip.is--wrong { background: var(--red); }
+
+			/* ---- toolbar ---- */
+			.toolbar {
+				margin: 22px 0 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+			}
+			.toolbar__count {
+				font-size: 14px; color: var(--muted); white-space: nowrap; flex-shrink: 0;
+			}
+			.toolbar__count b { color: var(--ink); font-weight: 700; }
+			.filter {
+				display: flex; gap: 6px; background: #fff;
+				border: 1px solid var(--line); border-radius: 999px;
+				padding: 4px;
+			}
+			.filter button {
+				padding: 7px 14px; border-radius: 999px;
+				font-size: 13px; font-weight: 600; color: var(--muted);
+			}
+			.filter button.is--on { background: var(--ink); color: #fff; }
+			.filter button:hover:not(.is--on) { color: var(--ink); }
+
+			/* ---- main ---- */
+			.page__main { flex: 1; padding: 22px 0 48px; }
+
+			/* ---- question card ---- */
+			.q-card {
+				background: var(--card); border: 1px solid var(--line);
+				border-radius: var(--radius); box-shadow: var(--shadow);
+				padding: 28px 30px;
+			}
+			.q-meta {
+				display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+				font-size: 12px; color: var(--muted);
+				margin-bottom: 12px;
+			}
+			.q-meta__tag {
+				padding: 5px 10px; border-radius: 999px;
+				background: var(--amber-bg); color: var(--amber-dk);
+				font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+				font-size: 11px;
+			}
+			.q-meta__src {
+				padding: 5px 10px; border-radius: 999px;
+				background: #eef1f6; color: var(--ink-2);
+				font-weight: 600;
+			}
+			.q-meta__attempts {
+				color: var(--muted);
+			}
+			.q-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+
+			/* ---- hint banner (shown BEFORE answer) ---- */
+			.hint-banner {
+				margin: 14px 0 18px; padding: 14px 16px;
+				background: #eef4fe; border-radius: 12px; border-left: 3px solid var(--accent);
+				font-size: 14px; line-height: 1.55; color: #1f3d76;
+			}
+			.hint-banner__head {
+				display: flex; align-items: center; gap: 8px;
+				font-weight: 700; margin-bottom: 4px;
+			}
+			.hint-banner__head svg { color: var(--accent); }
+
+			.q-body { font-size: 16px; color: var(--ink-2); line-height: 1.6; margin-top: 10px; }
+			.q-body p { margin: 0 0 10px; }
+
+			/* ---- options ---- */
+			.options { display: flex; flex-direction: column; gap: 10px; margin: 18px 0 4px; }
+			.option {
+				display: flex; align-items: center; gap: 14px;
+				padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 12px;
+				background: #fff; cursor: pointer; transition: all .15s;
+				font-size: 15px;
+			}
+			.option:hover { border-color: #c8d3e4; }
+			.option.is--checked { border-color: var(--accent); background: #f5f8fd; }
+			.option__marker {
+				width: 28px; height: 28px; flex-shrink: 0;
+				display: inline-flex; align-items: center; justify-content: center;
+				border-radius: 8px; background: #eef1f6; color: var(--ink-2);
+				font-weight: 700; font-size: 13px;
+			}
+			.option.is--checked .option__marker { background: var(--accent); color: #fff; }
+			.option.is--correct { border-color: var(--green); background: #f3faf5; }
+			.option.is--correct .option__marker { background: var(--green); color: #fff; }
+			.option.is--incorrect { border-color: var(--red); background: #fdf5f5; }
+			.option.is--incorrect .option__marker { background: var(--red); color: #fff; }
+			.option.is--locked { cursor: default; }
+
+			/* ---- input ---- */
+			.answer-input { margin: 18px 0 4px; }
+			.answer-input label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+			.answer-input input {
+				width: 100%; padding: 14px 16px; font-size: 16px; font-family: inherit;
+				border: 1.5px solid var(--line); border-radius: 12px; background: #fff;
+			}
+			.answer-input input:focus { outline: none; border-color: var(--accent); }
+			.answer-input input.is--correct { border-color: var(--green); background: #f3faf5; }
+			.answer-input input.is--incorrect { border-color: var(--red); background: #fdf5f5; }
+
+			/* ---- match ---- */
+			.match {
+				display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; margin: 18px 0 4px;
+				align-items: center;
+			}
+			.match__left { font-size: 15px; color: var(--ink); }
+			.match__select {
+				padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 10px;
+				font-family: inherit; font-size: 15px; background: #fff; cursor: pointer;
+				min-width: 220px;
+			}
+			.match__select:focus { outline: none; border-color: var(--accent); }
+
+			/* ---- feedback ---- */
+			.feedback {
+				margin-top: 18px; padding: 14px 16px; border-radius: 12px;
+				font-size: 14px; line-height: 1.55;
+				display: none;
+			}
+			.feedback.is--shown { display: block; }
+			.feedback--ok    { background: var(--green-bg); color: #1e6f40; }
+			.feedback--wrong { background: var(--red-bg);   color: var(--red-dk); }
+			.feedback__head {
+				display: flex; align-items: center; gap: 8px;
+				font-weight: 700; font-size: 15px; margin-bottom: 6px;
+			}
+			.feedback__correct {
+				margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,.08);
+				font-size: 13px;
+			}
+			.feedback__correct b { font-weight: 700; }
+
+			/* ---- actions ---- */
+			.q-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+			.btn {
+				padding: 12px 22px; border-radius: 12px;
+				font-weight: 700; font-size: 15px; transition: all .15s;
+				display: inline-flex; align-items: center; gap: 8px;
+			}
+			.btn--primary {
+				background: var(--ink); color: #fff;
+			}
+			.btn--primary:hover { background: var(--dark); }
+			.btn--primary:disabled { background: #c8ccd4; cursor: not-allowed; }
+			.btn--ghost {
+				background: #fff; color: var(--ink); border: 1.5px solid var(--line);
+			}
+			.btn--ghost:hover { background: #f7f9fc; }
+			.btn--green {
+				background: var(--green-dk); color: #fff;
+			}
+			.btn--green:hover { background: #26894f; }
+			.btn--amber {
+				background: var(--amber); color: #fff;
+			}
+			.btn--amber:hover { background: var(--amber-dk); }
+
+			/* ---- empty state ---- */
+			.empty {
+				background: var(--card); border: 1px solid var(--line);
+				border-radius: var(--radius); box-shadow: var(--shadow);
+				padding: 64px 32px; text-align: center;
+			}
+			.empty__icon {
+				width: 88px; height: 88px; margin: 0 auto 20px;
+				border-radius: 999px; background: var(--green-bg);
+				display: inline-flex; align-items: center; justify-content: center;
+				color: var(--green-dk);
+			}
+			.empty__title { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+			.empty__text { color: var(--muted); font-size: 15px; max-width: 440px; margin: 0 auto 24px; }
+
+			/* ---- finish screen ---- */
+			.final {
+				background: var(--card); border: 1px solid var(--line);
+				border-radius: var(--radius); box-shadow: var(--shadow);
+				padding: 48px 32px; text-align: center;
+			}
+			.final__emoji { font-size: 52px; margin-bottom: 12px; }
+			.final__title { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+			.final__note { color: var(--muted); font-size: 15px; margin: 14px auto 28px; max-width: 440px; }
+			.final__actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+			@media (max-width: 600px) {
+				.q-card { padding: 22px 18px; }
+				.match { grid-template-columns: 1fr; }
+				.match__select { width: 100%; min-width: 0; }
+				.topbar__title { display: none; }
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="topbar">
+			<div class="container topbar__row">
+				<div class="topbar__left">
+					<div class="topbar__icon">
+						<!-- AlertTriangle icon -->
+						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+					</div>
+					<div>
+						<div class="topbar__title">Химия · ОГЭ 2026</div>
+						<div class="topbar__subj">Работа над ошибками</div>
+					</div>
+				</div>
+				<div class="topbar__nav">
+					<a href="/login.html" class="nav-pill" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="nav-pill" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="nav-pill" id="iqmo-nav-logout" hidden>Выйти</button>
+					<a href="./subject-chemistry.html" class="btn-quit">К курсу</a>
+				</div>
+			</div>
+			<div class="container">
+				<div class="chips" id="chips"></div>
+			</div>
+		</header>
+
+		<main class="page__main">
+			<div class="container" id="stage"></div>
+		</main>
+
+		<script src="./chemistry-bank.js"></script>
+		<script src="./chemistry-cat01-source.js?v=9"></script>
+		<script src="./chemistry-cat03-source.js?v=9"></script>
+		<script src="./chemistry-cat04-source.js?v=9"></script>
+		<script src="./chemistry-cat04-custom-source.js?v=9"></script>
+		<script src="./chemistry-cat05-source.js?v=9"></script>
+		<script src="./chemistry-cat06-source.js?v=9"></script>
+		<script src="./chemistry-cat06-custom-source.js?v=9"></script>
+		<script src="./chemistry-cat07-source.js?v=9"></script>
+		<script src="./chemistry-cat08-source.js?v=9"></script>
+		<script src="./chemistry-cat09-source.js?v=9"></script>
+		<script src="./chemistry-cat11-source.js?v=9"></script>
+		<script src="./chemistry-cat12-source.js?v=9"></script>
+		<script src="./chemistry-cat13-source.js?v=9"></script>
+		<script src="./chemistry-cat10-source.js?v=9"></script>
+		<script src="./chemistry-cat14-source.js?v=9"></script>
+		<script src="./chemistry-cat15-source.js?v=9"></script>
+		<script src="./chemistry-cat16-source.js?v=9"></script>
+		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
+		<script src="./mistakes-store.js"></script>
+		<script>
+			// ============================================================
+			// SETUP
+			// ============================================================
+			const ALL_QUESTIONS = window.CHEMISTRY_QUESTIONS || [];
+			const BY_ID = new Map(ALL_QUESTIONS.map(q => [q.id, q]));
+
+			const TYPE_LABELS = {
+				single: 'один ответ',
+				multi:  'несколько ответов',
+				input:  'число',
+				match:  'соответствие'
+			};
+
+			const state = {
+				filter: 'all',     // 'all' | 'single' | 'multi' | 'input' | 'match'
+				queue: [],         // снимок текущих отфильтрованных записей
+				idx: 0,
+				given: null,
+				checked: false,
+				correct: false,
+				solvedInSession: 0,
+				failedInSession: 0
+			};
+
+			function loadQueue() {
+				const mistakes = window.MistakesStore.list();
+				// hydrate with question objects
+				let items = mistakes
+					.map(m => ({ m, q: BY_ID.get(m.qid) }))
+					.filter(x => x.q);
+				if (state.filter !== 'all') {
+					items = items.filter(x => x.q.type === state.filter);
+				}
+				// sort: most recent last seen first (newest mistakes first)
+				items.sort((a, b) => (b.m.lastDate || '').localeCompare(a.m.lastDate || ''));
+				return items;
+			}
+
+			function refreshQueue(keepIdx) {
+				state.queue = loadQueue();
+				if (!keepIdx) state.idx = 0;
+				state.given = null;
+				state.checked = false;
+				state.correct = false;
+			}
+
+			// ============================================================
+			// RENDER
+			// ============================================================
+			const elStage = document.getElementById('stage');
+			const elChips = document.getElementById('chips');
+
+			function formatDate(iso) {
+				if (!iso) return '';
+				const d = new Date(iso);
+				const months = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+				return `${d.getDate()} ${months[d.getMonth()]}`;
+			}
+
+			function checkAnswer(q, given) {
+				if (given === null || given === undefined || given === '' ||
+					(Array.isArray(given) && given.filter(x => x).length === 0)) return false;
+				const correct = q.correct;
+				if (Array.isArray(correct)) {
+					if (q.type === 'match') {
+						const g = (Array.isArray(given) ? given : []).map(x => x || '').join(',');
+						return g === correct.join(',');
+					}
+					const g = (Array.isArray(given) ? [...given] : []).sort().join(',');
+					return g === [...correct].sort().join(',');
+				}
+				return String(given).trim().toLowerCase() === String(correct).trim().toLowerCase();
+			}
+
+			function formatCorrect(q) {
+				if (q.type === 'match') {
+					return q.matchLeft.map((l, i) => `${l.letter} → ${q.correct[i]}`).join(', ');
+				}
+				if (Array.isArray(q.correct)) return [...q.correct].sort().join('');
+				return String(q.correct);
+			}
+
+			function renderChips() {
+				elChips.innerHTML = '';
+				const total = state.queue.length;
+				if (total === 0) return;
+				const MAX = 20; // не перегружаем шапку
+				const show = Math.min(total, MAX);
+				for (let i = 0; i < show; i++) {
+					const chip = document.createElement('span');
+					chip.className = 'chip';
+					if (i < state.idx) chip.classList.add('is--ok');
+					else if (i === state.idx) chip.classList.add('is--current');
+					elChips.appendChild(chip);
+				}
+				if (total > MAX) {
+					const more = document.createElement('span');
+					more.style.cssText = 'color: rgba(255,255,255,.7); font-size: 12px; font-weight: 600; margin-left: 6px;';
+					more.textContent = `+${total - MAX}`;
+					elChips.appendChild(more);
+				}
+			}
+
+			function renderToolbar() {
+				const list = window.MistakesStore.list();
+				const counts = {
+					all: list.length,
+					single: 0, multi: 0, input: 0, match: 0
+				};
+				list.forEach(m => {
+					const q = BY_ID.get(m.qid);
+					if (q && counts[q.type] !== undefined) counts[q.type]++;
+				});
+				return `
+					<div class="toolbar">
+						<div class="toolbar__count">В банке ошибок: <b>${list.length}</b></div>
+						<div class="filter" id="filter">
+							<button data-f="all"    class="${state.filter==='all'?'is--on':''}">Все · ${counts.all}</button>
+							<button data-f="single" class="${state.filter==='single'?'is--on':''}">Один ответ · ${counts.single}</button>
+							<button data-f="multi"  class="${state.filter==='multi'?'is--on':''}">Много · ${counts.multi}</button>
+							<button data-f="input"  class="${state.filter==='input'?'is--on':''}">Число · ${counts.input}</button>
+							<button data-f="match"  class="${state.filter==='match'?'is--on':''}">Соответствие · ${counts.match}</button>
+						</div>
+					</div>
+				`;
+			}
+
+			function render() {
+				const all = window.MistakesStore.list();
+				if (all.length === 0) return renderEmpty();
+				if (state.queue.length === 0) return renderFinished();
+
+				const item = state.queue[state.idx];
+				if (!item) return renderFinished();
+
+				const { q, m } = item;
+				const n = state.idx + 1;
+				const total = state.queue.length;
+
+				const pickedSet = new Set(Array.isArray(state.given) ? state.given : (state.given ? [state.given] : []));
+
+				let inputHtml = '';
+				if (q.type === 'single' || q.type === 'multi') {
+					inputHtml = `<div class="options">
+						${q.options.map(o => {
+							let cls = 'option';
+							if (pickedSet.has(o.id)) cls += ' is--checked';
+							if (state.checked) {
+								cls += ' is--locked';
+								const isRight = Array.isArray(q.correct) ? q.correct.includes(o.id) : q.correct === o.id;
+								if (isRight) cls += ' is--correct';
+								else if (pickedSet.has(o.id)) cls += ' is--incorrect';
+							}
+							return `<label class="${cls}" data-id="${o.id}">
+								<span class="option__marker">${o.id}</span>
+								<span>${o.label}</span>
+							</label>`;
+						}).join('')}
+					</div>`;
+				}
+				else if (q.type === 'input') {
+					let cls = '';
+					if (state.checked) cls = state.correct ? 'is--correct' : 'is--incorrect';
+					inputHtml = `<div class="answer-input">
+						<label for="ans">Ответ</label>
+						<input id="ans" type="text" inputmode="numeric" autocomplete="off"
+							value="${(state.given || '').toString().replace(/"/g,'&quot;')}"
+							placeholder="${q.placeholder || 'введите число'}"
+							class="${cls}"
+							${state.checked ? 'readonly' : ''} />
+					</div>`;
+				}
+				else if (q.type === 'match') {
+					const arr = Array.isArray(state.given) ? state.given : [];
+					inputHtml = `<div class="match">
+						${q.matchLeft.map((l, i) => `
+							<div class="match__left"><b>${l.letter})</b> ${l.label}</div>
+							<select class="match__select" data-idx="${i}" ${state.checked?'disabled':''}>
+								<option value="">—</option>
+								${q.matchRight.map(r => `<option value="${r.id}" ${arr[i]===r.id?'selected':''}>${r.id}) ${r.label}</option>`).join('')}
+							</select>
+						`).join('')}
+					</div>`;
+				}
+
+				let actionHtml = '';
+				if (!state.checked) {
+					actionHtml = `<button type="button" class="btn btn--primary" id="btn-check" disabled>Проверить</button>`;
+				} else if (state.correct) {
+					const hasNext = state.idx < state.queue.length - 1;
+					actionHtml = `<button type="button" class="btn btn--green" id="btn-next">
+						${hasNext ? 'Следующая ошибка →' : 'Завершить →'}
+					</button>`;
+				} else {
+					// Ошибся снова — можно попробовать ещё раз (не движемся вперёд)
+					actionHtml = `
+						<button type="button" class="btn btn--ghost" id="btn-retry">Попробовать ещё раз</button>
+						<button type="button" class="btn btn--amber" id="btn-skip">Пропустить пока →</button>
+					`;
+				}
+
+				const feedback = state.checked ? `
+					<div class="feedback is--shown ${state.correct ? 'feedback--ok' : 'feedback--wrong'}">
+						<div class="feedback__head">
+							${state.correct
+								? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Верно! Задание удалено из ошибок.'
+								: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Ещё раз ошиблись'}
+						</div>
+						${!state.correct ? `<div class="feedback__correct"><b>Правильный ответ:</b> ${formatCorrect(q)}</div>` : ''}
+					</div>
+				` : '';
+
+				elStage.innerHTML = `
+					${renderToolbar()}
+					<div class="q-card">
+						<div class="q-meta">
+							<span class="q-meta__tag">Ошибка ${n} из ${total}</span>
+							<span class="q-meta__src">Из: ${m.sourceLabel} · ${formatDate(m.lastDate)}</span>
+							${m.attempts > 1 ? `<span class="q-meta__attempts">Попыток: ${m.attempts}</span>` : ''}
+						</div>
+						<h1 class="q-title">${q.title}</h1>
+
+						${q.hint ? `
+							<div class="hint-banner">
+								<div class="hint-banner__head">
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z"/></svg>
+									Подсказка
+								</div>
+								${q.hint}
+							</div>
+						` : ''}
+
+						<div class="q-body">${q.body}</div>
+						${inputHtml}
+						${feedback}
+						<div class="q-foot">
+							<div></div>
+							<div style="display:flex; gap:8px;">${actionHtml}</div>
+						</div>
+					</div>
+				`;
+
+				wire(q);
+				renderChips();
+			}
+
+			function wire(q) {
+				// filter buttons
+				const filterEl = document.getElementById('filter');
+				if (filterEl) {
+					filterEl.querySelectorAll('button').forEach(b => {
+						b.addEventListener('click', () => {
+							state.filter = b.dataset.f;
+							refreshQueue(false);
+							render();
+						});
+					});
+				}
+
+				if (q.type === 'single' || q.type === 'multi') {
+					elStage.querySelectorAll('.option').forEach(el => {
+						el.addEventListener('click', () => {
+							if (state.checked) return;
+							const id = el.dataset.id;
+							if (q.type === 'single') {
+								state.given = id;
+							} else {
+								const cur = new Set(Array.isArray(state.given) ? state.given : []);
+								if (cur.has(id)) cur.delete(id);
+								else {
+									if (q.pickCount && cur.size >= q.pickCount) {
+										cur.delete(cur.values().next().value);
+									}
+									cur.add(id);
+								}
+								state.given = Array.from(cur);
+							}
+							render();
+						});
+					});
+				}
+				else if (q.type === 'input') {
+					const inp = document.getElementById('ans');
+					if (inp) {
+						inp.addEventListener('input', () => {
+							state.given = inp.value.trim();
+							updateCheckBtn();
+						});
+					}
+				}
+				else if (q.type === 'match') {
+					elStage.querySelectorAll('.match__select').forEach(sel => {
+						sel.addEventListener('change', () => {
+							const cur = Array.isArray(state.given) ? [...state.given] : [];
+							cur[Number(sel.dataset.idx)] = sel.value;
+							state.given = cur;
+							updateCheckBtn();
+						});
+					});
+				}
+
+				const btnCheck = document.getElementById('btn-check');
+				if (btnCheck) {
+					btnCheck.addEventListener('click', () => {
+						if (!isGivenNonEmpty(q)) return;
+						state.correct = checkAnswer(q, state.given);
+						state.checked = true;
+						if (state.correct) {
+							state.solvedInSession++;
+							// 🎯 решил правильно — убираем из банка навсегда
+							try { window.MistakesStore.remove(q.id); } catch(e) {}
+						} else {
+							state.failedInSession++;
+							// помечаем ещё одну неудачную попытку
+							try { window.MistakesStore.add(q.id, item().m.source); } catch(e) {}
+						}
+						render();
+					});
+					updateCheckBtn();
+				}
+
+				const btnNext = document.getElementById('btn-next');
+				if (btnNext) {
+					btnNext.addEventListener('click', () => {
+						// поскольку решили верно — убрали из банка. Обновим queue, но не увеличиваем idx,
+						// т.к. текущий элемент уже исчез из списка, следующий сам "подъедет" на эту позицию.
+						const newQueue = loadQueue();
+						// Если новая очередь короче и idx выходит за границу — финиш
+						state.queue = newQueue;
+						if (state.idx >= state.queue.length) {
+							state.given = null; state.checked = false; state.correct = false;
+							return render(); // покажет renderFinished / renderEmpty
+						}
+						state.given = null; state.checked = false; state.correct = false;
+						render();
+					});
+				}
+
+				const btnRetry = document.getElementById('btn-retry');
+				if (btnRetry) {
+					btnRetry.addEventListener('click', () => {
+						state.given = null;
+						state.checked = false;
+						state.correct = false;
+						render();
+					});
+				}
+
+				const btnSkip = document.getElementById('btn-skip');
+				if (btnSkip) {
+					btnSkip.addEventListener('click', () => {
+						// Просто идём дальше, не трогая банк (ошибка там осталась)
+						state.idx++;
+						state.given = null;
+						state.checked = false;
+						state.correct = false;
+						if (state.idx >= state.queue.length) render();
+						else render();
+					});
+				}
+			}
+
+			function item() { return state.queue[state.idx]; }
+
+			function isGivenNonEmpty(q) {
+				const g = state.given;
+				if (g === null || g === undefined || g === '') return false;
+				if (Array.isArray(g)) {
+					if (q.type === 'match') return g.filter(Boolean).length === q.matchLeft.length;
+					return g.filter(Boolean).length > 0;
+				}
+				return true;
+			}
+
+			function updateCheckBtn() {
+				const btn = document.getElementById('btn-check');
+				if (!btn) return;
+				const q = state.queue[state.idx].q;
+				btn.disabled = !isGivenNonEmpty(q);
+			}
+
+			function renderEmpty() {
+				elStage.innerHTML = `
+					${renderToolbar()}
+					<div class="empty">
+						<div class="empty__icon">
+							<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+						</div>
+						<h1 class="empty__title">У вас пока нет ошибок</h1>
+						<p class="empty__text">Когда в каком-либо тесте вы ответите неправильно, задание появится здесь — чтобы к нему можно было вернуться и разобрать.</p>
+						<div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+							<a href="./warmup-chemistry.html" class="btn btn--ghost">Пройти разминку</a>
+							<a href="./trial-chemistry.html" class="btn btn--primary">Пробный вариант</a>
+						</div>
+					</div>
+				`;
+				elChips.innerHTML = '';
+			}
+
+			function renderFinished() {
+				const solved = state.solvedInSession;
+				const left = window.MistakesStore.list().length;
+				elStage.innerHTML = `
+					<div class="final">
+						<div class="final__emoji">${left === 0 ? '🎉' : '💪'}</div>
+						<h1 class="final__title">${left === 0 ? 'Все ошибки разобраны!' : 'Сессия завершена'}</h1>
+						<p class="final__note">
+							${solved > 0 ? `В этой сессии вы разобрали <b>${solved}</b> ${pluralize(solved, 'ошибку', 'ошибки', 'ошибок')}.` : 'В этой сессии вы не решили верно ни одной из показанных ошибок.'}
+							${left === 0
+								? ' Банк ошибок пуст.'
+								: ` Осталось <b>${left}</b> в банке ошибок.`}
+						</p>
+						<div class="final__actions">
+							${left > 0 ? '<button type="button" class="btn btn--primary" id="btn-continue">Продолжить разбор →</button>' : ''}
+							<a href="./subject-chemistry.html" class="btn btn--ghost">К предмету</a>
+						</div>
+					</div>
+				`;
+				elChips.innerHTML = '';
+				const cont = document.getElementById('btn-continue');
+				if (cont) {
+					cont.addEventListener('click', () => {
+						state.solvedInSession = 0;
+						state.failedInSession = 0;
+						refreshQueue(false);
+						render();
+					});
+				}
+			}
+
+			function pluralize(n, one, few, many) {
+				const mod10 = n % 10, mod100 = n % 100;
+				if (mod10 === 1 && mod100 !== 11) return one;
+				if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+				return many;
+			}
+
+			// ============================================================
+			// INIT
+			// ============================================================
+			refreshQueue(false);
+			render();
+		</script>
+	</body>
+</html>

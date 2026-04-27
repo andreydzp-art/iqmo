@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ru" class="page">
+	<head>
+		<!-- Yandex.Metrika counter -->
+		<script type="text/javascript">
+		    (function(m,e,t,r,i,k,a){
+		        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+		        m[i].l=1*new Date();
+		        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+		        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+		    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108770166', 'ym');
+
+		    ym(108770166, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+		</script>
+		<noscript><div><img src="https://mc.yandex.ru/watch/108770166" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+		<!-- /Yandex.Metrika counter -->
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IQMO — Строение атома · Химия ОГЭ</title>
+		<meta
+			name="description"
+			content="Курс для начинающих: из чего состоит атом, электронные слои, схема строения, как найти период и группу на ОГЭ. С чеклистом и разминкой."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--bg: #f3f5f8;
+				--ink: #11141a;
+				--ink-2: #2a2f38;
+				--muted: #6b7280;
+				--line: #e6e9ef;
+				--card: #ffffff;
+				--dark: #1f2430;
+				--accent: #4f7bd6;
+				--accent-weak: #eaf0fb;
+				--green: #3ec37a;
+				--amber: #e39b2a;
+				--red: #d65a5a;
+				--radius: 18px;
+				--shadow: 0 1px 2px rgba(17,20,26,.04), 0 8px 24px -12px rgba(17,20,26,.08);
+			}
+			* { box-sizing: border-box; }
+			html, body { margin: 0; padding: 0; }
+			body {
+				font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+				color: var(--ink); background: var(--bg);
+				font-size: 16px; line-height: 1.55;
+				-webkit-font-smoothing: antialiased;
+				min-height: 100vh; display: flex; flex-direction: column;
+			}
+			a { color: inherit; text-decoration: none; }
+			button { font-family: inherit; cursor: pointer; border: 0; background: none; }
+			h1, h2, h3, h4, p { margin: 0; }
+			.container { width: 100%; max-width: 1220px; margin: 0 auto; padding: 0 24px; }
+
+			.header { background: #fff; border-bottom: 1px solid var(--line); padding: 16px 0; position: sticky; top: 0; z-index: 20; }
+			.header__container { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+			.logo { font-weight: 800; letter-spacing: .04em; font-size: 18px; }
+			.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 15px; padding: 11px 20px; border-radius: 999px; border: 1.5px solid transparent; transition: .12s; cursor: pointer; white-space: nowrap; }
+			.btn:active { transform: translateY(1px); }
+			.btn--primary { background: linear-gradient(180deg, #44c77d, #2fa965); color: #fff; box-shadow: 0 8px 20px -8px rgba(62,195,122,.55); }
+			.btn--primary:hover { filter: brightness(1.05); }
+			.btn--ghost { background: #fff; border-color: var(--line); color: var(--ink); }
+			.btn--ghost:hover { border-color: var(--ink); }
+			[hidden] { display: none !important; }
+
+			.crumbs { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); padding: 16px 0 0; flex-wrap: wrap; }
+			.crumbs a:hover { color: var(--accent); }
+			.crumbs__sep { opacity: .5; }
+
+			.page__main { flex: 1; padding: 8px 0 72px; }
+
+			.thero {
+				background: linear-gradient(135deg, #2a3044 0%, #1f2430 100%);
+				color: #fff; border-radius: var(--radius); padding: 32px 32px 28px;
+				margin-top: 16px; position: relative; overflow: hidden;
+			}
+			.thero::after {
+				content: ''; position: absolute; right: -60px; top: -40px;
+				width: 260px; height: 260px; border-radius: 50%;
+				background: radial-gradient(circle, rgba(79,123,214,.3), transparent 70%);
+			}
+			.thero__tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #ffd166; margin-bottom: 10px; }
+			.thero__title { font-size: 32px; font-weight: 800; letter-spacing: -.015em; max-width: 720px; }
+			.thero__sub { margin-top: 10px; color: rgba(255,255,255,.7); font-size: 15px; max-width: 720px; }
+			.thero__grid { display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: end; margin-top: 22px; position: relative; z-index: 1; }
+			.thero__progress { max-width: 460px; }
+			.thero__progress-bar { height: 8px; background: rgba(255,255,255,.12); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+			.thero__progress-fill { height: 100%; background: linear-gradient(90deg, #44c77d, #6dd58f); border-radius: 999px; }
+			.thero__progress-meta { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,.7); margin-top: 8px; }
+			.thero__progress-meta b { color: #fff; font-weight: 700; }
+			.thero__cta { display: flex; gap: 10px; flex-wrap: wrap; }
+			.thero__cta .btn--ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.22); }
+			.thero__cta .btn--ghost:hover { border-color: #fff; }
+
+			.section { margin-top: 32px; }
+			.section-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+			.section-title h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+			.section-title p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+			.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); }
+
+			.actions-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+			.action-card {
+				background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+				padding: 20px; display: flex; gap: 14px; align-items: flex-start;
+				transition: .15s; cursor: pointer;
+			}
+			.action-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 8px 20px -12px rgba(79,123,214,.4); }
+			.action-card__ic {
+				width: 44px; height: 44px; flex: 0 0 44px; border-radius: 12px;
+				display: flex; align-items: center; justify-content: center;
+				background: var(--accent-weak); color: var(--accent);
+			}
+			.action-card__ic svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
+			.action-card.is--train .action-card__ic { background: #e7f6ec; color: var(--green); }
+			.action-card__title { font-size: 17px; font-weight: 700; }
+			.action-card__sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+			.dumb-callout {
+				background: #fff8ea; border: 1px solid #f5e0b8; border-radius: 12px;
+				padding: 14px 18px; margin: 14px 0; font-size: 14px; color: var(--ink-2);
+			}
+			.dumb-callout strong { color: var(--ink); }
+
+			.cheat-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
+			.cheat-table th, .cheat-table td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; }
+			.cheat-table th { background: #f7f8fb; font-weight: 700; }
+
+			.lesson-block { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-bottom: 14px; }
+			.lesson-block h3 { font-size: 17px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.01em; }
+			.lesson-block p, .lesson-block li { font-size: 15px; color: var(--ink-2); }
+			.lesson-block ul, .lesson-block ol { margin: 8px 0 0; padding-left: 22px; }
+			.lesson-block li { margin: 6px 0; }
+			.lesson-block a:not(.btn),
+			.dumb-callout a:not(.btn),
+			.cheat-table a:not(.btn) {
+				color: var(--accent);
+				font-weight: 600;
+				text-decoration: underline;
+				text-decoration-thickness: 1px;
+				text-underline-offset: 2px;
+			}
+			.lesson-block a:not(.btn):hover,
+			.dumb-callout a:not(.btn):hover,
+			.cheat-table a:not(.btn):hover {
+				color: #3d63b8;
+			}
+			.formula {
+				display: inline-block; margin-top: 10px; padding: 8px 12px;
+				background: #f7f8fb; border: 1px solid var(--line); border-radius: 8px;
+				font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+			}
+			.figure-img {
+				display: block; max-width: 100%; height: auto; margin: 16px auto;
+				border-radius: 12px; border: 1px solid var(--line);
+			}
+			.figure-cap { font-size: 13px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+			details.theory-acc {
+				background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				padding: 14px 18px; margin-bottom: 10px; transition: border-color .15s;
+			}
+			details.theory-acc[open] { border-color: var(--accent); }
+			details.theory-acc summary {
+				font-weight: 700; font-size: 15px; cursor: pointer; display: flex;
+				align-items: center; gap: 10px; list-style: none;
+			}
+			details.theory-acc summary::-webkit-details-marker { display: none; }
+			details.theory-acc summary::before {
+				content: ''; width: 8px; height: 8px; border-right: 2px solid var(--muted);
+				border-bottom: 2px solid var(--muted); transform: rotate(-45deg);
+				transition: transform .15s;
+			}
+			details.theory-acc[open] summary::before { transform: rotate(45deg); }
+			details.theory-acc .theory-content { margin-top: 12px; color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+			details.theory-acc .theory-content p + p { margin-top: 8px; }
+
+			.subtopics { display: flex; flex-direction: column; gap: 8px; }
+			.subtopic-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+			.subtopic-row .subtopic { flex: 1; min-width: 0; }
+			.subtopic-row > .btn { flex-shrink: 0; }
+			button.subtopic {
+				width: 100%; font: inherit; color: inherit; text-align: left;
+				display: flex; align-items: center; gap: 12px;
+				padding: 12px 14px; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				transition: .12s; cursor: pointer;
+			}
+			button.subtopic:hover { border-color: var(--accent); }
+			button.subtopic:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+			.subtopics-hint { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.45; }
+			.subtopic__check {
+				width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line);
+				flex: 0 0 22px; display: flex; align-items: center; justify-content: center;
+				color: #fff; background: #fff;
+			}
+			.subtopic.is--done .subtopic__check { background: var(--green); border-color: var(--green); }
+			.subtopic.is--partial .subtopic__check { background: var(--amber); border-color: var(--amber); }
+			.subtopic__name { flex: 1; font-weight: 600; font-size: 15px; }
+			.subtopic__meta { color: var(--muted); font-size: 13px; }
+			.subtopic__go { color: var(--muted); }
+			.subtopic:hover .subtopic__go { color: var(--accent); }
+
+			.related-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+			.related {
+				background: #fff; border: 1px solid var(--line); border-radius: 12px;
+				padding: 16px; display: flex; align-items: center; gap: 12px;
+				transition: .12s;
+			}
+			.related:hover { border-color: var(--accent); transform: translateY(-1px); }
+			.related__ic {
+				width: 38px; height: 38px; border-radius: 10px; background: var(--accent-weak); color: var(--accent);
+				display: flex; align-items: center; justify-content: center;
+			}
+			.related__ic svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+			.related__name { font-weight: 700; font-size: 15px; }
+			.related__meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+			.footer { background: #fff; border-top: 1px solid var(--line); padding: 24px 0; margin-top: 40px; font-size: 13px; color: var(--muted); }
+			.footer__row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+			@media (max-width: 900px) {
+				.thero { padding: 24px 22px; }
+				.thero__title { font-size: 26px; }
+				.thero__grid { grid-template-columns: 1fr; gap: 18px; }
+				.actions-row, .related-row { grid-template-columns: 1fr; }
+			}
+		</style>
+	</head>
+	<body data-iqmo-topic="atom-structure">
+		<header class="header">
+			<div class="container header__container">
+				<a href="./index.html" class="logo">IQMO</a>
+				<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+					<a href="./subject-chemistry.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;">← К предмету</a>
+					<a href="/login.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;" id="iqmo-nav-login">Вход</a>
+					<a href="./profile.html" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;" id="iqmo-nav-profile" hidden>Профиль</a>
+					<button type="button" class="btn btn--ghost" style="padding:9px 16px; font-size:14px;" id="iqmo-nav-logout" hidden>Выйти</button>
+				</div>
+			</div>
+		</header>
+
+		<main class="page__main">
+			<div class="container">
+				<nav class="crumbs">
+					<a href="./index.html">Главная</a>
+					<span class="crumbs__sep">/</span>
+					<a href="./index.html">Предметы</a>
+					<span class="crumbs__sep">/</span>
+					<a href="./subject-chemistry.html">Химия</a>
+					<span class="crumbs__sep">/</span>
+					<span>Строение атома</span>
+				</nav>
+
+				<section class="thero">
+					<div class="thero__tag">ТЕМА 02 · С НУЛЯ ДО ЗАДАЧ ОГЭ</div>
+					<div class="thero__title">Строение атома: объясняем «как для себя»</div>
+					<div class="thero__sub">
+						Если слова «электронный слой», «валентность» и «схема строения» пугают — эта страница разложит всё по полочкам: что где лежит в атоме, как читать рисунок из задания и как без паники найти период и группу. Теория длинная нарочно: можно идти сверху вниз и отмечать подтемы в чеклисте.
+					</div>
+					<div class="thero__grid">
+						<div class="thero__progress" id="thero-progress">
+							<div class="thero__progress-meta"><span id="thero-progress-label">Подтемы курса</span><b id="thero-progress-value">—</b></div>
+							<div class="thero__progress-bar"><div class="thero__progress-fill" id="thero-progress-fill" style="width:0%;"></div></div>
+							<div class="thero__progress-meta" style="margin-top:6px;"><span id="thero-progress-sub">Читайте блоки ниже или пройдите разминку.</span><span id="thero-progress-extra"></span></div>
+						</div>
+						<div class="thero__cta">
+							<a href="#oge-focus" class="btn btn--ghost">Фокус ОГЭ</a>
+							<a href="#from-zero" class="btn btn--ghost">Начать с «что такое атом»</a>
+							<a href="#train" class="btn btn--primary">К разминке →</a>
+						</div>
+					</div>
+				</section>
+
+				<section class="section" id="oge-focus" style="margin-top: 24px;">
+					<div class="section-title">
+						<h2>Фокус ОГЭ: строение атома в билете</h2>
+						<p>Слоты 4–6 и связь с темой 01</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Где это встречается</h3>
+						<p>На странице предмета строка <b>02</b> считается по слотам <b>4, 5 и 6</b> части 1 — обычно это <b>схема электронных слоёв</b>, число протонов и электронов, <b>период и группа</b> по рисунку, иногда изотопы и запись <sup>A</sup><sub>Z</sub>X. Периодическая система — отдельно: <a href="./topic-periodic-table.html?v=20260422">тема 01</a>, <a href="./warmup-chemistry.html?topic=periodic">разминка по таблице</a> (слоты <b>1–3</b>). <a href="./warmup-chemistry.html?topic=atom">Разминка по этой теме</a> в банке IQMO подбирает вопросы из номеров <b>2, 4, 5 и 6</b> части 1: к «атому» добавлен <b>2-й</b> слот, потому что в вариантах рядом с темой часто идут смежные задания про электроны и схему (это не отменяет, что <b>тема 01</b> на предмете — 1–3).</p>
+					</div>
+					<div class="card" style="padding: 20px;">
+						<p style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:10px;">Если в формулировке задания…</p>
+						<table class="cheat-table" style="margin-top:0;">
+							<thead>
+								<tr>
+									<th>Формулировка / ситуация</th>
+									<th>Сначала проверьте</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Схема: ядро +Z, слои с числами электронов</td>
+									<td>Число <b>слоёв</b> → период; сумма e⁻ на <b>внешнем</b> слое → группа (главная А) в типовых задачах.</td>
+								</tr>
+								<tr>
+									<td>«Число протонов / электронов / нейтронов»</td>
+									<td>Z = протоны = e⁻ в нейтральном атоме; A − Z = нейтроны (если дано A).</td>
+								</tr>
+								<tr>
+									<td>Ион X<sup>n±</sup></td>
+									<td>Протоны не меняются; электроны: катион − e⁻, анион + e⁻ относительно атома.</td>
+								</tr>
+								<tr>
+									<td>Электронная формула 1s²2s²2p⁴</td>
+									<td>Сложите e⁻ на внешнем слое для связи с группой; сверьте с Z.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="dumb-callout" style="margin-top:14px;">
+						<strong>Ловушки:</strong> перепутать <b>период</b> и <b>группу</b>; считать внешний слой не тот (ближайший к ядру vs дальний); забыть про <b>гелий</b> (2 e⁻ на внешнем, но группа VIII А). Закрепление: <a href="./warmup-chemistry.html?topic=atom">разминка темы 02</a>.
+					</div>
+				</section>
+
+				<div class="actions-row">
+					<a href="#oge-recipe" class="action-card">
+						<span class="action-card__ic"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></span>
+						<div>
+							<div class="action-card__title">Рецепт для задания №2</div>
+							<div class="action-card__sub">По шагам: период и группа по схеме</div>
+						</div>
+					</a>
+					<a href="#train" class="action-card is--train">
+						<span class="action-card__ic"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg></span>
+						<div>
+							<div class="action-card__title">Разминка по теме</div>
+							<div class="action-card__sub">5 вопросов из заданий 2, 4, 5, 6</div>
+						</div>
+					</a>
+				</div>
+
+				<section class="section" id="from-zero">
+					<div class="section-title">
+						<h2>1. Самое начало: что вообще такое атом</h2>
+						<p>Без лишних терминов</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Микроскопически маленькая «стройка»</h3>
+						<p>Представьте шарик, который <b>невозможно увидеть</b> даже в школьный микроскоп. Это и есть атом — <b>мельчайшая частица химического элемента</b>, которая сохраняет его свойства.</p>
+						<p>Углерод в графите и алмазе — это всё ещё атомы углерода, просто «склеенные» по-разному. Если разбить атом углерода на части помельче — это уже <b>не углерод</b> в химическом смысле.</p>
+						<div class="dumb-callout">
+							<strong>Главная мысль:</strong> элемент (водород, кислород, железо…) — это «сорт» атомов с одинаковым ядром. Атом — одна такая «единичка».
+						</div>
+					</div>
+					<div class="lesson-block">
+						<h3>Две большие части: ядро и электроны</h3>
+						<p><b>Ядро</b> — тяжёлый центр, там почти вся масса. В ядре сидят <b>протоны</b> (заряд «плюс») и <b>нейтроны</b> (без электрического заряда — «нейтральные»).</p>
+						<p>Вокруг ядра на большом расстоянии (по меркам атома) летают <b>электроны</b> — лёгкие частицы с зарядом «минус». Их как раз рисуют «облаками» или <b>электронными слоями</b> в учебниках.</p>
+						<ul>
+							<li><b>Протон:</b> заряд +1 (в условных единицах), масса ≈ 1 а.е.м.</li>
+							<li><b>Нейтрон:</b> заряд 0, масса ≈ 1 а.е.м.</li>
+							<li><b>Электрон:</b> заряд −1, масса почти нулевая по сравнению с протоном.</li>
+						</ul>
+						<p>В <b>нейтральном атоме</b> число электронов равно числу протонов — плюсы и минусы балансируют, атом снаружи «не злой».</p>
+						<span class="formula">Заряд ядра = +Z &nbsp;·&nbsp; число электронов в атоме = Z</span>
+					</div>
+				</section>
+
+				<section class="section" id="numbers-z-a">
+					<div class="section-title">
+						<h2>2. Цифры, которые любит ОГЭ</h2>
+						<p>Z, A и запись <sup>A</sup><sub>Z</sub>X</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Порядковый номер Z</h3>
+						<p><b>Z</b> (порядковый номер) — это <b>число протонов в ядре</b>. Оно же, в нейтральном атоме, равно <b>числу электронов</b>.</p>
+						<p>В Периодической системе у каждого квадратика сверху как раз написан порядковый номер. Например, у кислорода Z = 8 → значит, 8 протонов и 8 электронов в нейтральном атоме.</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Массовое число A и изотопы (коротко)</h3>
+						<p><b>A</b> — массовое число: <b>протоны + нейтроны</b> в ядре. Нейтроны «не меняют химию» элемента сильно, но меняют массу.</p>
+						<p>Атомы одного элемента с разным числом нейтронов называют <b>изотопами</b>. Для ОГЭ часто достаточно помнить: у водорода бывает протий, дейтерий, тритий — это изотопы водорода.</p>
+						<span class="formula">A = число протонов + число нейтронов</span>
+					</div>
+				</section>
+
+				<section class="section" id="layers">
+					<div class="section-title">
+						<h2>3. Где «живут» электроны: слои и подуровни</h2>
+						<p>То, что нужно, чтобы читать схемы</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Электронный слой (энергетический уровень)</h3>
+						<p>Слой номер <b>n</b> иногда называют просто «первый слой», «второй слой»… В ОГЭ это почти всегда совпадает с <b>номером периода</b> для элементов главных подгрупп, которые вам дают в задачах.</p>
+						<p>На одном слое может быть несколько «этажей» — это <b>подуровни</b> s, p, d, f. На ОГЭ в простых заданиях чаще всего показывают <b>s</b> и <b>p</b> на внешнем слое.</p>
+						<ul>
+							<li>Подуровень <b>s</b> — максимум <b>2</b> электрона.</li>
+							<li>Подуровень <b>p</b> — максимум <b>6</b> электронов.</li>
+							<li>Подуровень <b>d</b> — до 10 (у вас в задачах реже на схеме).</li>
+						</ul>
+					</div>
+					<div class="lesson-block">
+						<h3>Как «заполняют» электроны (уровень ОГЭ)</h3>
+						<p>Строгие правила (Паули, Гунт, Клечковский) вы выучите позже. Для экзамена важно другое:</p>
+						<ol>
+							<li>Сначала заполняют внутренние слои, потом внешние.</li>
+							<li>На схеме из задания вам уже <b>нарисовали результат</b> — ваша задача <b>прочитать</b>, сколько электронов на каждом слое.</li>
+							<li><b>Внешний слой</b> — тот, что дальше от ядра и реально участвует в «общении» с другими атомами.</li>
+						</ol>
+						<div class="dumb-callout">
+							<strong>Памятка:</strong> число электронов на <b>внешнем</b> слое у элементов главных подгрупп (кроме гелия) часто совпадает с <b>номером группы</b> — это ваша опора в заданиях №2–3.
+						</div>
+					</div>
+				</section>
+
+				<section class="section" id="sample-scheme">
+					<div class="section-title">
+						<h2>4. Как выглядит типичная схема в задании</h2>
+						<p>Пример из банка IQMO</p>
+					</div>
+					<div class="card" style="padding: 22px;">
+						<p style="font-size:15px; color:var(--ink-2); margin-bottom:12px;">На рисунке обычно: кружок ядра с зарядом <b>+Z</b>, внутри подпись «протоны», рядом слои с числом электронов. Посчитайте <b>сколько оболочек</b> и сколько электронов на самой внешней.</p>
+						<img class="figure-img" src="./img/chemistry-q2-electron-shells.png" width="360" alt="Схема: ядро +8, внутренний уровень 2 электрона, внешний 6 электронов" />
+						<p class="figure-cap">Пример: ядро +8, два слоя, на внешнем 6 электронов → период 2, группа VI A → кислород.</p>
+					</div>
+				</section>
+
+				<section class="section" id="oge-recipe">
+					<div class="section-title">
+						<h2>5. Рецепт: период и группа по схеме</h2>
+						<p>Делайте в том же порядке</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Шаг 1. Считаем электронные слои</h3>
+						<p>Сколько «колец» или строк в схеме — столько <b>энергетических уровней</b>. Это и есть <b>номер периода</b> (для типичных заданий ОГЭ).</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Шаг 2. Смотрим внешний слой</h3>
+						<p>Находим слой с <b>наибольшим n</b> (самый дальний от ядра). Складываем электроны на всех подуровнях этого слоя — это число <b>валентных электронов</b> в простых случаях.</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Шаг 3. Группа (главная подгруппа A)</h3>
+						<p>Для большинства элементов, которые вам дадут: <b>номер группы = число электронов на внешнем слое</b>. Исключения (гелий, переходные металлы) на ОГЭ обычно не подсовывают в таком же виде.</p>
+						<p>Римскую цифру VI в «VI группе» не пугайте: это просто «шестая».</p>
+					</div>
+					<div class="lesson-block">
+						<h3>Шаг 4. Проверка через Z</h3>
+						<p>Если в ядре написан заряд <b>+Z</b>, он должен совпасть с <b>порядковым номером</b> найденного элемента. Если не сходится — пересчитайте слои.</p>
+					</div>
+				</section>
+
+				<section class="section" id="more">
+					<div class="section-title">
+						<h2>6. Чуть глубже (по желанию)</h2>
+						<p>Раскрывайте блоки, когда освоите основу</p>
+					</div>
+					<details class="theory-acc">
+						<summary>Ионы: почему у атома меняется число электронов</summary>
+						<div class="theory-content">
+							<p>Атом может <b>отдать</b> электроны (катион, положительный ион) или <b>принять</b> (анион, отрицательный). Число протонов при этом не меняется — меняется только электронная оболочка.</p>
+							<p>Пример: Na → Na⁺ (отдал один электрон), Cl → Cl⁻ (принял один электрон).</p>
+						</div>
+					</details>
+					<details class="theory-acc">
+						<summary>Электронная конфигурация и «строчка» 1s²2s²2p⁴</summary>
+						<div class="theory-content">
+							<p>Это компактная запись: число перед s/p — номер слоя, надстрочный индекс — сколько электронов на подуровне. Например, 2p⁴ значит «на втором слое на подуровне p четыре электрона».</p>
+							<p>Для ОГЭ часто достаточно уметь связать такую строку с <b>числом внешних электронов</b> и периодом.</p>
+						</div>
+					</details>
+					<details class="theory-acc">
+						<summary>Связь с темой 01 (таблица Менделеева)</summary>
+						<div class="theory-content">
+							<p>Таблица упорядочивает элементы по возрастанию Z. Период говорит о слоях, группа (главная) — о внешних электронах. Поэтому темы 01 и 02 в экзамене почти всегда идут рядом.</p>
+							<p>Откройте <a href="./topic-periodic-table.html?v=20260422">интерактивную таблицу</a>, кликните элемент и сравните «период» с числом слоёв на типовой схеме.</p>
+						</div>
+					</details>
+				</section>
+
+				<section class="section" id="subtopics-section">
+					<div class="section-title">
+						<h2>Подтемы · чеклист</h2>
+						<p>Три нажатия по строке: не начато → в процессе → освоено</p>
+					</div>
+					<div class="subtopics" id="subtopics-root" aria-label="Чеклист подтем темы 02"></div>
+					<p class="subtopics-hint">Прогресс хранится только в вашем браузере. Кнопка «к разделу» прокручивает к нужному блоку.</p>
+				</section>
+
+				<section class="section" id="train">
+					<div class="card" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; background: linear-gradient(135deg, #eaf0fb 0%, #f7f8fb 100%); border-color: transparent;">
+						<div style="flex:1; min-width:260px;">
+							<div style="font-size: 12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color: var(--accent); margin-bottom:6px;">Тренировка</div>
+							<h3 style="font-size: 22px; font-weight: 800; letter-spacing:-.01em;">Закрепить «Строение атома»</h3>
+							<p style="color: var(--muted); margin-top:6px; font-size:14px;">5 вопросов из заданий, близких к теме (№2, 4, 5, 6 в номерации части 1). Можно проходить несколько раз — вопросы перемешиваются.</p>
+						</div>
+						<div style="display:flex; gap:10px; flex-wrap: wrap;">
+							<a href="./warmup-chemistry.html" class="btn btn--ghost" style="background:#fff;">Любая разминка</a>
+							<a href="./warmup-chemistry.html?topic=atom" class="btn btn--primary">Разминка только по теме 02 →</a>
+						</div>
+					</div>
+				</section>
+
+				<section class="section">
+					<div class="section-title">
+						<h2>Дальше по курсу</h2>
+					</div>
+					<div class="related-row">
+						<a href="./topic-chemical-bond.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h8M12 8v8"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/></svg></span>
+							<div>
+								<div class="related__name">Тема 03 · Химическая связь</div>
+								<div class="related__meta">Ионная, ковалентная, металлическая</div>
+							</div>
+						</a>
+						<a href="./topic-periodic-table.html?v=20260422" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+							<div>
+								<div class="related__name">Тема 01 · Периодическая система</div>
+								<div class="related__meta">Связь схемы с таблицей Менделеева</div>
+							</div>
+						</a>
+					</div>
+					<div class="related-row" style="margin-top:12px;">
+						<a href="./mistakes-chemistry.html" class="related">
+							<span class="related__ic"><svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/><path d="M3 9h3M3 15h3M18 9h3M18 15h3M9 3v3M15 3v3M9 18v3M15 18v3"/></svg></span>
+							<div>
+								<div class="related__name">Работа над ошибками</div>
+								<div class="related__meta">Разбор промахов из тестов</div>
+							</div>
+						</a>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<footer class="footer">
+			<div class="container footer__row">
+				<span>© IQMO · 2026</span>
+				<span>Химия · ОГЭ · Тема 02 · Строение атома</span>
+			</div>
+		</footer>
+
+		<script src="./iqmo-sync.js"></script>
+		<script src="./iqmo-nav.js"></script>
+		<script src="./chem-progress.js"></script>
+		<script src="./mistakes-store.js"></script>
+		<script src="./chemistry-topic-map.js"></script>
+		<script>
+			(function () {
+				const SUBTOPIC_LS = 'iqmo-chem-topic02-subtopics';
+				const SUBTOPIC_ITEMS = [
+					{ name: 'Фокус ОГЭ: слоты 4–6', scroll: '#oge-focus' },
+					{ name: 'Что такое атом: ядро, протоны, нейтроны, электроны', scroll: '#from-zero' },
+					{ name: 'Порядковый номер Z и массовое число A', scroll: '#numbers-z-a' },
+					{ name: 'Электронные слои и подуровни (s, p, внешний слой)', scroll: '#layers' },
+					{ name: 'Чтение типовой схемы строения атома', scroll: '#sample-scheme' },
+					{ name: 'Алгоритм: период и группа по схеме (ОГЭ)', scroll: '#oge-recipe' }
+				];
+				const N_SUB = 6;
+
+				function readSubtopicState() {
+					try {
+						const raw = localStorage.getItem(SUBTOPIC_LS);
+						if (!raw) return Array(N_SUB).fill(0);
+						const a = JSON.parse(raw);
+						if (!Array.isArray(a)) return Array(N_SUB).fill(0);
+						const mapped = a.map(function (x) {
+							return x === 2 ? 2 : x === 1 ? 1 : 0;
+						});
+						if (mapped.length < N_SUB) return mapped.concat(Array(N_SUB - mapped.length).fill(0));
+						if (mapped.length > N_SUB) return mapped.slice(0, N_SUB);
+						return mapped;
+					} catch (e) {
+						return Array(N_SUB).fill(0);
+					}
+				}
+				function saveSubtopicState(st) {
+					try {
+						localStorage.setItem(SUBTOPIC_LS, JSON.stringify(st));
+					} catch (e) {}
+				}
+				function subtopicClass(st) {
+					if (st === 2) return 'is--done';
+					if (st === 1) return 'is--partial';
+					return '';
+				}
+				function renderSubtopics() {
+					const root = document.getElementById('subtopics-root');
+					if (!root) return;
+					const st = readSubtopicState();
+					root.innerHTML = SUBTOPIC_ITEMS.map(function (item, i) {
+						const status = st[i];
+						const cls = subtopicClass(status);
+						let checkInner = '';
+						if (status === 2) {
+							checkInner =
+								'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+						} else if (status === 1) {
+							checkInner =
+								'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+						}
+						const meta = status === 2 ? 'освоено' : status === 1 ? 'в процессе' : 'не отмечено';
+						return (
+							'<div class="subtopic-row">' +
+							'<button type="button" class="subtopic ' +
+							cls +
+							'" data-idx="' +
+							i +
+							'" aria-label="Статус подтемы: ' +
+							meta +
+							'. Нажмите, чтобы изменить.">' +
+							'<span class="subtopic__check">' +
+							checkInner +
+							'</span>' +
+							'<span class="subtopic__name">' +
+							item.name +
+							'</span>' +
+							'<span class="subtopic__meta">' +
+							meta +
+							'</span>' +
+							'<span class="subtopic__go" aria-hidden="true">→</span>' +
+							'</button>' +
+							'<a href="' +
+							item.scroll +
+							'" class="btn btn--ghost" style="padding:9px 14px; font-size:13px;">К разделу</a>' +
+							'</div>'
+						);
+					}).join('');
+					root.querySelectorAll('.subtopic[data-idx]').forEach(function (btn) {
+						btn.addEventListener('click', function () {
+							const idx = parseInt(btn.getAttribute('data-idx'), 10);
+							const cur = readSubtopicState();
+							cur[idx] = (cur[idx] + 1) % 3;
+							saveSubtopicState(cur);
+							renderSubtopics();
+							updateHeroFromSubtopics();
+						});
+					});
+				}
+				function updateHeroFromSubtopics() {
+					const st = readSubtopicState();
+					const done = st.filter(function (x) {
+						return x === 2;
+					}).length;
+					const partial = st.filter(function (x) {
+						return x === 1;
+					}).length;
+					const pct = Math.min(100, Math.round((done * 100 + partial * 45) / N_SUB));
+					const valEl = document.getElementById('thero-progress-value');
+					const fillEl = document.getElementById('thero-progress-fill');
+					const subEl = document.getElementById('thero-progress-sub');
+					const extraEl = document.getElementById('thero-progress-extra');
+					if (valEl) {
+						valEl.textContent =
+							done + ' из ' + N_SUB + ' освоено' + (partial ? ' · ' + partial + ' в процессе' : '');
+					}
+					if (fillEl) fillEl.style.width = pct + '%';
+					let sub = '';
+					let extra = '';
+					if (window.ChemProgress) {
+						const la = ChemProgress.getLastAttempt();
+						if (la && la.subject === 'chemistry') {
+							sub =
+								'Последний тест: ' +
+								la.correct +
+								'/' +
+								la.total +
+								' (' +
+								la.percent +
+								'%) · ' +
+								ChemProgress.formatRelativeTime(la.finishedAt);
+						}
+					}
+					if (!sub) sub = 'Пройдите разминку по теме или вариант — здесь появится сводка.';
+					if (window.MistakesStore && window.ChemTopicMap && typeof ChemTopicMap.belongsToWarmupTopic === 'function') {
+						const n = MistakesStore.list().filter(function (m) {
+							return ChemTopicMap.belongsToWarmupTopic(m.qid, 'atom');
+						}).length;
+						if (n > 0) {
+							const m10 = n % 10,
+								m100 = n % 100;
+							const ew =
+								m10 === 1 && m100 !== 11
+									? 'ошибка'
+									: m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)
+										? 'ошибки'
+										: 'ошибок';
+							extra = 'В банке по заданиям темы 02: ' + n + ' ' + ew;
+						}
+					}
+					if (subEl) subEl.textContent = sub;
+					if (extraEl) extraEl.textContent = extra || '';
+				}
+				renderSubtopics();
+				updateHeroFromSubtopics();
+			})();
+		</script>
+	</body>
+</html>

@@ -10,20 +10,8 @@ laravel/storage/framework/cache/
 laravel/storage/framework/sessions/
 laravel/storage/framework/views/
 
-# Сгенерированные копии статики. Источник правды — `extracted/`,
-# а `laravel/public/site/` создаётся скриптом `node scripts/sync-site.mjs`
-# (на VPS — на каждом деплое, локально — `npm run sync`). Хранить дубликат
-# в git больше не нужно; подробности — в `docs/DEPLOY.md`.
-laravel/public/site/
-
-# `laravel/public/admin/` — старая копия админки (без `site/`-префикса),
-# которую nginx иногда отдавал статически в обход Laravel-роутов.
-# Удалена из git; deploy.yml дополнительно снёс её на VPS, и больше
-# источника для неё в репо нет — git не положит её обратно.
-laravel/public/admin/
-
 # Legacy mirror — actual content lives in `extracted/uploads/` and is served
-# from `laravel/public/site/uploads/` (см. `routes/web.php` и DEPLOY.md).
+# from `laravel/public/site/uploads/` (see `routes/web.php` and DEPLOY.md).
 # Locally on Windows this can be a junction to `extracted/uploads/`, which
 # we don't want to track again.
 laravel/public/uploads/
@@ -46,3 +34,9 @@ laravel/storage/iqmo_cookies*.txt
 # Composer artefacts (use `composer` globally or `php composer.phar` locally)
 composer.phar
 composer-setup.php
+
+# CI debugging artefacts
+.gh-jobs.json
+.git_commit_msg.txt
+gh.json
+laravel/composer
