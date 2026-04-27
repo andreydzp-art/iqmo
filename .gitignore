@@ -16,6 +16,13 @@ laravel/storage/framework/views/
 # в git больше не нужно; подробности — в `docs/DEPLOY.md`.
 laravel/public/site/
 
+# `chemistry-banks-bundle.js` собирается тем же sync-site.mjs из 17 файлов
+# `chemistry-cat*-source.js` и кладётся одновременно в `extracted/` и в
+# `laravel/public/site/`, чтобы локальная разработка через `php artisan serve`
+# не упиралась в 404. Источник правды — те же 17 *-source.js, поэтому
+# bundle git не отслеживает.
+extracted/chemistry-banks-bundle.js
+
 # `laravel/public/admin/` — старая копия админки (без `site/`-префикса),
 # которую nginx иногда отдавал статически в обход Laravel-роутов.
 # Удалена из git; deploy.yml дополнительно снёс её на VPS, и больше
