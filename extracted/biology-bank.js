@@ -69,7 +69,7 @@ window.BIOLOGY_QUESTIONS = [
 		id: 6,
 		type: 'single',
 		title: 'Лабораторная посуда',
-		body: '<p>Как называют лабораторный прибор: сосуд с фитилём для нагревания спиртом? (см. типовой рисунок в варианте)</p>',
+		body: '<p>Как называют лабораторный прибор: сосуд с фитилём для нагревания спиртом?</p><figure class="q-figure" role="group" aria-label="Иллюстрация к заданию"><img class="q-figure__img" src="/img/biology/q06-laboratornaya-spirtovka.png" alt="Лабораторная спиртовка с горящим пламенем" loading="lazy" decoding="async" /></figure>',
 		options: [
 			{ id: '1', label: 'Пробирка' },
 			{ id: '2', label: 'Спиртовка' },
