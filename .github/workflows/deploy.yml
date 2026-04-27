@@ -69,6 +69,7 @@ jobs:
 
             test -d "$APP_DIR/.git" || { echo "ERROR: $APP_DIR is not a git repo on server"; exit 1; }
 
+            echo "=== DEPLOY: git fetch + reset to origin/main ==="
             cd "$APP_DIR"
             git fetch --all --prune
             git reset --hard origin/main
@@ -81,11 +82,14 @@ jobs:
             # класс ошибок, из-за которого месяц назад пропадала Метрика.
             command -v node >/dev/null 2>&1 \
               || { echo "ERROR: node не найден в PATH — нужен Node.js >=18 (см. docs/DEPLOY.md)"; exit 1; }
+            echo "=== DEPLOY: node scripts/sync-site.mjs (extracted → laravel/public/site) ==="
             node scripts/sync-site.mjs
 
+            echo "=== DEPLOY: composer install (Laravel) ==="
             cd "$LARAVEL_DIR"
             composer install --no-dev --optimize-autoloader --no-interaction
 
+            echo "=== DEPLOY: php artisan migrate + optimize:clear ==="
             php artisan migrate --force
             php artisan optimize:clear
 
@@ -114,6 +118,7 @@ jobs:
             # block, but combined with `script_stop: true` that block was killing
             # the *whole* SSH script in some environments before the deploy could
             # even reach `git fetch`. We now keep them separate, both `|| true`.
+            echo "=== DEPLOY: opcache touch + optional php-fpm reload (non-fatal) ==="
             find "$LARAVEL_DIR/app" "$LARAVEL_DIR/bootstrap" "$LARAVEL_DIR/routes" \
               -name '*.php' -exec touch {} + 2>&1 || echo "WARN: touch step failed (non-fatal)"
 
@@ -121,7 +126,7 @@ jobs:
               && echo "php8.3-fpm reloaded" \
               || echo "WARN: php8.3-fpm reload skipped (need NOPASSWD sudo on the server)"
 
-            echo "DEPLOY OK"
+            echo "=== DEPLOY OK (server script finished) ==="
 
   smoke:
     runs-on: ubuntu-latest
