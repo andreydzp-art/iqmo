@@ -176,7 +176,7 @@ window.BIOLOGY_QUESTIONS = [
 		id: 13,
 		type: 'input',
 		title: 'Внешность лошади',
-		body: '<p>По плану оценки экстерьера (масть, шея, профиль, зад) ответьте цифрами 1 или 2 по пунктам. А) серая масть, Б) шея длинная (AB<BC), В) прямой профиль головы, Г) прямая задняя постановка, Д) соответствие арабскому стандарту. Запишите 5 цифр подряд.</p>',
+		body: '<p>По плану оценки экстерьера (масть, шея, профиль, зад) ответьте цифрами 1 или 2 по пунктам. А) серая масть, Б) шея длинная (AB&lt;BC), В) прямой профиль головы, Г) прямая задняя постановка, Д) соответствие арабскому стандарту. Запишите 5 цифр подряд.</p><figure class="q-figure" role="group" aria-label="Лошадь для оценки экстерьера"><img class="q-figure__img" src="/img/biology/q13-loshad-gnedaya-bokovoj-profil.png" alt="Лошадь гнедой масти, вид сбоку" loading="lazy" decoding="async" /></figure><figure class="q-figure q-figure--wide" role="group" aria-label="Справочник: масти лошадей"><img class="q-figure__img" src="/img/biology/q13-tablica-mastej-loshadej.png" alt="Таблица мастей лошадей (9 вариантов)" loading="lazy" decoding="async" /></figure>',
 		placeholder: '5 цифр 1 и 2',
 		correct: '11112',
 		hint: 'По условию варианта: детали 1,1,1,1, а по масти не рыжая/гнедая — не соответствует стандарту → последняя 2.',
