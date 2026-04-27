@@ -32,6 +32,9 @@ $serveStatic = function (string $full): BinaryFileResponse {
     if ($mime !== null) {
         $response->headers->set('Content-Type', $mime);
     }
+    if ($ext === 'html' || $ext === 'htm') {
+        $response->headers->set('Cache-Control', 'private, no-cache');
+    }
     return $response;
 };
 

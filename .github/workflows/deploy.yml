@@ -50,83 +50,55 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Deploy over SSH
+      - name: SSH — git + sync-site (static)
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          # script_stop is intentionally false: we run our own `set -e`, and the
-          # external one masked the actual failure line in the runner log.
           script_stop: false
           script: |
-            # `-x` keeps the actual failure line visible in the runner log
-            # (the previous `script_stop: true` swallowed it).
             set -Eeuxo pipefail
-
             APP_DIR="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app"
-            LARAVEL_DIR="${APP_DIR}/laravel"
-
             test -d "$APP_DIR/.git" || { echo "ERROR: $APP_DIR is not a git repo on server"; exit 1; }
-
             echo "=== DEPLOY: git fetch + reset to origin/main ==="
             cd "$APP_DIR"
             git fetch --all --prune
             git reset --hard origin/main
-
-            # Регенерация статики из `extracted/` в `laravel/public/site/`.
-            # Источник правды — `extracted/` (75 файлов в git); `laravel/public/site/`
-            # с этого PR в .gitignore и поэтому НЕ переносится через `git reset --hard`.
-            # Sync пишет туда свежие копии всех страниц, JS, CSS, картинок и удаляет
-            # из target всё, чего нет в source — закрывая «pre-existing stale-HTML»
-            # класс ошибок, из-за которого месяц назад пропадала Метрика.
             command -v node >/dev/null 2>&1 \
               || { echo "ERROR: node не найден в PATH — нужен Node.js >=18 (см. docs/DEPLOY.md)"; exit 1; }
             echo "=== DEPLOY: node scripts/sync-site.mjs (extracted → laravel/public/site) ==="
             node scripts/sync-site.mjs
+            echo "=== DEPLOY: static layer OK ==="
 
+      - name: SSH — Laravel (composer, migrate, cleanup, fpm)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: false
+          script: |
+            set -Eeuxo pipefail
+            APP_DIR="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app"
+            LARAVEL_DIR="${APP_DIR}/laravel"
+            # К этому моменту static-слой уже зеркален к origin/main; при сбое composer
+            # `laravel/public/site/` остаётся с актуальной статикой.
             echo "=== DEPLOY: composer install (Laravel) ==="
             cd "$LARAVEL_DIR"
             composer install --no-dev --optimize-autoloader --no-interaction
-
             echo "=== DEPLOY: php artisan migrate + optimize:clear ==="
             php artisan migrate --force
             php artisan optimize:clear
-
-            # Nginx делает `try_files $uri ... /index.php`. Любая залежавшаяся .html-копия в
-            # `laravel/public/` обходит Laravel-роуты, и пользователь видит версию от прошлого
-            # деплоя (без Метрики, со старой вёрсткой и т.п.). Источник правды — `extracted/`,
-            # а в `laravel/public/` корневых .html в git нет вовсе. Поэтому смело сносим всё, что там есть.
             find "$LARAVEL_DIR/public" -maxdepth 1 -type f -name '*.html' -print -delete || true
-
-            # `laravel/public/admin/` (без `site/`) больше не в git и не в `extracted/`,
-            # значит `git reset --hard` сам удаляет её при первом проходе. Прежний
-            # `rm -rf` оставлен на одну поставку для подстраховки на случай, если на
-            # VPS была тень от предыдущего ручного копирования.
             rm -rf "$LARAVEL_DIR/public/admin"
-
-            # OPcache invalidation. Two strategies, both wrapped in `|| true` so
-            # the deploy never fails just because we couldn't bump bytecode:
-            #
-            #   1) touch *.php — works whenever `opcache.validate_timestamps=1`
-            #      (the typical default on bitrix/fastpanel hosts). USR2-free.
-            #   2) sudo -n systemctl reload php8.3-fpm — graceful FPM reload,
-            #      requires NOPASSWD sudo for this exact command (see docs/DEPLOY.md).
-            #      If NOPASSWD isn't configured, sudo exits 1 and we just log it.
-            #
-            # The reload step used to be a structured `if sudo ...; then ... else ...; fi`
-            # block, but combined with `script_stop: true` that block was killing
-            # the *whole* SSH script in some environments before the deploy could
-            # even reach `git fetch`. We now keep them separate, both `|| true`.
             echo "=== DEPLOY: opcache touch + optional php-fpm reload (non-fatal) ==="
             find "$LARAVEL_DIR/app" "$LARAVEL_DIR/bootstrap" "$LARAVEL_DIR/routes" \
               -name '*.php' -exec touch {} + 2>&1 || echo "WARN: touch step failed (non-fatal)"
-
             sudo -n systemctl reload php8.3-fpm 2>&1 \
               && echo "php8.3-fpm reloaded" \
               || echo "WARN: php8.3-fpm reload skipped (need NOPASSWD sudo on the server)"
-
-            echo "=== DEPLOY OK (server script finished) ==="
+            echo "=== DEPLOY: Laravel layer OK ==="
 
   smoke:
     runs-on: ubuntu-latest

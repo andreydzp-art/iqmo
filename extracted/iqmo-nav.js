@@ -15,6 +15,18 @@
 
 	async function run() {
 		ensureHiddenCss();
+		// Старая вёрстка: «Биология» в сайдбаре вела на index.html. Исправляем без перезаливки всей страницы.
+		(function fixSidebarBiologyHref() {
+			try {
+				var a = document.querySelector('nav.subjects a.tone-bio');
+				if (!a) return;
+				var h = (a.getAttribute('href') || '').trim();
+				if (!h || /subject-biology/.test(h)) return;
+				if (/\bindex\.html$/.test(h) || h === './index.html' || h === 'index.html') {
+					a.setAttribute('href', '/subject-biology.html');
+				}
+			} catch (eFix) {}
+		})();
 
 		var loggedIn = false;
 		try {
