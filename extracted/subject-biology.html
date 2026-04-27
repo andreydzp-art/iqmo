@@ -18,26 +18,26 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>IQMO — Химия · ОГЭ</title>
+		<title>IQMO — Биология · ОГЭ</title>
 		<meta
 			name="description"
-			content="Подготовка к ОГЭ по химии: темы ФИПИ 2026, разминка, быстрый тест, полный вариант, тренировка по разделам кодификатора и банк ошибок. Тренажёр IQMO."
+			content="Подготовка к ОГЭ по биологии: структура курса как в IQMO, задания и разделы появятся по мере наполнения банка. Тренажёр IQMO."
 		/>
-		<link rel="canonical" href="https://www.iqmoschool.ru/subject-chemistry.html" />
+		<link rel="canonical" href="https://www.iqmoschool.ru/subject-biology.html" />
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="IQMO" />
 		<meta property="og:locale" content="ru_RU" />
-		<meta property="og:url" content="https://www.iqmoschool.ru/subject-chemistry.html" />
-		<meta property="og:title" content="IQMO — Химия · ОГЭ 2026" />
+		<meta property="og:url" content="https://www.iqmoschool.ru/subject-biology.html" />
+		<meta property="og:title" content="IQMO — Биология · ОГЭ 2026" />
 		<meta
 			property="og:description"
-			content="Онлайн-тренажёр: темы, задания из базы ФИПИ, разбор ошибок, пробник и экзаменационный вариант. Готовьтесь к ОГЭ по химии в своём темпе."
+			content="Онлайн-тренажёр IQMO: курс в разработке, задания и тесты появятся по мере наполнения."
 		/>
 		<meta name="twitter:card" content="summary" />
-		<meta name="twitter:title" content="IQMO — Химия · ОГЭ 2026" />
+		<meta name="twitter:title" content="IQMO — Биология · ОГЭ 2026" />
 		<meta
 			name="twitter:description"
-			content="Темы ФИПИ, разминка, полный вариант и банк ошибок — подготовка к ОГЭ по химии в IQMO."
+			content="Подготовка к ОГЭ по биологии в IQMO — структура курса готова, банк заданий наполняется."
 		/>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -154,9 +154,17 @@
 				justify-content: center;
 				font-weight: 700;
 				font-size: 15px;
-				background: linear-gradient(135deg, #4f7bd6 0%, #6b93e0 100%);
+				background: linear-gradient(135deg, #2fa968 0%, #3ec37a 100%);
 				color: #fff;
 				flex: 0 0 auto;
+			}
+			#bio-profile-card .profile-card__avatar,
+			#bio-profile-card .profile-friend--me .profile-friend__avatar {
+				background: linear-gradient(135deg, #2fa968 0%, #3ec37a 100%);
+			}
+			#bio-profile-card .profile-card__level-badge {
+				background: #e7f6ec;
+				color: #2fa968;
 			}
 			.profile-card__name {
 				font-weight: 700;
@@ -474,6 +482,17 @@
 			}
 			.format--accent { background: #fff; border-color: var(--line); }
 			.format--accent .format__start { color: var(--accent); }
+			.format--soon {
+				cursor: default;
+				opacity: 0.94;
+				pointer-events: none;
+			}
+			.format--soon:hover {
+				transform: none;
+				border-color: transparent;
+				box-shadow: var(--shadow);
+			}
+			.format--soon .format__start { color: var(--muted); font-weight: 600; }
 
 			/* ---- express prep (format card) ---- */
 			.format__controls {
@@ -731,7 +750,7 @@
 					<span class="crumbs__sep">/</span>
 					<a href="./index.html">Предметы</a>
 					<span class="crumbs__sep">/</span>
-					<span>Химия</span>
+					<span>Биология</span>
 				</nav>
 
 				<div class="grid">
@@ -740,12 +759,12 @@
 						<nav class="subjects">
 							<div class="subjects__title">Предметы</div>
 							<div class="subjects__list">
-								<a href="./subject-biology.html" class="subjects__item tone-bio">
+								<a href="./subject-biology.html" class="subjects__item is--active tone-bio">
 									<span class="subjects__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c0-6 4-8 5-9M17 3c0 6-4 8-5 9"/><path d="M7 21c7 0 10-4 10-10M17 3C10 3 7 7 7 13"/></svg></span>
 									<span class="subjects__label">Биология</span>
 									<span class="subjects__count">ОГЭ</span>
 								</a>
-								<a href="./subject-chemistry.html" class="subjects__item is--active tone-chem">
+								<a href="./subject-chemistry.html" class="subjects__item tone-chem">
 									<span class="subjects__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v7L5 20a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-10V3"/><path d="M7 16h10"/></svg></span>
 									<span class="subjects__label">Химия</span>
 									<span class="subjects__count">ОГЭ</span>
@@ -788,7 +807,7 @@
 							</div>
 						</nav>
 
-						<section class="profile-card" id="chem-profile-card" aria-label="Краткий профиль">
+						<section class="profile-card" id="bio-profile-card" aria-label="Краткий профиль">
 							<div class="profile-card__head">
 								<div class="profile-card__avatar" id="pc-avatar" aria-hidden="true">ИК</div>
 								<div class="profile-card__info">
@@ -843,7 +862,7 @@
 										<span
 											class="profile-friend__avatar"
 											id="pc-friend-avatar"
-											style="background: linear-gradient(135deg, #4f7bd6 0%, #6b93e0 100%)"
+											style="background: linear-gradient(135deg, #2fa968 0%, #3ec37a 100%)"
 											>ИК</span>
 										<span class="profile-friend__name">Вы</span>
 										<span class="profile-friend__score" id="pc-friend-me-score">0</span>
@@ -888,36 +907,37 @@
 							<div class="hero__content">
 								<div class="hero__head">
 									<span class="hero__tag"><span class="hero__tag-dot"></span>ОГЭ 2026 · 9 класс</span>
-									<span class="hero__class">Химия</span>
+									<span class="hero__class" style="color:#2fa968;">Биология</span>
 								</div>
 								<h1 class="hero__title">
-									Подготовься к ОГЭ по&nbsp;химии <em>на&nbsp;5</em>&nbsp;— в своём темпе
+									Подготовься к ОГЭ по&nbsp;биологии <em>на&nbsp;5</em>&nbsp;— в своём темпе
 								</h1>
 								<p class="hero__subtitle">
-									<span id="chem-hero-subtitle">Темы курса, задания из базы ФИПИ, разбор типовых ошибок и полный вариант экзамена. Выбирай формат и начинай тренировку.</span>
+									<span id="bio-hero-subtitle"
+										>Разделы и тесты наполняем по мере готовности: тут — та же структура, что и в курсе по химии. Как только задания появятся в банке, откроются разминка, варианты и темы.</span>
 								</p>
 
 								<div class="hero__stats">
 									<div class="hero__stat">
-										<div class="hero__stat-num" id="chem-stat-topics">—</div>
-										<div class="hero__stat-label">тем курса</div>
+										<div class="hero__stat-num" id="bio-stat-topics">0</div>
+										<div class="hero__stat-label">тем (план курса)</div>
 									</div>
 									<div class="hero__stat">
-										<div class="hero__stat-num" id="chem-stat-questions">—</div>
+										<div class="hero__stat-num" id="bio-stat-questions">0</div>
 										<div class="hero__stat-label">заданий в базе</div>
 									</div>
 									<div class="hero__stat">
-										<div class="hero__stat-num">32 / 40</div>
+										<div class="hero__stat-num">—</div>
 										<div class="hero__stat-label">средний балл</div>
 									</div>
 								</div>
 
-								<div class="hero__cta">
-									<a href="./full-test-chemistry.html" class="btn btn--primary">
-										Начать тест · химия ОГЭ
-										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-									</a>
-									<a href="./trial-chemistry.html" class="btn btn--ghost">Пробный вариант · 25 мин</a>
+								<div class="hero__cta" aria-label="Скоро">
+									<span class="btn btn--primary" style="opacity: 0.72; cursor: default; pointer-events: none" role="text">
+										Тесты в разработке
+										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+									</span>
+									<span class="btn btn--ghost" style="opacity: 0.72; cursor: default; pointer-events: none" role="text">Пробник и полный вариант — скоро</span>
 								</div>
 
 								<div class="hero__last" id="hero-last-result">
@@ -929,117 +949,120 @@
 							<div class="hero__side" aria-hidden="true">
 								<svg viewBox="0 0 280 440" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
 									<g>
-										<circle cx="40"  cy="60"  r="8"  fill="#4f7bd6" fill-opacity=".25"/>
+										<circle cx="40"  cy="60"  r="8"  fill="#2fa968" fill-opacity=".25"/>
 										<circle cx="240" cy="80"  r="10" fill="#3ec37a" fill-opacity=".3"/>
 										<circle cx="50"  cy="380" r="10" fill="#e39b2a" fill-opacity=".3"/>
-										<circle cx="230" cy="370" r="7"  fill="#4f7bd6" fill-opacity=".35"/>
-										<circle cx="25"  cy="220" r="5"  fill="#4f7bd6" fill-opacity=".4"/>
+										<circle cx="230" cy="370" r="7"  fill="#2fa968" fill-opacity=".35"/>
+										<circle cx="25"  cy="220" r="5"  fill="#2fa968" fill-opacity=".4"/>
 									</g>
 									<g transform="translate(70,100)">
 										<path d="M45 0 H95 V8 H89 V42 L148 130 Q164 156 138 156 H2 Q-24 156 -8 130 L51 42 V8 H45 Z"
-											fill="#fff" stroke="#4f7bd6" stroke-width="2.5"/>
+											fill="#fff" stroke="#2fa968" stroke-width="2.5"/>
 										<path d="M15 100 L125 100 L148 130 Q164 156 138 156 H2 Q-24 156 -8 130 Z"
 											fill="url(#liquid)"/>
 										<circle cx="40"  cy="138" r="5" fill="#fff" opacity=".8"/>
 										<circle cx="75"  cy="126" r="4" fill="#fff" opacity=".7"/>
 										<circle cx="100" cy="140" r="6" fill="#fff" opacity=".8"/>
 										<circle cx="55"  cy="148" r="3" fill="#fff" opacity=".6"/>
-										<path d="M55 -20 Q50 -10 58 -4 Q66 2 60 12" stroke="#4f7bd6" stroke-opacity=".4" stroke-width="2" stroke-linecap="round" fill="none"/>
-										<path d="M75 -28 Q70 -18 78 -12 Q86 -6 80 6" stroke="#4f7bd6" stroke-opacity=".3" stroke-width="2" stroke-linecap="round" fill="none"/>
+										<path d="M55 -20 Q50 -10 58 -4 Q66 2 60 12" stroke="#2fa968" stroke-opacity=".4" stroke-width="2" stroke-linecap="round" fill="none"/>
+										<path d="M75 -28 Q70 -18 78 -12 Q86 -6 80 6" stroke="#2fa968" stroke-opacity=".3" stroke-width="2" stroke-linecap="round" fill="none"/>
 									</g>
 									<g transform="translate(150,320)">
-										<line x1="0" y1="0" x2="40" y2="20" stroke="#4f7bd6" stroke-opacity=".5" stroke-width="1.5"/>
-										<line x1="40" y1="20" x2="80" y2="0" stroke="#4f7bd6" stroke-opacity=".5" stroke-width="1.5"/>
+										<line x1="0" y1="0" x2="40" y2="20" stroke="#2fa968" stroke-opacity=".5" stroke-width="1.5"/>
+										<line x1="40" y1="20" x2="80" y2="0" stroke="#2fa968" stroke-opacity=".5" stroke-width="1.5"/>
 										<circle cx="0"  cy="0"  r="10" fill="#3ec37a" fill-opacity=".3" stroke="#3ec37a" stroke-opacity=".6"/>
-										<circle cx="40" cy="20" r="13" fill="#4f7bd6" fill-opacity=".25" stroke="#4f7bd6" stroke-opacity=".6"/>
+										<circle cx="40" cy="20" r="13" fill="#2fa968" fill-opacity=".25" stroke="#2fa968" stroke-opacity=".6"/>
 										<circle cx="80" cy="0"  r="10" fill="#e39b2a" fill-opacity=".3" stroke="#e39b2a" stroke-opacity=".55"/>
 									</g>
 									<defs>
 										<linearGradient id="liquid" x1="0" x2="0" y1="0" y2="1">
-											<stop offset="0%" stop-color="#86b3ff" stop-opacity=".7"/>
-											<stop offset="100%" stop-color="#4f7bd6" stop-opacity=".55"/>
+											<stop offset="0%" stop-color="#7fd9a4" stop-opacity=".7"/>
+											<stop offset="100%" stop-color="#2fa968" stop-opacity=".55"/>
 										</linearGradient>
 									</defs>
 								</svg>
 							</div>
 						</section>
 
-						<!-- 2. FORMATS -->
+						<!-- 2. FORMATS (макет как у химии; ссылки откроем после наполнения банка) -->
 						<section id="formats">
 							<div class="section-title">
 								<h2>Выбери формат теста</h2>
-								<p>Все задания — из базы ФИПИ 2026</p>
+								<p>Банк заданий по биологии наполняется — ориентиры как в ФИПИ ОГЭ</p>
 							</div>
 							<div class="formats">
-								<a href="./warmup-chemistry.html" class="format">
+								<div class="format format--soon">
+									<span class="format__badge">скоро</span>
 									<div class="format__head">
 										<span class="format__icon" style="background:#e7f6ec; color:#2fa968;">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
 										</span>
 										<div>
 											<div class="format__title">Разминка</div>
-											<div class="format__meta"><span>5 вопросов</span><span>· 3 мин</span><span>· без оценки</span></div>
+											<div class="format__meta"><span>короткий тест</span><span>· без оценки</span><span>· 0 вопросов пока</span></div>
 										</div>
 									</div>
-									<p class="format__desc">Быстрая проверка, чтобы размяться перед серьёзным тестом. Случайные темы, без таймера.</p>
+									<p class="format__desc">Короткая проверка перед серьёзным тестом. Запустим, когда в банке появятся задания.</p>
 									<div class="format__foot">
-										<span class="format__start">Начать →</span>
+										<span class="format__start">Скоро</span>
 									</div>
-								</a>
+								</div>
 
-								<a href="./uploads/easy-test.html?mode=quick" class="format format--accent">
-									<span class="format__badge">популярно</span>
+								<div class="format format--soon format--accent">
+									<span class="format__badge">скоро</span>
 									<div class="format__head">
 										<span class="format__icon">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
 										</span>
 										<div>
 											<div class="format__title">Быстрый тест</div>
-											<div class="format__meta"><span>15 вопросов</span><span>· ~12 мин</span><span>· по темам</span></div>
+											<div class="format__meta"><span>по темам</span><span>· таймер</span><span>· 0 вопросов пока</span></div>
 										</div>
 									</div>
-									<p class="format__desc">Проверь себя на реальных заданиях — задания случайно перемешаны по всем темам курса.</p>
+									<p class="format__desc">Подборка по всему курсу — задания из банка, перемешанные по темам.</p>
 									<div class="format__foot">
-										<span class="format__start">Начать →</span>
+										<span class="format__start">Скоро</span>
 									</div>
-								</a>
+								</div>
 
-								<a href="./full-test-chemistry.html" class="format">
+								<div class="format format--soon">
+									<span class="format__badge">скоро</span>
 									<div class="format__head">
 										<span class="format__icon" style="background:#fbf0d9; color:#c28216;">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 										</span>
 										<div>
 											<div class="format__title">Полный вариант ОГЭ</div>
-											<div class="format__meta"><span>24 задания</span><span>· 180 мин</span><span>· с оценкой</span></div>
+											<div class="format__meta"><span>структура экзамена</span><span>· с оценкой</span><span>· после наполнения</span></div>
 										</div>
 									</div>
-									<p class="format__desc">Как на настоящем экзамене: таймер, запрет назад возвращаться, итоговая оценка и рейтинг.</p>
+									<p class="format__desc">Как на экзамене: таймер и итоговая оценка — после появления полного комплекта заданий.</p>
 									<div class="format__foot">
-										<span class="format__start">Начать →</span>
+										<span class="format__start">Скоро</span>
 									</div>
-								</a>
+								</div>
 
-								<a href="#categories" class="format format--accent" data-scroll-to="categories">
+								<div class="format format--soon format--accent">
+									<span class="format__badge">скоро</span>
 									<div class="format__head">
 										<span class="format__icon" style="background:#eef1f6; color:#2a2f38;">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 7h16"/><path d="M7 7v12"/><path d="M10 11h10"/><path d="M10 15h10"/></svg>
 										</span>
 										<div>
 											<div class="format__title">Тренировка по категориям</div>
-											<div class="format__meta"><span>18 разделов</span><span>· точечно</span><span>· по слабым местам</span></div>
+											<div class="format__meta"><span>разделы кодификатора</span><span>· точечно</span><span>· список ниже</span></div>
 										</div>
 									</div>
-									<p class="format__desc">Выберите конкретный раздел (как в кодификаторе) и тренируйте только задания из этой категории. Вопросы для категорий добавим по мере наполнения.</p>
+									<p class="format__desc">Конкретный раздел ФИПИ — только задания выбранной категории. Ссылки откроем вместе с банком.</p>
 									<div class="format__foot">
-										<span class="format__start">Открыть список →</span>
+										<span class="format__start">См. блок ниже ↓</span>
 									</div>
-								</a>
+								</div>
 
-								<a href="./express-chemistry.html" class="format format--accent">
-									<span class="format__badge">новое</span>
+								<div class="format format--soon format--accent">
+									<span class="format__badge">скоро</span>
 									<div class="format__head">
-										<span class="format__icon" style="background:#eef3ff; color:#3c68d6;">
+										<span class="format__icon" style="background:#e7f6ec; color:#2fa968;">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 												<path d="M12 3v3"/><path d="M12 18v3"/><path d="M4.2 6.2l2.1 2.1"/><path d="M17.7 17.7l2.1 2.1"/>
 												<path d="M3 12h3"/><path d="M18 12h3"/><path d="M6.3 17.7l-2.1 2.1"/><path d="M19.8 6.2l-2.1 2.1"/>
@@ -1048,30 +1071,31 @@
 										</span>
 										<div>
 											<div class="format__title">Экспресс‑подготовка</div>
-											<div class="format__meta"><span>на 3 / 4 / 5</span><span>· план по дням</span><span>· по категориям</span></div>
+											<div class="format__meta"><span>план</span><span>· по дням</span><span>· после банка</span></div>
 										</div>
 									</div>
-									<p class="format__desc">Готовая стратегия подготовки: каждый день — короткая тренировка из нужных тем. Выберите цель и срок на следующем шаге.</p>
+									<p class="format__desc">Пошаговый план с короткими сессиями — подключим, когда накопятся задания по разделам.</p>
 									<div class="format__foot">
-										<span class="format__start">Открыть →</span>
+										<span class="format__start">Скоро</span>
 									</div>
-								</a>
+								</div>
 
-								<a href="./mistakes-chemistry.html" class="format">
+								<div class="format format--soon">
+									<span class="format__badge">скоро</span>
 									<div class="format__head">
 										<span class="format__icon" style="background:#fbe2e2; color:#b23e3e;">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
 										</span>
 										<div>
 											<div class="format__title">Работа над ошибками</div>
-											<div class="format__meta"><span id="mistakes-count">банк личных ошибок</span></div>
+											<div class="format__meta"><span>банк личных ошибок</span><span>· после тестов по био</span></div>
 										</div>
 									</div>
-									<p class="format__desc">Задания, в которых вы ошиблись в любом тесте. С подсказкой и разбором — решил верно, задание уходит из банка.</p>
+									<p class="format__desc">Повтор заданий, в которых вы ошибались. Заработает после появления тренажёра по предмету.</p>
 									<div class="format__foot">
-										<span class="format__start">Начать →</span>
+										<span class="format__start">Скоро</span>
 									</div>
-								</a>
+								</div>
 							</div>
 						</section>
 
@@ -1079,156 +1103,149 @@
 						<section class="card categories" id="categories">
 							<div class="section-title">
 								<h2>Тренировка по категориям</h2>
-								<p>Разделы 1–18 (как в кодификаторе)</p>
+								<p>Разделы по кодификатору (после наполнения банка)</p>
 							</div>
-							<div class="categories__grid" id="chem-categories-grid">
-								<p style="color:var(--muted); font-size:15px; padding:8px 0;">Загрузка…</p>
+							<div class="categories__grid" id="bio-categories-grid">
+								<p style="color:var(--muted); font-size:15px; line-height:1.55; margin:0; padding:4px 0 8px;">
+									Разметка списка категорий (как у химии) появится здесь, когда в банке появятся задания по разделам.
+									Сейчас <b>0 вопросов</b> в каждом блоке.
+								</p>
 							</div>
 						</section>
 
-						<!-- 3. TOPICS -->
+						<!-- 3. TOPICS (заглушки — материалы и страницы тем подключим при наполнении) -->
 						<section class="card topics">
 							<div class="section-title">
 								<h2>Темы курса</h2>
 								<a href="#formats">Форматы →</a>
 							</div>
 							<p style="font-size:13px; color:var(--muted); margin:-6px 0 12px; line-height:1.45;">
-								Полоса считается по <b>последней завершённой</b> попытке (разминка, пробник или полный вариант): берутся только задания, которые есть в сохранённой сводке с автопроверкой, и сопоставляются с номерами 1–22 в варианте ФИПИ. Если в той попытке не было ни одного задания из привязки к строке — «н/д» (для полного варианта в сводку обычно не попадают развёрнутые задания части&nbsp;2).
+								Как на курсе по химии: прогресс по полосе появится после тестов с автопроверкой. Пока банк пуст — везде «н/д» и <b>0 заданий</b>.
 							</p>
-							<p style="font-size:13px; color:var(--muted); margin:-4px 0 14px; line-height:1.5; padding:12px 14px; background:var(--accent-weak); border-radius:12px; border:1px solid rgba(79,123,214,.2);">
-								Большая часть части&nbsp;1 в химии ОГЭ опирается на базовые блоки: <b>периодическая система и атом</b>, <b>типы связи</b>, <b>классы веществ</b>, <b>типы реакций</b>, <b>растворы</b>, <b>металлы/неметаллы</b>, <b>органика</b>, <b>экология и быт</b>.
-								В каждой теме ниже (01–10) есть короткий блок <b>«Фокус ОГЭ»</b> — что именно спрашивают и где чаще ошибаются.
+							<p style="font-size:13px; color:var(--muted); margin:-4px 0 14px; line-height:1.5; padding:12px 14px; background:#e7f6ec; border-radius:12px; border:1px solid rgba(47, 169, 104, 0.25);">
+								Ниже — ориентир по блокам ОГЭ по биологии: названия можно скорректировать под ваш кодификатор. Ссылки на страницы тем и числа вопросов заполним, когда банк будет готов.
 							</p>
-							<div class="topics__grid" id="topics-course-grid">
-								<a href="./topic-periodic-table.html?v=20260422" class="topic is--new" data-topic-slots="1,2,3" data-topic-cats="2">
+							<div class="topics__grid" id="bio-topics-grid">
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">01</span>
 									<div class="topic__body">
-										<div class="topic__name">Периодическая система Менделеева</div>
+										<div class="topic__name">Живые организмы. Среда обитания</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count" data-topic-count></span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-atom-structure.html" class="topic is--new" data-topic-slots="4,5,6" data-topic-cats="5">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">02</span>
 									<div class="topic__body">
-										<div class="topic__name">Строение атома</div>
+										<div class="topic__name">Клетка. Методы изучения</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count" data-topic-count></span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-chemical-bond.html" class="topic is--new" data-topic-slots="5,13" data-topic-cats="4">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">03</span>
 									<div class="topic__body">
-										<div class="topic__name">Химическая связь</div>
+										<div class="topic__name">Вещество и энергетика клетки</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count" data-topic-count></span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-inorganic-classes.html" class="topic is--new" data-topic-slots="8,9,10,11" data-topic-cats="6">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">04</span>
 									<div class="topic__body">
-										<div class="topic__name">Классы неорганических соединений</div>
+										<div class="topic__name">Размножение, рост, развитие</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count" data-topic-count></span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-chemical-reactions.html" class="topic is--new" data-topic-slots="7,8,9,10,11,12" data-topic-cats="10,11,13,14">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">05</span>
 									<div class="topic__body">
-										<div class="topic__name">Химические реакции</div>
+										<div class="topic__name">Наследственность. Мутации</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count" data-topic-count></span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-solutions-dissociation.html" class="topic is--new" data-topic-slots="13,14" data-topic-cats="12,13,16">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">06</span>
 									<div class="topic__body">
-										<div class="topic__name">Растворы. Электролитическая диссоциация</div>
+										<div class="topic__name">Эволюция и селекция</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count" data-topic-count></span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-metals-compounds.html" class="topic is--new" data-topic-slots="17,18,19">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">07</span>
 									<div class="topic__body">
-										<div class="topic__name">Металлы и их соединения</div>
+										<div class="topic__name">Растения</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count">· 32 задания</span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-nonmetals-compounds.html" class="topic is--new" data-topic-slots="9,10,11,12">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">08</span>
 									<div class="topic__body">
-										<div class="topic__name">Неметаллы и их соединения</div>
+										<div class="topic__name">Грибы, лишайники, бактерии</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count">· 28 заданий</span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-organic-substances.html" class="topic is--new" data-topic-slots="20,21,22">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">09</span>
 									<div class="topic__body">
-										<div class="topic__name">Органические вещества</div>
+										<div class="topic__name">Животные. Человек</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count">· 40 заданий</span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
-
-								<a href="./topic-life-ecology.html" class="topic is--new" data-topic-slots="15,16">
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
+								<div class="topic is--new" style="cursor: default">
 									<span class="topic__num">10</span>
 									<div class="topic__body">
-										<div class="topic__name">Химия в жизни. Экология</div>
+										<div class="topic__name">Экология. Личное и общественное здоровье</div>
 										<div class="topic__meta">
-											<span class="topic__bar"><span class="topic__bar-fill" data-topic-fill style="width:0%;"></span></span>
-											<span class="topic__percent" data-topic-pct>н/д</span>
-											<span class="topic__count">· 18 заданий</span>
+											<span class="topic__bar"><span class="topic__bar-fill" style="width:0%"></span></span>
+											<span class="topic__percent">н/д</span>
+											<span class="topic__count">· 0 заданий</span>
 										</div>
 									</div>
-									<span class="topic__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-								</a>
+									<span class="topic__go" style="color: var(--muted); opacity: 0.5">…</span>
+								</div>
 							</div>
 						</section>
 
@@ -1239,7 +1256,9 @@
 								<p>На основе ваших последних тестов</p>
 							</div>
 							<div class="weak__list" id="weak-spots-root">
-								<p class="weak__empty" style="color:var(--muted); font-size:15px; padding:8px 0;">Загрузка…</p>
+								<p class="weak__empty" style="color:var(--muted); font-size:15px; padding:8px 0; line-height:1.5;">
+									Пока нет данных по пробелам: пройдите тесты по биологии, когда они появятся в IQMO, — здесь отобразятся темы для повторения.
+								</p>
 							</div>
 						</section>
 					</div>
@@ -1281,76 +1300,57 @@
 				</div>
 			</div>
 		</footer>
-		<script src="./chemistry-bank.js?v=10"></script>
 		<script src="./iqmo-sync.js"></script>
 		<script src="./chem-progress.js"></script>
 		<script src="./iqmo-nav.js"></script>
 		<script src="./iqmo-regnudge.js?v=3"></script>
-		<script src="./mistakes-store.js"></script>
-		<script src="./chemistry-topic-map.js"></script>
-		<script src="./chemistry-categories.js?v=9"></script>
 		<script>
 			(function () {
-				function pluralize(n, one, few, many) {
-					const m10 = n % 10, m100 = n % 100;
-					if (m10 === 1 && m100 !== 11) return one;
-					if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
-					return many;
-				}
-
-				const elCount = document.getElementById('mistakes-count');
-				if (elCount && window.MistakesStore) {
-					const n = window.MistakesStore.list().length;
-					if (n > 0) {
-						elCount.innerHTML = '<span style="color:#b23e3e; font-weight:700;">' + n + ' ' + pluralize(n, 'ошибка', 'ошибки', 'ошибок') + ' в банке</span>';
-					} else {
-						elCount.textContent = 'банк пуст — пройдите тест';
-					}
-				}
-
 				function fmtPts(n) {
 					return String(Math.max(0, Math.round(Number(n) || 0))).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
 				}
-				(function fillChemProfileCard() {
-					if (!window.ChemProgress || !document.getElementById('chem-profile-card')) return;
-					try {
-						ChemProgress.ensureAnonId();
-					} catch (e) {}
-					const snap = ChemProgress.getGamificationSnapshot();
-					let streakDays = 0;
-					try {
-						const st = JSON.parse(localStorage.getItem('iqmo-chem-streak') || 'null');
-						if (st && typeof st.days === 'number') streakDays = st.days;
-					} catch (e) {}
-					const stg = Math.min(50, Math.max(1, (snap.level && snap.level.current) || (snap.stage && snap.stage.stage) || 1));
-					const badge = document.getElementById('pc-badge');
-					const sl = document.getElementById('pc-stage-label');
-					if (badge) badge.textContent = 'Уровень ' + stg;
-					if (sl) sl.textContent = snap.levelTitle || (window.ChemProgress.getLevelTitle ? ChemProgress.getLevelTitle(stg) : '');
-					const elStreak = document.getElementById('pc-streak');
-					if (elStreak) elStreak.textContent = String(streakDays);
-					const pts = Number(snap.totalPoints) || 0;
-					const elPts = document.getElementById('pc-points');
-					if (elPts) elPts.textContent = fmtPts(pts);
-					const weekPts = Number(snap.week && snap.week.points) || 0;
-					const meScore = document.getElementById('pc-friend-me-score');
-					if (meScore) meScore.textContent = fmtPts(weekPts > 0 ? weekPts : Math.min(pts, 99999));
-					let anon = '';
-					try {
-						anon = localStorage.getItem('iqmo-chem-anon-id') || '';
-					} catch (e2) {}
-					let ini = 'ИК';
-					if (anon.length >= 2) {
-						const compact = anon.replace(/[^a-zA-Z0-9]/g, '');
-						if (compact.length >= 2) ini = compact.slice(0, 2).toUpperCase();
-						else ini = anon.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 2).toUpperCase() || 'ИК';
+				(function fillBioProfileCard() {
+					if (!document.getElementById('bio-profile-card')) return;
+					if (window.ChemProgress) {
+						try {
+							ChemProgress.ensureAnonId();
+						} catch (e) {}
+						const snap = ChemProgress.getGamificationSnapshot();
+						let streakDays = 0;
+						try {
+							const st = JSON.parse(localStorage.getItem('iqmo-chem-streak') || 'null');
+							if (st && typeof st.days === 'number') streakDays = st.days;
+						} catch (e) {}
+						const stg = Math.min(50, Math.max(1, (snap.level && snap.level.current) || (snap.stage && snap.stage.stage) || 1));
+						const badge = document.getElementById('pc-badge');
+						const sl = document.getElementById('pc-stage-label');
+						if (badge) badge.textContent = 'Уровень ' + stg;
+						if (sl) sl.textContent = snap.levelTitle || (window.ChemProgress.getLevelTitle ? ChemProgress.getLevelTitle(stg) : '');
+						const elStreak = document.getElementById('pc-streak');
+						if (elStreak) elStreak.textContent = String(streakDays);
+						const pts = Number(snap.totalPoints) || 0;
+						const elPts = document.getElementById('pc-points');
+						if (elPts) elPts.textContent = fmtPts(pts);
+						const weekPts = Number(snap.week && snap.week.points) || 0;
+						const meScore = document.getElementById('pc-friend-me-score');
+						if (meScore) meScore.textContent = fmtPts(weekPts > 0 ? weekPts : Math.min(pts, 99999));
+						let anon = '';
+						try {
+							anon = localStorage.getItem('iqmo-chem-anon-id') || '';
+						} catch (e2) {}
+						let ini = 'ИК';
+						if (anon.length >= 2) {
+							const compact = anon.replace(/[^a-zA-Z0-9]/g, '');
+							if (compact.length >= 2) ini = compact.slice(0, 2).toUpperCase();
+							else ini = anon.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 2).toUpperCase() || 'ИК';
+						}
+						if (ini.length < 2) ini = 'ИК';
+						const av = document.getElementById('pc-avatar');
+						const fav = document.getElementById('pc-friend-avatar');
+						if (av) av.textContent = ini;
+						if (fav) fav.textContent = ini;
 					}
-					if (ini.length < 2) ini = 'ИК';
-					const av = document.getElementById('pc-avatar');
-					const fav = document.getElementById('pc-friend-avatar');
-					if (av) av.textContent = ini;
-					if (fav) fav.textContent = ini;
-					const fk = 'iqmo-chem-first-visit';
+					const fk = 'iqmo-site-first-visit';
 					let first = localStorage.getItem(fk);
 					if (!first) {
 						first = String(Date.now());
@@ -1361,22 +1361,22 @@
 					const daysOn = Math.max(1, Math.floor((Date.now() - Number(first)) / 86400000) + 1);
 					const elDays = document.getElementById('pc-days');
 					if (elDays) elDays.textContent = String(daysOn);
-					const approxTests = pts > 0 ? Math.max(1, Math.floor(pts / 42)) : 0;
-					const elTests = document.getElementById('pc-tests');
-					if (elTests) elTests.textContent = approxTests > 0 ? String(approxTests) + '+' : '0';
 				})();
 
 				function paintHeroLastResult(sessionLoggedIn) {
 					const heroInner = document.getElementById('hero-last-result-inner');
-					if (!heroInner || !window.ChemProgress) return;
+					if (!heroInner || !window.ChemProgress) {
+						if (heroInner) heroInner.textContent = 'Тесты по биологии появятся позже — здесь будет последний результат.';
+						return;
+					}
 					const la = ChemProgress.getLastAttempt();
-					if (la && la.subject === 'chemistry') {
+					if (la && la.subject === 'biology') {
 						const when = ChemProgress.formatRelativeTime(la.finishedAt);
 						const profileLink = sessionLoggedIn
-							? ' · <a href="./profile.html" style="color:#4f7bd6; font-weight:600; margin-left:4px;">открыть профиль →</a>'
+							? ' · <a href="./profile.html" style="color:#2fa968; font-weight:600; margin-left:4px;">открыть профиль →</a>'
 							: '';
 						heroInner.innerHTML =
-							'Последний результат: <b>' +
+							'Последний результат (био): <b>' +
 							la.correct +
 							' / ' +
 							la.total +
@@ -1386,7 +1386,8 @@
 							when +
 							profileLink;
 					} else {
-						heroInner.textContent = 'Пройдите разминку или вариант — здесь появится последний результат.';
+						heroInner.textContent =
+							'Тесты по биологии в разработке. Результаты химии смотрите в курсе «Химия» или в профиле.';
 					}
 				}
 				paintHeroLastResult(false);
@@ -1400,207 +1401,13 @@
 						});
 				}
 
-				// Real stats (topics / questions) for hero
-				(function applyHeroRealStats() {
-					const elTopics = document.getElementById('chem-stat-topics');
-					const elQs = document.getElementById('chem-stat-questions');
-					const elSub = document.getElementById('chem-hero-subtitle');
-
-					try {
-						const topics = document.querySelectorAll('#topics-course-grid a.topic').length || 0;
-						if (elTopics) elTopics.textContent = String(topics || '—');
-
-						const qsAll = Array.isArray(window.CHEMISTRY_QUESTIONS) ? window.CHEMISTRY_QUESTIONS : [];
-						// Exclude "open" tasks that are not checkable / not in practice pool.
-						const qs = qsAll.filter(q => q && q.type !== 'open');
-						if (elQs) elQs.textContent = String(qs.length || '—');
-
-						if (elSub) {
-							const parts = [];
-							if (topics) parts.push(topics + ' ' + pluralize(topics, 'тема', 'темы', 'тем'));
-							if (qs.length) parts.push(qs.length + ' ' + pluralize(qs.length, 'задание', 'задания', 'заданий') + ' из базы ФИПИ');
-							parts.push('разбор типовых ошибок');
-							parts.push('полный вариант экзамена');
-							elSub.textContent = parts.join(', ') + '. Выбирай формат и начинай тренировку.';
-						}
-					} catch (e) {
-						// keep defaults
-					}
-				})();
-
-				const weakRoot = document.getElementById('weak-spots-root');
-				if (weakRoot) {
-					if (window.ChemTopicMap && window.MistakesStore) {
-						const rows = ChemTopicMap.aggregateFromMistakes().slice(0, 3);
-						if (rows.length === 0) {
-							weakRoot.innerHTML =
-								'<p class="weak__empty" style="color:var(--muted); font-size:15px; padding:8px 0;">Пока нет типичных ошибок по темам — пройдите тест, и мы подскажем, что подтянуть.</p>';
-						} else {
-							const svgIcon =
-								'<span class="weak__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span>';
-							weakRoot.innerHTML = rows
-								.map(function (r) {
-									const train = './uploads/easy-test.html?topic=' + encodeURIComponent(r.trainTopic);
-									return (
-										'<div class="weak__item">' +
-										svgIcon +
-										'<div><div class="weak__name">' +
-										r.label +
-										'</div><div class="weak__info">В банке ошибок: <b>' +
-										r.count +
-										'</b> ' +
-										pluralize(r.count, 'запись', 'записи', 'записей') +
-										'</div></div><div class="weak__btns">' +
-										'<a href="./topic-periodic-table.html?v=20260422" class="weak__btn">К темам</a>' +
-										'<a href="' +
-										train +
-										'" class="weak__btn weak__btn--primary">Тренировать</a></div></div>'
-									);
-								})
-								.join('');
-						}
-					} else {
-						weakRoot.innerHTML =
-							'<p class="weak__empty" style="color:var(--muted); font-size:15px; padding:8px 0;">Не удалось загрузить подсказки по темам. Проверьте соединение и <a href="#" onclick="location.reload();return false;" style="color:var(--accent); font-weight:700;">обновите страницу</a>.</p>';
-					}
-				}
-
-				function applyCourseTopicBars() {
-					var grid = document.getElementById('topics-course-grid');
-					if (!grid || !window.ChemTopicMap || !window.ChemProgress) return;
-					var slotFn = ChemTopicMap.part1SlotFromQid;
-					if (typeof slotFn !== 'function') return;
-					var la = ChemProgress.getLastAttempt();
-					var items =
-						la && la.subject === 'chemistry' && Array.isArray(la.items) ? la.items : null;
-					var bySlot = {};
-					if (items) {
-						items.forEach(function (it) {
-							if (!it || typeof it.qid !== 'number') return;
-							var slot = slotFn(it.qid);
-							if (slot == null) return;
-							bySlot[slot] = !!it.ok;
-						});
-					}
-					grid.querySelectorAll('a[data-topic-slots]').forEach(function (link) {
-						var raw = link.getAttribute('data-topic-slots') || '';
-						var slots = raw
-							.split(',')
-							.map(function (s) {
-								return parseInt(s.trim(), 10);
-							})
-							.filter(function (n) {
-								return n >= 1 && n <= 22;
-							});
-						var nHit = 0,
-							ok = 0;
-						slots.forEach(function (slot) {
-							if (Object.prototype.hasOwnProperty.call(bySlot, slot)) {
-								nHit++;
-								if (bySlot[slot]) ok++;
-							}
-						});
-						var fill = link.querySelector('[data-topic-fill]');
-						var pctEl = link.querySelector('[data-topic-pct]');
-						link.className = 'topic';
-						if (nHit === 0) {
-							link.classList.add('is--new');
-							if (fill) fill.style.width = '0%';
-							if (pctEl) pctEl.textContent = 'нет данных';
-							return;
-						}
-						var pct = Math.round((ok / nHit) * 100);
-						if (fill) fill.style.width = pct + '%';
-						if (pctEl) pctEl.textContent = pct + '%';
-						if (pct >= 80) link.classList.add('is--mastered');
-						else if (pct >= 45) link.classList.add('is--progress');
-						else link.classList.add('is--weak');
-					});
-				}
-				applyCourseTopicBars();
-
-				function applyCourseTopicCounts() {
-					var grid = document.getElementById('topics-course-grid');
-					if (!grid || !Array.isArray(window.CHEMISTRY_CATEGORIES)) return;
-					var byCatId = {};
-					window.CHEMISTRY_CATEGORIES.forEach(function (c) {
-						if (!c || typeof c.id !== 'number') return;
-						byCatId[c.id] = Array.isArray(c.qids) ? c.qids.length : 0;
-					});
-					grid.querySelectorAll('a[data-topic-cats]').forEach(function (link) {
-						var raw = (link.getAttribute('data-topic-cats') || '').trim();
-						if (!raw) return;
-						var catIds = raw
-							.split(',')
-							.map(function (s) {
-								return parseInt(s.trim(), 10);
-							})
-							.filter(function (n) {
-								return Number.isFinite(n) && n > 0;
-							});
-						var total = 0;
-						catIds.forEach(function (id) {
-							total += byCatId[id] || 0;
-						});
-						var el = link.querySelector('[data-topic-count]') || link.querySelector('.topic__count');
-						if (!el) return;
-						if (total > 0) el.textContent = '· ' + total + ' ' + pluralize(total, 'задание', 'задания', 'заданий');
-					});
-				}
-				applyCourseTopicCounts();
-
-				function renderChemCategories() {
-					var grid = document.getElementById('chem-categories-grid');
-					if (!grid) return;
-					if (!Array.isArray(window.CHEMISTRY_CATEGORIES)) {
-						grid.innerHTML =
-							'<p style="color:var(--muted); font-size:15px; padding:8px 0;">Не удалось загрузить категории. Проверьте соединение и <a href="#" onclick="location.reload();return false;" style="color:var(--accent); font-weight:700;">обновите страницу</a>.</p>';
-						return;
-					}
-					grid.innerHTML = window.CHEMISTRY_CATEGORIES.map(function (c) {
-						var num = String(c.id).padStart(2, '0');
-						var href = './category-chemistry.html?cat=' + encodeURIComponent(String(c.id));
-						var nq = Array.isArray(c.qids) ? c.qids.length : 0;
-						var hasBank = nq > 0;
-						var meta = hasBank ? ('готово · ' + nq + ' вопросов') : 'скоро · 0 вопросов';
-						var cls = 'cat' + (hasBank ? '' : ' is--coming');
-						return (
-							'<a class="' + cls + '" href="' + href + '">' +
-							'<span class="cat__num">' + num + '</span>' +
-							'<div class="cat__body">' +
-							'<div class="cat__name">' + c.title + '</div>' +
-							'<div class="cat__meta">Статус: <b>' + meta + '</b></div>' +
-							'</div>' +
-							'<span class="cat__go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>' +
-							'</a>'
-						);
-					}).join('');
-				}
-				renderChemCategories();
-
-				(function wireScrollCards() {
-					var links = document.querySelectorAll('a[data-scroll-to]');
-					if (!links || !links.length) return;
-					links.forEach(function (a) {
-						a.addEventListener('click', function (e) {
-							var id = a.getAttribute('data-scroll-to');
-							if (!id) return;
-							var target = document.getElementById(id);
-							if (!target) return;
-							e.preventDefault();
-							try { history.replaceState(null, '', '#' + id); } catch (err) {}
-							var header = document.querySelector('.header');
-							var offset = header ? (header.getBoundingClientRect().height + 14) : 92;
-							var top = window.scrollY + target.getBoundingClientRect().top - offset;
-							window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-							target.style.outline = '2px solid rgba(79,123,214,.35)';
-							target.style.outlineOffset = '6px';
-							setTimeout(function () {
-								target.style.outline = '';
-								target.style.outlineOffset = '';
-							}, 1200);
-						});
-					});
+				(function countBioPlaceholders() {
+					const grid = document.getElementById('bio-topics-grid');
+					const elT = document.getElementById('bio-stat-topics');
+					const elQ = document.getElementById('bio-stat-questions');
+					const n = grid ? grid.querySelectorAll('.topic').length : 0;
+					if (elT) elT.textContent = String(n);
+					if (elQ) elQ.textContent = '0';
 				})();
 			})();
 		</script>
