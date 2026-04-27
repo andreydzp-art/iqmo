@@ -78,6 +78,8 @@ DROP TABLE IF EXISTS analytics_events;
 
 `deploy.yml` прогоняет **`node scripts/sync-site.mjs` на GitHub runner** (Node 20, см. `actions/setup-node`), затем **rsync** с `--delete` в `…/app/laravel/public/site/` и только потом **SSH** с `git reset` + `composer` / миграциями. На **VPS Node не требуется** (раньше sync шёл по SSH, и nvm/node не был в PATH — деплой падал). Пакет **`openssh-server` + `rsync`** на сервере обычно уже есть. Никаких ручных синков перед `git push` не нужно.
 
+**Secrets:** `DEPLOY_HOST` и `DEPLOY_USER` должны быть **одна строка без пробела в конце и без перевода строки** (если вставить «как в блокноте» с лишним Enter, ssh пишет `hostname contains invalid characters`). В workflow значения **обрезаются**, но лучше поправить и в кабинете GitHub.
+
 ### Локально (если правите HTML и хотите проверить через `php artisan serve`)
 
 ```bash

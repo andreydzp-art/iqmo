@@ -86,18 +86,29 @@ jobs:
       - name: Rsync public/site → VPS
         env:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_USER_IN: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST_IN: ${{ secrets.DEPLOY_HOST }}
         run: |
           set -euo pipefail
-          REMOTE="${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}"
+          # Секреты GitHub нередко содержат \r / пробел в конце / перевод строки — ssh тогда
+          # падает с: hostname contains invalid characters.
+          trim() { printf '%s' "$1" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'; }
+          DEPLOY_USER=$(trim "${DEPLOY_USER_IN:-}")
+          DEPLOY_HOST=$(trim "${DEPLOY_HOST_IN:-}")
+          if [ -z "$DEPLOY_USER" ] || [ -z "$DEPLOY_HOST" ]; then
+            echo "DEPLOY_USER или DEPLOY_HOST пустые после trim — проверьте Secrets (без лишних переносов в конце поля)."
+            exit 1
+          fi
           DEST="/var/www/iqmoschool_r_usr/data/www/iqmoschool.ru/app/laravel/public/site/"
           install -d -m 700 ~/.ssh
           echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/iqmo_deploy
           chmod 600 ~/.ssh/iqmo_deploy
-          echo "=== DEPLOY: rsync laravel/public/site/ → $DEST ==="
+          echo "=== DEPLOY: rsync → host (len=${#DEPLOY_HOST}) path=.../laravel/public/site/ (user via ssh -l) ==="
+          # user задаём -l, в dest остаётся только host:path (меньше шансов сломать разбор при лишних символах)
           rsync -az --delete \
-            -e "ssh -i ~/.ssh/iqmo_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
+            -e "ssh -i ${HOME}/.ssh/iqmo_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l \"$DEPLOY_USER\"" \
             "laravel/public/site/" \
-            "$REMOTE:$DEST"
+            "${DEPLOY_HOST}:${DEST}"
           echo "=== DEPLOY: rsync OK ==="
 
       - name: SSH — Laravel (composer, migrate, cleanup, fpm)
