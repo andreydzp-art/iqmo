@@ -60,20 +60,31 @@ const BANK_FILES = [
 const SKIP_FILES = new Set(['.DS_Store', 'Thumbs.db', BUNDLE_NAME]);
 const SKIP_DIRS = new Set(['node_modules', '.git']);
 
+/** Админка в `laravel/resources/admin-ui`; не зеркалить `extracted/admin` в `public/site/admin/`.
+ *  При `root` = `public/site` nginx отдаёт `/admin/index.html` как статику до PHP — обход авторизации,
+ *  падает smoke в deploy.yml. */
+function shouldSkipAdminMirror(relPosix) {
+	return relPosix === 'admin' || relPosix.startsWith('admin/');
+}
+
 if (!existsSync(SRC)) {
 	console.error(`[sync-site] source not found: ${SRC}`);
 	process.exit(1);
 }
 
-async function walk(dir, base = dir, out = []) {
+async function walk(dir, base = dir, out = [], skipAdminFromSource = false) {
 	const entries = await readdir(dir, { withFileTypes: true });
 	for (const e of entries) {
 		if (e.isDirectory()) {
 			if (SKIP_DIRS.has(e.name)) continue;
-			await walk(join(dir, e.name), base, out);
+			const rel = relative(base, join(dir, e.name)).replace(/\\/g, '/');
+			if (skipAdminFromSource && shouldSkipAdminMirror(rel)) continue;
+			await walk(join(dir, e.name), base, out, skipAdminFromSource);
 		} else if (e.isFile()) {
 			if (SKIP_FILES.has(e.name)) continue;
-			out.push(relative(base, join(dir, e.name)));
+			const rel = relative(base, join(dir, e.name)).replace(/\\/g, '/');
+			if (skipAdminFromSource && shouldSkipAdminMirror(rel)) continue;
+			out.push(rel);
 		}
 	}
 	return out;
@@ -84,8 +95,8 @@ async function ensureDir(p) {
 }
 
 async function main() {
-	const srcRel = await walk(SRC);
-	const dstRel = existsSync(DST) ? await walk(DST) : [];
+	const srcRel = await walk(SRC, SRC, [], true);
+	const dstRel = existsSync(DST) ? await walk(DST, DST, [], false) : [];
 
 	const srcSet = new Set(srcRel);
 

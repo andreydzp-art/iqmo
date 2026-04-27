@@ -71,7 +71,7 @@ DROP TABLE IF EXISTS analytics_events;
 
 - **Источник:** `extracted/` (commits to git)
 - **Цель (рантайм):** `laravel/public/site/` — её читают Laravel-маршруты (`routes/web.php`).
-- **Преобразование:** `node scripts/sync-site.mjs` зеркалит первое во второе и **удаляет в target всё, чего нет в source** (так что `git rm` в `extracted/` тоже распространяется).
+- **Преобразование:** `node scripts/sync-site.mjs` зеркалит первое во второе и **удаляет в target всё, чего нет в source** (так что `git rm` в `extracted/` тоже распространяется). Папка **`extracted/admin/`** в `public/site/` **намеренно не копируется** (админка — только `resources/admin-ui` + Laravel; иначе при `root` = `public/site` nginx отдаёт `/admin/index.html` как статику и обходит middleware). Папка **`extracted/admin/`** в `public/site/` **намеренно не копируется** (админка отдаётся только из `resources/admin-ui` через Laravel; иначе при `root` = `public/site` nginx отдаёт `/admin/index.html` как статику и обходит middleware).
 - **Bundle вопросов:** тот же sync-скрипт собирает `chemistry-banks-bundle.js` из 17 файлов `chemistry-cat*-source.js` и кладёт его одновременно в `extracted/` и `laravel/public/site/`. Источник — git'овые `*-source.js`, сам bundle не отслеживается (`.gitignore`). Это закрывает старый класс ошибок, когда страница теста забывала один из 17 `<script>` тегов и часть категорий тихо исчезала.
 
 ### На деплое (автоматически)
