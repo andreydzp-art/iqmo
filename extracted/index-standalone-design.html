@@ -789,7 +789,20 @@ h1,h2,h3,p{margin:0}
   display:flex;flex-direction:column;
   overflow-y:auto;
 }
-.modal__steps{display:flex;align-items:center;gap:8px;margin-bottom:22px}
+.modal__steps{display:flex;align-items:center;gap:8px;margin-bottom:22px;padding-right:44px}
+.modal__close{
+  position:absolute;top:16px;right:16px;
+  width:36px;height:36px;border-radius:12px;
+  border:1.5px solid var(--line);background:#fff;
+  display:grid;place-items:center;
+  color:var(--muted);
+  cursor:pointer;
+  transition:color .15s ease, border-color .15s ease, transform .12s ease;
+  z-index:3;
+}
+.modal__close:hover{color:var(--ink);border-color:#d8d6cf;transform:translateY(-1px)}
+.modal__close:active{transform:translateY(1px)}
+.modal__close svg{width:16px;height:16px}
 .modal__step-dot{
   flex:1;height:6px;border-radius:99px;background:#ebe7df;position:relative;overflow:hidden;
 }
@@ -1393,6 +1406,11 @@ h1,h2,h3,p{margin:0}
 <div class="modal" id="register-modal" role="dialog" aria-modal="true" aria-labelledby="register-title" aria-hidden="true">
   <div class="modal__backdrop"></div>
   <div class="modal__card">
+    <button type="button" class="modal__close" id="register-close" aria-label="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18"></path>
+      </svg>
+    </button>
     <aside class="modal__side">
       <div>
         <span class="modal__eyebrow">★ 7 дней бесплатно</span>
@@ -1592,6 +1610,8 @@ tick(); setInterval(tick, 1000);
   const modal = document.getElementById('register-modal');
   const form = document.getElementById('register-form');
   const done = document.getElementById('register-done');
+  const closeBtn = document.getElementById('register-close');
+  const backdrop = modal ? modal.querySelector('.modal__backdrop') : null;
   const stepLabel = document.getElementById('step-label');
   const stepDots = document.querySelectorAll('#step-bar .modal__step-dot');
   const nextBtn = document.getElementById('step-next');
@@ -1616,6 +1636,12 @@ tick(); setInterval(tick, 1000);
     document.querySelector('[data-choice="subject"] [data-val="chem"]').classList.add('is-on');
     document.querySelector('[data-choice="goal"] [data-val="4"]').classList.add('is-on');
     setTimeout(()=>document.getElementById('reg-name').focus(),60);
+  }
+
+  function close(){
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
   }
 
   function setStep(i){
@@ -1651,6 +1677,12 @@ tick(); setInterval(tick, 1000);
   // open triggers
   document.querySelectorAll('[data-open-register]').forEach(el=>{
     el.addEventListener('click', e=>{ e.preventDefault(); open(); });
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  if (backdrop) backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
   });
 
   // chip choice toggling (single-select per group)
