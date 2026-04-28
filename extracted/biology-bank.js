@@ -50,7 +50,7 @@ window.BIOLOGY_QUESTIONS = [
 		type: 'multi',
 		pickCount: 2,
 		title: 'Анализ графика',
-		body: '<p>Изучите описание (рост до пика около 45 особей между 35 и 50 днями, затем снижение) и <b>график</b> зависимости численности популяции от времени. Какие <b>два</b> из пяти утверждений наиболее точно отражают ситуацию?</p><figure class="q-figure q-figure--wide" role="group" aria-label="График к заданию"><img class="q-figure__img" src="/img/biology/q04-grafik-chislennosti-populyacii.png" alt="График: численность популяции (ось Y) от времени в днях (ось X), пик около 45" loading="lazy" decoding="async" /></figure>',
+		body: '<p>Изучите описание (рост до пика около 45 особей между 35 и 50 днями, затем снижение) и <b>график</b> зависимости численности популяции от времени. Какие <b>два</b> из пяти утверждений наиболее точно отражают ситуацию?</p><figure class="q-figure" role="group" aria-label="График к заданию"><img class="q-figure__img" src="/img/biology/q04-grafik-chislennosti-populyacii.png" alt="График: численность популяции (ось Y) от времени в днях (ось X), пик около 45" loading="lazy" decoding="async" /></figure>',
 		options: [
 			{ id: '1', label: 'За время наблюдения численность популяции постоянно возрастала' },
 			{ id: '2', label: 'Максимальная численность популяции наблюдалась между 35-м и 50-м днями' },
