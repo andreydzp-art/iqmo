@@ -2,7 +2,7 @@
 // Структура согласована с full-test-biology.html (type, body, options, matchLeft/Right, correct, hint).
 // Схема пищевой сети (дубрава) — задания 19–21.
 const _BIO_FIG_19_21 =
-	'<figure class="q-figure q-figure--wide" role="group" aria-label="Схема пищевой сети в дубраве">' +
+	'<figure class="q-figure" role="group" aria-label="Схема пищевой сети в дубраве">' +
 	'<img class="q-figure__img" src="/img/biology/q19-21-shema-pischevoj-seti-lesa.png" alt="Пищевая сеть в дубраве: дерево, организмы и связи, буквы на схеме" loading="lazy" decoding="async" />' +
 	'</figure>';
 window.BIOLOGY_QUESTIONS = [
