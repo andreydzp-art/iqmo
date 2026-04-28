@@ -22,6 +22,15 @@ final class IqmoAdminQuizMetricsBuilder
                 'quiz_to_reg' => 8.0,
             ],
         ],
+        'biology-2' => [
+            'name' => 'Биология · Quiz #2',
+            'questions' => 15,
+            'targets' => [
+                'email_gate' => 25.0,
+                'email_to_reg' => 30.0,
+                'quiz_to_reg' => 8.0,
+            ],
+        ],
         'chemistry-1' => [
             'name' => 'Химия · Quiz #1',
             'questions' => 15,
