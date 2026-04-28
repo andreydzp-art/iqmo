@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IQMO — Сможете набрать 13/15 по химии?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#fafaf7;
+  --ink:#0e0e12;
+  --ink-2:#3b3d49;
+  --muted:#7a7d8a;
+  --line:#e9e8e1;
+  --primary:#5b3df5;
+  --primary-soft:#ece8ff;
+  --mint:#23d3a4;
+  --mint-soft:#daf6ec;
+  --sun:#ffd23a;
+  --sun-soft:#fff1c2;
+  --coral:#ff6b6b;
+  --coral-soft:#ffe2e2;
+  --leaf:#3aa66f;
+  --leaf-soft:#d8f0e2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Manrope',system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(91,61,245,.10), transparent 38%),
+    radial-gradient(circle at 88% 92%, rgba(58,166,111,.12), transparent 38%),
+    var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;
+}
+button{font-family:inherit;cursor:pointer;border:0;background:none}
+h1,h2,h3,p{margin:0}
+.wrap{max-width:640px;margin:0 auto;padding:24px;width:100%;flex:1;display:flex;flex-direction:column}
+
+/* ---------- Top bar ---------- */
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;letter-spacing:-.02em}
+.brand__mark{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--primary),#8a72ff);
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px;
+  box-shadow:0 4px 14px -4px rgba(91,61,245,.5);
+}
+
+/* ---------- Progress ---------- */
+.progress{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.progress__bar{flex:1;height:10px;border-radius:99px;background:#ebe7df;overflow:hidden;position:relative}
+.progress__fill{
+  position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,var(--leaf),#5fd09a);
+  width:0%;border-radius:99px;
+  transition:width .4s cubic-bezier(.2,.8,.3,1.2);
+  box-shadow:0 0 0 3px rgba(58,166,111,.18);
+}
+.progress__txt{font-size:13px;font-weight:900;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.streak{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:99px;
+  background:var(--coral-soft);color:#c33d3d;font-weight:900;font-size:12px;
+}
+
+/* ---------- Card / screens ---------- */
+.card{
+  background:#fff;border:1.5px solid var(--line);border-radius:24px;
+  padding:28px;
+  box-shadow:0 1px 0 rgba(14,14,18,.04), 0 12px 30px -16px rgba(14,14,18,.18);
+  flex:1;display:flex;flex-direction:column;
+}
+
+/* ---------- Start screen ---------- */
+.start{align-items:center;text-align:center;padding:40px 28px}
+.start__art{
+  width:160px;height:160px;border-radius:32px;
+  background:linear-gradient(160deg,var(--leaf-soft) 0%,#ffeebd 100%);
+  display:grid;place-items:center;font-size:80px;
+  margin-bottom:20px;
+  box-shadow:0 16px 40px -16px rgba(58,166,111,.4);
+  position:relative;
+}
+.start__art::before{
+  content:'';position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.5);
+}
+.start__h{font-size:30px;font-weight:900;letter-spacing:-.02em;line-height:1.05;margin-bottom:12px}
+.start__h em{font-style:normal;background:linear-gradient(135deg,var(--leaf),#5fd09a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.start__sub{font-size:15.5px;color:var(--ink-2);max-width:380px;line-height:1.5;margin-bottom:22px}
+.start__meta{display:flex;gap:20px;font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:24px}
+.start__meta b{color:var(--ink);font-weight:900}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-weight:900;font-size:15px;
+  padding:15px 24px;border-radius:14px;
+  transition:transform .12s ease;
+  white-space:nowrap;border:0;cursor:pointer;
+}
+.btn--primary{
+  background:var(--primary);color:#fff;
+  box-shadow:0 4px 0 #3a23c4,0 12px 24px -10px rgba(91,61,245,.5);
+}
+.btn--primary:hover{transform:translateY(-1px)}
+.btn--primary:active{transform:translateY(2px);box-shadow:0 2px 0 #3a23c4}
+.btn--leaf{
+  background:var(--leaf);color:#fff;
+  box-shadow:0 4px 0 #2b8557,0 12px 24px -10px rgba(58,166,111,.5);
+}
+.btn--leaf:hover{transform:translateY(-1px)}
+.btn--leaf:active{transform:translateY(2px);box-shadow:0 2px 0 #2b8557}
+.btn--ghost{
+  background:#fff;color:var(--ink);border:1.5px solid var(--line);box-shadow:0 2px 0 var(--line);
+}
+.btn--lg{padding:17px 28px;font-size:16px;border-radius:16px;width:100%;max-width:340px}
+
+/* ---------- Question ---------- */
+.q__visual{
+  width:100%;aspect-ratio:1.6;border-radius:18px;
+  display:grid;place-items:center;font-size:90px;line-height:1;
+  margin-bottom:20px;position:relative;overflow:hidden;
+  border:1.5px solid var(--line);
+}
+.q__h{font-size:22px;font-weight:900;letter-spacing:-.01em;line-height:1.2;margin-bottom:18px}
+.q__opts{display:flex;flex-direction:column;gap:10px}
+.opt{
+  display:flex;align-items:center;gap:12px;
+  padding:15px 18px;border-radius:14px;
+  background:#fff;border:1.5px solid var(--line);
+  font-weight:800;font-size:15px;color:var(--ink);
+  text-align:left;cursor:pointer;
+  transition:all .12s ease;
+  box-shadow:0 2px 0 var(--line);
+  width:100%;
+}
+.opt:hover:not(:disabled){border-color:var(--primary);transform:translateY(-1px);box-shadow:0 3px 0 var(--primary-soft)}
+.opt__bullet{
+  width:28px;height:28px;border-radius:9px;
+  background:#f5f3ec;color:var(--ink-2);
+  display:grid;place-items:center;font-size:12px;font-weight:900;flex:0 0 auto;
+}
+.opt__txt{flex:1}
+.opt__mark{font-size:18px;font-weight:900;width:24px;text-align:right;display:none}
+
+.opt.is-correct{background:var(--mint-soft);border-color:var(--mint);color:#0c5a44;box-shadow:0 3px 0 #b3e8d3;animation:pop .35s cubic-bezier(.2,.8,.3,1.2)}
+.opt.is-correct .opt__bullet{background:var(--mint);color:#fff}
+.opt.is-correct .opt__mark{display:inline;color:var(--mint)}
+.opt.is-wrong{background:var(--coral-soft);border-color:var(--coral);color:#a32626;box-shadow:0 3px 0 #f5cccc;animation:shake .35s ease}
+.opt.is-wrong .opt__bullet{background:var(--coral);color:#fff}
+.opt.is-wrong .opt__mark{display:inline;color:var(--coral)}
+.opt.is-shown-correct{background:var(--mint-soft);border-color:var(--mint);color:#0c5a44}
+.opt.is-shown-correct .opt__bullet{background:var(--mint);color:#fff}
+.opt.is-shown-correct .opt__mark{display:inline;color:var(--mint)}
+.opt:disabled{cursor:default}
+.opt.is-dim{opacity:.5}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* ---------- Feedback bar ---------- */
+.feedback{
+  margin-top:18px;padding:16px 18px;border-radius:14px;
+  display:flex;gap:12px;align-items:flex-start;
+  animation:slideUp .3s cubic-bezier(.2,.8,.3,1.2);
+}
+@keyframes slideUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.feedback--good{background:var(--mint-soft);border:1.5px solid var(--mint);color:#0c5a44}
+.feedback--bad{background:var(--coral-soft);border:1.5px solid var(--coral);color:#a32626}
+.feedback__emoji{font-size:24px;line-height:1;flex:0 0 auto}
+.feedback__title{font-size:14px;font-weight:900;margin-bottom:3px}
+.feedback__exp{font-size:13.5px;font-weight:600;line-height:1.4;opacity:.85}
+.feedback__next{
+  margin-left:auto;align-self:center;
+  background:#0e0e12;color:#fff;
+  padding:10px 18px;border-radius:11px;
+  font-weight:900;font-size:13px;
+  box-shadow:0 3px 0 #2a2a30;
+  white-space:nowrap;
+}
+.feedback__next:active{transform:translateY(2px);box-shadow:0 1px 0 #2a2a30}
+
+/* +XP toast */
+.xp-toast{
+  position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-30px);
+  background:var(--sun);color:#3d2f00;
+  padding:10px 18px;border-radius:99px;font-weight:900;font-size:14px;
+  box-shadow:0 8px 24px -8px rgba(255,210,58,.6);
+  opacity:0;pointer-events:none;
+  transition:transform .35s cubic-bezier(.2,.8,.3,1.2), opacity .25s ease;
+  z-index:100;
+}
+.xp-toast.is-show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ---------- Result screen ---------- */
+.result{align-items:center;text-align:center;padding:24px 24px 22px}
+.result__ring{
+  width:104px;height:104px;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:34px;font-weight:900;color:#fff;letter-spacing:-.02em;
+  font-family:'Space Grotesk',sans-serif;
+  margin-bottom:14px;
+  box-shadow:0 16px 40px -12px rgba(91,61,245,.4);
+  position:relative;
+  animation:ringIn .5s cubic-bezier(.2,.8,.3,1.2);
+}
+@keyframes ringIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.result__ring small{font-size:14px;font-weight:700;opacity:.7;display:block;margin-top:-2px}
+.result__ring.r-low{background:linear-gradient(135deg,var(--coral),#ff8a65)}
+.result__ring.r-mid{background:linear-gradient(135deg,var(--primary),#9277ff)}
+.result__ring.r-hi{background:linear-gradient(135deg,var(--leaf),#5fd09a);box-shadow:0 16px 40px -12px rgba(58,166,111,.4)}
+
+.result__h{font-size:24px;font-weight:900;letter-spacing:-.02em;line-height:1.05;margin-bottom:6px}
+.result__sub{font-size:14px;color:var(--ink-2);max-width:420px;line-height:1.45;margin-bottom:14px}
+
+.result__stats{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;
+  margin-bottom:14px;
+}
+.stat{
+  background:#fafaf7;border:1.5px solid var(--line);border-radius:12px;
+  padding:10px 8px;text-align:center;
+}
+.stat__num{font-size:19px;font-weight:900;letter-spacing:-.01em;font-family:'Space Grotesk',sans-serif}
+.stat__num.good{color:var(--leaf)}
+.stat__num.bad{color:var(--coral)}
+.stat__num.neutral{color:var(--primary)}
+.stat__lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+
+.weak{
+  width:100%;text-align:left;
+  background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;
+  margin-bottom:14px;
+}
+.weak__h{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.weak__list{display:flex;flex-direction:column;gap:6px}
+.weak__row{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700}
+.weak__row .ic{width:22px;height:22px;border-radius:7px;background:var(--coral-soft);color:var(--coral);display:grid;place-items:center;font-size:12px;font-weight:900;flex:0 0 auto}
+.weak__none{font-size:14px;color:var(--ink-2);line-height:1.5}
+.weak__none b{color:var(--leaf)}
+
+.result__pitch{
+  background:linear-gradient(165deg,#0e0e12 0%,#1a1532 100%);
+  color:#fff;border-radius:16px;padding:14px 18px;width:100%;
+  text-align:left;margin-bottom:14px;position:relative;overflow:hidden;
+}
+.result__pitch::before{
+  content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,210,58,.25),transparent 70%);
+}
+.result__pitch h4{font-size:16px;font-weight:900;letter-spacing:-.01em;margin-bottom:4px;position:relative}
+.result__pitch p{font-size:13px;color:rgba(255,255,255,.75);line-height:1.45;position:relative}
+.result__pitch .tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10.5px;font-weight:900;color:var(--sun);text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:6px;position:relative;
+}
+
+.result__cta{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center}
+.result__retry{font-size:13.5px;color:var(--muted);font-weight:700;text-decoration:underline;cursor:pointer;background:none;border:0;padding:8px}
+.result__retry:hover{color:var(--ink)}
+
+/* hidden helper */
+.hidden{display:none !important}
+
+@media (max-width:520px){
+  .wrap{padding:16px}
+  .card{padding:20px;border-radius:20px}
+  .start{padding:28px 18px}
+  .start__h{font-size:24px}
+  .start__art{width:130px;height:130px;font-size:64px;border-radius:24px}
+  .q__h{font-size:18px}
+  .q__visual{font-size:64px}
+  .feedback__next{padding:8px 12px;font-size:12px}
+  .result__h{font-size:22px}
+  .result__ring{width:120px;height:120px;font-size:34px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="progress" id="progressWrap" hidden>
+    <div class="progress__bar"><div class="progress__fill" id="progressFill"></div></div>
+    <span class="progress__txt" id="progressTxt">0 / 15</span>
+    <span class="streak" id="streakChip">🔥 0</span>
+  </div>
+
+  <main class="card" id="card">
+    <!-- screens injected by JS -->
+  </main>
+</div>
+
+<div class="xp-toast" id="xpToast">+10 XP</div>
+
+<script>
+/* ===================== QUIZ DATA ===================== */
+const QUIZ = {
+  title: "Сможете набрать 13 из 15 по химии?",
+  subtitle: "15 быстрых вопросов уровня ОГЭ. Без давления — просто проверьте, как у вас с химией прямо сейчас.",
+  questions: [
+    // ---- Лёгкие (1-5) ----
+    { topic:"Атомы", art:"⚛️", visual:"linear-gradient(135deg,#ece8ff,#fff1c2)",
+      q:"Из чего состоит ядро атома?",
+      opts:["Из электронов","Из протонов и нейтронов","Из молекул","Из ионов"], correct:1,
+      exp:"В ядре — протоны (заряд +) и нейтроны (нет заряда). Электроны вращаются вокруг." },
+    { topic:"Таблица Менделеева", art:"🧪", visual:"linear-gradient(135deg,#daf6ec,#fff1c2)",
+      q:"Какой элемент обозначается символом O?",
+      opts:["Олово","Осмий","Кислород","Золото"], correct:2,
+      exp:"O — Oxygenium, кислород. Золото — Au, олово — Sn." },
+    { topic:"Вода", art:"💧", visual:"linear-gradient(135deg,#daf6ec,#ece8ff)",
+      q:"Какова формула воды?",
+      opts:["H₂O","HO₂","H₂O₂","OH"], correct:0,
+      exp:"Два атома водорода и один кислорода. H₂O₂ — это уже перекись водорода." },
+    { topic:"Состояния вещества", art:"❄️", visual:"linear-gradient(135deg,#ece8ff,#daf6ec)",
+      q:"При какой температуре вода замерзает (при нормальном давлении)?",
+      opts:["−10 °C","0 °C","+4 °C","+10 °C"], correct:1,
+      exp:"Ровно 0 °C при 1 атмосфере. При +4 °C у воды максимальная плотность — но не замерзание." },
+    { topic:"Кислоты", art:"🍋", visual:"linear-gradient(135deg,#fff1c2,#ffe2e2)",
+      q:"Какая среда у раствора с pH = 3?",
+      opts:["Кислая","Нейтральная","Щелочная","Без среды"], correct:0,
+      exp:"pH < 7 — кислая, pH = 7 — нейтральная, pH > 7 — щелочная." },
+
+    // ---- Средние (6-10) ----
+    { topic:"Реакции", art:"🔥", visual:"linear-gradient(135deg,#ffe2e2,#fff1c2)",
+      q:"Что выделяется при горении метана (CH₄) в кислороде?",
+      opts:["H₂ и N₂","CO₂ и H₂O","CO и H₂","O₂ и C"], correct:1,
+      exp:"CH₄ + 2O₂ → CO₂ + 2H₂O. Полное сгорание углеводорода даёт углекислый газ и воду." },
+    { topic:"Соли", art:"🧂", visual:"linear-gradient(135deg,#ece8ff,#daf6ec)",
+      q:"Какова формула поваренной соли?",
+      opts:["NaCl","KCl","Na₂SO₄","CaCO₃"], correct:0,
+      exp:"NaCl — хлорид натрия. KCl — хлорид калия (тоже соль, но другая), CaCO₃ — мел." },
+    { topic:"Газы", art:"💨", visual:"linear-gradient(135deg,#daf6ec,#ece8ff)",
+      q:"Какой газ преобладает в атмосфере Земли?",
+      opts:["Кислород","Углекислый газ","Азот","Водород"], correct:2,
+      exp:"Азот — около 78%. Кислорода ~21%, остального — около 1%." },
+    { topic:"Металлы", art:"⚙️", visual:"linear-gradient(135deg,#fff1c2,#ece8ff)",
+      q:"Какой металл самый лёгкий?",
+      opts:["Алюминий","Железо","Литий","Магний"], correct:2,
+      exp:"Литий — плотность 0,53 г/см³, легче воды. На воде плавает." },
+    { topic:"Реакции", art:"⚗️", visual:"linear-gradient(135deg,#ece8ff,#ffe2e2)",
+      q:"Что произойдёт, если добавить цинк (Zn) в соляную кислоту (HCl)?",
+      opts:["Ничего","Выделится водород","Выделится кислород","Образуется вода"], correct:1,
+      exp:"Zn + 2HCl → ZnCl₂ + H₂↑. Активный металл вытесняет водород из кислоты." },
+
+    // ---- Сложнее (11-15) ----
+    { topic:"Молярная масса", art:"📐", visual:"linear-gradient(135deg,#ece8ff,#daf6ec)",
+      q:"Чему равна молярная масса воды (H₂O)?",
+      opts:["16 г/моль","18 г/моль","20 г/моль","22 г/моль"], correct:1,
+      exp:"M(H₂O) = 2·1 + 16 = 18 г/моль." },
+    { topic:"Периодический закон", art:"📊", visual:"linear-gradient(135deg,#fff1c2,#daf6ec)",
+      q:"Что определяет порядковый номер элемента в таблице Менделеева?",
+      opts:["Число нейтронов","Число протонов в ядре","Атомную массу","Число электронных уровней"], correct:1,
+      exp:"Порядковый номер = число протонов = заряд ядра. Это и есть «паспорт» элемента." },
+    { topic:"Окисление", art:"🔋", visual:"linear-gradient(135deg,#ffe2e2,#ece8ff)",
+      q:"Что такое окисление в реакции?",
+      opts:["Присоединение электронов","Отдача электронов","Поглощение тепла","Образование осадка"], correct:1,
+      exp:"Окисление = отдача электронов, восстановление = их приём. Запоминалка: ОВР." },
+    { topic:"Органика", art:"🧬", visual:"linear-gradient(135deg,#daf6ec,#fff1c2)",
+      q:"К какому классу относится этанол (C₂H₅OH)?",
+      opts:["Альдегиды","Кислоты","Спирты","Эфиры"], correct:2,
+      exp:"Группа −OH у углерода — это спирт. У этанола один атом углерода с OH, значит одноатомный спирт." },
+    { topic:"Связи", art:"🔗", visual:"linear-gradient(135deg,#ece8ff,#fff1c2)",
+      q:"Какая связь в молекуле NaCl?",
+      opts:["Ковалентная неполярная","Ковалентная полярная","Ионная","Металлическая"], correct:2,
+      exp:"Между металлом (Na) и неметаллом (Cl) с большой разностью электроотрицательностей — ионная." },
+  ]
+};
+
+const MICROS_GOOD = ["Отлично!","Точно!","Огонь 🔥","Молодец!","В точку","Шарите","Чисто","Так держать"];
+const MICROS_BAD  = ["Бывает","Не страшно","Запомним","Норм, идём дальше","Это в копилку","Ничего"];
+
+/* ===================== STATE ===================== */
+const state = {
+  i: 0,           // current question index
+  correct: 0,
+  streak: 0,
+  bestStreak: 0,
+  xp: 0,
+  wrongTopics: new Set(),
+  answers: [],    // {qi, ok, picked}
+};
+
+const card = document.getElementById('card');
+const progressWrap = document.getElementById('progressWrap');
+const progressFill = document.getElementById('progressFill');
+const progressTxt = document.getElementById('progressTxt');
+const streakChip = document.getElementById('streakChip');
+const xpToast = document.getElementById('xpToast');
+
+/* ===================== SCREENS ===================== */
+function renderStart(){
+  progressWrap.hidden = true;
+  card.className = 'card start';
+  card.innerHTML = `
+    <div class="start__art">⚗️</div>
+    <h1 class="start__h">Сможете набрать <em>13 из 15</em><br/>по химии?</h1>
+    <p class="start__sub">15 быстрых вопросов уровня ОГЭ. Без давления — просто проверьте, как у вас с химией прямо сейчас.</p>
+    <div class="start__meta">
+      <span><b>~3 мин</b> · 15 вопросов</span>
+      <span><b>4</b> варианта</span>
+      <span><b>+10 XP</b> за ответ</span>
+    </div>
+    <button class="btn btn--leaf btn--lg" id="startBtn">Поехали →</button>
+    <p style="margin-top:14px;font-size:12px;color:var(--muted);font-weight:700">Бесплатно. Без регистрации. Результат увидите в конце.</p>
+  `;
+  document.getElementById('startBtn').onclick = ()=>{ state.i=0; renderQuestion(); };
+}
+
+function updateProgress(){
+  const total = QUIZ.questions.length;
+  const pct = (state.i / total) * 100;
+  progressFill.style.width = pct + '%';
+  progressTxt.textContent = `${state.i} / ${total}`;
+  streakChip.textContent = `🔥 ${state.streak}`;
+  streakChip.style.opacity = state.streak > 0 ? '1' : '.4';
+}
+
+function renderQuestion(){
+  const q = QUIZ.questions[state.i];
+  progressWrap.hidden = false;
+  updateProgress();
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="q__visual" style="background:${q.visual}">${q.art}</div>
+    <div style="font-size:11px;font-weight:900;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">${q.topic}</div>
+    <h2 class="q__h">${q.q}</h2>
+    <div class="q__opts" id="opts">
+      ${q.opts.map((o,i)=>`
+        <button class="opt" data-i="${i}">
+          <span class="opt__bullet">${String.fromCharCode(65+i)}</span>
+          <span class="opt__txt">${o}</span>
+          <span class="opt__mark"></span>
+        </button>`).join('')}
+    </div>
+    <div id="fbSlot"></div>
+  `;
+  card.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>handleAnswer(parseInt(btn.dataset.i,10));
+  });
+}
+
+function handleAnswer(picked){
+  const q = QUIZ.questions[state.i];
+  const ok = picked === q.correct;
+  const opts = card.querySelectorAll('.opt');
+
+  opts.forEach((btn,idx)=>{
+    btn.disabled = true;
+    if(idx === picked) btn.classList.add(ok ? 'is-correct' : 'is-wrong');
+    if(!ok && idx === q.correct) btn.classList.add('is-shown-correct');
+    if(idx !== picked && idx !== q.correct) btn.classList.add('is-dim');
+    btn.querySelector('.opt__mark').textContent = (idx===q.correct) ? '✓' : (idx===picked ? '✕' : '');
+  });
+
+  state.answers.push({qi: state.i, ok, picked});
+  if(ok){
+    state.correct++;
+    state.streak++;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+    state.xp += 10 + (state.streak >= 3 ? 5 : 0); // bonus on streak
+    showXp(state.streak >= 3 ? '+15 XP 🔥' : '+10 XP');
+  } else {
+    state.streak = 0;
+    state.wrongTopics.add(q.topic);
+  }
+  updateProgress();
+
+  const microPool = ok ? MICROS_GOOD : MICROS_BAD;
+  const micro = microPool[Math.floor(Math.random()*microPool.length)];
+  const isLast = state.i === QUIZ.questions.length - 1;
+
+  document.getElementById('fbSlot').innerHTML = `
+    <div class="feedback feedback--${ok?'good':'bad'}">
+      <span class="feedback__emoji">${ok ? (state.streak>=3?'🔥':'✅') : '💡'}</span>
+      <div style="flex:1">
+        <div class="feedback__title">${micro}${ok && state.streak>=3 ? ` · серия ${state.streak}` : ''}</div>
+        <div class="feedback__exp">${q.exp}</div>
+      </div>
+      <button class="feedback__next" id="nextBtn">${isLast ? 'Результат →' : 'Дальше →'}</button>
+    </div>
+  `;
+  document.getElementById('nextBtn').onclick = ()=>{
+    if(isLast){ renderResult(); }
+    else { state.i++; renderQuestion(); }
+  };
+  document.getElementById('nextBtn').focus();
+}
+
+function showXp(text){
+  xpToast.textContent = text;
+  xpToast.classList.add('is-show');
+  clearTimeout(showXp._t);
+  showXp._t = setTimeout(()=>xpToast.classList.remove('is-show'), 1100);
+}
+
+function renderResult(){
+  const total = QUIZ.questions.length;
+  const score = state.correct;
+  let tier, ring, headline, sub, emoji, pitch;
+
+  if(score <= 5){
+    tier='low'; ring='r-low'; emoji='🌱';
+    headline='Есть пробелы — и это абсолютно нормально';
+    sub='ОГЭ ещё впереди. У вас полно времени, чтобы спокойно подтянуть базу — без зубрёжки и без паники.';
+    pitch={
+      tag:'⚡ Ваш план',
+      h:'Поднимем до уверенной 4 за 3–4 недели',
+      p:'Начнём с самых частых тем ОГЭ. По 30 минут в день — и через месяц вы перепройдёте этот квиз с другими цифрами.'
+    };
+  } else if(score <= 10){
+    tier='mid'; ring='r-mid'; emoji='💪';
+    headline='Хороший уровень — есть что добить';
+    sub='База у вас точно есть. Осталось закрыть несколько тем — и пробник на 5 перестанет казаться нереальным.';
+    pitch={
+      tag:'⚡ Ваш план',
+      h:'До твёрдой 4–5 — ~2 недели',
+      p:'Сфокусируемся только на ваших слабых темах. Платформа сама будет возвращать их через 1 и 5 дней.'
+    };
+  } else {
+    tier='hi'; ring='r-hi'; emoji='🚀';
+    headline='Шикарный результат!';
+    sub='Если так пройдёте на экзамене — это уверенная 5. Осталось довести до автомата сложные темы.';
+    pitch={
+      tag:'⚡ Ваш план',
+      h:'Доводим до 100% и пробуем тренажёр пробников',
+      p:'У нас есть формат полных пробников ОГЭ под таймер — ровно как на экзамене. Войдёте в зону комфорта.'
+    };
+  }
+
+  const wrong = total - score;
+  const accuracy = Math.round((score/total)*100);
+
+  const allWeak = Array.from(state.wrongTopics);
+  const weakTopics = allWeak.slice(0, 5);
+  const extraCount = allWeak.length - weakTopics.length;
+  const weakHTML = weakTopics.length ? `
+    <div class="weak">
+      <div class="weak__h">Темы, которые стоит подтянуть</div>
+      <div class="weak__list">
+        ${weakTopics.map(t=>`<div class="weak__row"><span class="ic">!</span>${t}</div>`).join('')}
+        ${extraCount>0 ? `<div class="weak__row" style="color:var(--muted);font-weight:700"><span class="ic" style="background:var(--primary-soft);color:var(--primary)">+</span>и ещё ${extraCount} тема${extraCount===1?'':(extraCount<5?'ы':'')}</div>` : ''}
+      </div>
+    </div>
+  ` : `
+    <div class="weak">
+      <div class="weak__h">Темы</div>
+      <div class="weak__none">Слабых тем не нашлось — <b>вы прошли все блоки чисто.</b> Теперь можно идти на пробник.</div>
+    </div>
+  `;
+
+  progressWrap.hidden = true;
+  card.className = 'card result';
+  card.innerHTML = `
+    <div class="result__ring ${ring}">
+      ${score}<small>/ ${total}</small>
+    </div>
+    <h2 class="result__h">${emoji} ${headline}</h2>
+    <p class="result__sub">${sub}</p>
+
+    <div class="result__stats">
+      <div class="stat"><div class="stat__num good">${score}</div><div class="stat__lbl">Верно</div></div>
+      <div class="stat"><div class="stat__num bad">${wrong}</div><div class="stat__lbl">Ошибок</div></div>
+      <div class="stat"><div class="stat__num neutral">${state.bestStreak}🔥</div><div class="stat__lbl">Серия</div></div>
+    </div>
+
+    ${weakHTML}
+
+    <div class="result__pitch">
+      <div class="tag">${pitch.tag}</div>
+      <h4>${pitch.h}</h4>
+      <p>${pitch.p}</p>
+    </div>
+
+    <div class="result__cta">
+      <a href="/?register=1#start" class="btn btn--primary btn--lg">Начать подготовку</a>
+      <button class="result__retry" id="retryBtn">↻ Пройти квиз заново</button>
+    </div>
+
+    <p style="margin-top:10px;font-size:11.5px;color:var(--muted);font-weight:700;text-align:center">
+      Вы заработали <b style="color:var(--ink)">${state.xp} XP</b> · уровень 1 разблокирован
+    </p>
+  `;
+  document.getElementById('retryBtn').onclick = ()=>{
+    state.i = 0; state.correct = 0; state.streak = 0; state.bestStreak = 0;
+    state.xp = 0; state.wrongTopics = new Set(); state.answers = [];
+    renderStart();
+  };
+}
+
+
+renderStart();
+</script>
+</body>
+</html>
