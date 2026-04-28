@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 final class QuizTrackController extends Controller
 {
     private const ALLOWED_QUIZ_IDS = ['biology-1', 'biology-2', 'biology-2-short', 'chemistry-1', 'chemistry-2'];
-    private const ALLOWED_EVENTS = ['start', 'question', 'gate_shown', 'gate_submit', 'cta_register'];
+    private const ALLOWED_EVENTS = ['start', 'question', 'gate_shown', 'gate_submit', 'cta_register', 'complete'];
 
     public function track(Request $request)
     {

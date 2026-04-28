@@ -99,7 +99,11 @@ $skipIfAuthed = function (Request $request) use ($serveStatic): \Symfony\Compone
 };
 
 Route::get('/login.html', $skipIfAuthed);
-Route::get('/uploads/login.html', $skipIfAuthed);
+Route::get('/uploads/login.html', function (Request $request) {
+    $qs = $request->getQueryString();
+    $url = '/login.html'.($qs ? ('?'.$qs) : '');
+    return redirect($url, 302);
+});
 
 // `/uploads/*` теперь читается из `public/site/uploads/*` — единый источник правды
 // (синхронизируется из `extracted/uploads/` через `node scripts/sync-site.mjs`).

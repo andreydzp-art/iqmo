@@ -589,6 +589,7 @@ function showXp(text){
 
 function renderResult(){
   try { if (window.ym) ym(108770166, 'reachGoal', 'quiz_completed', { quiz_id: QUIZ_ID, score: state.correct }); } catch (e0) {}
+  track('complete', { payload: { score: state.correct } });
   const total = QUIZ.questions.length;
   const score = state.correct;
   let tier, ring, headline, sub, emoji, pitch;

@@ -97,6 +97,14 @@ final class IqmoAdminQuizMetricsBuilder
                 ->distinct()
                 ->count('sid');
 
+            // Mirrors frontend goal `quiz_completed` (we store it as server event `complete`).
+            $completes = (int) $iqmo->table('quiz_events')
+                ->where('quiz_id', $quizId)
+                ->where('event', 'complete')
+                ->where('occurred_at_ms', '>=', $sinceMs)
+                ->distinct()
+                ->count('sid');
+
             $gateShown = (int) $iqmo->table('quiz_events')
                 ->where('quiz_id', $quizId)
                 ->where('event', 'gate_shown')
@@ -107,6 +115,14 @@ final class IqmoAdminQuizMetricsBuilder
             $gateSubmit = (int) $iqmo->table('quiz_events')
                 ->where('quiz_id', $quizId)
                 ->where('event', 'gate_submit')
+                ->where('occurred_at_ms', '>=', $sinceMs)
+                ->distinct()
+                ->count('sid');
+
+            // Mirrors frontend goal `quiz_register_click` (we store it as server event `cta_register`).
+            $registerClicks = (int) $iqmo->table('quiz_events')
+                ->where('quiz_id', $quizId)
+                ->where('event', 'cta_register')
                 ->where('occurred_at_ms', '>=', $sinceMs)
                 ->distinct()
                 ->count('sid');
@@ -169,8 +185,10 @@ final class IqmoAdminQuizMetricsBuilder
                 'targets' => $cfg['targets'],
                 'counts' => [
                     'starts' => $starts,
+                    'completes' => $completes,
                     'gateShown' => $gateShown,
                     'gateSubmit' => $gateSubmit,
+                    'registerClicks' => $registerClicks,
                     'leads' => $leads,
                     'registrationsAttributed' => $emailToReg,
                 ],
