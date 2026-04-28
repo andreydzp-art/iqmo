@@ -1498,7 +1498,7 @@ h1,h2,h3,p{margin:0}
       <div class="ring">✓</div>
       <h3>Готово! Серия запущена 🔥</h3>
       <p>Мы отправили подтверждение на email. Через секунду перенесём вас на первую сессию.</p>
-      <a href="./profile.html" class="btn btn--primary" style="margin-top:8px">Открыть кабинет →</a>
+      <a href="/subject-biology.html" class="btn btn--primary" style="margin-top:8px">Открыть курс →</a>
     </div>
   </div>
 </div>
@@ -1703,6 +1703,9 @@ tick(); setInterval(tick, 1000);
       // submit
       form.hidden = true;
       done.hidden = false;
+      setTimeout(() => {
+        try { window.location.href = '/subject-biology.html'; } catch (e) {}
+      }, 1100);
     }
   });
   form.addEventListener('submit', e=>e.preventDefault());
