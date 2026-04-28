@@ -14,28 +14,9 @@ html = html.replace(
 	`<style>\n/* === iqmo-base.css (встроено) === */\n${baseCss}\n</style>\n`
 );
 
-{
-	const startMark = '<!-- Yandex.Metrika counter -->';
-	const endMark = '<!-- /Yandex.Metrika counter -->';
-	const s = html.indexOf(startMark);
-	const e = html.indexOf(endMark);
-	if (s !== -1 && e !== -1 && e > s) {
-		html = html.slice(0, s) + html.slice(e + endMark.length);
-	}
-}
-
-for (const tag of [
-	'<script src="./iqmo-sync.js"></script>',
-	'<script src="./chem-progress.js"></script>',
-	'<script src="./iqmo-nav.js"></script>',
-	'<script src="./iqmo-regnudge.js?v=3"></script>',
-]) {
-	html = html.split(tag).join('');
-}
-
 html = html.replace(
 	'<head>',
-	'<head>\n\t<!-- Standalone для предпросмотра: стили встроены, внешние скрипты IQMO убраны; шрифт Manrope по ссылке Google Fonts -->'
+	'<head>\n\t<!-- Одна HTML-страница для переноса: iqmo-base.css встроен; Метрика и внешние скрипты как в index.html -->'
 );
 
 const out = join(extracted, 'index-standalone-design.html');
