@@ -100,6 +100,21 @@ $skipIfAuthed = function (Request $request) use ($serveStatic): \Symfony\Compone
 
 Route::get('/login.html', $skipIfAuthed);
 Route::get('/uploads/login.html', function (Request $request) {
+    // Keep the legacy alias, but canonicalize to /login.html for anonymous users.
+    // For authed users we preserve the "skip login screen" redirect behavior.
+    $uid = IqmoJwt::userIdFromCookie($request);
+    if ($uid !== null && $uid > 0) {
+        $next = (string) $request->query('next', '');
+        $safe = $next !== ''
+            && str_starts_with($next, '/')
+            && ! str_starts_with($next, '//')
+            && ! str_contains($next, "\r")
+            && ! str_contains($next, "\n");
+        $target = $safe ? $next : '/subject-biology.html';
+
+        return redirect($target, 302);
+    }
+
     $qs = $request->getQueryString();
     $url = '/login.html'.($qs ? ('?'.$qs) : '');
     return redirect($url, 302);
