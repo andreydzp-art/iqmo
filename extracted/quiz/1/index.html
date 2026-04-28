@@ -496,6 +496,7 @@ function renderStart(){
   document.getElementById('startBtn').onclick = ()=>{
     state.i=0;
     track('start');
+    try { if (window.ym) ym(108770166, 'reachGoal', 'quiz_started', { quiz_id: QUIZ_ID }); } catch (e0) {}
     renderQuestion();
   };
 }
@@ -593,6 +594,7 @@ function showXp(text){
 }
 
 function renderResult(){
+  try { if (window.ym) ym(108770166, 'reachGoal', 'quiz_completed', { quiz_id: QUIZ_ID, score: state.correct }); } catch (e0) {}
   const total = QUIZ.questions.length;
   const score = state.correct;
   let tier, ring, headline, sub, emoji, pitch;
@@ -680,7 +682,10 @@ function renderResult(){
     </p>
   `;
   const cta = card.querySelector('.result__cta a.btn--primary');
-  if (cta) cta.addEventListener('click', ()=>{ track('cta_register'); });
+  if (cta) cta.addEventListener('click', ()=>{
+    track('cta_register');
+    try { if (window.ym) ym(108770166, 'reachGoal', 'quiz_register_click', { quiz_id: QUIZ_ID, score: state.correct }); } catch (e0) {}
+  });
   document.getElementById('retryBtn').onclick = ()=>{
     state.i = 0; state.correct = 0; state.streak = 0; state.bestStreak = 0;
     state.xp = 0; state.wrongTopics = new Set(); state.answers = [];

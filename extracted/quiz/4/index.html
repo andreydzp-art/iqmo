@@ -586,6 +586,7 @@ function renderStart(){
   document.getElementById('startBtn').onclick = ()=>{
     state.i=0;
     track('start');
+    try { if (window.ym) ym(108770166, 'reachGoal', 'quiz_started', { quiz_id: QUIZ_ID }); } catch (e0) {}
     renderQuestion();
   };
 }
@@ -765,6 +766,7 @@ gateForm.addEventListener('submit', e=>{
 });
 
 function renderResult(){
+  try { if (window.ym) ym(108770166, 'reachGoal', 'quiz_completed', { quiz_id: QUIZ_ID, score: state.correct }); } catch (e0) {}
   const total = QUIZ.questions.length;
   const score = state.correct;
   let ring, headline, sub, emoji, pitch;
@@ -830,7 +832,10 @@ function renderResult(){
   `;
 
   const cta = card.querySelector('.result__cta a.btn--primary');
-  if (cta) cta.addEventListener('click', ()=>{ track('cta_register'); });
+  if (cta) cta.addEventListener('click', ()=>{
+    track('cta_register');
+    try { if (window.ym) ym(108770166, 'reachGoal', 'quiz_register_click', { quiz_id: QUIZ_ID, score: state.correct }); } catch (e0) {}
+  });
 
   document.getElementById('retryBtn').onclick = ()=>{
     Object.assign(state, {i:0, correct:0, streak:0, bestStreak:0, xp:0, wrongTopics:new Set(), answers:[], email:null});
