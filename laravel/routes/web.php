@@ -135,12 +135,18 @@ Route::get('/quiz/{id}/{path?}', function (string $id, ?string $path = null) use
     abort(404);
 })->where('path', '.*');
 
+// Canonical homepage is served at `/` (without exposing the file name in the URL).
+// Keep `/index-standalone-design.html` for backward compatibility, but redirect to `/`.
+Route::get('/index-standalone-design.html', function () {
+    return redirect('/', 302);
+})->name('iqmo.home_canonical');
+
 Route::get('/', function () use ($serveStatic) {
-    return $serveStatic(public_path('site/index.html'));
+    return $serveStatic(public_path('site/index-standalone-design.html'));
 })->name('home');
 
 Route::get('/index.html', function () use ($serveStatic) {
-    return $serveStatic(public_path('site/index.html'));
+    return $serveStatic(public_path('site/index-standalone-design.html'));
 })->name('iqmo.site_index');
 
 Route::get('/profile.html', function () use ($serveStatic) {
