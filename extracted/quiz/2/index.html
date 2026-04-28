@@ -288,6 +288,29 @@ h1,h2,h3,p{margin:0}
   .result__h{font-size:22px}
   .result__ring{width:120px;height:120px;font-size:34px}
 }
+
+/* ---------- Email gate ---------- */
+.gate{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.gate.is-open{display:flex}
+.gate__bd{position:absolute;inset:0;background:rgba(14,14,18,.6);backdrop-filter:blur(4px);opacity:0;animation:gfade .25s ease forwards}
+@keyframes gfade{to{opacity:1}}
+.gate__card{position:relative;width:100%;max-width:440px;background:#fff;border-radius:24px;padding:30px 26px 24px;text-align:center;box-shadow:0 30px 70px -18px rgba(14,14,18,.45);transform:translateY(14px) scale(.94);opacity:0;animation:gpop .35s cubic-bezier(.2,.8,.3,1.2) forwards}
+@keyframes gpop{to{transform:translateY(0) scale(1);opacity:1}}
+.gate__chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding:5px 12px;border-radius:99px;background:var(--leaf-soft)}
+.gate__art{width:78px;height:78px;border-radius:22px;margin:0 auto 14px;display:grid;place-items:center;font-size:38px;background:linear-gradient(160deg,var(--leaf-soft) 0%,var(--sun-soft) 100%);box-shadow:0 12px 30px -10px rgba(58,166,111,.4)}
+.gate__h{font-size:22px;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:8px}
+.gate__sub{font-size:14.5px;color:var(--ink-2);line-height:1.5;margin-bottom:20px}
+.gate__field{margin-bottom:10px;text-align:left;display:flex;flex-direction:column;gap:6px}
+.gate__field input{font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);padding:14px 16px;border-radius:13px;border:1.5px solid var(--line);background:#fff;outline:none;transition:border-color .15s ease,box-shadow .15s ease;width:100%}
+.gate__field input:focus{border-color:var(--leaf);box-shadow:0 0 0 4px rgba(58,166,111,.14)}
+.gate__field.has-error input{border-color:var(--coral);background:#fff7f7}
+.gate__field input::placeholder{color:#b6b8c0;font-weight:500}
+.gate__err{font-size:12px;font-weight:700;color:var(--coral);min-height:14px}
+.gate__btn{width:100%;background:var(--leaf);color:#fff;border:0;padding:15px 22px;border-radius:14px;font-weight:900;font-size:15px;box-shadow:0 4px 0 #2b8557,0 12px 24px -10px rgba(58,166,111,.5);cursor:pointer;transition:transform .12s ease;font-family:inherit}
+.gate__btn:hover{transform:translateY(-1px)}
+.gate__btn:active{transform:translateY(2px);box-shadow:0 2px 0 #2b8557}
+.gate__note{margin-top:12px;font-size:12px;color:var(--muted);font-weight:600;line-height:1.5}
+.gate__trust{margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:11px;font-weight:700;color:var(--muted);flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -305,6 +328,30 @@ h1,h2,h3,p{margin:0}
 </div>
 
 <div class="xp-toast" id="xpToast">+10 XP</div>
+
+<!-- Email gate (after Q14) -->
+<div class="gate" id="emailGate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="gate__bd"></div>
+  <div class="gate__card">
+    <div class="gate__chip">✓ Результат готов</div>
+    <div class="gate__art">🎯</div>
+    <h3 class="gate__h" id="gate-title">Узнайте свой результат</h3>
+    <p class="gate__sub">Мы уже посчитали баллы и нашли слабые темы. Введите email — покажем результат и пришлём разбор ошибок.</p>
+    <form id="gateForm" novalidate>
+      <div class="gate__field" id="gateField">
+        <input id="gateEmail" type="email" placeholder="вы@example.ru" autocomplete="email" inputmode="email" />
+        <span class="gate__err" id="gateErr"></span>
+      </div>
+      <button type="submit" class="gate__btn" id="gateBtn">Получить результат →</button>
+    </form>
+    <div class="gate__note">Отправим результат и персональные рекомендации по подготовке.</p>
+    <div class="gate__trust">
+      <span>🔒 Не передаём третьим</span>
+      <span>·</span>
+      <span>✉ 1 письмо</span>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ===================== QUIZ DATA ===================== */
@@ -481,7 +528,10 @@ function handleAnswer(picked){
 
   const microPool = ok ? MICROS_GOOD : MICROS_BAD;
   const micro = microPool[Math.floor(Math.random()*microPool.length)];
-  const isLast = state.i === QUIZ.questions.length - 1;
+  const total = QUIZ.questions.length;
+  const isGate = state.i === total - 2;
+  const isLast = state.i === total - 1;
+  const lbl = isGate ? 'Узнать результат →' : (isLast ? 'Результат →' : 'Дальше →');
 
   document.getElementById('fbSlot').innerHTML = `
     <div class="feedback feedback--${ok?'good':'bad'}">
@@ -490,11 +540,12 @@ function handleAnswer(picked){
         <div class="feedback__title">${micro}${ok && state.streak>=3 ? ` · серия ${state.streak}` : ''}</div>
         <div class="feedback__exp">${q.exp}</div>
       </div>
-      <button class="feedback__next" id="nextBtn">${isLast ? 'Результат →' : 'Дальше →'}</button>
+      <button class="feedback__next" id="nextBtn">${lbl}</button>
     </div>
   `;
   document.getElementById('nextBtn').onclick = ()=>{
-    if(isLast){ renderResult(); }
+    if(isGate){ openEmailGate(); }
+    else if(isLast){ renderResult(); }
     else { state.i++; renderQuestion(); }
   };
   document.getElementById('nextBtn').focus();
@@ -601,6 +652,70 @@ function renderResult(){
   };
 }
 
+
+/* ===================== EMAIL GATE ===================== */
+const gate = document.getElementById('emailGate');
+const gateInput = document.getElementById('gateEmail');
+const gateField = document.getElementById('gateField');
+const gateErr = document.getElementById('gateErr');
+const gateForm = document.getElementById('gateForm');
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function openEmailGate(){
+  gate.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+  gateInput.value = '';
+  gateField.classList.remove('has-error');
+  gateErr.textContent = '';
+  setTimeout(()=>gateInput.focus(), 200);
+}
+function closeEmailGate(){
+  gate.classList.remove('is-open');
+  document.body.style.overflow = '';
+}
+gateInput.addEventListener('input', ()=>{
+  if(gateField.classList.contains('has-error')){
+    gateField.classList.remove('has-error');
+    gateErr.textContent = '';
+  }
+});
+gateForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const v = gateInput.value.trim();
+  if(!v){
+    gateField.classList.add('has-error');
+    gateErr.textContent = 'Введите email, чтобы увидеть результат';
+    gateInput.focus();
+    return;
+  }
+  if(!EMAIL_RE.test(v)){
+    gateField.classList.add('has-error');
+    gateErr.textContent = 'Похоже, email с опечаткой';
+    gateInput.focus();
+    return;
+  }
+  state.email = v;
+  try {
+    fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: v,
+        quiz_id: 'chemistry-1',
+        score: state.correct,
+        total: QUIZ.questions.length,
+        wrong_topics: Array.from(state.wrongTopics),
+      })
+    }).catch(()=>{});
+  } catch (e0) {}
+  try {
+    if (window.ym) ym(108770166, 'reachGoal', 'quiz_email_captured');
+    if (window.dataLayer) dataLayer.push({ event: 'quiz_email_captured', quiz: 'chemistry', score: state.correct });
+  } catch (e1) {}
+  closeEmailGate();
+  state.i = QUIZ.questions.length;
+  renderResult();
+});
 
 renderStart();
 </script>
