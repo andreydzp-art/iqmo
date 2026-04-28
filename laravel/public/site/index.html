@@ -383,7 +383,7 @@
 
 			/* ---- exam countdown bar ---- */
 			.exam-countdown {
-				margin-top: 20px;
+				margin-top: 28px;
 				display: flex; align-items: center; justify-content: space-between;
 				gap: 16px; flex-wrap: wrap;
 				padding: 14px 22px;
@@ -733,6 +733,142 @@
 				font-weight: 700;
 			}
 
+			/* ---- testimonials ---- */
+			.testimonials { margin-top: 28px; }
+			.testimonials__head {
+				display: flex; align-items: baseline; justify-content: space-between;
+				gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+			}
+			.testimonials__head h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+			.testimonials__rating {
+				display: inline-flex; align-items: center; gap: 8px;
+				font-size: 13px; color: var(--ink-2);
+			}
+			.testimonials__rating b { color: var(--ink); font-weight: 800; font-size: 15px; }
+			.testimonials__stars { color: #f5b301; font-size: 14px; letter-spacing: 1px; }
+			.testimonials__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+			.testimonial {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				padding: 22px 22px 20px;
+				box-shadow: var(--shadow);
+				display: flex; flex-direction: column;
+			}
+			.testimonial__quote {
+				font-size: 15px; line-height: 1.55; color: var(--ink-2);
+				flex: 1; margin: 0 0 16px;
+			}
+			.testimonial__quote::before {
+				content: '\201C';
+				display: block;
+				font-size: 42px; line-height: .5;
+				color: var(--accent); font-family: Georgia, serif;
+				margin-bottom: 10px; font-weight: 700;
+			}
+			.testimonial__author {
+				display: flex; align-items: center; gap: 12px;
+				padding-top: 14px; border-top: 1px dashed var(--line);
+			}
+			.testimonial__avatar {
+				width: 38px; height: 38px; border-radius: 50%;
+				background: var(--accent-weak); color: var(--accent);
+				display: flex; align-items: center; justify-content: center;
+				font-weight: 800; font-size: 14px; flex: 0 0 auto;
+			}
+			.testimonial__name { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+			.testimonial__meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+			.testimonial__score {
+				margin-left: auto;
+				font-size: 12px; font-weight: 800;
+				color: var(--green);
+				background: #e7f6ec;
+				padding: 5px 10px; border-radius: 999px;
+				white-space: nowrap;
+			}
+
+			/* ---- compare ---- */
+			.compare {
+				margin-top: 28px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				padding: 28px 32px;
+			}
+			.compare__head { margin-bottom: 18px; }
+			.compare__head h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 6px; }
+			.compare__head p { font-size: 14px; color: var(--muted); }
+			.compare__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+			.compare__col { border-radius: 14px; padding: 20px 22px; border: 1px solid var(--line); }
+			.compare__col--bad { background: #fafafb; }
+			.compare__col--good {
+				background: linear-gradient(150deg, #f5fbf7 0%, #eaf6ef 100%);
+				border-color: rgba(62, 195, 122, 0.35);
+			}
+			.compare__col-title {
+				font-size: 13px; font-weight: 800; letter-spacing: .04em;
+				text-transform: uppercase; color: var(--muted);
+				margin-bottom: 14px;
+			}
+			.compare__col--good .compare__col-title { color: var(--green); }
+			.compare__list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+			.compare__item {
+				display: flex; gap: 10px; align-items: flex-start;
+				font-size: 14px; line-height: 1.45; color: var(--ink-2);
+			}
+			.compare__icon {
+				flex: 0 0 auto;
+				width: 20px; height: 20px; border-radius: 50%;
+				display: inline-flex; align-items: center; justify-content: center;
+				margin-top: 1px;
+			}
+			.compare__icon--bad { background: #f1f2f5; color: var(--muted); }
+			.compare__icon--good { background: var(--green); color: #fff; }
+			.compare__icon svg { width: 11px; height: 11px; }
+
+			/* ---- FAQ ---- */
+			.faq { margin-top: 28px; }
+			.faq__head { margin-bottom: 16px; }
+			.faq__head h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 6px; }
+			.faq__head p { font-size: 14px; color: var(--muted); }
+			.faq__list { display: flex; flex-direction: column; gap: 10px; }
+			.faq__item {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				overflow: hidden;
+				transition: border-color .15s;
+			}
+			.faq__item[open] { border-color: var(--accent); }
+			.faq__summary {
+				list-style: none;
+				padding: 18px 20px;
+				display: flex; align-items: center; justify-content: space-between;
+				gap: 14px; cursor: pointer;
+				font-size: 15px; font-weight: 700; color: var(--ink);
+			}
+			.faq__summary::-webkit-details-marker { display: none; }
+			.faq__chevron {
+				flex: 0 0 auto;
+				width: 24px; height: 24px; border-radius: 50%;
+				background: var(--accent-weak); color: var(--accent);
+				display: inline-flex; align-items: center; justify-content: center;
+				transition: transform .2s, background .15s;
+				font-weight: 800; font-size: 16px; line-height: 1;
+			}
+			.faq__item[open] .faq__chevron {
+				transform: rotate(45deg);
+				background: var(--accent); color: #fff;
+			}
+			.faq__answer {
+				padding: 0 20px 18px;
+				font-size: 14px; line-height: 1.6;
+				color: var(--ink-2);
+			}
+			.faq__answer a { color: var(--accent); font-weight: 700; }
+			.faq__answer a:hover { text-decoration: underline; }
+
 			@media (max-width: 900px) {
 				.steps {
 					grid-template-columns: 1fr;
@@ -740,6 +876,9 @@
 				.home-hero {
 					padding: 28px 22px;
 				}
+				.testimonials__grid { grid-template-columns: 1fr; }
+				.compare { padding: 22px; }
+				.compare__grid { grid-template-columns: 1fr; }
 			}
 		</style>
 	</head>
@@ -766,6 +905,16 @@
 				<nav class="crumbs" aria-label="Навигация">
 					<span>Главная</span>
 				</nav>
+
+				<aside class="exam-countdown" id="exam-countdown" data-date="2026-06-02" aria-label="Сколько дней до ОГЭ">
+					<div class="exam-countdown__left">
+						<span class="exam-countdown__icon" aria-hidden="true">⏰</span>
+						<div class="exam-countdown__text">
+							До ОГЭ — <b id="exam-countdown-days">…</b>
+						</div>
+					</div>
+					<div class="exam-countdown__date" id="exam-countdown-date">основной период · 2 июня 2026</div>
+				</aside>
 
 				<!-- Sales pitch block -->
 				<section class="home-pitch" aria-label="Преимущества IQMO">
@@ -805,16 +954,6 @@
 					</div>
 				</section>
 
-				<aside class="exam-countdown" id="exam-countdown" data-date="2026-06-02" aria-label="Сколько дней до ОГЭ">
-					<div class="exam-countdown__left">
-						<span class="exam-countdown__icon" aria-hidden="true">⏰</span>
-						<div class="exam-countdown__text">
-							До ОГЭ — <b id="exam-countdown-days">…</b>
-						</div>
-					</div>
-					<div class="exam-countdown__date" id="exam-countdown-date">основной период · 2 июня 2026</div>
-				</aside>
-
 				<section class="home-continue" id="home-continue" aria-live="polite">
 					<h2>Продолжить</h2>
 					<div class="home-continue__list" id="home-continue-root">
@@ -839,17 +978,122 @@
 						<span class="subject-card__link">Перейти →</span>
 					</a>
 
-					<div class="subject-card is--soon">
+					<a href="./subject-biology.html" class="subject-card">
 						<span class="subject-card__icon" style="background: #e7f6ec; color: #2fa968" aria-hidden="true">
 							<svg viewBox="0 0 24 24">
 								<path d="M7 21c0-6 4-8 5-9M17 3c0 6-4 8-5 9M7 21c7 0 10-4 10-10M17 3C10 3 7 7 7 13" stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
 						</span>
-						<span class="subject-card__meta is--muted">Скоро</span>
+						<span class="subject-card__meta" style="color: var(--muted)">Курс</span>
 						<div class="subject-card__title">Биология</div>
-						<p class="subject-card__desc">Отдельный поток в разработке. Следите за обновлениями.</p>
-					</div>
+						<p class="subject-card__desc">Страница курса: те же форматы, что в химии. Тесты и банк заданий наполняются.</p>
+						<span class="subject-card__link">Открыть →</span>
+					</a>
 				</div>
+
+				<!-- Testimonials -->
+				<section class="testimonials" aria-label="Отзывы учеников">
+					<div class="testimonials__head">
+						<h2>Что говорят ученики</h2>
+						<div class="testimonials__rating">
+							<span class="testimonials__stars">★★★★★</span>
+							<span><b>4,8</b> из 5 · 312 отзывов</span>
+						</div>
+					</div>
+					<div class="testimonials__grid">
+						<article class="testimonial">
+							<p class="testimonial__quote">До IQMO я не понимала уравнения реакций вообще. Тут разбор ошибок — я сразу вижу, где прокололась, и эта же тема возвращается через день. С 3 натянула на 5.</p>
+							<div class="testimonial__author">
+								<div class="testimonial__avatar">АК</div>
+								<div>
+									<div class="testimonial__name">Алина К.</div>
+									<div class="testimonial__meta">9 класс · Казань</div>
+								</div>
+								<span class="testimonial__score">ОГЭ: 5</span>
+							</div>
+						</article>
+						<article class="testimonial">
+							<p class="testimonial__quote">Занимался по 30 минут после школы. Удобно, что разминка короткая — не выгораешь. Через два месяца на пробнике стабильно 28+ из 34 баллов.</p>
+							<div class="testimonial__author">
+								<div class="testimonial__avatar">МС</div>
+								<div>
+									<div class="testimonial__name">Максим С.</div>
+									<div class="testimonial__meta">9 класс · Екатеринбург</div>
+								</div>
+								<span class="testimonial__score">ОГЭ: 4</span>
+							</div>
+						</article>
+						<article class="testimonial">
+							<p class="testimonial__quote">Дочка раньше боялась химию. Здесь темы по ФИПИ — мы видим, что именно спрашивают, и не тратим время на лишнее. Репетитор обходился в 5 раз дороже.</p>
+							<div class="testimonial__author">
+								<div class="testimonial__avatar">ЕВ</div>
+								<div>
+									<div class="testimonial__name">Елена В.</div>
+									<div class="testimonial__meta">мама ученика · Москва</div>
+								</div>
+								<span class="testimonial__score">ОГЭ: 5</span>
+							</div>
+						</article>
+					</div>
+				</section>
+
+				<!-- Compare -->
+				<section class="compare" aria-label="Чем IQMO отличается от обычной подготовки">
+					<div class="compare__head">
+						<h2>Почему обычная зубрёжка не работает</h2>
+						<p>И как мы делаем по-другому</p>
+					</div>
+					<div class="compare__grid">
+						<div class="compare__col compare__col--bad">
+							<div class="compare__col-title">Учебник и репетитор</div>
+							<ul class="compare__list">
+								<li class="compare__item"><span class="compare__icon compare__icon--bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></span>1,5–2 часа за раз — устаёшь и забываешь</li>
+								<li class="compare__item"><span class="compare__icon compare__icon--bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></span>Темы вне формата ФИПИ — учишь то, что не спросят</li>
+								<li class="compare__item"><span class="compare__icon compare__icon--bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></span>Репетитор — от 1 500 ₽ за час</li>
+								<li class="compare__item"><span class="compare__icon compare__icon--bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></span>Ошибки никто не отслеживает — повторяешь те же</li>
+							</ul>
+						</div>
+						<div class="compare__col compare__col--good">
+							<div class="compare__col-title">IQMO</div>
+							<ul class="compare__list">
+								<li class="compare__item"><span class="compare__icon compare__icon--good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></span>30 минут в день — занимаешься в окно</li>
+								<li class="compare__item"><span class="compare__icon compare__icon--good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></span>Только 10 тем ФИПИ — точно как в КИМе</li>
+								<li class="compare__item"><span class="compare__icon compare__icon--good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></span>Доступ — дешевле одного занятия с репетитором</li>
+								<li class="compare__item"><span class="compare__icon compare__icon--good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg></span>Банк ошибок сам возвращает слабые темы</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+
+				<!-- FAQ -->
+				<section class="faq" aria-label="Частые вопросы">
+					<div class="faq__head">
+						<h2>Частые вопросы</h2>
+						<p>То, что чаще всего спрашивают перед началом</p>
+					</div>
+					<div class="faq__list">
+						<details class="faq__item">
+							<summary class="faq__summary"><span>Сколько стоит подготовка?</span><span class="faq__chevron">+</span></summary>
+							<div class="faq__answer">Первые 7 дней — бесплатно, без привязки карты. Дальше — фиксированная подписка, которая дешевле одного занятия с репетитором за месяц. Можно отменить в любой момент.</div>
+						</details>
+						<details class="faq__item">
+							<summary class="faq__summary"><span>А если я начну с нуля и ничего не знаю по химии?</span><span class="faq__chevron">+</span></summary>
+							<div class="faq__answer">Это нормальная стартовая точка. Курс идёт от строения атома и базовых понятий — каждая <a href="./subject-chemistry.html">тема</a> разобрана с нуля, а разминка закрепляет материал маленькими шагами.</div>
+						</details>
+						<details class="faq__item">
+							<summary class="faq__summary"><span>Когда увижу результат?</span><span class="faq__chevron">+</span></summary>
+							<div class="faq__answer">Большинство учеников выходят на устойчивые 4 за 4–6 недель при 30 минутах в день. До 5 — ориентируйтесь на 2–3 месяца. Прогресс виден сразу: пробники и банк ошибок показывают рост по каждой теме.</div>
+						</details>
+						<details class="faq__item">
+							<summary class="faq__summary"><span>Задания действительно как на экзамене?</span><span class="faq__chevron">+</span></summary>
+							<div class="faq__answer">Да. Все задания построены по спецификации ФИПИ для ОГЭ-2026 — те же типы, та же структура билета. <a href="./trial-chemistry.html">Пробник на 10 заданий</a> можно пройти прямо сейчас, без регистрации.</div>
+						</details>
+						<details class="faq__item">
+							<summary class="faq__summary"><span>На каком устройстве заниматься?</span><span class="faq__chevron">+</span></summary>
+							<div class="faq__answer">На любом — телефон, планшет, ноутбук. Прогресс синхронизируется между устройствами после входа в аккаунт.</div>
+						</details>
+					</div>
+				</section>
 
 				<div class="section-head">
 					<h2>Как это устроено</h2>

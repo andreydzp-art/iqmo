@@ -383,7 +383,7 @@
 
 			/* ---- exam countdown bar ---- */
 			.exam-countdown {
-				margin-top: 20px;
+				margin-top: 28px;
 				display: flex; align-items: center; justify-content: space-between;
 				gap: 16px; flex-wrap: wrap;
 				padding: 14px 22px;
@@ -906,6 +906,16 @@
 					<span>Главная</span>
 				</nav>
 
+				<aside class="exam-countdown" id="exam-countdown" data-date="2026-06-02" aria-label="Сколько дней до ОГЭ">
+					<div class="exam-countdown__left">
+						<span class="exam-countdown__icon" aria-hidden="true">⏰</span>
+						<div class="exam-countdown__text">
+							До ОГЭ — <b id="exam-countdown-days">…</b>
+						</div>
+					</div>
+					<div class="exam-countdown__date" id="exam-countdown-date">основной период · 2 июня 2026</div>
+				</aside>
+
 				<!-- Sales pitch block -->
 				<section class="home-pitch" aria-label="Преимущества IQMO">
 					<div class="home-pitch__copy">
@@ -943,16 +953,6 @@
 						<div class="home-pitch__stat-label">хватит, чтобы дойти до пятёрки на ОГЭ</div>
 					</div>
 				</section>
-
-				<aside class="exam-countdown" id="exam-countdown" data-date="2026-06-02" aria-label="Сколько дней до ОГЭ">
-					<div class="exam-countdown__left">
-						<span class="exam-countdown__icon" aria-hidden="true">⏰</span>
-						<div class="exam-countdown__text">
-							До ОГЭ — <b id="exam-countdown-days">…</b>
-						</div>
-					</div>
-					<div class="exam-countdown__date" id="exam-countdown-date">основной период · 2 июня 2026</div>
-				</aside>
 
 				<section class="home-continue" id="home-continue" aria-live="polite">
 					<h2>Продолжить</h2>
