@@ -476,6 +476,24 @@
 			.format--accent { background: #fff; border-color: var(--line); }
 			.format--accent .format__start { color: var(--accent); }
 
+			/* Карточка со вложенными ссылками: полный экран — одна цель, без nested <a> */
+			.format--tile-link .format__head,
+			.format--tile-link .format__desc,
+			.format--tile-link .format__foot {
+				pointer-events: none;
+			}
+			.format--tile-link .format__desc a {
+				pointer-events: auto;
+				position: relative;
+				z-index: 2;
+			}
+			.format__tile-hit {
+				position: absolute;
+				inset: 0;
+				border-radius: inherit;
+				z-index: 1;
+			}
+
 			/* ---- express prep (format card) ---- */
 			.format__controls {
 				display: grid;
@@ -1005,7 +1023,8 @@
 									</div>
 								</a>
 
-								<div class="format">
+								<div class="format format--tile-link">
+									<a href="./full-test-chemistry.html" class="format__tile-hit" aria-label="Полный вариант ОГЭ — открыть тест"></a>
 									<div class="format__head">
 										<span class="format__icon" style="background:#fbf0d9; color:#c28216;">
 											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1020,7 +1039,7 @@
 										<a href="./subject-biology.html" style="color: var(--accent); font-weight: 600;">курс</a> ·
 										<a href="./full-test-biology.html" style="color: var(--accent); font-weight: 600;">полные варианты</a></span></p>
 									<div class="format__foot">
-										<a href="./full-test-chemistry.html" class="format__start">Начать →</a>
+										<span class="format__start">Начать →</span>
 									</div>
 								</div>
 
