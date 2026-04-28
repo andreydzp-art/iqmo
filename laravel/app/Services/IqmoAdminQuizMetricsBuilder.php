@@ -49,6 +49,15 @@ final class IqmoAdminQuizMetricsBuilder
                 'quiz_to_reg' => 8.0,
             ],
         ],
+        'chemistry-2' => [
+            'name' => 'Химия · Quiz #2 (12)',
+            'questions' => 12,
+            'targets' => [
+                'email_gate' => 25.0,
+                'email_to_reg' => 30.0,
+                'quiz_to_reg' => 8.0,
+            ],
+        ],
     ];
 
     /** @return array<string, mixed> */
