@@ -115,6 +115,26 @@ Route::get('/uploads/{path}', function (string $path) use ($serveStatic) {
     return $serveStatic($full);
 })->where('path', '.*');
 
+// Quiz landings live under `public/site/quiz/<id>/index.html` (synced from `extracted/quiz/<id>/index.html`).
+// On VPS Nginx typically routes `/quiz/...` to Laravel (the file is not under `public/`), so serve it here.
+Route::get('/quiz/{id}/{path?}', function (string $id, ?string $path = null) use ($serveStatic) {
+    if (! preg_match('/^[0-9]+$/', $id)) {
+        abort(404);
+    }
+
+    $path = $path === null ? '' : ltrim($path, '/');
+    if ($path === '' || $path === 'index.html') {
+        $full = public_path('site/quiz/'.$id.'/index.html');
+        if (! is_file($full)) {
+            abort(404);
+        }
+        return $serveStatic($full);
+    }
+
+    // For now quiz is a single-file landing; disallow arbitrary file serving under /quiz.
+    abort(404);
+})->where('path', '.*');
+
 Route::get('/', function () use ($serveStatic) {
     return $serveStatic(public_path('site/index.html'));
 })->name('home');
