@@ -52,7 +52,7 @@ final class LoginRedirectTest extends TestCase
         $response = $this->withCookies($this->authedCookie())->get('/login.html');
 
         $response->assertStatus(302);
-        $response->assertRedirect('/profile.html');
+        $response->assertRedirect('/subject-biology.html');
     }
 
     public function test_authed_user_honors_local_next_param(): void
@@ -73,7 +73,7 @@ final class LoginRedirectTest extends TestCase
             ->get('/login.html?next=//evil.example/foo');
 
         $response->assertStatus(302);
-        $response->assertRedirect('/profile.html');
+        $response->assertRedirect('/subject-biology.html');
     }
 
     public function test_authed_user_ignores_absolute_next(): void
@@ -82,7 +82,7 @@ final class LoginRedirectTest extends TestCase
             ->get('/login.html?next=https://evil.example/');
 
         $response->assertStatus(302);
-        $response->assertRedirect('/profile.html');
+        $response->assertRedirect('/subject-biology.html');
     }
 
     public function test_alias_uploads_login_html_also_redirects(): void
@@ -91,7 +91,7 @@ final class LoginRedirectTest extends TestCase
             ->get('/uploads/login.html');
 
         $response->assertStatus(302);
-        $response->assertRedirect('/profile.html');
+        $response->assertRedirect('/subject-biology.html');
     }
 
     public function test_invalid_cookie_falls_through_to_login_form(): void

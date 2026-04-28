@@ -90,7 +90,7 @@ $skipIfAuthed = function (Request $request) use ($serveStatic): \Symfony\Compone
             && ! str_starts_with($next, '//')
             && ! str_contains($next, "\r")
             && ! str_contains($next, "\n");
-        $target = $safe ? $next : '/profile.html';
+        $target = $safe ? $next : '/subject-biology.html';
 
         return redirect($target, 302);
     }
