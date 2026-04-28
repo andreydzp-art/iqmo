@@ -29,5 +29,14 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute(45)->by($key);
         });
+
+        // Public quiz tracking (anonymous). Keep it generous enough not to drop real users,
+        // but strict enough to avoid a noisy client spamming the DB.
+        RateLimiter::for('quiz-track', function (Request $request) {
+            $sid = (string) ($request->cookie('iqmo_qsid') ?? '');
+            $key = sha1($request->ip().'|'.($sid !== '' ? $sid : 'no_sid'));
+
+            return Limit::perMinute(120)->by($key);
+        });
     }
 }

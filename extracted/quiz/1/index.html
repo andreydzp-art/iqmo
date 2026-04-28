@@ -447,6 +447,29 @@ const state = {
   answers: [],    // {qi, ok, picked}
 };
 
+const QUIZ_ID = 'biology-1';
+function track(ev, extra){
+  try {
+    const body = JSON.stringify({
+      quiz_id: QUIZ_ID,
+      event: ev,
+      q_idx: extra && extra.q_idx ? extra.q_idx : undefined,
+      payload: extra && extra.payload ? extra.payload : undefined,
+    });
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: 'application/json' });
+      navigator.sendBeacon('/api/quiz/track', blob);
+    } else {
+      fetch('/api/quiz/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        keepalive: true,
+      }).catch(()=>{});
+    }
+  } catch (e) {}
+}
+
 const card = document.getElementById('card');
 const progressWrap = document.getElementById('progressWrap');
 const progressFill = document.getElementById('progressFill');
@@ -470,7 +493,11 @@ function renderStart(){
     <button class="btn btn--leaf btn--lg" id="startBtn">Поехали →</button>
     <p style="margin-top:14px;font-size:12px;color:var(--muted);font-weight:700">Бесплатно. Без регистрации. Результат увидите в конце.</p>
   `;
-  document.getElementById('startBtn').onclick = ()=>{ state.i=0; renderQuestion(); };
+  document.getElementById('startBtn').onclick = ()=>{
+    state.i=0;
+    track('start');
+    renderQuestion();
+  };
 }
 
 function updateProgress(){
@@ -484,6 +511,7 @@ function updateProgress(){
 
 function renderQuestion(){
   const q = QUIZ.questions[state.i];
+  track('question', { q_idx: state.i + 1, payload: { topic: q.topic } });
   progressWrap.hidden = false;
   updateProgress();
   card.className = 'card';
@@ -651,6 +679,8 @@ function renderResult(){
       Вы заработали <b style="color:var(--ink)">${state.xp} XP</b> · уровень 1 разблокирован
     </p>
   `;
+  const cta = card.querySelector('.result__cta a.btn--primary');
+  if (cta) cta.addEventListener('click', ()=>{ track('cta_register'); });
   document.getElementById('retryBtn').onclick = ()=>{
     state.i = 0; state.correct = 0; state.streak = 0; state.bestStreak = 0;
     state.xp = 0; state.wrongTopics = new Set(); state.answers = [];
@@ -668,6 +698,7 @@ const gateForm = document.getElementById('gateForm');
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function openEmailGate(){
+  track('gate_shown');
   gate.classList.add('is-open');
   document.body.style.overflow = 'hidden';
   gateInput.value = '';
@@ -701,13 +732,14 @@ gateForm.addEventListener('submit', e=>{
     return;
   }
   state.email = v;
+  track('gate_submit', { payload: { has_email: true, score: state.correct } });
   try {
     fetch('/api/lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: v,
-        quiz_id: 'biology-1',
+        quiz_id: QUIZ_ID,
         score: state.correct,
         total: QUIZ.questions.length,
         wrong_topics: Array.from(state.wrongTopics),

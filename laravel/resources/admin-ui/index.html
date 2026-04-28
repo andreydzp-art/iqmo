@@ -988,6 +988,7 @@
 				<nav class="admin__nav" id="nav">
 					<button type="button" class="is--active" data-section="overview">Обзор</button>
 					<button type="button" data-section="users">Пользователи</button>
+					<button type="button" data-section="quizzes">Квизы</button>
 					<button type="button" class="is--soon" data-section="subjects">Предметы</button>
 					<button type="button" class="is--soon" data-section="topics">Темы</button>
 					<button type="button" class="is--soon" data-section="questions">Вопросы</button>
@@ -1209,6 +1210,30 @@
 					</div>
 				</div>
 
+				<div id="panel-quizzes" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Квизы</h1>
+							<p class="admin__lead" id="quizzes-lead">Загрузка метрик…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" id="quizzes-period" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="quizzes-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+
+					<div class="callout" id="quizzes-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size: 13px">/api/admin/quizzes</code>
+					</div>
+
+					<div id="quizzes-root"></div>
+				</div>
+
 				<div id="panel-placeholder" hidden>
 					<div class="admin__top">
 						<div>
@@ -1298,6 +1323,7 @@
 			(function () {
 				const SECTION_TITLES = {
 					users: 'Пользователи',
+					quizzes: 'Квизы',
 					subjects: 'Предметы',
 					topics: 'Темы',
 					questions: 'Вопросы',
@@ -1802,6 +1828,9 @@
 				let usersFetchSeq = 0;
 				let drawerSeq = 0;
 				let usersInitialized = false;
+				const quizzesState = { days: 7 };
+				let quizzesFetchSeq = 0;
+				let quizzesInitialized = false;
 
 				const STATUS_LABELS = {
 					active: 'активен',
@@ -1857,6 +1886,198 @@
 					return String(s)
 						.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 						.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+				}
+
+				function fmtPct(v) {
+					if (v === null || v === undefined || !isFinite(v)) return '—';
+					return String(v).replace('.', ',') + '%';
+				}
+
+				function tagForTarget(value, target) {
+					if (value === null || value === undefined || !isFinite(value)) return '<span class="tag tag--warn">н/д</span>';
+					return value + 0.0001 >= target
+						? '<span class="tag tag--ok">OK</span>'
+						: '<span class="tag tag--warn">ниже цели</span>';
+				}
+
+				function kpiHtml(label, value, hint, tag) {
+					return (
+						'<div class="kpi">' +
+							'<div class="kpi__label">' + escapeHtml(label) + '</div>' +
+							'<div class="kpi__value">' + escapeHtml(value) + '</div>' +
+							'<div class="kpi__meta" style="justify-content:flex-start;gap:10px;">' +
+								'<span class="kpi__delta--flat">' + escapeHtml(hint) + '</span>' + tag +
+							'</div>' +
+							'<div class="kpi__hint"></div>' +
+						'</div>'
+					);
+				}
+
+				function questionsTbodyHtml(list, starts) {
+					if (!list || list.length === 0) {
+						return '<tr><td colspan="3" style="color:var(--muted);padding:14px;">Нет question-событий.</td></tr>';
+					}
+					return list.map(function (row) {
+						const q = row.q || 0;
+						const sessions = row.sessions || 0;
+						const pct = row.pct;
+						const pctStr = pct === null || pct === undefined ? '—' : (String(pct).replace('.', ',') + '%');
+						const warn = (starts > 0 && pct !== null && pct !== undefined && pct < 60) ? ' <span class="tag tag--warn">drop</span>' : '';
+						return (
+							'<tr>' +
+								'<td><strong>#' + q + '</strong></td>' +
+								'<td class="num">' + fmtIntRu(sessions) + '</td>' +
+								'<td>' + escapeHtml(pctStr) + warn + '</td>' +
+							'</tr>'
+						);
+					}).join('');
+				}
+
+				async function fetchQuizzesJson() {
+					const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+					const timer = ctl ? setTimeout(function () { ctl.abort(); }, 12000) : null;
+					try {
+						const r = await fetch('/api/admin/quizzes?days=' + quizzesState.days, {
+							credentials: 'same-origin',
+							cache: 'no-store',
+							headers: { Accept: 'application/json' },
+							signal: ctl ? ctl.signal : undefined,
+						});
+						if (!r.ok) {
+							let detail = '';
+							try {
+								const body = await r.json();
+								if (body && body.meta) {
+									const m = body.meta;
+									detail = [m.errorMessage, m.errorClass, m.errorAt].filter(Boolean).join(' · ');
+								}
+							} catch (_) {}
+							const err = new Error('quizzes_http_' + r.status);
+							err.httpStatus = r.status;
+							err.serverDetail = detail;
+							throw err;
+						}
+						return await r.json();
+					} finally {
+						if (timer) clearTimeout(timer);
+					}
+				}
+
+				function renderQuizzes(payload) {
+					const root = document.getElementById('quizzes-root');
+					const lead = document.getElementById('quizzes-lead');
+					const co = document.getElementById('quizzes-callout');
+					const rangeEl = document.getElementById('quizzes-period-range');
+					if (rangeEl) rangeEl.textContent = formatPeriodRangeRu(quizzesState.days);
+
+					const quizzes = (payload && payload.quizzes) ? payload.quizzes : [];
+
+					if (lead) {
+						lead.textContent =
+							'Метрики по квизам из MySQL (quiz_events, quiz_leads, users). Окно: ' + periodLabelShort(quizzesState.days) + '.';
+					}
+					if (co) {
+						co.className = 'callout callout--live';
+						co.innerHTML = '<strong>Живые данные:</strong> расчёт на сервере · источники: <code>quiz_events</code>, <code>quiz_leads</code>, <code>users</code>.';
+					}
+
+					if (!root) return;
+					root.innerHTML = '';
+
+					if (!quizzes || quizzes.length === 0) {
+						root.innerHTML =
+							'<div class="card"><h2>Нет данных</h2><p style="margin:0;color:var(--muted);font-size:13px;">' +
+							'События квиза ещё не поступают или таблицы не созданы миграциями.</p></div>';
+						return;
+					}
+
+					quizzes.forEach(function (q) {
+						const card = document.createElement('div');
+						card.className = 'card';
+						card.style.marginBottom = '14px';
+
+						const starts = (q.counts && q.counts.starts) ? q.counts.starts : 0;
+						const leads = (q.counts && q.counts.leads) ? q.counts.leads : 0;
+						const reg = (q.counts && q.counts.registrationsAttributed) ? q.counts.registrationsAttributed : 0;
+
+						const r = q.rates || {};
+						const t = q.targets || {};
+						const emailGate = r.emailGateConversionPct;
+						const emailToReg = r.emailToRegistrationPct;
+						const quizToReg = r.quizToRegistrationPct;
+
+						card.innerHTML =
+							'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
+								'<h2 style="margin:0 0 6px;">' + escapeHtml(q.name || q.quizId || 'Квиз') + '</h2>' +
+								'<div style="color:var(--muted);font-size:12px;font-weight:700;">' +
+									'стартов ' + fmtIntRu(starts) + ' · лидов ' + fmtIntRu(leads) + ' · рег. ' + fmtIntRu(reg) +
+								'</div>' +
+							'</div>' +
+							'<div class="kpi-grid" style="margin-top:12px;margin-bottom:0;">' +
+								kpiHtml('Email-gate conversion', fmtPct(emailGate), 'цель ≥ ' + fmtPct(t.email_gate), tagForTarget(emailGate, t.email_gate)) +
+								kpiHtml('Email → Registration', fmtPct(emailToReg), 'цель ≥ ' + fmtPct(t.email_to_reg), tagForTarget(emailToReg, t.email_to_reg)) +
+								kpiHtml('Quiz → Registration', fmtPct(quizToReg), 'цель ≥ ' + fmtPct(t.quiz_to_reg), tagForTarget(quizToReg, t.quiz_to_reg)) +
+							'</div>' +
+							'<div class="table-wrap" style="margin-top:14px;">' +
+								'<table>' +
+									'<thead><tr><th>Вопрос</th><th>Дошли (сессий)</th><th>Q-completion rate</th></tr></thead>' +
+									'<tbody>' + questionsTbodyHtml(q.questions || [], starts) + '</tbody>' +
+								'</table>' +
+							'</div>';
+
+						root.appendChild(card);
+					});
+				}
+
+				async function renderQuizzesPanel() {
+					const seq = ++quizzesFetchSeq;
+					const lead = document.getElementById('quizzes-lead');
+					const co = document.getElementById('quizzes-callout');
+					if (lead) lead.textContent = 'Загрузка метрик…';
+					if (co) {
+						co.className = 'callout';
+						co.innerHTML = '<strong>Загрузка…</strong> запрос <code style="font-size: 13px">/api/admin/quizzes</code>';
+					}
+
+					let data;
+					try {
+						data = await fetchQuizzesJson();
+						if (seq !== quizzesFetchSeq) return;
+						renderQuizzes(data);
+					} catch (err) {
+						if (seq !== quizzesFetchSeq) return;
+						if (lead) lead.textContent = 'Не удалось загрузить /api/admin/quizzes.';
+						if (co) {
+							co.className = 'callout';
+							const status = err && err.httpStatus ? err.httpStatus : '?';
+							const detail = err && err.serverDetail ? err.serverDetail : '';
+							let body = '<strong>Ошибка:</strong> API <code>/api/admin/quizzes</code> вернул ' + status + '.';
+							if (detail) body += ' Причина: <code style="font-size:13px">' + escapeAttr(detail) + '</code>';
+							else if (status === 401 || status === 403) body += ' Проверьте вход в IQMO и <code>IQMO_ADMIN_EMAILS</code>.';
+							else if (err && err.name === 'AbortError') body = '<strong>Ошибка:</strong> запрос <code>/api/admin/quizzes</code> превысил 12 сек (timeout).';
+							co.innerHTML = body;
+						}
+						const root = document.getElementById('quizzes-root');
+						if (root) root.innerHTML = '';
+					}
+				}
+
+				function bindQuizzesUi() {
+					if (quizzesInitialized) return;
+					quizzesInitialized = true;
+
+					const period = document.getElementById('quizzes-period');
+					if (period) {
+						period.addEventListener('click', function (e) {
+							const btn = e.target.closest('button[data-days]');
+							if (!btn) return;
+							period.querySelectorAll('button').forEach(function (b) {
+								b.classList.toggle('is--on', b === btn);
+							});
+							quizzesState.days = parseInt(btn.getAttribute('data-days'), 10);
+							renderQuizzesPanel().catch(function () {});
+						});
+					}
 				}
 
 				function statusPill(s) {
@@ -2359,16 +2580,21 @@
 					});
 					const overview = document.getElementById('panel-overview');
 					const users = document.getElementById('panel-users');
+					const quizzes = document.getElementById('panel-quizzes');
 					const ph = document.getElementById('panel-placeholder');
 					overview.hidden = section !== 'overview';
 					users.hidden = section !== 'users';
-					ph.hidden = section === 'overview' || section === 'users';
+					quizzes.hidden = section !== 'quizzes';
+					ph.hidden = section === 'overview' || section === 'users' || section === 'quizzes';
 
 					if (section === 'overview') {
 						setDashTab(dashTab);
 					} else if (section === 'users') {
 						bindUsersUi();
 						renderUsers().catch(function () {});
+					} else if (section === 'quizzes') {
+						bindQuizzesUi();
+						renderQuizzesPanel().catch(function () {});
 					} else {
 						const title = SECTION_TITLES[section] || section;
 						document.getElementById('placeholder-title').textContent = title;

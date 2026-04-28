@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\AdminOverviewController;
+use App\Http\Controllers\Api\AdminQuizzesController;
 use App\Http\Controllers\Api\AdminUsersController;
 use App\Http\Controllers\Api\AnalyticsIngestController;
 use App\Http\Controllers\Api\IqmoAuthController;
 use App\Http\Controllers\Api\IqmoProfileController;
+use App\Http\Controllers\Api\QuizLeadController;
+use App\Http\Controllers\Api\QuizTrackController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->group(function (): void {
@@ -29,8 +32,17 @@ Route::prefix('api')->group(function (): void {
             ->middleware('throttle:analytics-ingest');
     });
 
+    // Anonymous quiz tracking (no auth). Stores drop-off + email-gate funnel.
+    Route::post('/quiz/track', [QuizTrackController::class, 'track'])
+        ->middleware('throttle:quiz-track');
+
+    // Quiz lead capture (email gate). Anonymous.
+    Route::post('/lead', [QuizLeadController::class, 'store'])
+        ->middleware('throttle:quiz-track');
+
     Route::middleware(['iqmo.portal_admin'])->group(function (): void {
         Route::get('/admin/overview', [AdminOverviewController::class, 'overview']);
+        Route::get('/admin/quizzes', [AdminQuizzesController::class, 'index']);
         Route::get('/admin/users', [AdminUsersController::class, 'index']);
         Route::get('/admin/users/{id}', [AdminUsersController::class, 'show'])
             ->whereNumber('id');
