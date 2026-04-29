@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 final class QuizLeadController extends Controller
 {
-    private const ALLOWED_QUIZ_IDS = ['biology-1', 'biology-2', 'biology-2-short', 'biology-3', 'chemistry-1', 'chemistry-2'];
+    private const ALLOWED_QUIZ_IDS = ['biology-1', 'biology-2', 'biology-2-short', 'biology-3', 'biology-v2', 'chemistry-1', 'chemistry-2'];
 
     public function store(Request $request)
     {

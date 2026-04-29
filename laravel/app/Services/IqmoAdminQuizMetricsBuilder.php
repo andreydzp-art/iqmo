@@ -49,6 +49,15 @@ final class IqmoAdminQuizMetricsBuilder
                 'quiz_to_reg' => 8.0,
             ],
         ],
+        'biology-v2' => [
+            'name' => 'Биология · v2 package (12)',
+            'questions' => 12,
+            'targets' => [
+                'email_gate' => 25.0,
+                'email_to_reg' => 30.0,
+                'quiz_to_reg' => 8.0,
+            ],
+        ],
         'chemistry-1' => [
             'name' => 'Химия · Quiz #1',
             'questions' => 15,
