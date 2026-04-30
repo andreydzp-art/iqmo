@@ -8,6 +8,41 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 require __DIR__.'/auth.php';
 
+// Internal opcache reset endpoint. Ходит сюда только deploy-скрипт со
+// ssh-сессии VPS (loopback) — потому что на VPS нет NOPASSWD-sudo на
+// `systemctl reload php8.3-fpm`, а opcache при `validate_timestamps=0`
+// иначе держит закешированный bytecode `routes/iqmo_api.php` и новые
+// admin-эндпоинты возвращают 404 даже после `php artisan optimize:clear`.
+//
+// Авторизация двойная (любой из вариантов открывает доступ):
+//   1) запрос с loopback (REMOTE_ADDR ∈ {127.0.0.1, ::1}) — типичный
+//      случай для локального curl на VPS;
+//   2) HTTP-заголовок `X-Deploy-Secret` совпадает с `IQMO_DEPLOY_SECRET`
+//      из `.env` (на случай, если deploy-скрипт ходит не с loopback).
+//
+// Эндпоинт сам по себе сбрасывает только OPcache PHP, не трогает БД и не
+// раскрывает данных, поэтому метаинформация о сбросе считается безопасной.
+Route::post('/_internal/opcache-reset', function (Request $request) {
+    $remote = (string) $request->server('REMOTE_ADDR', '');
+    $isLoopback = in_array($remote, ['127.0.0.1', '::1', '::ffff:127.0.0.1'], true);
+    $expected = (string) (env('IQMO_DEPLOY_SECRET') ?? '');
+    $given = (string) $request->headers->get('X-Deploy-Secret', '');
+    $secretOk = $expected !== '' && hash_equals($expected, $given);
+    if (! $isLoopback && ! $secretOk) {
+        abort(403, 'forbidden');
+    }
+    if (! function_exists('opcache_reset')) {
+        return response()->json(['ok' => false, 'reason' => 'opcache_unavailable'], 200);
+    }
+    $ok = opcache_reset();
+
+    return response()->json([
+        'ok' => (bool) $ok,
+        'remote' => $remote,
+        'usedSecret' => $secretOk,
+    ]);
+});
+
 // `/uploads/login.html` must remain a real page (not redirect to `/login.html`): an outdated
 // `site/login.html` stub that meta-refreshes to `/uploads/` would otherwise loop with a redirect.
 

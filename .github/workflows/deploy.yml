@@ -151,6 +151,16 @@ jobs:
             sudo -n systemctl reload php8.3-fpm 2>&1 \
               && echo "php8.3-fpm reloaded" \
               || echo "WARN: php8.3-fpm reload skipped (need NOPASSWD sudo on the server)"
+            # `touch` + optimize:clear не помогают, если opcache настроен с
+            # `validate_timestamps=0` — bytecode `routes/iqmo_api.php` живёт
+            # до явного сброса. Дёргаем internal-роут с loopback (см. routes/web.php),
+            # секрет не нужен — REMOTE_ADDR=127.0.0.1.
+            echo "=== DEPLOY: opcache_reset() via loopback request ==="
+            curl -fsS -k -m 10 -X POST \
+              --resolve www.iqmoschool.ru:443:127.0.0.1 \
+              "https://www.iqmoschool.ru/_internal/opcache-reset" \
+              && echo "" \
+              || echo "WARN: opcache reset request failed (route missing or nginx vhost mismatch)"
             echo "=== DEPLOY: Laravel layer OK ==="
 
   smoke:
