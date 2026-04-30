@@ -326,6 +326,22 @@
 			.review-item.is--skip  .review-item__badge { background: #eef1f6; color: var(--muted); }
 			.review-item__body { font-size: 15px; line-height: 1.55; color: var(--ink-2); margin-bottom: 12px; }
 			.review-item__body p { margin: 0 0 8px; }
+			/* В разборе нет обёртки .q-body, поэтому собственных ограничений у фигур нет
+			   и они рендерятся в натуральных пикселях (~1000×1000). В режиме «прочитать
+			   и понять ошибку» иллюстрация — вспомогательная: держим её в компактной
+			   рамке слева, чтобы текст разбора был основным фокусом. */
+			.review-item__body .q-figure {
+				margin: 10px 0 12px;
+				max-width: min(100%, 240px);
+				width: 100%;
+			}
+			.review-item__body .q-figure--wide { max-width: min(100%, 360px); }
+			.review-item__body .q-figure__img,
+			.review-item__body img {
+				display: block; width: 100%; max-width: 100%; height: auto;
+				border-radius: 10px;
+				box-shadow: 0 6px 18px -12px rgba(20, 28, 44, 0.25);
+			}
 
 			.review-answers { display: grid; gap: 10px; margin: 10px 0 14px; }
 			.review-answer {
