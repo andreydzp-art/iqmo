@@ -98,9 +98,15 @@
 			else el.removeAttribute('hidden');
 		});
 
-		// Для авторизованных «Главная» в шапке/breadcrumbs ведёт на стартовую страницу
-		// первого предмета, а не на лендинг (учебный продукт, лендинг им бесполезен).
-		// Эвристика «своего предмета»: если URL уже на subject-/full-test-/category-/topic-
+		// Навигация для авторизованных:
+		//   • кнопка «Главная» в шапке: ведёт в первый предмет (учебный продукт, лендинг
+		//     им бесполезен), а сам ярлык переименовываем в «К занятиям» — текст точнее
+		//     описывает действие.
+		//   • первая крошка «Главная» в breadcrumbs: дубль шапки → прячем вместе с «/».
+		//   • вторая крошка «Предметы»: страницы списка предметов нет, ссылка ведёт на
+		//     лендинг → конвертируем в неактивный <span>, чтобы крошка просто помечала
+		//     текущий уровень иерархии.
+		// Эвристика «своего предмета»: если URL уже в subject-/full-test-/category-/topic-
 		// химии — ведём на химию, иначе на биологию (биология — первый предмет в сайдбаре).
 		// Маркер `data-iqmo-keep-href` отключает подмену для конкретной ссылки на случай,
 		// если где-то понадобится явный возврат на лендинг (например, Лого).
@@ -113,30 +119,56 @@
 				// Жёсткий список «домашних» URL: чтобы случайно не переписать ссылку
 				// на статью с заголовком «Главная» в каком-нибудь будущем разделе.
 				var HOME_HREF_RE = /^(\/|#|\.\/index(-[a-z0-9-]+)?\.html|\/index(-[a-z0-9-]+)?\.html|index(-[a-z0-9-]+)?\.html)$/i;
+				var BREADCRUMB_SEL = 'nav.crumbs, nav[aria-label="breadcrumbs"], .breadcrumbs';
+
+				// Найдём breadcrumbs-контейнеры и пометим их, чтобы потом не подменять
+				// ссылки внутри (там «Главная» прячется, а не переименовывается).
+				var crumbContainers = Array.from(document.querySelectorAll(BREADCRUMB_SEL));
+
+				// Заменяем текстовый узел «Главная» на «К занятиям» — без потери svg/иконок.
+				function relabelHomeTo(a, label) {
+					var w = document.createTreeWalker(a, NodeFilter.SHOW_TEXT, null);
+					var n;
+					while ((n = w.nextNode())) {
+						if (n.nodeValue && /главная/i.test(n.nodeValue)) {
+							n.nodeValue = n.nodeValue.replace(/главная/i, label);
+						}
+					}
+				}
+
 				document.querySelectorAll('a').forEach(function (a) {
 					if (a.dataset.iqmoKeepHref === '1') return;
 					var text = (a.textContent || '').trim().toLowerCase();
 					if (text !== 'главная') return;
 					var href = (a.getAttribute('href') || '').trim();
 					if (!HOME_HREF_RE.test(href)) return;
+					var inCrumbs = crumbContainers.some(function (c) { return c.contains(a); });
+					if (inCrumbs) return; // breadcrumbs обрабатываются отдельным проходом
 					a.setAttribute('href', preferred);
+					relabelHomeTo(a, 'К занятиям');
+					a.setAttribute('aria-label', 'К занятиям');
 				});
 
-				// В breadcrumbs «Главная / Предметы / Биология» первая крошка для
-				// авторизованного ведёт ровно туда же, куда и кнопка «Главная» в шапке —
-				// дублирующий шаг, который перегружает интерфейс. Прячем её вместе со
-				// следующим разделителем, чтобы крошки стартовали с «Предметы».
-				document.querySelectorAll('nav.crumbs, nav[aria-label="breadcrumbs"], .breadcrumbs').forEach(function (nav) {
-					var crumb = Array.from(nav.querySelectorAll('a')).find(function (a) {
-						if (a.dataset.iqmoKeepHref === '1') return false;
-						return (a.textContent || '').trim().toLowerCase() === 'главная';
+				// breadcrumbs: «Главная» прячем, «Предметы» превращаем в <span>.
+				crumbContainers.forEach(function (nav) {
+					nav.querySelectorAll('a').forEach(function (a) {
+						if (a.dataset.iqmoKeepHref === '1') return;
+						var text = (a.textContent || '').trim().toLowerCase();
+						var href = (a.getAttribute('href') || '').trim();
+						if (!HOME_HREF_RE.test(href)) return;
+						if (text === 'главная') {
+							a.style.display = 'none';
+							var sep = a.nextElementSibling;
+							if (sep && sep.classList && (sep.classList.contains('crumbs__sep') || sep.classList.contains('breadcrumbs__sep'))) {
+								sep.style.display = 'none';
+							}
+						} else if (text === 'предметы') {
+							var span = document.createElement('span');
+							if (a.className) span.className = a.className;
+							span.textContent = a.textContent;
+							a.parentNode.replaceChild(span, a);
+						}
 					});
-					if (!crumb) return;
-					crumb.style.display = 'none';
-					var sep = crumb.nextElementSibling;
-					if (sep && sep.classList && (sep.classList.contains('crumbs__sep') || sep.classList.contains('breadcrumbs__sep'))) {
-						sep.style.display = 'none';
-					}
 				});
 			} catch (eHome) {}
 		}
