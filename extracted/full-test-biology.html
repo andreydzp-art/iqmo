@@ -1627,19 +1627,38 @@
 				const readyCount = readyVariants.length;
 				const inProgressCount = variantInfos.filter(x => (x.state === 'current' || x.state === 'cooldown') && x.res && x.res.inProgress).length;
 
-				/** Только два ближайших по очереди: текущий/кулдаун и следующий (замок / скоро), без всей сетки. */
-				let showIndices = [];
+				/**
+				 * Состав сетки вариантов:
+				 *   1) Все ранее пройденные — чтобы ученик мог вернуться, разобрать ошибки
+				 *      и пересдать (раньше пройденные исчезали из UI, и до них было не добраться).
+				 *   2) Текущий (next-not-passed) и следующий за ним «локед» — фокус на сегодня.
+				 *   3) Если все варианты ready и пройдены, добавим первый «coming» + пару следующих.
+				 */
+				const visibleSet = new Set();
+				variantInfos.forEach((vi, i) => {
+					if (vi.state === 'passed') visibleSet.add(i);
+				});
 				if (firstNotPassedIdx >= 0) {
-					showIndices = [firstNotPassedIdx, firstNotPassedIdx + 1].filter(i => i < variantInfos.length);
+					visibleSet.add(firstNotPassedIdx);
+					if (firstNotPassedIdx + 1 < variantInfos.length) visibleSet.add(firstNotPassedIdx + 1);
 				} else {
 					for (let j = 0; j < variantInfos.length; j++) {
 						if (variantInfos[j].state === 'coming') {
-							showIndices = [j, j + 1].filter(i => i < variantInfos.length);
+							visibleSet.add(j);
+							if (j + 1 < variantInfos.length) visibleSet.add(j + 1);
 							break;
 						}
 					}
 				}
-				const variantInfosVisible = showIndices.map(i => variantInfos[i]);
+				const variantInfosVisible = Array.from(visibleSet).sort((a, b) => a - b).map(i => variantInfos[i]);
+				// Сетка переключается между «парой» и полным гридом: при <=2 плиток держим компактный
+				// pair-вид (как раньше), при пройденных вариантах раскрываем во всю ширину.
+				const variantsGridCls = variantInfosVisible.length <= 2
+					? 'vp-grid vp-grid--pair' + (variantInfosVisible.length === 1 ? ' vp-grid--single' : '')
+					: 'vp-grid';
+				const variantsHintHtml = passedCount > 0
+					? `Пройденные варианты остаются здесь — кликните, чтобы пересдать или разобрать ошибки. Следующий новый откроется после ≥ <b>50%</b> в части 1 текущего.`
+					: `Показаны два ближайших варианта — тот, до которого вы дошли по порядку, и следующий. Остальные появятся после прохождения с <b>≥ 50%</b> в части 1.`;
 
 				const streakHtml = streakStatus.days > 0
 					? `<div class="vp-streak"><span class="vp-streak__flame">🔥</span>Серия: <b>${streakStatus.days}</b> ${streakStatus.days === 1 ? 'день' : 'дн.'} подряд${streakStatus.todayDone ? ' · сегодня ✓' : ''}</div>`
@@ -1661,8 +1680,8 @@
 					</div>
 
 					<div class="vp-section-title">Варианты</div>
-					<p class="vp-section-hint">Показаны два ближайших варианта — тот, до которого вы дошли по порядку, и следующий. Остальные появятся после прохождения с <b>≥ 50%</b> в части 1.</p>
-					<div class="vp-grid vp-grid--pair${variantInfosVisible.length === 1 ? ' vp-grid--single' : ''}">
+					<p class="vp-section-hint">${variantsHintHtml}</p>
+					<div class="${variantsGridCls}">
 						${variantInfosVisible.length ? variantInfosVisible.map(vi => {
 							const v = vi.v;
 							let cls = '', statusHtml = '', badgeHtml = '', lockHtml = '', disabled = false;
