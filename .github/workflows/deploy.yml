@@ -124,8 +124,20 @@ jobs:
             LARAVEL_DIR="${APP_DIR}/laravel"
             # К этому моменту static-слой уже зеркален к origin/main; при сбое composer
             # `laravel/public/site/` остаётся с актуальной статикой.
-            echo "=== DEPLOY: remove stray public admin + root *.html (nginx must not beat PHP) ==="
-            find "$LARAVEL_DIR/public" -maxdepth 1 -type f -name '*.html' -print -delete || true
+            echo "=== DEPLOY: remove stray public admin + root static (nginx must not beat public/site) ==="
+            # Nginx ищет статику в `public/` ДО того, как уйти в `public/site/` через
+            # Laravel. Любой stale `chem-progress.js` / `iqmo-base.css` / `subject-*.html`
+            # в корне `public/`, оставшийся от старых деплоев, перекрывает свежую копию
+            # из `public/site/` (Last-Modified не двигается, статика «зависает на 25 апр»).
+            # Поэтому подметаем все распространённые статичные расширения на верхнем
+            # уровне `public/` — `index.php` и `.htaccess` остаются, потому что они
+            # с другими расширениями.
+            find "$LARAVEL_DIR/public" -maxdepth 1 -type f \( \
+              -name '*.html' -o -name '*.js' -o -name '*.css' \
+              -o -name '*.svg' -o -name '*.png' -o -name '*.jpg' \
+              -o -name '*.jpeg' -o -name '*.gif' -o -name '*.webp' \
+              -o -name '*.ico' -o -name '*.map' \
+            \) -print -delete || true
             rm -rf "$LARAVEL_DIR/public/admin" || true
             echo "=== DEPLOY: composer install (Laravel) ==="
             cd "$LARAVEL_DIR"
