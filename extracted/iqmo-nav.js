@@ -121,6 +121,23 @@
 					if (!HOME_HREF_RE.test(href)) return;
 					a.setAttribute('href', preferred);
 				});
+
+				// В breadcrumbs «Главная / Предметы / Биология» первая крошка для
+				// авторизованного ведёт ровно туда же, куда и кнопка «Главная» в шапке —
+				// дублирующий шаг, который перегружает интерфейс. Прячем её вместе со
+				// следующим разделителем, чтобы крошки стартовали с «Предметы».
+				document.querySelectorAll('nav.crumbs, nav[aria-label="breadcrumbs"], .breadcrumbs').forEach(function (nav) {
+					var crumb = Array.from(nav.querySelectorAll('a')).find(function (a) {
+						if (a.dataset.iqmoKeepHref === '1') return false;
+						return (a.textContent || '').trim().toLowerCase() === 'главная';
+					});
+					if (!crumb) return;
+					crumb.style.display = 'none';
+					var sep = crumb.nextElementSibling;
+					if (sep && sep.classList && (sep.classList.contains('crumbs__sep') || sep.classList.contains('breadcrumbs__sep'))) {
+						sep.style.display = 'none';
+					}
+				});
 			} catch (eHome) {}
 		}
 
