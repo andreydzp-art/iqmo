@@ -98,6 +98,32 @@
 			else el.removeAttribute('hidden');
 		});
 
+		// Для авторизованных «Главная» в шапке/breadcrumbs ведёт на стартовую страницу
+		// первого предмета, а не на лендинг (учебный продукт, лендинг им бесполезен).
+		// Эвристика «своего предмета»: если URL уже на subject-/full-test-/category-/topic-
+		// химии — ведём на химию, иначе на биологию (биология — первый предмет в сайдбаре).
+		// Маркер `data-iqmo-keep-href` отключает подмену для конкретной ссылки на случай,
+		// если где-то понадобится явный возврат на лендинг (например, Лого).
+		if (loggedIn) {
+			try {
+				var preferred = '/subject-biology.html';
+				if (/(^|\/)(subject|full-test|category|topic)[-_].*chem/i.test(location.pathname)) {
+					preferred = '/subject-chemistry.html';
+				}
+				// Жёсткий список «домашних» URL: чтобы случайно не переписать ссылку
+				// на статью с заголовком «Главная» в каком-нибудь будущем разделе.
+				var HOME_HREF_RE = /^(\/|#|\.\/index(-[a-z0-9-]+)?\.html|\/index(-[a-z0-9-]+)?\.html|index(-[a-z0-9-]+)?\.html)$/i;
+				document.querySelectorAll('a').forEach(function (a) {
+					if (a.dataset.iqmoKeepHref === '1') return;
+					var text = (a.textContent || '').trim().toLowerCase();
+					if (text !== 'главная') return;
+					var href = (a.getAttribute('href') || '').trim();
+					if (!HOME_HREF_RE.test(href)) return;
+					a.setAttribute('href', preferred);
+				});
+			} catch (eHome) {}
+		}
+
 		return loggedIn;
 	}
 
