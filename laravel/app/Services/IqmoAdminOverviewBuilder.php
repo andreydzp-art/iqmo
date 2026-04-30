@@ -412,7 +412,7 @@ final class IqmoAdminOverviewBuilder
     {
         try {
             $q = DB::connection('iqmo')->table('analytics_events')
-                ->where('event', 'chem.attempt_complete')
+                ->whereIn('event', ['chem.attempt_complete', 'bio.attempt_complete'])
                 ->where('occurred_at', '>=', $sinceMs)
                 ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.mode')) IN ('trial','full')");
 
@@ -450,7 +450,7 @@ final class IqmoAdminOverviewBuilder
         $minShows = IqmoAdminOverviewMath::topQuestionsMinShows($days);
 
         $rows = DB::connection('iqmo')->table('analytics_events')
-            ->where('event', 'chem.attempt_complete')
+            ->whereIn('event', ['chem.attempt_complete', 'bio.attempt_complete'])
             ->where('occurred_at', '>=', $sinceMs)
             ->orderByDesc('id')
             ->limit(12_000)
@@ -483,9 +483,9 @@ final class IqmoAdminOverviewBuilder
                     'COUNT(*) AS total_cnt,'
                     .'COUNT(DISTINCT user_id) AS distinct_users,'
                     .'MAX(occurred_at) AS last_ms,'
-                    ."SUM(CASE WHEN event = 'chem.topic_view' THEN 1 ELSE 0 END) AS cnt_view,"
-                    ."SUM(CASE WHEN event = 'chem.attempt_start' THEN 1 ELSE 0 END) AS cnt_start,"
-                    ."SUM(CASE WHEN event = 'chem.attempt_complete' THEN 1 ELSE 0 END) AS cnt_complete"
+                    ."SUM(CASE WHEN event IN ('chem.topic_view','bio.topic_view') THEN 1 ELSE 0 END) AS cnt_view,"
+                    ."SUM(CASE WHEN event IN ('chem.attempt_start','bio.attempt_start') THEN 1 ELSE 0 END) AS cnt_start,"
+                    ."SUM(CASE WHEN event IN ('chem.attempt_complete','bio.attempt_complete') THEN 1 ELSE 0 END) AS cnt_complete"
                 )
                 ->first();
 
@@ -522,9 +522,9 @@ final class IqmoAdminOverviewBuilder
             $row = DB::connection('iqmo')->table('analytics_events')
                 ->where('occurred_at', '>=', $sinceMs)
                 ->selectRaw(
-                    "COUNT(DISTINCT CASE WHEN event = 'chem.topic_view' THEN user_id END) AS u_view,"
-                    ."COUNT(DISTINCT CASE WHEN event = 'chem.attempt_start' THEN user_id END) AS u_start,"
-                    ."COUNT(DISTINCT CASE WHEN event = 'chem.attempt_complete' THEN user_id END) AS u_complete"
+                    "COUNT(DISTINCT CASE WHEN event IN ('chem.topic_view','bio.topic_view') THEN user_id END) AS u_view,"
+                    ."COUNT(DISTINCT CASE WHEN event IN ('chem.attempt_start','bio.attempt_start') THEN user_id END) AS u_start,"
+                    ."COUNT(DISTINCT CASE WHEN event IN ('chem.attempt_complete','bio.attempt_complete') THEN user_id END) AS u_complete"
                 )
                 ->first();
 
@@ -556,12 +556,12 @@ final class IqmoAdminOverviewBuilder
                     FROM analytics_events s
                     INNER JOIN analytics_events c
                       ON c.user_id = s.user_id
-                     AND c.event = 'chem.attempt_complete'
+                     AND c.event IN ('chem.attempt_complete','bio.attempt_complete')
                      AND JSON_UNQUOTE(JSON_EXTRACT(c.payload_json, '$.attemptId')) =
                          JSON_UNQUOTE(JSON_EXTRACT(s.payload_json, '$.attemptId'))
                      AND c.occurred_at > s.occurred_at
                      AND c.occurred_at <= s.occurred_at + 14400000
-                    WHERE s.event = 'chem.attempt_start'
+                    WHERE s.event IN ('chem.attempt_start','bio.attempt_start')
                       AND s.occurred_at >= ?";
             if ($untilMs !== null) {
                 $sql .= ' AND s.occurred_at < ?';

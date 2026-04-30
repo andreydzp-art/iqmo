@@ -98,6 +98,20 @@
 		} catch (e) {}
 	}
 
+	// Subject → namespace для имён событий аналитики. Биология шлёт `bio.*`,
+	// всё остальное (включая отсутствующий subject) — `chem.*` (исторический префикс).
+	function eventNamespaceForSubject(subject) {
+		var s = subject == null ? '' : String(subject).toLowerCase();
+		return s === 'biology' || s === 'bio' ? 'bio' : 'chem';
+	}
+
+	// Subject -> namespace для имён событий аналитики. Биология шлёт `bio.*`,
+	// всё остальное (включая отсутствующий subject) - `chem.*` (исторический префикс).
+	function eventNamespaceForSubject(subject) {
+		var s = subject == null ? '' : String(subject).toLowerCase();
+		return s === 'biology' || s === 'bio' ? 'bio' : 'chem';
+	}
+
 	function flushAnalyticsQueue() {
 		if (iqmoAnalyticsFlushing || typeof fetch !== 'function') return;
 		const queue = loadAnalyticsQueue();
@@ -193,7 +207,7 @@
 		};
 		sendAnalyticsEvents([
 			{
-				event: 'chem.attempt_start',
+				event: eventNamespaceForSubject(payload.subject) + '.attempt_start',
 				occurredAt: Date.now(),
 				payload: payload
 			}
@@ -773,7 +787,7 @@
 				const items = Array.isArray(payload.items) ? payload.items : [];
 				sendAnalyticsEvents([
 					{
-						event: 'chem.attempt_complete',
+						event: eventNamespaceForSubject(payload.subject) + '.attempt_complete',
 						occurredAt: finishedAt,
 						payload: {
 							subject: payload.subject,
@@ -850,6 +864,7 @@
 		try {
 			var slug = document.body && document.body.getAttribute('data-iqmo-topic');
 			if (!slug) return;
+			var subjectAttr = (document.body && document.body.getAttribute('data-iqmo-subject')) || 'chemistry';
 			var sk = 'iqmo-topic-view-sent:' + slug;
 			try {
 				if (sessionStorage.getItem(sk)) return;
@@ -857,9 +872,9 @@
 			} catch (e0) {}
 			sendAnalyticsEvents([
 				{
-					event: 'chem.topic_view',
+					event: eventNamespaceForSubject(subjectAttr) + '.topic_view',
 					occurredAt: Date.now(),
-					payload: { subject: 'chemistry', topicSlug: String(slug) }
+					payload: { subject: String(subjectAttr), topicSlug: String(slug) }
 				}
 			]);
 			try {

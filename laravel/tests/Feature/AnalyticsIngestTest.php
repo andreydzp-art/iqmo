@@ -273,6 +273,44 @@ final class AnalyticsIngestTest extends TestCase
         $this->assertSame(100, $payload['percent']);
     }
 
+    public function test_biology_events_are_accepted_and_persisted(): void
+    {
+        // Биология шлёт `bio.*` (тот же ингест, что и chem.*). Цель теста — гарантия,
+        // что allowlist не вернёт обратно в режим «только химия» при будущих рефакторах.
+        $response = $this->postEvents([
+            ['event' => 'bio.topic_view', 'payload' => ['subject' => 'biology', 'topicSlug' => 'cell']],
+            [
+                'event' => 'bio.attempt_start',
+                'payload' => [
+                    'mode' => 'full',
+                    'subject' => 'biology',
+                    'attemptId' => 'bio-att-1',
+                    'totalQuestions' => 30,
+                ],
+            ],
+            [
+                'event' => 'bio.attempt_complete',
+                'payload' => [
+                    'mode' => 'full',
+                    'subject' => 'biology',
+                    'attemptId' => 'bio-att-1',
+                    'correct' => 21,
+                    'total' => 30,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['ok' => true, 'saved' => 3]);
+
+        $rows = DB::connection('iqmo')->table('analytics_events')->orderBy('id')->get();
+        $this->assertSame(['bio.topic_view', 'bio.attempt_start', 'bio.attempt_complete'], $rows->pluck('event')->all());
+        $complete = json_decode((string) $rows->last()->payload_json, true);
+        $this->assertSame(21, $complete['correct']);
+        $this->assertSame(30, $complete['total']);
+        $this->assertSame(70, $complete['percent']);
+    }
+
     public function test_oversized_body_is_rejected_with_413(): void
     {
         // Эмулируем огромное тело: 65 KB событий. Реальный фронт такого никогда не

@@ -13,6 +13,9 @@ class AnalyticsIngestController extends Controller
         'chem.attempt_start',
         'chem.attempt_complete',
         'chem.topic_view',
+        'bio.attempt_start',
+        'bio.attempt_complete',
+        'bio.topic_view',
         'iqmo.purchase',
     ];
 
@@ -104,9 +107,9 @@ class AnalyticsIngestController extends Controller
 
             $rawPl = isset($ev['payload']) && is_array($ev['payload']) ? $ev['payload'] : [];
             $payload = match ($name) {
-                'chem.topic_view' => $this->sanitizeTopic($rawPl),
-                'chem.attempt_start' => $this->sanitizeAttempt($rawPl, false),
-                'chem.attempt_complete' => $this->sanitizeAttempt($rawPl, true),
+                'chem.topic_view', 'bio.topic_view' => $this->sanitizeTopic($rawPl),
+                'chem.attempt_start', 'bio.attempt_start' => $this->sanitizeAttempt($rawPl, false),
+                'chem.attempt_complete', 'bio.attempt_complete' => $this->sanitizeAttempt($rawPl, true),
                 'iqmo.purchase' => $this->sanitizePurchase($rawPl),
                 default => null,
             };

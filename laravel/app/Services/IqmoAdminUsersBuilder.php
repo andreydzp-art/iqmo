@@ -83,7 +83,7 @@ final class IqmoAdminUsersBuilder
             $sleeping14d = max(0, $totalUsers - $activeIn14d);
 
             $withAtLeastOneAttempt = (int) $iqmo->table('analytics_events')
-                ->where('event', 'chem.attempt_complete')
+                ->whereIn('event', ['chem.attempt_complete', 'bio.attempt_complete'])
                 ->distinct()->count('user_id');
         }
 
@@ -151,7 +151,7 @@ final class IqmoAdminUsersBuilder
                 if ($hasAnalytics) {
                     $base->whereNotIn('id', function ($sq): void {
                         $sq->select('user_id')->from('analytics_events')
-                            ->where('event', 'chem.attempt_complete')
+                            ->whereIn('event', ['chem.attempt_complete', 'bio.attempt_complete'])
                             ->distinct();
                     });
                 }
@@ -231,9 +231,9 @@ final class IqmoAdminUsersBuilder
                 ->selectRaw('user_id,
                     MAX(occurred_at) AS last_event,
                     COUNT(*) AS events_total,
-                    SUM(CASE WHEN event = "chem.attempt_complete" THEN 1 ELSE 0 END) AS attempts_evt,
+                    SUM(CASE WHEN event IN ("chem.attempt_complete","bio.attempt_complete") THEN 1 ELSE 0 END) AS attempts_evt,
                     AVG(CASE
-                        WHEN event = "chem.attempt_complete"
+                        WHEN event IN ("chem.attempt_complete","bio.attempt_complete")
                          AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, "$.mode")) IN ("trial","full")
                         THEN CAST(JSON_EXTRACT(payload_json, "$.percent") AS DECIMAL(10,2))
                         ELSE NULL
@@ -414,9 +414,9 @@ final class IqmoAdminUsersBuilder
                 ->selectRaw('
                     COUNT(*) AS events_total,
                     MAX(occurred_at) AS last_event,
-                    SUM(CASE WHEN event = "chem.attempt_complete" THEN 1 ELSE 0 END) AS attempts,
+                    SUM(CASE WHEN event IN ("chem.attempt_complete","bio.attempt_complete") THEN 1 ELSE 0 END) AS attempts,
                     AVG(CASE
-                        WHEN event = "chem.attempt_complete"
+                        WHEN event IN ("chem.attempt_complete","bio.attempt_complete")
                          AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, "$.mode")) IN ("trial","full")
                         THEN CAST(JSON_EXTRACT(payload_json, "$.percent") AS DECIMAL(10,2))
                         ELSE NULL
@@ -538,7 +538,7 @@ final class IqmoAdminUsersBuilder
             // дороже, и в большинстве случаев совпадает).
             if ($hasAnalytics) {
                 $rows = $iqmo->table('analytics_events')->whereIn('user_id', $userIds)
-                    ->where('event', 'chem.attempt_complete')
+                    ->whereIn('event', ['chem.attempt_complete', 'bio.attempt_complete'])
                     ->selectRaw('user_id, COUNT(*) AS c')
                     ->groupBy('user_id')->get();
                 foreach ($rows as $r) {
