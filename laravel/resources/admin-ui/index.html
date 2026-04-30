@@ -989,13 +989,13 @@
 					<button type="button" class="is--active" data-section="overview">Обзор</button>
 					<button type="button" data-section="users">Пользователи</button>
 					<button type="button" data-section="quizzes">Квизы</button>
-					<button type="button" class="is--soon" data-section="subjects">Предметы</button>
-					<button type="button" class="is--soon" data-section="topics">Темы</button>
-					<button type="button" class="is--soon" data-section="questions">Вопросы</button>
-					<button type="button" class="is--soon" data-section="tests">Тесты</button>
-					<button type="button" class="is--soon" data-section="mistakes">Ошибки</button>
-					<button type="button" class="is--soon" data-section="funnel">Воронка</button>
-					<button type="button" class="is--soon" data-section="activity">Активность</button>
+					<button type="button" data-section="subjects">Предметы</button>
+					<button type="button" data-section="topics">Темы</button>
+					<button type="button" data-section="questions">Вопросы</button>
+					<button type="button" data-section="tests">Тесты</button>
+					<button type="button" data-section="mistakes">Ошибки</button>
+					<button type="button" data-section="funnel">Воронка</button>
+					<button type="button" data-section="activity">Активность</button>
 				</nav>
 				<div class="admin__foot">
 					Сводка «Обзор» подгружается из БД; при сбое API показывается демо из mock-data.js.
@@ -1232,6 +1232,178 @@
 					</div>
 
 					<div id="quizzes-root"></div>
+				</div>
+
+				<div id="panel-subjects" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Предметы</h1>
+							<p class="admin__lead" id="subjects-lead">Загрузка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" data-analytics-period="subjects" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="subjects-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+					<div class="callout" id="subjects-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/subjects</code>
+					</div>
+					<div id="subjects-root"></div>
+				</div>
+
+				<div id="panel-topics" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Темы</h1>
+							<p class="admin__lead" id="topics-lead">Загрузка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" data-analytics-period="topics" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="topics-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+					<div class="callout" id="topics-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/topics</code>
+					</div>
+					<div id="topics-root"></div>
+				</div>
+
+				<div id="panel-questions" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Вопросы</h1>
+							<p class="admin__lead" id="questions-lead">Загрузка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" data-analytics-period="questions" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="questions-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+					<div class="callout" id="questions-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/questions</code>
+					</div>
+					<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 14px;">
+						<label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);">
+							Предмет
+							<select id="questions-filter-subject" style="padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;">
+								<option value="all">Все</option>
+								<option value="chemistry">Химия</option>
+								<option value="biology">Биология</option>
+							</select>
+						</label>
+						<label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);">
+							qid
+							<input id="questions-filter-q" type="text" placeholder="часть qid"
+								style="padding:6px 10px;border:1px solid var(--line);border-radius:8px;min-width:180px;">
+						</label>
+						<label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);">
+							<input id="questions-filter-wrong" type="checkbox"> только проблемные (≥ 50% ошибок)
+						</label>
+					</div>
+					<div id="questions-root"></div>
+				</div>
+
+				<div id="panel-tests" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Тесты</h1>
+							<p class="admin__lead" id="tests-lead">Загрузка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" data-analytics-period="tests" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="tests-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+					<div class="callout" id="tests-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/tests</code>
+					</div>
+					<div id="tests-root"></div>
+				</div>
+
+				<div id="panel-mistakes" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Ошибки</h1>
+							<p class="admin__lead" id="mistakes-lead">Загрузка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" data-analytics-period="mistakes" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="mistakes-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+					<div class="callout" id="mistakes-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/mistakes</code>
+					</div>
+					<div id="mistakes-root"></div>
+				</div>
+
+				<div id="panel-funnel" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Воронка</h1>
+							<p class="admin__lead" id="funnel-lead">Загрузка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" data-analytics-period="funnel" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="funnel-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+					<div class="callout" id="funnel-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/funnel</code>
+					</div>
+					<div id="funnel-root"></div>
+				</div>
+
+				<div id="panel-activity" hidden>
+					<div class="admin__top">
+						<div>
+							<h1 class="admin__title">Активность</h1>
+							<p class="admin__lead" id="activity-lead">Загрузка…</p>
+						</div>
+						<div class="period-wrap">
+							<div class="period" data-analytics-period="activity" role="group" aria-label="Период">
+								<button type="button" data-days="1">Сегодня</button>
+								<button type="button" class="is--on" data-days="7">7 дней</button>
+								<button type="button" data-days="14">14 дней</button>
+								<button type="button" data-days="30">Месяц</button>
+							</div>
+							<p class="period-range" id="activity-period-range" aria-live="polite"></p>
+						</div>
+					</div>
+					<div class="callout" id="activity-callout">
+						<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/activity</code>
+					</div>
+					<div id="activity-root"></div>
 				</div>
 
 				<div id="panel-placeholder" hidden>
@@ -2573,7 +2745,438 @@
 					});
 				}
 
+				// ─── Панели аналитики (Subjects / Topics / Questions / Tests / Mistakes / Funnel / Activity) ──
+				// Один общий контракт: каждая панель — это HTTP GET к /api/admin/<section>?days=N,
+				// дальше специфический renderer строит карточки/таблицы. Состояние
+				// (выбранный период, последний fetch sequence) хранится в analyticsState[section].
+				const analyticsState = {
+					subjects: { days: 7, seq: 0, init: false },
+					topics: { days: 7, seq: 0, init: false },
+					questions: { days: 7, seq: 0, init: false, filters: { subject: 'all', q: '', wrongOnly: false } },
+					tests: { days: 7, seq: 0, init: false },
+					mistakes: { days: 7, seq: 0, init: false },
+					funnel: { days: 7, seq: 0, init: false },
+					activity: { days: 7, seq: 0, init: false },
+				};
+				const ANALYTICS_RENDERERS = {
+					subjects: renderSubjectsPanel,
+					topics: renderTopicsPanel,
+					questions: renderQuestionsPanel,
+					tests: renderTestsPanel,
+					mistakes: renderMistakesPanel,
+					funnel: renderFunnelPanel,
+					activity: renderActivityPanel,
+				};
+
+				function buildAnalyticsUrl(section, st) {
+					let url = '/api/admin/' + section + '?days=' + st.days;
+					if (section === 'questions') {
+						const f = st.filters || {};
+						if (f.subject && f.subject !== 'all') url += '&subject=' + encodeURIComponent(f.subject);
+						if (f.q) url += '&q=' + encodeURIComponent(f.q);
+						if (f.wrongOnly) url += '&wrongOnly=1';
+					}
+					return url;
+				}
+
+				async function fetchAnalyticsJson(section, st) {
+					const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+					const timer = ctl ? setTimeout(function () { ctl.abort(); }, 12000) : null;
+					try {
+						const r = await fetch(buildAnalyticsUrl(section, st), {
+							credentials: 'same-origin',
+							cache: 'no-store',
+							headers: { Accept: 'application/json' },
+							signal: ctl ? ctl.signal : undefined,
+						});
+						if (!r.ok) {
+							let detail = '';
+							try {
+								const body = await r.json();
+								if (body && body.meta) {
+									const m = body.meta;
+									detail = [m.errorMessage, m.errorClass, m.errorAt].filter(Boolean).join(' · ');
+								}
+							} catch (_) {}
+							const err = new Error('analytics_http_' + r.status);
+							err.httpStatus = r.status;
+							err.serverDetail = detail;
+							throw err;
+						}
+						return await r.json();
+					} finally {
+						if (timer) clearTimeout(timer);
+					}
+				}
+
+				function setAnalyticsLoadingState(section) {
+					const lead = document.getElementById(section + '-lead');
+					const co = document.getElementById(section + '-callout');
+					if (lead) lead.textContent = 'Загрузка метрик…';
+					if (co) {
+						co.className = 'callout';
+						co.innerHTML = '<strong>Загрузка…</strong> запрос <code style="font-size:13px">/api/admin/' + section + '</code>';
+					}
+				}
+
+				function setAnalyticsErrorState(section, err) {
+					const lead = document.getElementById(section + '-lead');
+					const co = document.getElementById(section + '-callout');
+					const root = document.getElementById(section + '-root');
+					if (lead) lead.textContent = 'Не удалось загрузить /api/admin/' + section + '.';
+					if (co) {
+						co.className = 'callout';
+						const status = err && err.httpStatus ? err.httpStatus : '?';
+						const detail = err && err.serverDetail ? err.serverDetail : '';
+						let body = '<strong>Ошибка:</strong> API <code>/api/admin/' + section + '</code> вернул ' + status + '.';
+						if (detail) body += ' Причина: <code style="font-size:13px">' + escapeAttr(detail) + '</code>';
+						else if (status === 401 || status === 403) body += ' Проверьте вход в IQMO и <code>IQMO_ADMIN_EMAILS</code>.';
+						else if (err && err.name === 'AbortError') body = '<strong>Ошибка:</strong> запрос <code>/api/admin/' + section + '</code> превысил 12 сек (timeout).';
+						co.innerHTML = body;
+					}
+					if (root) root.innerHTML = '';
+				}
+
+				async function loadAnalyticsPanel(section) {
+					const st = analyticsState[section];
+					if (!st) return;
+					const seq = ++st.seq;
+					setAnalyticsLoadingState(section);
+					const rangeEl = document.getElementById(section + '-period-range');
+					if (rangeEl) rangeEl.textContent = formatPeriodRangeRu(st.days);
+					try {
+						const data = await fetchAnalyticsJson(section, st);
+						if (seq !== st.seq) return;
+						const renderer = ANALYTICS_RENDERERS[section];
+						if (renderer) renderer(data, st);
+					} catch (err) {
+						if (seq !== st.seq) return;
+						setAnalyticsErrorState(section, err);
+					}
+				}
+
+				function bindAnalyticsPanelOnce(section) {
+					const st = analyticsState[section];
+					if (!st || st.init) return;
+					st.init = true;
+					const period = document.querySelector('[data-analytics-period="' + section + '"]');
+					if (period) {
+						period.addEventListener('click', function (e) {
+							const btn = e.target.closest('button[data-days]');
+							if (!btn) return;
+							period.querySelectorAll('button').forEach(function (b) {
+								b.classList.toggle('is--on', b === btn);
+							});
+							st.days = parseInt(btn.getAttribute('data-days'), 10) || 7;
+							loadAnalyticsPanel(section).catch(function () {});
+						});
+					}
+					if (section === 'questions') {
+						const subj = document.getElementById('questions-filter-subject');
+						const q = document.getElementById('questions-filter-q');
+						const w = document.getElementById('questions-filter-wrong');
+						let qDebounce = null;
+						if (subj) subj.addEventListener('change', function () {
+							st.filters.subject = subj.value || 'all';
+							loadAnalyticsPanel('questions').catch(function () {});
+						});
+						if (q) q.addEventListener('input', function () {
+							clearTimeout(qDebounce);
+							qDebounce = setTimeout(function () {
+								st.filters.q = (q.value || '').trim();
+								loadAnalyticsPanel('questions').catch(function () {});
+							}, 250);
+						});
+						if (w) w.addEventListener('change', function () {
+							st.filters.wrongOnly = !!w.checked;
+							loadAnalyticsPanel('questions').catch(function () {});
+						});
+					}
+				}
+
+				// ─── Renderers ────────────────────────────────────────────────────
+				function setLiveCallout(section, sourcesText) {
+					const co = document.getElementById(section + '-callout');
+					if (!co) return;
+					co.className = 'callout callout--live';
+					co.innerHTML = '<strong>Живые данные:</strong> расчёт на сервере · ' + sourcesText;
+				}
+
+				function setNoData(rootId, message) {
+					const root = document.getElementById(rootId);
+					if (!root) return;
+					root.innerHTML =
+						'<div class="card"><h2>Нет данных</h2><p style="margin:0;color:var(--muted);font-size:13px;">' +
+						escapeHtml(message) +
+						'</p></div>';
+				}
+
+				function renderSubjectsPanel(payload, st) {
+					const lead = document.getElementById('subjects-lead');
+					if (lead) lead.textContent = 'Сводка по предметам из событий attempt_*. Окно: ' + periodLabelShort(st.days) + '.';
+					setLiveCallout('subjects', 'источник: <code>analytics_events</code> (chem.* и bio.*).');
+					const root = document.getElementById('subjects-root');
+					if (!root) return;
+					const list = (payload && payload.subjects) || [];
+					if (list.length === 0) { setNoData('subjects-root', 'За окно нет attempt-событий.'); return; }
+					root.innerHTML = list.map(function (s) {
+						return (
+							'<div class="card" style="margin-bottom:14px;">' +
+								'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
+									'<h2 style="margin:0;">' + escapeHtml(s.label) + '</h2>' +
+									'<div style="color:var(--muted);font-size:12px;font-weight:700;">' +
+										'просмотры темы ' + fmtIntRu(s.views) + ' · стартов ' + fmtIntRu(s.starts) +
+										' · попыток ' + fmtIntRu(s.attempts) + ' · юзеров ' + fmtIntRu(s.users) +
+									'</div>' +
+								'</div>' +
+								'<div class="kpi-grid" style="margin-top:12px;">' +
+									kpiHtml('Средний результат', fmtPct(s.avgPct), 'AVG percent (trial+full)', '') +
+									kpiHtml('Часть 1 пройдена', fmtPct(s.passPct), 'доля попыток с passedPart1=true', '') +
+									kpiHtml('Старт → завершение', fmtPct(s.completionPct), 'attempt_complete / attempt_start', '') +
+									kpiHtml('Тема → старт', fmtPct(s.viewToStartPct), 'attempt_start / topic_view', '') +
+								'</div>' +
+							'</div>'
+						);
+					}).join('');
+				}
+
+				function renderTopicsPanel(payload, st) {
+					const lead = document.getElementById('topics-lead');
+					if (lead) lead.textContent = 'Что юзеры читают и пробуют решать. Окно: ' + periodLabelShort(st.days) + '.';
+					setLiveCallout('topics', 'источник: <code>chem.topic_view</code> + <code>attempt_complete.topicSlug</code>.');
+					const root = document.getElementById('topics-root');
+					if (!root) return;
+					const list = (payload && payload.topics) || [];
+					if (list.length === 0) { setNoData('topics-root', 'Нет ни одного topic_view за окно.'); return; }
+					const rows = list.map(function (t) {
+						return (
+							'<tr>' +
+								'<td><strong>' + escapeHtml(t.topicSlug) + '</strong></td>' +
+								'<td><span class="status-pill status-pill--' + escapeAttr(t.subject || 'unknown') + '">' + escapeHtml(t.subject || '—') + '</span></td>' +
+								'<td class="num">' + fmtIntRu(t.views) + '</td>' +
+								'<td class="num">' + fmtIntRu(t.attempts) + '</td>' +
+								'<td>' + fmtPct(t.viewToAttemptPct) + '</td>' +
+								'<td>' + fmtPct(t.avgPct) + '</td>' +
+							'</tr>'
+						);
+					}).join('');
+					root.innerHTML =
+						'<div class="card"><div class="table-wrap"><table>' +
+							'<thead><tr><th>Тема</th><th>Предмет</th><th>Просмотров</th><th>Попыток</th><th>Тема → попытка</th><th>Средний %</th></tr></thead>' +
+							'<tbody>' + rows + '</tbody>' +
+						'</table></div></div>';
+				}
+
+				function renderQuestionsPanel(payload, st) {
+					const lead = document.getElementById('questions-lead');
+					const meta = (payload && payload.meta) || {};
+					const minShows = meta.minShows || '?';
+					if (lead) lead.textContent = 'qid из attempt_complete.items. Окно: ' + periodLabelShort(st.days) + ' · фильтр shows ≥ ' + minShows + '.';
+					setLiveCallout('questions', 'источник: <code>analytics_events.payload_json.items[]</code>.');
+					const root = document.getElementById('questions-root');
+					if (!root) return;
+					const list = (payload && payload.questions) || [];
+					if (list.length === 0) { setNoData('questions-root', 'По текущим фильтрам qid не найдены.'); return; }
+					const rows = list.map(function (q) {
+						const flag = q.flag ? ' <span class="tag tag--warn">review</span>' : '';
+						return (
+							'<tr>' +
+								'<td><code>' + escapeHtml(q.qid) + '</code>' + flag + '</td>' +
+								'<td><span class="status-pill status-pill--' + escapeAttr(q.subject || 'unknown') + '">' + escapeHtml(q.subject || '—') + '</span></td>' +
+								'<td class="num">' + fmtIntRu(q.shows) + '</td>' +
+								'<td class="num">' + fmtIntRu(q.wrong) + '</td>' +
+								'<td>' + q.wrongPct + '%</td>' +
+							'</tr>'
+						);
+					}).join('');
+					root.innerHTML =
+						'<div class="card"><div class="table-wrap"><table>' +
+							'<thead><tr><th>qid</th><th>Предмет</th><th>Показов</th><th>Ошибок</th><th>% ошибок</th></tr></thead>' +
+							'<tbody>' + rows + '</tbody>' +
+						'</table></div></div>';
+				}
+
+				function renderTestsPanel(payload, st) {
+					const lead = document.getElementById('tests-lead');
+					if (lead) lead.textContent = 'Сводка по вариантам теста (variantId / variantTitle). Окно: ' + periodLabelShort(st.days) + '.';
+					setLiveCallout('tests', 'источник: <code>attempt_complete.variantId</code> + <code>variantTitle</code>.');
+					const root = document.getElementById('tests-root');
+					if (!root) return;
+					const list = (payload && payload.tests) || [];
+					if (list.length === 0) { setNoData('tests-root', 'За окно никто не проходил вариант теста.'); return; }
+					const rows = list.map(function (t) {
+						return (
+							'<tr>' +
+								'<td><strong>#' + (t.variantId == null ? '—' : t.variantId) + '</strong></td>' +
+								'<td>' + escapeHtml(t.variantTitle || '—') + '</td>' +
+								'<td><span class="status-pill status-pill--' + escapeAttr(t.subject || 'unknown') + '">' + escapeHtml(t.subject || '—') + '</span></td>' +
+								'<td>' + escapeHtml(t.mode) + '</td>' +
+								'<td class="num">' + fmtIntRu(t.attempts) + '</td>' +
+								'<td class="num">' + fmtIntRu(t.users) + '</td>' +
+								'<td>' + fmtPct(t.avgPct) + '</td>' +
+								'<td>' + fmtPct(t.passPct) + '</td>' +
+							'</tr>'
+						);
+					}).join('');
+					root.innerHTML =
+						'<div class="card"><div class="table-wrap"><table>' +
+							'<thead><tr><th>ID</th><th>Название</th><th>Предмет</th><th>Режим</th><th>Прохождений</th><th>Юзеров</th><th>Средний %</th><th>Часть 1 пройдена</th></tr></thead>' +
+							'<tbody>' + rows + '</tbody>' +
+						'</table></div></div>';
+				}
+
+				function renderMistakesPanel(payload, st) {
+					const lead = document.getElementById('mistakes-lead');
+					if (lead) lead.textContent = 'Топ qid с ошибками + юзеры с наибольшим числом промахов. Окно: ' + periodLabelShort(st.days) + '.';
+					setLiveCallout('mistakes', 'источник: <code>attempt_complete.items[].ok</code>.');
+					const root = document.getElementById('mistakes-root');
+					if (!root) return;
+					const qids = (payload && payload.topQids) || [];
+					const users = (payload && payload.topUsers) || [];
+					if (qids.length === 0 && users.length === 0) { setNoData('mistakes-root', 'За окно никто не ошибался — поздравляем :)'); return; }
+					const qidRows = qids.map(function (q) {
+						return (
+							'<tr>' +
+								'<td><code>' + escapeHtml(q.qid) + '</code></td>' +
+								'<td><span class="status-pill status-pill--' + escapeAttr(q.subject || 'unknown') + '">' + escapeHtml(q.subject || '—') + '</span></td>' +
+								'<td class="num">' + fmtIntRu(q.shows) + '</td>' +
+								'<td class="num">' + fmtIntRu(q.wrong) + '</td>' +
+								'<td>' + q.wrongPct + '%</td>' +
+							'</tr>'
+						);
+					}).join('') || '<tr><td colspan="5" style="color:var(--muted);padding:14px;">—</td></tr>';
+					const userRows = users.map(function (u) {
+						return (
+							'<tr>' +
+								'<td><strong>' + (u.userId || '—') + '</strong></td>' +
+								'<td>' + escapeHtml(u.email || '—') + '</td>' +
+								'<td class="num">' + fmtIntRu(u.attempts) + '</td>' +
+								'<td class="num">' + fmtIntRu(u.wrong) + '</td>' +
+							'</tr>'
+						);
+					}).join('') || '<tr><td colspan="4" style="color:var(--muted);padding:14px;">—</td></tr>';
+					root.innerHTML =
+						'<div class="card" style="margin-bottom:14px;"><h2 style="margin:0 0 8px;">Топ qid по числу ошибок</h2><div class="table-wrap"><table>' +
+							'<thead><tr><th>qid</th><th>Предмет</th><th>Показов</th><th>Ошибок</th><th>% ошибок</th></tr></thead>' +
+							'<tbody>' + qidRows + '</tbody></table></div></div>' +
+						'<div class="card"><h2 style="margin:0 0 8px;">Топ юзеров по числу промахов</h2><div class="table-wrap"><table>' +
+							'<thead><tr><th>ID</th><th>Email</th><th>Попыток</th><th>Промахов</th></tr></thead>' +
+							'<tbody>' + userRows + '</tbody></table></div></div>';
+				}
+
+				function renderFunnelPanel(payload, st) {
+					const lead = document.getElementById('funnel-lead');
+					if (lead) lead.textContent = 'Сквозная воронка: регистрация → тема → попытка. Окно: ' + periodLabelShort(st.days) + '.';
+					setLiveCallout('funnel', 'источники: <code>users</code>, <code>analytics_events</code>.');
+					const root = document.getElementById('funnel-root');
+					if (!root) return;
+					const steps = (payload && payload.steps) || [];
+					const tx = (payload && payload.transitions) || {};
+					const daily = (payload && payload.daily) || [];
+					if (steps.length === 0) { setNoData('funnel-root', 'Нет ни регистраций, ни событий за окно.'); return; }
+					const maxValue = Math.max.apply(null, steps.map(function (s) { return s.value || 0; }).concat([1]));
+					const stepHtml = steps.map(function (s) {
+						const w = Math.max(2, Math.round(100 * (s.value || 0) / maxValue));
+						return (
+							'<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">' +
+								'<div style="min-width:180px;font-weight:600;">' + escapeHtml(s.label) + '</div>' +
+								'<div style="flex:1;background:#eef1f6;border-radius:8px;overflow:hidden;height:26px;position:relative;">' +
+									'<div style="background:linear-gradient(90deg,#4f7bd6,#6f97f0);height:100%;width:' + w + '%;"></div>' +
+									'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-size:12px;font-weight:700;color:#0d1220;">' +
+										fmtIntRu(s.value) + (s.pct === null || s.pct === undefined ? '' : ' · ' + s.pct + '%') +
+									'</div>' +
+								'</div>' +
+							'</div>' +
+							'<div style="font-size:12px;color:var(--muted);margin-left:192px;margin-bottom:14px;">' + escapeHtml(s.hint || '') + '</div>'
+						);
+					}).join('');
+
+					const txHtml =
+						'<div class="kpi-grid" style="margin-top:8px;">' +
+							kpiHtml('Тема → старт', fmtPct(tx.view_to_start), 'attempt_start / topic_view', '') +
+							kpiHtml('Старт → завершение', fmtPct(tx.start_to_complete), 'attempt_complete / attempt_start', '') +
+							kpiHtml('Завершение → trial+full', fmtPct(tx.complete_to_real), 'real / complete', '') +
+						'</div>';
+
+					const max = Math.max.apply(null, daily.map(function (d) { return d.count; }).concat([1]));
+					const ns = 'http://www.w3.org/2000/svg';
+					let bars = '';
+					daily.forEach(function (d, i) {
+						const bh = max > 0 ? Math.round((d.count / max) * 70) : 0;
+						bars += '<rect x="' + (i * (600 / Math.max(1, daily.length)) + 1) + '" y="' + (80 - bh) + '" width="' + Math.max(1, Math.floor((600 / Math.max(1, daily.length)) - 2)) + '" height="' + bh + '" rx="2" fill="' + (d.count > 0 ? '#4f7bd6' : '#e6e9ef') + '"><title>' + escapeAttr(d.date + ': ' + d.count) + '</title></rect>';
+					});
+					const dailyHtml = daily.length === 0 ? '' : (
+						'<div class="card" style="margin-top:14px;"><h2 style="margin:0 0 6px;">Завершённые тесты по дням</h2>' +
+							'<svg viewBox="0 0 600 80" preserveAspectRatio="none" width="100%" height="80" xmlns="' + ns + '">' + bars + '</svg>' +
+						'</div>'
+					);
+
+					root.innerHTML =
+						'<div class="card">' + stepHtml + txHtml + '</div>' +
+						dailyHtml;
+				}
+
+				function renderActivityPanel(payload, st) {
+					const lead = document.getElementById('activity-lead');
+					if (lead) lead.textContent = 'Когда юзеры реально активны. Окно: ' + periodLabelShort(st.days) + '.';
+					setLiveCallout('activity', 'источник: <code>analytics_events.occurred_at</code>.');
+					const root = document.getElementById('activity-root');
+					if (!root) return;
+					const hourly = (payload && payload.hourly) || [];
+					const weekday = (payload && payload.weekday) || [];
+					const top = (payload && payload.topUsers) || [];
+					const totalEvents = hourly.reduce(function (s, h) { return s + (h.events || 0); }, 0);
+					if (totalEvents === 0 && top.length === 0) { setNoData('activity-root', 'За окно событий нет.'); return; }
+
+					const maxH = Math.max.apply(null, hourly.map(function (h) { return h.events; }).concat([1]));
+					let hBars = '';
+					hourly.forEach(function (h, i) {
+						const bh = Math.round((h.events / maxH) * 90);
+						hBars += '<g><rect x="' + (i * 25 + 4) + '" y="' + (100 - bh) + '" width="20" height="' + bh + '" rx="2" fill="' + (h.events > 0 ? '#4f7bd6' : '#e6e9ef') + '"><title>' + escapeAttr(h.hour + ':00 — ' + h.events + ' событий, ' + h.users + ' юзеров') + '</title></rect>' +
+							(i % 3 === 0 ? '<text x="' + (i * 25 + 14) + '" y="118" text-anchor="middle" font-size="10" fill="#586275">' + h.hour + '</text>' : '') +
+							'</g>';
+					});
+
+					const maxW = Math.max.apply(null, weekday.map(function (w) { return w.events; }).concat([1]));
+					const wRows = weekday.map(function (w) {
+						const pct = Math.round(100 * (w.events / maxW));
+						return (
+							'<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">' +
+								'<div style="min-width:36px;font-weight:600;">' + w.label + '</div>' +
+								'<div style="flex:1;background:#eef1f6;border-radius:6px;height:18px;overflow:hidden;">' +
+									'<div style="background:#4f7bd6;height:100%;width:' + pct + '%;"></div>' +
+								'</div>' +
+								'<div style="min-width:90px;text-align:right;font-size:12px;color:var(--muted);">' + fmtIntRu(w.events) + ' (' + fmtIntRu(w.users) + ' ю.)</div>' +
+							'</div>'
+						);
+					}).join('');
+
+					const topRows = top.map(function (u) {
+						return (
+							'<tr>' +
+								'<td><strong>' + (u.userId || '—') + '</strong></td>' +
+								'<td>' + escapeHtml(u.email || '—') + '</td>' +
+								'<td class="num">' + fmtIntRu(u.events) + '</td>' +
+								'<td class="num">' + fmtIntRu(u.attempts) + '</td>' +
+								'<td>' + (u.lastEventMs ? formatRelativeRu(u.lastEventMs) : '—') + '</td>' +
+							'</tr>'
+						);
+					}).join('') || '<tr><td colspan="5" style="color:var(--muted);padding:14px;">—</td></tr>';
+
+					root.innerHTML =
+						'<div class="card" style="margin-bottom:14px;"><h2 style="margin:0 0 8px;">Активность по часам (UTC сервера)</h2>' +
+							'<svg viewBox="0 0 610 130" width="100%" height="130" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' + hBars + '</svg>' +
+						'</div>' +
+						'<div class="card" style="margin-bottom:14px;"><h2 style="margin:0 0 8px;">Активность по дням недели</h2>' + wRows + '</div>' +
+						'<div class="card"><h2 style="margin:0 0 8px;">Топ-20 активных юзеров</h2><div class="table-wrap"><table>' +
+							'<thead><tr><th>ID</th><th>Email</th><th>Событий</th><th>Завершённых тестов</th><th>Последнее событие</th></tr></thead>' +
+							'<tbody>' + topRows + '</tbody></table></div></div>';
+				}
+
 				// ─── переключение разделов ───────────────────────────────────────
+				const ANALYTICS_SECTIONS = ['subjects', 'topics', 'questions', 'tests', 'mistakes', 'funnel', 'activity'];
+				const ALL_PANELS = ['overview', 'users', 'quizzes'].concat(ANALYTICS_SECTIONS).concat(['placeholder']);
+
 				document.getElementById('nav').addEventListener('click', function (e) {
 					const btn = e.target.closest('button[data-section]');
 					if (!btn) return;
@@ -2581,14 +3184,13 @@
 					document.querySelectorAll('#nav button').forEach(function (b) {
 						b.classList.toggle('is--active', b === btn);
 					});
-					const overview = document.getElementById('panel-overview');
-					const users = document.getElementById('panel-users');
-					const quizzes = document.getElementById('panel-quizzes');
+					ALL_PANELS.forEach(function (id) {
+						const el = document.getElementById('panel-' + id);
+						if (!el) return;
+						el.hidden = (id !== section) && !(id === 'placeholder' && !ALL_PANELS.includes(section));
+					});
 					const ph = document.getElementById('panel-placeholder');
-					overview.hidden = section !== 'overview';
-					users.hidden = section !== 'users';
-					quizzes.hidden = section !== 'quizzes';
-					ph.hidden = section === 'overview' || section === 'users' || section === 'quizzes';
+					if (ph) ph.hidden = ALL_PANELS.includes(section) && section !== 'placeholder';
 
 					if (section === 'overview') {
 						setDashTab(dashTab);
@@ -2598,10 +3200,15 @@
 					} else if (section === 'quizzes') {
 						bindQuizzesUi();
 						renderQuizzesPanel().catch(function () {});
+					} else if (ANALYTICS_SECTIONS.indexOf(section) !== -1) {
+						bindAnalyticsPanelOnce(section);
+						loadAnalyticsPanel(section).catch(function () {});
 					} else {
 						const title = SECTION_TITLES[section] || section;
-						document.getElementById('placeholder-title').textContent = title;
-						document.getElementById('placeholder-lead').textContent = title + ' — в разработке';
+						const t = document.getElementById('placeholder-title');
+						const l = document.getElementById('placeholder-lead');
+						if (t) t.textContent = title;
+						if (l) l.textContent = title + ' — в разработке';
 					}
 				});
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminAnalyticsController;
 use App\Http\Controllers\Api\AdminOverviewController;
 use App\Http\Controllers\Api\AdminQuizzesController;
 use App\Http\Controllers\Api\AdminUsersController;
@@ -46,5 +47,13 @@ Route::prefix('api')->group(function (): void {
         Route::get('/admin/users', [AdminUsersController::class, 'index']);
         Route::get('/admin/users/{id}', [AdminUsersController::class, 'show'])
             ->whereNumber('id');
+
+        Route::get('/admin/subjects', [AdminAnalyticsController::class, 'subjects']);
+        Route::get('/admin/topics', [AdminAnalyticsController::class, 'topics']);
+        Route::get('/admin/questions', [AdminAnalyticsController::class, 'questions']);
+        Route::get('/admin/tests', [AdminAnalyticsController::class, 'tests']);
+        Route::get('/admin/mistakes', [AdminAnalyticsController::class, 'mistakes']);
+        Route::get('/admin/funnel', [AdminAnalyticsController::class, 'funnel']);
+        Route::get('/admin/activity', [AdminAnalyticsController::class, 'activity']);
     });
 });
