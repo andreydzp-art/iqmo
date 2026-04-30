@@ -156,11 +156,15 @@ jobs:
             # до явного сброса. Дёргаем internal-роут с loopback (см. routes/web.php),
             # секрет не нужен — REMOTE_ADDR=127.0.0.1.
             echo "=== DEPLOY: opcache_reset() via loopback request ==="
+            # Файл `public/_opcache_reset.php` намеренно standalone (не Laravel-роут):
+            # сам routes/web.php лежит в opcache, поэтому новые роуты в нём не видны
+            # до сброса. Standalone PHP-файл, которого раньше не было, opcache
+            # подхватывает сразу. Нгинкс резолвится через --resolve на 127.0.0.1.
             curl -fsS -k -m 10 -X POST \
               --resolve www.iqmoschool.ru:443:127.0.0.1 \
-              "https://www.iqmoschool.ru/_internal/opcache-reset" \
+              "https://www.iqmoschool.ru/_opcache_reset.php" \
               && echo "" \
-              || echo "WARN: opcache reset request failed (route missing or nginx vhost mismatch)"
+              || echo "WARN: opcache reset request failed (file missing or nginx denied access)"
             echo "=== DEPLOY: Laravel layer OK ==="
 
   smoke:
