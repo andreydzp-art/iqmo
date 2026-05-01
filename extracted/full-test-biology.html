@@ -981,7 +981,7 @@
 				elCard.innerHTML = `
 					<div class="q-head">
 						<div class="q-head__left">
-							<div class="q-tag">${q.type === 'written' ? '<span class="part-banner">Часть 2</span>' : ''}Задание <b>${q.id}</b> / ${QCOUNT} · ${taskTypeLabel(q)}</div>
+							<div class="q-tag">${q.type === 'written' ? '<span class="part-banner">Часть 2</span>' : ''}Задание <b>${state.current + 1}</b> / ${QCOUNT} · ${taskTypeLabel(q)}</div>
 							<h1 class="q-title">${q.title}</h1>
 						</div>
 						<button type="button" class="q-flag ${flagged?'is--on':''}" id="btn-flag">
