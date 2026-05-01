@@ -1054,6 +1054,377 @@
 				background: var(--gm-violet-50); color: var(--gm-violet);
 				font-size: 13px; font-weight: 700;
 			}
+
+			/* ============================================================
+			   LEVEL MAP v2 — карта одной главы (7 узлов + босс)
+			   Точная вёрстка по референсу _tmp_ft6/level-map.html.
+			   Все классы префиксированы .lm- чтобы не конфликтовать со
+			   старым .gm- кодом. CSS-переменные локальные (--lm-*).
+			   ============================================================ */
+			.lm {
+				--lm-bg:        #f6f7fb;
+				--lm-bg-2:      #eef0f7;
+				--lm-surface:   #ffffff;
+				--lm-line:      #e6e8f0;
+				--lm-line-2:    #eef0f7;
+				--lm-ink:       #0f1226;
+				--lm-ink-2:     #2a2e4a;
+				--lm-muted:     #6b7094;
+				--lm-muted-2:   #9aa0bf;
+				--lm-primary:   #4f46e5;
+				--lm-primary-2: #6366f1;
+				--lm-primary-50:#eef0ff;
+				--lm-violet:    #7c3aed;
+				--lm-violet-50: #f3eeff;
+				--lm-emerald:   #10b981;
+				--lm-emerald-50:#e7faf2;
+				--lm-amber:     #f59e0b;
+				--lm-shadow-sm: 0 1px 2px rgba(15,18,38,.04), 0 1px 1px rgba(15,18,38,.03);
+				--lm-shadow:    0 1px 2px rgba(15,18,38,.04), 0 8px 24px rgba(15,18,38,.06);
+				--lm-shadow-glow:0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45);
+				--lm-shadow-boss:0 0 0 6px rgba(124,58,237,.12), 0 18px 36px -8px rgba(124,58,237,.45);
+				font-feature-settings: "ss01","cv11";
+			}
+			.lm .lm-num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+			/* HERO */
+			.lm-hero {
+				background: var(--lm-surface);
+				border: 1px solid var(--lm-line);
+				border-radius: 28px;
+				padding: 28px 32px;
+				box-shadow: var(--lm-shadow);
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: 28px;
+				align-items: center;
+				position: relative;
+				overflow: hidden;
+			}
+			.lm-hero::before {
+				content: ""; position: absolute; inset: auto -10% -60% auto;
+				width: 520px; height: 520px;
+				background: radial-gradient(closest-side, rgba(124,58,237,.10), transparent 70%);
+				pointer-events: none;
+			}
+			.lm-back {
+				color: var(--lm-muted); font-size: 12.5px;
+				display: inline-flex; align-items: center; gap: 6px;
+				text-decoration: none;
+			}
+			.lm-back:hover { color: var(--lm-ink-2); }
+			.lm-hero h1 {
+				margin: 10px 0 8px; font-size: 32px; line-height: 1.1;
+				letter-spacing: -0.02em; font-weight: 800; color: var(--lm-ink);
+			}
+			.lm-hero h1 .lm-dot { color: var(--lm-muted-2); margin: 0 6px; font-weight: 400; }
+			.lm-hero p.lm-lead {
+				margin: 0 0 18px; color: var(--lm-muted);
+				font-size: 14.5px; line-height: 1.55; max-width: 56ch;
+			}
+			.lm-cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+			.lm-btn {
+				height: 42px; padding: 0 16px; border-radius: 12px;
+				border: 1px solid var(--lm-line); background: var(--lm-surface);
+				font-weight: 600; font-size: 13.5px; color: var(--lm-ink-2);
+				display: inline-flex; align-items: center; gap: 8px;
+				cursor: pointer; transition: background .15s, border-color .15s;
+			}
+			.lm-btn:hover { background: var(--lm-bg-2); }
+			.lm-btn-streak {
+				background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
+				border-color: #fed7aa; color: #9a3412;
+			}
+			.lm-btn-streak:hover { background: linear-gradient(180deg, #ffedd5 0%, #fed7aa 100%); }
+
+			.lm-stat-cluster {
+				display: grid; grid-template-columns: repeat(4, auto);
+				border: 1px solid var(--lm-line);
+				border-radius: 18px;
+				background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+				overflow: hidden;
+				min-width: 540px;
+			}
+			.lm-stat {
+				padding: 16px 22px;
+				display: flex; align-items: center; gap: 12px;
+				border-right: 1px solid var(--lm-line-2);
+				white-space: nowrap;
+			}
+			.lm-stat:last-child { border-right: none; }
+			.lm-stat-ico {
+				width: 38px; height: 38px; border-radius: 10px;
+				display: inline-flex; align-items: center; justify-content: center;
+				flex-shrink: 0;
+			}
+			.lm-ico-star { background: #fff7d6; color: #b45309; }
+			.lm-ico-fire { background: #ffe4e1; color: #dc2626; }
+			.lm-ico-xp   { background: var(--lm-violet-50); color: var(--lm-violet); }
+			.lm-ico-lvl  { background: var(--lm-primary-50); color: var(--lm-primary); }
+			.lm-stat-val {
+				font-size: 19px; font-weight: 800; letter-spacing: -.01em;
+				line-height: 1; color: var(--lm-ink);
+			}
+			.lm-stat-lbl {
+				font-size: 11.5px; color: var(--lm-muted); margin-top: 4px;
+				letter-spacing: .02em;
+			}
+			.lm-stat .lm-num { font-weight: 800; }
+			.lm-stat-lvl-num {
+				font-size: 26px; font-weight: 800;
+				background: linear-gradient(180deg, var(--lm-primary) 0%, var(--lm-violet) 100%);
+				-webkit-background-clip: text; background-clip: text;
+				-webkit-text-fill-color: transparent;
+				line-height: 1;
+			}
+
+			/* MAP */
+			.lm-map-card {
+				margin-top: 22px;
+				background: var(--lm-surface);
+				border: 1px solid var(--lm-line);
+				border-radius: 28px;
+				padding: 26px 28px 30px;
+				box-shadow: var(--lm-shadow);
+				position: relative;
+				overflow: hidden;
+			}
+			.lm-map-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
+			.lm-map-title { font-size: 18px; font-weight: 700; letter-spacing: -.01em; color: var(--lm-ink); }
+			.lm-map-sub { font-size: 12.5px; color: var(--lm-muted); }
+			.lm-legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+			.lm-legend-item { font-size: 12px; color: var(--lm-muted); display: inline-flex; align-items: center; gap: 6px; }
+			.lm-legend-dot { width: 8px; height: 8px; border-radius: 999px; }
+			.lm-legend-done { background: var(--lm-emerald); }
+			.lm-legend-now  { background: var(--lm-primary); box-shadow: 0 0 0 3px rgba(79,70,229,.18); }
+			.lm-legend-lock { background: #c8cce0; }
+			.lm-legend-boss { background: var(--lm-violet); }
+
+			.lm-map-wrap { position: relative; height: 290px; margin-top: 18px; }
+			.lm-map-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+			.lm-nodes {
+				position: absolute; inset: 0;
+				display: grid;
+				grid-template-columns: repeat(8, 1fr);  /* 7 узлов + 1 босс = 8 ячеек */
+				align-items: center;
+			}
+			.lm-cell {
+				display: flex; flex-direction: column; align-items: center; justify-content: center;
+				position: relative; height: 100%;
+			}
+			.lm-cell .lm-label-top {
+				position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+				font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+				white-space: nowrap;
+			}
+			.lm-cell .lm-label-top.is--next { color: var(--lm-primary); }
+			.lm-cell .lm-label-top.is--boss { color: var(--lm-violet); }
+
+			.lm-node {
+				width: 78px; height: 78px; border-radius: 999px;
+				background: var(--lm-surface);
+				border: 2px solid var(--lm-line);
+				display: flex; align-items: center; justify-content: center;
+				font-size: 26px; font-weight: 800; color: var(--lm-muted-2);
+				position: relative;
+				transition: transform .15s ease;
+				z-index: 2;
+				cursor: pointer;
+				font-family: inherit;
+				padding: 0;
+			}
+			.lm-node:disabled { cursor: not-allowed; }
+			.lm-node.is--done {
+				border-color: var(--lm-emerald);
+				color: var(--lm-emerald);
+				background: #fff;
+			}
+			.lm-node.is--done::after {
+				content: ""; position: absolute; right: -4px; top: -4px;
+				width: 26px; height: 26px; border-radius: 999px;
+				background: var(--lm-emerald);
+				background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+				background-repeat: no-repeat; background-position: center;
+				box-shadow: 0 4px 10px -2px rgba(16,185,129,.55), 0 0 0 3px #fff;
+			}
+			.lm-node.is--current {
+				background: linear-gradient(180deg, var(--lm-primary-2) 0%, var(--lm-primary) 100%);
+				border-color: transparent;
+				color: #fff;
+				box-shadow: var(--lm-shadow-glow);
+				animation: lmPulse 2.4s ease-in-out infinite;
+			}
+			@keyframes lmPulse {
+				0%,100% { box-shadow: 0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45); }
+				50%     { box-shadow: 0 0 0 10px rgba(79,70,229,.14), 0 0 0 20px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.55); }
+			}
+			.lm-node.is--locked {
+				background: #f3f4fb;
+				border-color: var(--lm-line);
+				color: var(--lm-muted-2);
+			}
+			.lm-node.is--locked .lm-lock { width: 22px; height: 22px; }
+			.lm-node.is--boss {
+				width: 88px; height: 88px;
+				background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+				border-color: transparent;
+				color: #fff;
+				box-shadow: var(--lm-shadow-boss);
+			}
+			.lm-node.is--boss::before {
+				content: ""; position: absolute; inset: -6px; border-radius: 999px;
+				background: conic-gradient(from 0deg, rgba(167,139,250,.0), rgba(167,139,250,.55), rgba(167,139,250,.0) 60%);
+				-webkit-mask: radial-gradient(circle, transparent 60%, #000 61%);
+				        mask: radial-gradient(circle, transparent 60%, #000 61%);
+				z-index: -1;
+				animation: lmSpin 8s linear infinite;
+			}
+			.lm-node.is--boss.is--locked { background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%); color: #fff; opacity: .9; }
+			@keyframes lmSpin { to { transform: rotate(360deg); } }
+			.lm-node.is--boss .lm-boss-lock {
+				position: absolute; right: -2px; top: -2px;
+				width: 24px; height: 24px; border-radius: 999px; background: #fff;
+				color: var(--lm-violet); display: inline-flex; align-items: center; justify-content: center;
+				box-shadow: 0 4px 10px -2px rgba(124,58,237,.45), 0 0 0 3px #fff;
+			}
+
+			.lm-cap { margin-top: 14px; text-align: center; max-width: 130px; }
+			.lm-cap-name { font-size: 13.5px; font-weight: 600; color: var(--lm-ink); }
+			.lm-cap-status { font-size: 12px; margin-top: 3px; color: var(--lm-muted); display: inline-flex; align-items: center; gap: 5px; }
+			.lm-cap-status.is--done { color: var(--lm-emerald); font-weight: 600; }
+			.lm-cap-status.is--now  { color: var(--lm-primary); font-weight: 600; }
+			.lm-cap-stars { margin-top: 6px; display: inline-flex; gap: 3px; }
+			.lm-cap-stars svg { width: 14px; height: 14px; }
+			.lm-star-on  { color: #f59e0b; }
+			.lm-star-off { color: #d9dcea; }
+			.lm-score-chip {
+				margin-top: 8px;
+				display: inline-flex; align-items: center; gap: 5px;
+				font-size: 11.5px; font-weight: 600;
+				background: var(--lm-emerald-50); color: #047857;
+				padding: 3px 9px; border-radius: 999px;
+				border: 1px solid #c2f0d9;
+			}
+			.lm-start-btn {
+				margin-top: 10px;
+				height: 34px; padding: 0 14px;
+				border-radius: 10px; border: 0;
+				background: linear-gradient(180deg, var(--lm-primary-2), var(--lm-primary));
+				color: #fff; font-weight: 600; font-size: 13px;
+				display: inline-flex; align-items: center; gap: 6px;
+				cursor: pointer;
+				box-shadow: 0 6px 14px -4px rgba(79,70,229,.55);
+				font-family: inherit;
+			}
+			.lm-start-btn:hover { filter: brightness(1.05); }
+			.lm-boss-hint {
+				margin-top: 10px; max-width: 130px; text-align: center;
+				font-size: 11.5px; color: var(--lm-muted); line-height: 1.4;
+			}
+
+			/* BOTTOM CARDS */
+			.lm-grid4 {
+				margin-top: 22px;
+				display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+			}
+			.lm-card {
+				background: var(--lm-surface);
+				border: 1px solid var(--lm-line);
+				border-radius: 20px;
+				padding: 20px;
+				box-shadow: var(--lm-shadow-sm);
+				display: flex; flex-direction: column;
+				min-height: 240px;
+			}
+			.lm-card h3 { font-size: 14px; font-weight: 700; margin: 0 0 14px; letter-spacing: -.005em; color: var(--lm-ink); }
+			.lm-card-foot { margin-top: auto; padding-top: 14px; border-top: 1px dashed var(--lm-line-2); }
+			.lm-link {
+				color: var(--lm-ink-2); font-size: 13px; font-weight: 600;
+				display: inline-flex; align-items: center; gap: 6px;
+				text-decoration: none;
+			}
+			.lm-link:hover { color: var(--lm-primary); }
+			.lm-ring-row { display: flex; align-items: center; gap: 16px; }
+			.lm-ring { width: 86px; height: 86px; flex-shrink: 0; position: relative; }
+			.lm-ring svg { transform: rotate(-90deg); }
+			.lm-ring .lm-pct {
+				position: absolute; inset: 0; display: flex; flex-direction: column;
+				align-items: center; justify-content: center;
+				font-size: 18px; font-weight: 800; color: var(--lm-ink);
+			}
+			.lm-ring .lm-pct small { font-size: 10px; font-weight: 600; color: var(--lm-muted); margin-top: 2px; }
+			.lm-kv { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+			.lm-kv-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+			.lm-kv-row .lm-k { color: var(--lm-muted); }
+			.lm-kv-row .lm-v { color: var(--lm-ink); font-weight: 700; }
+			.lm-stat-list { display: flex; flex-direction: column; gap: 12px; }
+			.lm-stat-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+			.lm-stat-row .lm-k { color: var(--lm-muted); display: inline-flex; align-items: center; gap: 8px; }
+			.lm-stat-row .lm-v { font-weight: 700; color: var(--lm-ink); }
+			.lm-stat-bullet { width: 6px; height: 6px; border-radius: 999px; background: var(--lm-muted-2); }
+
+			.lm-lb { display: flex; flex-direction: column; gap: 10px; }
+			.lm-lb-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+			.lm-lb-rank {
+				width: 22px; height: 22px; border-radius: 6px;
+				display: inline-flex; align-items: center; justify-content: center;
+				font-weight: 800; font-size: 11.5px; color: #fff; flex-shrink: 0;
+			}
+			.lm-lb-1 { background: linear-gradient(180deg,#fbbf24,#d97706); }
+			.lm-lb-2 { background: linear-gradient(180deg,#cbd5e1,#94a3b8); }
+			.lm-lb-3 { background: linear-gradient(180deg,#fbbf24,#b45309); opacity: .85; }
+			.lm-lb-name { flex: 1; color: var(--lm-ink-2); font-weight: 600; }
+			.lm-lb-score { font-weight: 700; color: var(--lm-ink); }
+			.lm-lb-mini { width: 26px; height: 26px; border-radius: 999px; background: var(--lm-bg-2); display: inline-flex; align-items: center; justify-content: center; color: var(--lm-muted); font-weight: 700; font-size: 11px; }
+
+			.lm-ach-list { display: flex; flex-direction: column; gap: 10px; }
+			.lm-ach { display: flex; align-items: center; gap: 12px; }
+			.lm-ach-ico {
+				width: 36px; height: 36px; border-radius: 10px;
+				display: inline-flex; align-items: center; justify-content: center;
+				flex-shrink: 0;
+			}
+			.lm-ach-ico.a1 { background: var(--lm-emerald-50); color: var(--lm-emerald); }
+			.lm-ach-ico.a2 { background: var(--lm-primary-50); color: var(--lm-primary); }
+			.lm-ach-ico.a3 { background: var(--lm-violet-50); color: var(--lm-violet); }
+			.lm-ach-ico.is--locked { background: var(--lm-bg-2); color: var(--lm-muted-2); }
+			.lm-ach-text { flex: 1; min-width: 0; }
+			.lm-ach-name { font-weight: 700; font-size: 13px; color: var(--lm-ink); }
+			.lm-ach-name.is--locked { color: var(--lm-muted-2); }
+			.lm-ach-desc { font-size: 11.5px; color: var(--lm-muted); margin-top: 2px; line-height: 1.35; }
+			.lm-ach-check {
+				width: 18px; height: 18px; border-radius: 999px; background: var(--lm-emerald);
+				display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+			}
+			.lm-ach-check.is--locked { background: transparent; border: 1.5px dashed #cdd1e3; }
+
+			.lm-tip {
+				margin-top: 18px;
+				background: linear-gradient(180deg, #fbf6ff 0%, #f4ebff 100%);
+				border: 1px solid #ead8ff;
+				border-radius: 14px;
+				padding: 14px 18px;
+				font-size: 13px; color: #5b21b6;
+				display: flex; align-items: center; gap: 10px;
+			}
+			.lm-tip b { font-weight: 700; }
+
+			@media (max-width: 980px) {
+				.lm-hero { grid-template-columns: 1fr; }
+				.lm-stat-cluster { min-width: 0; grid-template-columns: repeat(2, 1fr); }
+				.lm-stat:nth-child(2n) { border-right: none; }
+				.lm-grid4 { grid-template-columns: repeat(2, 1fr); }
+			}
+			@media (max-width: 640px) {
+				.lm-grid4 { grid-template-columns: 1fr; }
+				.lm-hero { padding: 22px; }
+				.lm-hero h1 { font-size: 26px; }
+				.lm-map-card { padding: 18px; }
+				.lm-map-wrap { height: auto; }
+				.lm-nodes { grid-template-columns: repeat(2, 1fr); gap: 18px 8px; position: static; }
+				.lm-cell { height: auto; padding: 16px 0; }
+				.lm-map-svg { display: none; }
+			}
 		</style>
 	</head>
 
@@ -2276,6 +2647,13 @@
 				const ready = variants.filter(v => v.status === 'ready');
 				host.innerHTML = ready.map(v => `<a href="?v=${v.id}" style="display:inline-block;margin:4px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);text-decoration:none;font-weight:600;">${v.title || ('Вариант ' + v.id)}</a>`).join('');
 			}
+			// ============================================================
+			// LEVEL MAP v2 — карта Главы 1 («Полный вариант ОГЭ»)
+			// 7 обычных узлов + 1 финальный босс. Реализация 1:1 по
+			// _tmp_ft6/level-map.html. Старый код (renderGmNode и т.п.)
+			// больше не используется и оставлен мёртвым кодом, чтобы не
+			// рисковать при минорных будущих фиксах.
+			// ============================================================
 			function _renderVariantPickerImpl() {
 				const picker = document.getElementById('variant-picker');
 				const testRoot = document.getElementById('test-root');
@@ -2288,160 +2666,530 @@
 				if (pb) pb.parentElement.style.display = 'none';
 				if (!picker) return;
 				picker.style.display = 'block';
+				picker.classList.add('lm');
 
-				const variants = window.CHEMISTRY_VARIANTS || [];
+				const allVariants = window.CHEMISTRY_VARIANTS || [];
+				const ready = allVariants.filter(v => v.status === 'ready');
+				// Глава 1 = первые 7 ready + 8-й как финальный босс. Если ready < 8, босс
+				// делается из последнего ready, остальные ячейки пустыми (но обычно у нас
+				// ready >> 8). Если ready < 2 — fallback-list.
+				if (ready.length < 2) {
+					_renderVariantPickerFallback(picker);
+					return;
+				}
+				const chapterReady = ready.slice(0, 8); // максимум 8
+				const bossId = chapterReady[chapterReady.length - 1].id;
+				const variantSlots = chapterReady.slice(0, -1); // обычные узлы
+				const bossSlot = chapterReady[chapterReady.length - 1];
+
+				// Для каждого узла считаем done/current/locked.
 				const attempts = loadAttempts();
 				const streak = loadStreak();
 				const streakStatus = computeStreakStatus(streak);
-
-				// === 1. Состояния узлов (passed / current / locked / cooldown / coming) ===
-				let firstNotPassedIdx = -1;
-				const readyVariants = variants.filter(v => v.status === 'ready');
-				const variantInfos = variants.map((v, idx) => {
-					const info = { v, idx };
-					if (v.status !== 'ready') { info.state = 'coming'; return info; }
-					const res = getVariantResult(v);
-					info.res = res;
-					info.best = gmVariantBest(v);
-					if (res && res.passed) info.state = 'passed';
-					else info.state = 'pending';
-					return info;
+				const passOf = v => {
+					const best = gmVariantBest(v);
+					return best && best.percent >= 50 ? best : null;
+				};
+				const variantInfos = variantSlots.map((v, i) => {
+					const best = passOf(v);
+					return { v, i, isBoss: false, best };
 				});
+				// Состояния обычных узлов: первый non-done = current, остальные после = locked
+				let currentIdx = -1;
 				for (let i = 0; i < variantInfos.length; i++) {
-					if (variantInfos[i].state === 'pending') { firstNotPassedIdx = i; break; }
+					if (!variantInfos[i].best) { currentIdx = i; break; }
 				}
 				variantInfos.forEach((vi, i) => {
-					if (vi.state !== 'pending') return;
-					if (DEV_UNLOCK_ALL) {
-						vi.state = (i === firstNotPassedIdx) ? 'current' : 'pending-open';
-						return;
-					}
-					if (i === firstNotPassedIdx) {
-						const att = attempts[vi.v.id];
-						if (att && att.cooldownUntil && att.cooldownUntil > Date.now()) {
-							vi.state = 'cooldown';
-							vi.cooldownLeft = att.cooldownUntil - Date.now();
-						} else {
-							vi.state = 'current';
-						}
-					} else {
-						vi.state = 'locked';
-					}
+					if (vi.best) vi.state = 'done';
+					else if (i === currentIdx) vi.state = 'current';
+					else vi.state = 'locked';
 				});
+				// Босс
+				const allRegularDone = variantInfos.every(vi => vi.state === 'done');
+				const bossBest = passOf(bossSlot);
+				const bossInfo = {
+					v: bossSlot, i: variantInfos.length, isBoss: true, best: bossBest,
+					state: bossBest ? 'done' : (allRegularDone ? 'current' : 'locked'),
+				};
 
-				// === 2. Босс — последний ready-вариант. Если все предыдущие пройдены, босс становится current. ===
-				let bossIdx = -1;
-				for (let i = variantInfos.length - 1; i >= 0; i--) {
-					if (variantInfos[i].v.status === 'ready') { bossIdx = i; break; }
-				}
-				if (bossIdx >= 0) variantInfos[bossIdx].isBoss = true;
+				// Метрики Главы 1: XP, звёзды, ср. балл, время.
+				const stats = lmComputeChapterStats([...variantInfos, bossInfo]);
+				// Глобальный уровень и серия — берём как раньше.
+				const globalStats = gmComputedStats(allVariants);
+				const ringPct = stats.totalNodes ? Math.round(100 * stats.passed / stats.totalNodes) : 0;
+				const dashOffset = Math.max(0, Math.round(226 * (1 - ringPct / 100)));
 
-				// === 3. Stat cluster (XP / Level / Stars / Streak) ===
-				const stats = gmComputedStats(variants);
+				const heroLead = (allRegularDone && !bossBest)
+					? 'Все варианты Главы 1 пройдены. Открыт финальный босс — победите его, чтобы открыть Главу 2.'
+					: (bossBest)
+						? 'Глава 1 завершена. Можно перерешать любой вариант, чтобы поднять звёзды.'
+						: 'Проходите варианты по порядку. Следующий открывается, когда вы набираете не менее 50 % правильных ответов в части 1 текущего варианта.';
 
-				// === 4. Detect новые ачивки (level up / unlock) для confetti и спутника ===
 				const seen = gmLoadSeen();
-				const justLeveledUp = (seen.level !== undefined) && stats.level > seen.level;
-				const freshUnlockId = (seen.lastUnlockedId == null && firstNotPassedIdx >= 0)
-					? variantInfos[firstNotPassedIdx].v.id
-					: (seen.lastUnlockedId !== null && firstNotPassedIdx >= 0
-						&& variantInfos[firstNotPassedIdx].v.id !== seen.lastUnlockedId)
-							? variantInfos[firstNotPassedIdx].v.id : null;
-
-				// === 5. «Самый коварный» бейдж — на одном локед-варианте ===
-				const dangerVid = gmDangerVariantId(variants);
-
-				// === 6. Render ===
-				const ALL_INFOS = variantInfos; // показываем ВСЕ варианты, включая coming, чтобы карта была полной
-				const cols = Math.min(8, Math.max(4, Math.ceil(Math.sqrt(ALL_INFOS.length * 1.5))));
-
-				const heroSubText = streakStatus.days > 0
-					? `Серия <b>${streakStatus.days}</b> ${streakStatus.days === 1 ? 'день' : 'дн.'} подряд${streakStatus.todayDone ? ' · сегодня ✓' : ''}. Разблокировка следующего узла — при <b>≥ 50%</b> в части 1.`
-					: `Начните серию: пройдите вариант сегодня. Следующий узел открывается при <b>≥ 50%</b> в части 1.`;
+				const justLeveledUp = (seen.level !== undefined) && globalStats.level > seen.level;
+				const freshUnlockId = (seen.lastUnlockedId == null && currentIdx >= 0)
+					? variantInfos[currentIdx].v.id
+					: (currentIdx >= 0 && variantInfos[currentIdx].v.id !== seen.lastUnlockedId
+						? variantInfos[currentIdx].v.id : null);
 
 				picker.innerHTML = `
-					<div class="gm-hero">
-						<div class="gm-hero__left">
-							<a href="./subject-chemistry.html" class="gm-hero__back">← К предмету</a>
-							<div class="gm-hero__title">
-								Полный вариант ОГЭ · Химия
-							</div>
-							<div class="gm-hero__sub">${heroSubText}</div>
-						</div>
-						<div class="gm-stat-cluster" aria-label="Игровая статистика">
-							<div class="gm-stat">
-								<div class="gm-stat__label">⭐ Звёзды</div>
-								<div class="gm-stat__val">${stats.totalStars}</div>
-								<div class="gm-stat__sub">из ${readyVariants.length * 3} возможных</div>
-							</div>
-							<div class="gm-stat">
-								<div class="gm-stat__label">🔥 Серия</div>
-								<div class="gm-stat__val">${streakStatus.days || 0}</div>
-								<div class="gm-stat__sub">${streakStatus.days === 1 ? 'день' : 'дней'}${streakStatus.todayDone ? ' · сегодня ✓' : ''}</div>
-							</div>
-							<div class="gm-stat">
-								<div class="gm-stat__label">💎 XP</div>
-								<div class="gm-stat__val">${stats.totalXp}</div>
-								<div class="gm-stat__sub">${100 - (stats.totalXp % 100)} до уровня</div>
-							</div>
-							<div class="gm-stat">
-								<div class="gm-stat__label">Уровень</div>
-								<div class="gm-stat__val gm-stat__val--gradient">${stats.level}</div>
-								<div class="gm-stat__sub">${stats.title}</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="gm-map-section">
-						<div class="gm-map-section__head">
-							<div class="gm-map-section__title">Карта главы 1 · «Полный вариант»</div>
-							<div class="gm-map-section__hint">Пройдите варианты по порядку. В конце — <b style="color:var(--gm-violet)">финальный босс</b> с лучшим из всех.</div>
-						</div>
-						<div class="gm-map" style="--gm-cols:${cols}">
-							<svg class="gm-map__path" id="gm-map-path" preserveAspectRatio="none"></svg>
-							<div class="gm-map__nodes" id="gm-map-nodes">
-								${ALL_INFOS.map((vi, i) => renderGmNode(vi, i, attempts, dangerVid, freshUnlockId)).join('')}
-							</div>
-						</div>
+					<div class="lm-shell">
+						${lmHeroHtml({ heroLead, stats, globalStats, streakStatus })}
+						${lmMapHtml({ variantInfos, bossInfo, currentIdx })}
+						${lmGrid4Html({ stats, globalStats, streakStatus })}
+						${lmTipHtml(stats, bossInfo)}
 					</div>
 				`;
 
-				// === 7. Wire clicks ===
-				picker.querySelectorAll('.gm-node[data-v]').forEach(btn => {
+				// Wire clicks
+				picker.querySelectorAll('.lm-node[data-v]').forEach(btn => {
 					btn.addEventListener('click', () => {
-						if (btn.disabled) return;
 						const st = btn.dataset.state;
 						const v = btn.dataset.v;
-						if (st === 'locked' || st === 'coming') {
-							alert(st === 'coming'
-								? 'Этот вариант скоро появится.'
-								: 'Чтобы открыть этот вариант, пройдите предыдущие с результатом ≥ 50% в части 1.');
-							return;
-						}
-						if (st === 'cooldown') {
-							alert('После двух провальных попыток вариант временно закрыт. Отдохните и повторите задания.');
+						if (st === 'locked') {
+							alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
 							return;
 						}
 						window.location.search = '?v=' + v;
 					});
 				});
+				picker.querySelectorAll('.lm-start-btn[data-v]').forEach(btn => {
+					btn.addEventListener('click', e => {
+						e.stopPropagation();
+						window.location.search = '?v=' + btn.dataset.v;
+					});
+				});
 
-				// === 8. Draw SVG path between nodes ===
-				requestAnimationFrame(() => gmDrawPath(picker, variantInfos));
-				window.addEventListener('resize', () => gmDrawPath(picker, variantInfos), { passive: true });
-
-				// === 9. Confetti / level-up overlay для свежих событий ===
+				// Confetti / level-up
 				if (justLeveledUp) {
-					gmShowLevelUp(stats.level, stats.title);
-					try { if (window.ym) ym(108770166, 'reachGoal', 'level_up', { level: stats.level }); } catch (e0) {}
+					gmShowLevelUp(globalStats.level, globalStats.title);
+					try { if (window.ym) ym(108770166, 'reachGoal', 'level_up', { level: globalStats.level }); } catch (e0) {}
 				} else if (freshUnlockId) {
 					setTimeout(() => gmFireConfetti({ origin: { y: 0.4 } }), 250);
 				}
 
-				// Save «seen» state
-				seen.level = stats.level;
-				seen.lastUnlockedId = firstNotPassedIdx >= 0 ? variantInfos[firstNotPassedIdx].v.id : null;
+				// Save seen state
+				seen.level = globalStats.level;
+				seen.lastUnlockedId = currentIdx >= 0 ? variantInfos[currentIdx].v.id : (allRegularDone ? bossSlot.id : null);
 				gmSaveSeen(seen);
+			}
+
+			// ── helpers (lm-*) ────────────────────────────────────────────
+
+			function lmComputeChapterStats(allInfos) {
+				let totalScore = 0, scoredCount = 0, passed = 0, totalStars = 0, totalXp = 0;
+				allInfos.forEach(vi => {
+					if (vi.best) {
+						passed++;
+						totalScore += vi.best.percent;
+						scoredCount++;
+						const stars = gmStarsForPercent(vi.best.percent);
+						totalStars += stars;
+						totalXp += gmXpForVariant(vi.best.percent);
+					}
+				});
+				const avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
+				return {
+					totalNodes: allInfos.length,
+					maxStars: allInfos.length * 3,
+					passed, totalStars, totalXp, avgScore,
+				};
+			}
+
+			function lmHeroHtml({ heroLead, stats, globalStats, streakStatus }) {
+				return `
+					<section class="lm-hero">
+						<div>
+							<a href="./subject-chemistry.html" class="lm-back">
+								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+								К предмету
+							</a>
+							<h1>Полный вариант ОГЭ <span class="lm-dot">·</span> Химия</h1>
+							<p class="lm-lead">${heroLead}</p>
+							<div class="lm-cta-row">
+								<button class="lm-btn lm-btn-streak" type="button">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="#ea580c"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7zM12 19.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+									${streakStatus.days > 0
+										? 'Серия ' + streakStatus.days + ' ' + (streakStatus.days === 1 ? 'день' : 'дн.') + (streakStatus.todayDone ? ' · сегодня ✓' : '')
+										: 'Начните серию — пройдите вариант сегодня'}
+								</button>
+								<a href="./subject-chemistry.html" class="lm-btn">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+									К расписанию глав
+								</a>
+							</div>
+						</div>
+						<div class="lm-stat-cluster" role="group" aria-label="Прогресс">
+							<div class="lm-stat">
+								<div class="lm-stat-ico lm-ico-star">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>
+								</div>
+								<div>
+									<div class="lm-stat-val"><span class="lm-num">${stats.totalStars}</span> <span style="color:var(--lm-muted);font-size:12px;font-weight:600">/ ${stats.maxStars}</span></div>
+									<div class="lm-stat-lbl">Звёзд в главе</div>
+								</div>
+							</div>
+							<div class="lm-stat">
+								<div class="lm-stat-ico lm-ico-fire">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7z"/></svg>
+								</div>
+								<div>
+									<div class="lm-stat-val"><span class="lm-num">${streakStatus.days || 0}</span></div>
+									<div class="lm-stat-lbl">Дней подряд</div>
+								</div>
+							</div>
+							<div class="lm-stat">
+								<div class="lm-stat-ico lm-ico-xp">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 3 8l9 6 9-6-9-6zM3 14l9 6 9-6"/></svg>
+								</div>
+								<div>
+									<div class="lm-stat-val"><span class="lm-num">${globalStats.totalXp}</span> <span style="font-size:12px; color:var(--lm-muted); font-weight:600; letter-spacing:.05em;">XP</span></div>
+									<div class="lm-stat-lbl">Опыт</div>
+								</div>
+							</div>
+							<div class="lm-stat">
+								<div class="lm-stat-ico lm-ico-lvl" style="background:transparent;">
+									<div class="lm-stat-lvl-num lm-num">${globalStats.level}</div>
+								</div>
+								<div>
+									<div class="lm-stat-val" style="font-size:14px;">${globalStats.title}</div>
+									<div class="lm-stat-lbl">Уровень · ${100 - (globalStats.totalXp % 100)} XP до след.</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				`;
+			}
+
+			function lmMapHtml({ variantInfos, bossInfo, currentIdx }) {
+				const allInfos = [...variantInfos, bossInfo];
+				const cells = allInfos.map((vi, i) => lmCellHtml(vi, i, currentIdx)).join('');
+				const passedCount = allInfos.filter(vi => vi.state === 'done').length;
+				return `
+					<section class="lm-map-card">
+						<div class="lm-map-head">
+							<div>
+								<div class="lm-map-title">Карта Главы 1 · «Полный вариант»</div>
+								<div class="lm-map-sub">${variantInfos.length} ${_lmPlural(variantInfos.length, ['этап', 'этапа', 'этапов'])} · 1 финальный босс</div>
+							</div>
+							<div class="lm-legend">
+								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-done"></span> Пройден</span>
+								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-now"></span> Доступен</span>
+								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-lock"></span> Заблокирован</span>
+								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-boss"></span> Босс</span>
+							</div>
+						</div>
+						<div class="lm-map-wrap">
+							<svg class="lm-map-svg" viewBox="0 0 1220 290" preserveAspectRatio="none" aria-hidden="true">
+								<defs>
+									<linearGradient id="lmDoneGrad" x1="0" x2="1">
+										<stop offset="0" stop-color="#10b981"/>
+										<stop offset="1" stop-color="#4f46e5"/>
+									</linearGradient>
+									<pattern id="lmDashed" x="0" y="0" width="14" height="2" patternUnits="userSpaceOnUse">
+										<rect x="0" y="0" width="8" height="2" fill="#cdd2e6"/>
+									</pattern>
+								</defs>
+								<path d="M 60 145 C 220 100, 360 190, 520 145 S 800 100, 940 145 S 1120 190, 1180 145"
+									fill="none" stroke="url(#lmDashed)" stroke-width="3" stroke-linecap="round"/>
+								${_lmDoneCurve(passedCount, allInfos.length)}
+							</svg>
+							<div class="lm-nodes">
+								${cells}
+							</div>
+						</div>
+					</section>
+				`;
+			}
+
+			// progress curve from start to last passed node (rough approximation)
+			function _lmDoneCurve(passedCount, total) {
+				if (passedCount <= 0 || total <= 1) return '';
+				const xStart = 60;
+				const xEnd = 1180;
+				const xCurrent = xStart + (xEnd - xStart) * (passedCount / total);
+				return `<path d="M ${xStart} 145 C ${xStart + 80} 120, ${xStart + 140} 110, ${xCurrent} 130"
+					fill="none" stroke="url(#lmDoneGrad)" stroke-width="4" stroke-linecap="round"/>`;
+			}
+
+			function lmCellHtml(vi, idx, currentIdx) {
+				const v = vi.v;
+				const isBoss = vi.isBoss;
+				const state = vi.state; // 'done' | 'current' | 'locked'
+				const isNext = (state === 'current' && !isBoss);
+				const labelTop = isNext
+					? '<div class="lm-label-top is--next">› Следующий</div>'
+					: (isBoss
+						? '<div class="lm-label-top is--boss">★ Финальный босс</div>'
+						: '');
+				let nodeInner = '';
+				if (state === 'done' && !isBoss) {
+					nodeInner = String(v.id);
+				} else if (state === 'locked' && !isBoss) {
+					nodeInner = `<svg class="lm-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+				} else if (isBoss) {
+					nodeInner = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M6 9H4a2 2 0 0 1-2-2V5h4"/>
+						<path d="M18 9h2a2 2 0 0 0 2-2V5h-4"/>
+						<path d="M6 4h12v6a6 6 0 0 1-12 0V4z"/>
+						<line x1="12" y1="15" x2="12" y2="19"/>
+						<path d="M8 21h8"/>
+					</svg>`;
+					if (state === 'locked') {
+						nodeInner += `<div class="lm-boss-lock" aria-hidden="true">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+						</div>`;
+					}
+				} else {
+					// current normal
+					nodeInner = String(v.id);
+				}
+				const cls = ['lm-node'];
+				if (state === 'done') cls.push('is--done');
+				if (state === 'current') cls.push('is--current');
+				if (state === 'locked') cls.push('is--locked');
+				if (isBoss) cls.push('is--boss');
+				const disabled = (state === 'locked');
+				const cap = isBoss ? 'Сложный вариант' : (v.title || ('Вариант ' + v.id));
+				const capStatusHtml = lmCapStatusHtml(vi, state, isBoss);
+
+				return `
+					<div class="lm-cell">
+						${labelTop}
+						<button type="button" class="${cls.join(' ')}" data-v="${v.id}" data-state="${state}" ${disabled ? 'disabled' : ''} aria-label="${cap} — ${state}">
+							${nodeInner}
+						</button>
+						<div class="lm-cap">
+							<div class="lm-cap-name">${cap}</div>
+							${capStatusHtml}
+						</div>
+					</div>
+				`;
+			}
+
+			function lmCapStatusHtml(vi, state, isBoss) {
+				if (state === 'done') {
+					const stars = vi.best ? gmStarsForPercent(vi.best.percent) : 0;
+					return `
+						<div class="lm-cap-status is--done">
+							<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+							${isBoss ? 'Босс побеждён' : 'Пройден'}
+						</div>
+						${lmStarsHtml(stars)}
+						${vi.best ? `<div class="lm-score-chip"><span class="lm-num">${vi.best.percent}%</span></div>` : ''}
+					`;
+				}
+				if (state === 'current') {
+					return `
+						<div class="lm-cap-status is--now">${isBoss ? 'Босс открыт' : 'Доступен сейчас'}</div>
+						<button type="button" class="lm-start-btn" data-v="${vi.v.id}">
+							<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
+							${isBoss ? 'Сразиться' : 'Начать'}
+						</button>
+					`;
+				}
+				if (state === 'locked') {
+					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 7 вариантов</div>`;
+					return `<div class="lm-cap-status">Заблокирован</div>`;
+				}
+				return '';
+			}
+
+			function lmStarsHtml(filled) {
+				let html = '<div class="lm-cap-stars" aria-label="Звёзды: ' + filled + ' из 3">';
+				for (let i = 1; i <= 3; i++) {
+					const cls = i <= filled ? 'lm-star-on' : 'lm-star-off';
+					html += `<svg viewBox="0 0 24 24" fill="currentColor" class="${cls}"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>`;
+				}
+				html += '</div>';
+				return html;
+			}
+
+			function lmGrid4Html({ stats, globalStats, streakStatus }) {
+				const ringPct = stats.totalNodes ? Math.round(100 * stats.passed / stats.totalNodes) : 0;
+				const dashOffset = Math.max(0, Math.round(226 * (1 - ringPct / 100)));
+				const inProgress = (stats.passed > 0 && stats.passed < stats.totalNodes) ? 1 : 0;
+				return `
+					<section class="lm-grid4">
+						<div class="lm-card">
+							<h3>Твой прогресс</h3>
+							<div class="lm-ring-row">
+								<div class="lm-ring" aria-label="${ringPct}% пройдено">
+									<svg width="86" height="86" viewBox="0 0 86 86">
+										<circle cx="43" cy="43" r="36" fill="none" stroke="#eef0f7" stroke-width="9"/>
+										<circle cx="43" cy="43" r="36" fill="none" stroke="url(#lmRingGrad)" stroke-width="9"
+											stroke-linecap="round"
+											stroke-dasharray="226"
+											stroke-dashoffset="${dashOffset}"/>
+										<defs>
+											<linearGradient id="lmRingGrad" x1="0" x2="1" y1="0" y2="1">
+												<stop offset="0" stop-color="#6366f1"/>
+												<stop offset="1" stop-color="#7c3aed"/>
+											</linearGradient>
+										</defs>
+									</svg>
+									<div class="lm-pct"><span class="lm-num">${ringPct}%</span><small>пройдено</small></div>
+								</div>
+								<div class="lm-kv">
+									<div class="lm-kv-row"><span class="lm-k">Узлов</span><span class="lm-v lm-num">${stats.passed} / ${stats.totalNodes}</span></div>
+									<div class="lm-kv-row"><span class="lm-k">Звёзды</span><span class="lm-v lm-num">${stats.totalStars} / ${stats.maxStars}</span></div>
+									<div class="lm-kv-row"><span class="lm-k">Средний балл</span><span class="lm-v lm-num">${stats.avgScore}%</span></div>
+								</div>
+							</div>
+							<div class="lm-card-foot">
+								<a class="lm-link" href="./profile.html">Подробнее
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+								</a>
+							</div>
+						</div>
+
+						<div class="lm-card">
+							<h3>Статистика главы</h3>
+							<div class="lm-stat-list">
+								<div class="lm-stat-row">
+									<span class="lm-k"><span class="lm-stat-bullet" style="background:#6366f1"></span>Всего узлов</span>
+									<span class="lm-v lm-num">${stats.totalNodes}</span>
+								</div>
+								<div class="lm-stat-row">
+									<span class="lm-k"><span class="lm-stat-bullet" style="background:#10b981"></span>Пройдено</span>
+									<span class="lm-v lm-num">${stats.passed}</span>
+								</div>
+								<div class="lm-stat-row">
+									<span class="lm-k"><span class="lm-stat-bullet" style="background:#f59e0b"></span>В процессе</span>
+									<span class="lm-v lm-num">${inProgress}</span>
+								</div>
+								<div class="lm-stat-row">
+									<span class="lm-k"><span class="lm-stat-bullet" style="background:#a855f7"></span>Средний балл</span>
+									<span class="lm-v lm-num">${stats.avgScore}%</span>
+								</div>
+								<div class="lm-stat-row">
+									<span class="lm-k"><span class="lm-stat-bullet" style="background:#94a3b8"></span>Заработано XP</span>
+									<span class="lm-v lm-num">${stats.totalXp}</span>
+								</div>
+							</div>
+							<div class="lm-card-foot">
+								<a class="lm-link" href="./profile.html">Профиль
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+								</a>
+							</div>
+						</div>
+
+						<div class="lm-card">
+							<h3>Топ недели · группа 9-Б</h3>
+							<div class="lm-lb">
+								<div class="lm-lb-row">
+									<div class="lm-lb-rank lm-lb-1">1</div>
+									<div class="lm-lb-name">Алексей П.</div>
+									<div class="lm-lb-score lm-num">92%</div>
+								</div>
+								<div class="lm-lb-row">
+									<div class="lm-lb-rank lm-lb-2">2</div>
+									<div class="lm-lb-name">Мария Т.</div>
+									<div class="lm-lb-score lm-num">88%</div>
+								</div>
+								<div class="lm-lb-row">
+									<div class="lm-lb-rank lm-lb-3">3</div>
+									<div class="lm-lb-name">Дмитрий В.</div>
+									<div class="lm-lb-score lm-num">85%</div>
+								</div>
+								<div class="lm-lb-row" style="opacity:.85">
+									<div class="lm-lb-mini">4</div>
+									<div class="lm-lb-name" style="color:var(--lm-muted)">София Р.</div>
+									<div class="lm-lb-score lm-num" style="color:var(--lm-muted)">81%</div>
+								</div>
+								<div class="lm-lb-row" style="background: var(--lm-primary-50); padding: 8px 10px; margin: 0 -10px; border-radius: 10px;">
+									<div class="lm-lb-mini" style="background: var(--lm-primary); color: #fff;">12</div>
+									<div class="lm-lb-name" style="color: var(--lm-primary)">Ты</div>
+									<div class="lm-lb-score lm-num" style="color: var(--lm-primary)">${stats.avgScore}%</div>
+								</div>
+							</div>
+							<div class="lm-card-foot">
+								<span class="lm-link" style="color:var(--lm-muted-2);cursor:default;">Демо-данные · соц. функции скоро</span>
+							</div>
+						</div>
+
+						<div class="lm-card">
+							<h3>Достижения</h3>
+							<div class="lm-ach-list">
+								${lmAchievementsHtml(stats, streakStatus)}
+							</div>
+							<div class="lm-card-foot">
+								<a class="lm-link" href="./profile.html">Все достижения
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+								</a>
+							</div>
+						</div>
+					</section>
+				`;
+			}
+
+			function lmAchievementsHtml(stats, streakStatus) {
+				const items = [
+					{
+						unlocked: stats.passed >= 1,
+						cls: 'a1',
+						name: 'Первые шаги',
+						desc: 'Пройдите первый вариант',
+						svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>',
+					},
+					{
+						unlocked: streakStatus.days >= 5,
+						cls: 'a2',
+						name: 'Серия 5 дней',
+						desc: 'Решайте каждый день',
+						svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7z"/></svg>',
+					},
+					{
+						unlocked: stats.avgScore >= 70 && stats.passed > 0,
+						cls: 'a3',
+						name: 'Точность',
+						desc: 'Наберите 70% в среднем',
+						svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+					},
+					{
+						unlocked: false,
+						cls: 'a3',
+						name: 'Покоритель',
+						desc: 'Победите финального босса',
+						svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+					},
+				];
+				return items.map(it => `
+					<div class="lm-ach">
+						<div class="lm-ach-ico ${it.unlocked ? it.cls : 'is--locked'}">
+							${it.svg}
+						</div>
+						<div class="lm-ach-text">
+							<div class="lm-ach-name ${it.unlocked ? '' : 'is--locked'}">${it.name}</div>
+							<div class="lm-ach-desc">${it.desc}</div>
+						</div>
+						<div class="lm-ach-check ${it.unlocked ? '' : 'is--locked'}">
+							${it.unlocked ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+						</div>
+					</div>
+				`).join('');
+			}
+
+			function lmTipHtml(stats, bossInfo) {
+				let text = '<b>Совет.</b> Старайтесь набирать ≥ 50% в части 1, чтобы открыть следующий вариант. За 80%+ дают 3 звезды и +50 XP.';
+				if (bossInfo.state === 'current' && !bossInfo.best) {
+					text = '<b>Босс открыт.</b> Финальный вариант сложнее обычных — повторите слабые задания перед боем.';
+				} else if (bossInfo.state === 'done') {
+					text = '<b>Глава 1 завершена!</b> Можно перерешивать варианты для повышения звёзд. Скоро откроется Глава 2.';
+				}
+				return `
+					<div class="lm-tip">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+						<div>${text}</div>
+					</div>
+				`;
+			}
+
+			function _lmPlural(n, forms) {
+				const m10 = n % 10, m100 = n % 100;
+				if (m10 === 1 && m100 !== 11) return forms[0];
+				if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return forms[1];
+				return forms[2];
 			}
 
 			function renderGmNode(vi, idx, attempts, dangerVid, freshUnlockId) {
