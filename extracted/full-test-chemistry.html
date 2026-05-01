@@ -17,6 +17,11 @@
 
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- Банк и формулировки правятся часто. Браузерный кэш самого HTML заставлял
+		     учеников видеть «старый» body и «старый» правильный ответ до hard-refresh.
+		     `no-store` стоит дешевле, чем неверная подсказка. На JS-баке кэш по-прежнему
+		     контролируется через ?v=N. -->
+		<meta http-equiv="Cache-Control" content="no-store" />
 		<title>IQMO — Полный вариант ОГЭ · Химия</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
