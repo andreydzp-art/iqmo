@@ -734,8 +734,8 @@
 		</main>
 
 		<script src="./exam-config.js"></script>
-		<script src="./biology-bank.js?v=22"></script>
-		<script src="./biology-variants.js?v=3"></script>
+		<script src="./biology-bank.js?v=25"></script>
+		<script src="./biology-variants.js?v=4"></script>
 		<script src="./iqmo-sync.js"></script>
 		<script src="./iqmo-nav.js"></script>
 		<script src="./iqmo-regnudge.js?v=3"></script>
@@ -981,7 +981,7 @@
 				elCard.innerHTML = `
 					<div class="q-head">
 						<div class="q-head__left">
-							<div class="q-tag">${q.type === 'written' ? '<span class="part-banner">Часть 2</span>' : ''}Задание <b>${state.current + 1}</b> / ${QCOUNT} · ${taskTypeLabel(q)}</div>
+							<div class="q-tag">${q.type === 'written' ? '<span class="part-banner">Часть 2</span>' : ''}Задание <b>${state.current + 1}</b> / ${QCOUNT}${q.type === 'todo' ? ' · в подготовке' : ' · ' + taskTypeLabel(q)}</div>
 							<h1 class="q-title">${q.title}</h1>
 						</div>
 						<button type="button" class="q-flag ${flagged?'is--on':''}" id="btn-flag">
@@ -1131,7 +1131,7 @@
 				try {
 					if (window.MistakesStore) {
 						const items = QUESTIONS
-							.filter(q => q.type !== 'written')
+							.filter(q => q.type !== 'written' && q.type !== 'todo')
 							.map(q => ({ qid: q.id, ok: checkAnswer(q).status === 'ok' }));
 						window.MistakesStore.commitTestResults({ source: 'full', items });
 					}
@@ -1141,7 +1141,7 @@
 				try {
 					let ok = 0, total = 0;
 					QUESTIONS.forEach(q => {
-						if (q.type === 'written') return;
+						if (q.type === 'written' || q.type === 'todo') return;
 						total++;
 						if (checkAnswer(q).status === 'ok') ok++;
 					});
@@ -1182,7 +1182,7 @@
 							total: s.totalMax,
 							percent: s.percent,
 							passedPart1: part1Ratio >= 0.5,
-							items: QUESTIONS.filter(function (q) { return q.type !== 'written'; }).map(function (q) {
+							items: QUESTIONS.filter(function (q) { return q.type !== 'written' && q.type !== 'todo'; }).map(function (q) {
 								return { qid: q.id, ok: checkAnswer(q).status === 'ok' };
 							})
 						});
@@ -1289,6 +1289,7 @@
 				let autoPoints = 0, autoDone = 0, autoTotal = 0;
 				let selfPoints = 0, selfMax = 0, selfReviewed = 0, selfTotal = 0;
 				QUESTIONS.forEach(q => {
+					if (q.type === 'todo') return; // плейсхолдер пропускаем — нет ни авто, ни самопроверки
 					if (q.type === 'written') {
 						selfTotal++;
 						const r = checkAnswer(q);
@@ -1311,6 +1312,10 @@
 			function checkAnswer(q) {
 				const given = state.answers[q.id];
 				const correct = q.correct;
+				if (q.type === 'todo') {
+					// Плейсхолдер. Не учитывается в баллах и в фильтрах ошибок/верных.
+					return { status: 'todo', given: undefined, correct: undefined };
+				}
 				if (q.type === 'written') {
 					// Не автопроверяется. Статус «selfcheck» с баллами из state.selfScores.
 					const scores = (state.selfScores && state.selfScores[q.id]) || {};
@@ -1363,16 +1368,26 @@
 					if (filter === 'wrong') return it.res.status === 'wrong' || it.res.status === 'skip';
 					if (filter === 'ok')    return it.res.status === 'ok';
 					if (filter === 'part2') return it.q.type === 'written';
-					return true;
+					return true; // 'all' — показываем и todo
 				});
 
-				const cls = { ok: 'is--ok', wrong: 'is--wrong', skip: 'is--skip', selfcheck: 'sc-card' };
-				const lbl = { ok: 'Правильно', wrong: 'Ошибка', skip: 'Пропущено', selfcheck: 'Самопроверка' };
+				const cls = { ok: 'is--ok', wrong: 'is--wrong', skip: 'is--skip', selfcheck: 'sc-card', todo: 'is--skip' };
+				const lbl = { ok: 'Правильно', wrong: 'Ошибка', skip: 'Пропущено', selfcheck: 'Самопроверка', todo: 'В подготовке' };
 
 				const listHtml = filtered.length === 0
 					? `<div class="review-item"><div class="review-item__body" style="text-align:center; color:var(--muted);">В этой категории заданий нет.</div></div>`
 					: filtered.map(({ q, idx, res }) => {
 						if (q.type === 'written') return renderSelfCheckItem(q, idx, res);
+						if (q.type === 'todo') return `
+							<article class="review-item ${cls[res.status]}">
+								<div class="review-item__head">
+									<span class="review-item__num">${idx + 1}</span>
+									<span class="review-item__title">${q.title}</span>
+									<span class="review-item__badge">${lbl[res.status]}</span>
+								</div>
+								<div class="review-item__body">${q.body}</div>
+							</article>
+						`;
 						const yourVal = formatAnswer(q, res.given);
 						const corrVal = formatAnswer(q, res.correct);
 						const yourCls = res.status === 'ok' ? 'is--correct'
@@ -1405,8 +1420,8 @@
 						`;
 					}).join('');
 
-				const wrongCount = items.filter(i => i.q.type !== 'written' && i.res.status !== 'ok').length;
-				const okCount = items.filter(i => i.q.type !== 'written' && i.res.status === 'ok').length;
+				const wrongCount = items.filter(i => i.q.type !== 'written' && i.q.type !== 'todo' && i.res.status !== 'ok').length;
+				const okCount = items.filter(i => i.q.type !== 'written' && i.q.type !== 'todo' && i.res.status === 'ok').length;
 				const part2Count = items.filter(i => i.q.type === 'written').length;
 
 				const tp = scoring.totalPoints, tm = scoring.totalMax;
@@ -1569,7 +1584,7 @@
 					let ok = 0, total = 0;
 					(v.qids || []).forEach(qid => {
 						const q = bank.find(b => b.id === qid);
-						if (!q || q.type === 'written') return; // только часть 1 для порога
+						if (!q || q.type === 'written' || q.type === 'todo') return; // только часть 1 для порога; todo не считается
 						total++;
 						const given = s.answers ? s.answers[q.id] : undefined;
 						if (checkAnswerStatic(q, given) === 'ok') ok++;
