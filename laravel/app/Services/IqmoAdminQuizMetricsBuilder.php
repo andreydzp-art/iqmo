@@ -20,16 +20,9 @@ final class IqmoAdminQuizMetricsBuilder
      *          target email_to_reg/quiz_to_reg тоже null — измеряем только phone-gate conversion.
      */
     private const QUIZZES = [
-        'biology-1' => [
-            'name' => 'Биология · Quiz #1',
-            'questions' => 15,
-            'channel' => 'email',
-            'targets' => [
-                'email_gate' => 25.0,
-                'email_to_reg' => 30.0,
-                'quiz_to_reg' => 8.0,
-            ],
-        ],
+        // 'biology-1' (15 вопросов, /quiz/1) выведен из эксплуатации 2026-05-01.
+        // Исторические события и лиды остаются в БД для холодного анализа,
+        // но в дашборде квиз больше не показывается.
         'biology-2' => [
             'name' => 'Биология · Quiz #2',
             'questions' => 15,

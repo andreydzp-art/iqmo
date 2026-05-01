@@ -11,7 +11,8 @@ final class QuizLeadController extends Controller
     // Допустимые quiz_id. biology-v4 — телефонный квиз /quiz/8 (фаза A/B-теста
     // "phone vs email"); остальные — email-квизы /quiz/1.../quiz/7.
     private const ALLOWED_QUIZ_IDS = [
-        'biology-1', 'biology-2', 'biology-2-short', 'biology-3', 'biology-v2', 'biology-v4',
+        // 'biology-1' выведен 2026-05-01 (см. IqmoAdminQuizMetricsBuilder).
+        'biology-2', 'biology-2-short', 'biology-3', 'biology-v2', 'biology-v4',
         'chemistry-1', 'chemistry-2',
     ];
 
