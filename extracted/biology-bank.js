@@ -190,7 +190,7 @@ window.BIOLOGY_QUESTIONS = [
 		id: 14,
 		type: 'single',
 		title: 'Пищеварительная система',
-		body: '<p>На схеме отмечены органы пищеварительной системы: <b>А</b> — глотка, <b>Б</b> — печень, <b>В</b> — пищевод, <b>Г</b> — прямая кишка. По какой букве обозначен орган, <b>по которому</b> пища проталкивается <b>в пищевод</b>?</p><figure class="q-figure" role="group" aria-label="Схема пищеварительной системы человека"><img class="q-figure__img" src="/img/biology/q14-shema-pishchevaritelnoj-sistemy.png" alt="Схема пищеварительной системы человека: А — глотка, Б — печень, В — пищевод, Г — прямая кишка" loading="lazy" decoding="async" /></figure>',
+		body: '<p>На схеме отмечены органы пищеварительной системы: <b>А</b> — глотка, <b>Б</b> — печень, <b>В</b> — пищевод, <b>Г</b> — прямая кишка. По какой букве обозначен орган, <b>по которому</b> пища проталкивается <b>в пищевод</b>?</p><figure class="q-figure q-figure--small" role="group" aria-label="Схема пищеварительной системы человека"><img class="q-figure__img" src="/img/biology/q14-shema-pishchevaritelnoj-sistemy.png" alt="Схема пищеварительной системы человека: А — глотка, Б — печень, В — пищевод, Г — прямая кишка" loading="lazy" decoding="async" /></figure>',
 		options: [
 			{ id: '1', label: 'А' },
 			{ id: '2', label: 'Б' },

@@ -182,6 +182,10 @@
 				width: 100%;
 			}
 			.q-body .q-figure--wide { max-width: min(100%, 640px); }
+			/* Для портретных схем (соотношение сильно вертикальное, например пищеварительная
+			   система): на ширине 400px высота уезжает почти в полэкрана. Урезаем, чтобы
+			   текст вопроса оставался основным фокусом. */
+			.q-body .q-figure--small { max-width: min(100%, 280px); }
 			.q-body .q-figure__img {
 				display: block; width: 100%; max-width: 100%; height: auto; margin: 0 auto; border-radius: 12px;
 				box-shadow: 0 8px 24px -14px rgba(20, 28, 44, 0.3);
@@ -725,7 +729,7 @@
 		</main>
 
 		<script src="./exam-config.js"></script>
-		<script src="./biology-bank.js?v=14"></script>
+		<script src="./biology-bank.js?v=15"></script>
 		<script src="./biology-variants.js?v=3"></script>
 		<script src="./iqmo-sync.js"></script>
 		<script src="./iqmo-nav.js"></script>
