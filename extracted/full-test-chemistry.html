@@ -2058,8 +2058,10 @@
 			// VARIANT PICKER (only used when ?v is missing/invalid)
 			// ============================================================
 			// ---- linear progression helpers ----
-			const STREAK_KEY = 'iqmo-chem-streak';
-			const ATTEMPTS_KEY = 'iqmo-chem-attempts'; // { [vid]: { attempts: n, lastFailAt: ts, cooldownUntil: ts } }
+			// var (а не const) — иначе TDZ при вызовах из renderVariantPicker, который
+			// исполняется из IIFE раньше места объявления.
+			var STREAK_KEY = 'iqmo-chem-streak';
+			var ATTEMPTS_KEY = 'iqmo-chem-attempts'; // { [vid]: { attempts: n, lastFailAt: ts, cooldownUntil: ts } }
 
 			function loadAttempts() {
 				try { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '{}') || {}; }
@@ -2122,19 +2124,21 @@
 			// GAMIFICATION CALCULATIONS
 			// XP/Level/Stars считаем из того же localStorage, что уже есть.
 			// БД не трогаем: вся прогрессия может быть восстановлена из попыток.
+			// ВАЖНО: данные таблиц/констант ниже встроены прямо в функции — иначе
+			// при вызове до достижения объявления const ловим TDZ-ReferenceError.
 			// ============================================================
-			const GM_LEVEL_TITLES = [
-				{ at: 0,  name: 'Новичок' },
-				{ at: 5,  name: 'Ученик' },
-				{ at: 10, name: 'Исследователь' },
-				{ at: 15, name: 'Знаток' },
-				{ at: 20, name: 'Магистр' },
-				{ at: 30, name: 'Гуру ОГЭ' },
-			];
 			function gmLevelFromXp(xp) { return Math.floor((xp || 0) / 100); }
 			function gmTitleForLevel(level) {
-				let cur = GM_LEVEL_TITLES[0];
-				for (const t of GM_LEVEL_TITLES) { if (level >= t.at) cur = t; }
+				const titles = [
+					{ at: 0,  name: 'Новичок' },
+					{ at: 5,  name: 'Ученик' },
+					{ at: 10, name: 'Исследователь' },
+					{ at: 15, name: 'Знаток' },
+					{ at: 20, name: 'Магистр' },
+					{ at: 30, name: 'Гуру ОГЭ' },
+				];
+				let cur = titles[0];
+				for (const t of titles) { if (level >= t.at) cur = t; }
 				return cur.name;
 			}
 			function gmStarsForPercent(percent) {
@@ -2206,7 +2210,8 @@
 			}
 
 			// confetti: динамическая загрузка по требованию (не грузим, если не нужно).
-			let _gmConfettiPromise = null;
+			// var — защита от TDZ (ниже точки вызова).
+			var _gmConfettiPromise = null;
 			function gmLoadConfetti() {
 				if (_gmConfettiPromise) return _gmConfettiPromise;
 				_gmConfettiPromise = new Promise(resolve => {
@@ -2233,7 +2238,8 @@
 			}
 
 			// Ключ для отслеживания «свежей» разблокировки и level-up между визитами.
-			const GM_SEEN_KEY = 'iqmo-chem-gm-seen';
+			// var (а не const) — иначе TDZ при вызовах из renderVariantPicker.
+			var GM_SEEN_KEY = 'iqmo-chem-gm-seen';
 			function gmLoadSeen() {
 				try { return JSON.parse(localStorage.getItem(GM_SEEN_KEY) || '{}') || {}; }
 				catch (e) { return {}; }
@@ -2246,6 +2252,31 @@
 			// LEVEL MAP (variant picker — gamified)
 			// ============================================================
 			function renderVariantPicker() {
+				try { return _renderVariantPickerImpl(); }
+				catch (e) {
+					console.error('[gm] renderVariantPicker failed:', e);
+					try { if (window.ym) ym(108770166, 'reachGoal', 'gm_picker_error', { message: String(e && e.message || e) }); } catch (e0) {}
+					const picker = document.getElementById('variant-picker');
+					if (picker) {
+						picker.style.display = 'block';
+						picker.innerHTML = `
+							<div style="max-width:720px;margin:48px auto;padding:24px 28px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);">
+								<h2 style="margin:0 0 8px;">Не удалось построить карту уровней</h2>
+								<p style="color:var(--muted);margin:0 0 12px;">${String(e && e.message || e).replace(/</g,'&lt;')}</p>
+								<p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Если ошибка повторяется — попробуйте обновить страницу (Ctrl+F5). Список вариантов в безопасном режиме ниже.</p>
+								<div id="vp-fallback"></div>
+							</div>`;
+						try { _renderVariantPickerFallback(document.getElementById('vp-fallback')); } catch (e1) {}
+					}
+				}
+			}
+			function _renderVariantPickerFallback(host) {
+				if (!host) return;
+				const variants = window.CHEMISTRY_VARIANTS || [];
+				const ready = variants.filter(v => v.status === 'ready');
+				host.innerHTML = ready.map(v => `<a href="?v=${v.id}" style="display:inline-block;margin:4px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);text-decoration:none;font-weight:600;">${v.title || ('Вариант ' + v.id)}</a>`).join('');
+			}
+			function _renderVariantPickerImpl() {
 				const picker = document.getElementById('variant-picker');
 				const testRoot = document.getElementById('test-root');
 				if (testRoot) testRoot.style.display = 'none';
