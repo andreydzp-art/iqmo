@@ -2163,6 +2163,36 @@
 						return;
 					}
 
+					// A/B-сводка: суммируем стартеры/гейт-сабмиты/лидов по каналам "phone" vs "email".
+					// На phone-канале attribution к users не считается (фаза A), поэтому сравниваем
+					// только верх воронки: starts → gate_submit → lead, в %.
+					(function renderChannelSummary() {
+						const totals = { phone: { starts: 0, leads: 0, gateSubmit: 0 }, email: { starts: 0, leads: 0, gateSubmit: 0 } };
+						quizzes.forEach(function (q) {
+							const ch = (q.channel === 'phone') ? 'phone' : 'email';
+							const c = q.counts || {};
+							totals[ch].starts += (c.starts || 0);
+							totals[ch].leads += (c.leads || 0);
+							totals[ch].gateSubmit += (c.gateSubmit || 0);
+						});
+						if (totals.phone.starts === 0 && totals.email.starts === 0) return;
+						const pct = function (n, d) { return d > 0 ? (Math.round(100.0 * n / d * 10) / 10).toFixed(1) + '%' : '—'; };
+						const summary = document.createElement('div');
+						summary.className = 'card';
+						summary.style.marginBottom = '14px';
+						summary.innerHTML =
+							'<h2 style="margin:0 0 6px;">A/B сводка: phone vs email</h2>' +
+							'<p style="margin:0 0 12px;color:var(--muted);font-size:13px;">' +
+							'Сравниваем gate-conversion (стартовавшие → оставили контакт). Окно: ' + escapeHtml(periodLabelShort(quizzesState.days)) + '.</p>' +
+							'<div class="kpi-grid" style="margin-bottom:0;">' +
+								kpiHtml('📱 Phone-gate', pct(totals.phone.gateSubmit || totals.phone.leads, totals.phone.starts),
+									'стартов ' + fmtIntRu(totals.phone.starts) + ' · телефонов ' + fmtIntRu(totals.phone.leads), '') +
+								kpiHtml('✉ Email-gate', pct(totals.email.gateSubmit || totals.email.leads, totals.email.starts),
+									'стартов ' + fmtIntRu(totals.email.starts) + ' · email-лидов ' + fmtIntRu(totals.email.leads), '') +
+							'</div>';
+						root.appendChild(summary);
+					})();
+
 					quizzes.forEach(function (q) {
 						const card = document.createElement('div');
 						card.className = 'card';
@@ -2180,18 +2210,26 @@
 						const emailToReg = r.emailToRegistrationPct;
 						const quizToReg = r.quizToRegistrationPct;
 
+						const isPhone = (q.channel === 'phone');
+						const gateLabel = isPhone ? 'Phone-gate conversion' : 'Email-gate conversion';
+						const contactToRegLabel = isPhone ? 'Phone → Registration' : 'Email → Registration';
+						const leadsLabel = isPhone ? 'телефонов' : 'email-лидов';
+						const channelBadge = isPhone
+							? '<span style="display:inline-block;margin-left:8px;padding:2px 8px;background:#fff1c2;color:#7a5a00;border-radius:999px;font-size:11px;font-weight:700;">📱 phone</span>'
+							: '<span style="display:inline-block;margin-left:8px;padding:2px 8px;background:#ece8ff;color:#3f2cb5;border-radius:999px;font-size:11px;font-weight:700;">✉ email</span>';
+
 						card.innerHTML =
 							'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
-								'<h2 style="margin:0 0 6px;">' + escapeHtml(q.name || q.quizId || 'Квиз') + '</h2>' +
+								'<h2 style="margin:0 0 6px;">' + escapeHtml(q.name || q.quizId || 'Квиз') + channelBadge + '</h2>' +
 								'<div style="color:var(--muted);font-size:12px;font-weight:700;">' +
 									'стартов ' + fmtIntRu(starts) + ' · completed ' + fmtIntRu(completes) + ' · register_click ' + fmtIntRu(registerClicks) +
-									' · лидов ' + fmtIntRu(leads) + ' · рег. ' + fmtIntRu(reg) +
+									' · ' + leadsLabel + ' ' + fmtIntRu(leads) + ' · рег. ' + fmtIntRu(reg) +
 								'</div>' +
 							'</div>' +
 							'<div class="kpi-grid" style="margin-top:12px;margin-bottom:0;">' +
-								kpiHtml('Email-gate conversion', fmtPct(emailGate), 'цель ≥ ' + fmtPct(t.email_gate), tagForTarget(emailGate, t.email_gate)) +
-								kpiHtml('Email → Registration', fmtPct(emailToReg), 'цель ≥ ' + fmtPct(t.email_to_reg), tagForTarget(emailToReg, t.email_to_reg)) +
-								kpiHtml('Quiz → Registration', fmtPct(quizToReg), 'цель ≥ ' + fmtPct(t.quiz_to_reg), tagForTarget(quizToReg, t.quiz_to_reg)) +
+								kpiHtml(gateLabel, fmtPct(emailGate), 'цель ≥ ' + fmtPct(t.email_gate), tagForTarget(emailGate, t.email_gate)) +
+								kpiHtml(contactToRegLabel, fmtPct(emailToReg), isPhone ? 'без attribution в фазе A' : ('цель ≥ ' + fmtPct(t.email_to_reg)), tagForTarget(emailToReg, t.email_to_reg)) +
+								kpiHtml('Quiz → Registration', fmtPct(quizToReg), isPhone ? 'без attribution в фазе A' : ('цель ≥ ' + fmtPct(t.quiz_to_reg)), tagForTarget(quizToReg, t.quiz_to_reg)) +
 							'</div>' +
 							'<div class="table-wrap" style="margin-top:14px;">' +
 								'<table>' +

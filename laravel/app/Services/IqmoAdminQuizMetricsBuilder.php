@@ -11,11 +11,19 @@ final class IqmoAdminQuizMetricsBuilder
 {
     private const ALLOWED_DAYS = [1, 7, 14, 30];
 
-    /** @var array<string, array{name:string, questions:int, targets: array<string,float>}> */
+    /**
+     * @var array<string, array{name:string, questions:int, channel:string, targets: array<string,float>}>
+     *
+     * `channel` определяет, по какому контакту собираются лиды и как считается attribution:
+     * - email: lead.email JOIN users.email (как было), все email-метрики работают как раньше;
+     * - phone: lead.phone, attribution к users НЕ считается (в фазе A users не создаются по телефону),
+     *          target email_to_reg/quiz_to_reg тоже null — измеряем только phone-gate conversion.
+     */
     private const QUIZZES = [
         'biology-1' => [
             'name' => 'Биология · Quiz #1',
             'questions' => 15,
+            'channel' => 'email',
             'targets' => [
                 'email_gate' => 25.0,
                 'email_to_reg' => 30.0,
@@ -25,6 +33,7 @@ final class IqmoAdminQuizMetricsBuilder
         'biology-2' => [
             'name' => 'Биология · Quiz #2',
             'questions' => 15,
+            'channel' => 'email',
             'targets' => [
                 'email_gate' => 25.0,
                 'email_to_reg' => 30.0,
@@ -34,6 +43,7 @@ final class IqmoAdminQuizMetricsBuilder
         'biology-2-short' => [
             'name' => 'Биология · Quiz #2 (short, 12)',
             'questions' => 12,
+            'channel' => 'email',
             'targets' => [
                 'email_gate' => 25.0,
                 'email_to_reg' => 30.0,
@@ -43,6 +53,7 @@ final class IqmoAdminQuizMetricsBuilder
         'biology-3' => [
             'name' => 'Биология · Quiz #3 (v3, 12)',
             'questions' => 12,
+            'channel' => 'email',
             'targets' => [
                 'email_gate' => 25.0,
                 'email_to_reg' => 30.0,
@@ -52,15 +63,27 @@ final class IqmoAdminQuizMetricsBuilder
         'biology-v2' => [
             'name' => 'Биология · v2 package (12)',
             'questions' => 12,
+            'channel' => 'email',
             'targets' => [
                 'email_gate' => 25.0,
                 'email_to_reg' => 30.0,
                 'quiz_to_reg' => 8.0,
             ],
         ],
+        'biology-v4' => [
+            'name' => 'Биология · v4 phone-gate (12)',
+            'questions' => 12,
+            'channel' => 'phone',
+            'targets' => [
+                'email_gate' => 25.0, // phone-gate conversion (label меняем на фронте)
+                'email_to_reg' => 0.0,
+                'quiz_to_reg' => 0.0,
+            ],
+        ],
         'chemistry-1' => [
             'name' => 'Химия · Quiz #1',
             'questions' => 15,
+            'channel' => 'email',
             'targets' => [
                 'email_gate' => 25.0,
                 'email_to_reg' => 30.0,
@@ -70,6 +93,7 @@ final class IqmoAdminQuizMetricsBuilder
         'chemistry-2' => [
             'name' => 'Химия · Quiz #2 (12)',
             'questions' => 12,
+            'channel' => 'email',
             'targets' => [
                 'email_gate' => 25.0,
                 'email_to_reg' => 30.0,
@@ -145,27 +169,41 @@ final class IqmoAdminQuizMetricsBuilder
                 ->distinct()
                 ->count('sid');
 
-            $leads = (int) $iqmo->table('quiz_leads')
+            $channel = (string) ($cfg['channel'] ?? 'email');
+
+            $leadsBuilder = $iqmo->table('quiz_leads')
                 ->where('quiz_id', $quizId)
-                ->where('created_at_ms', '>=', $sinceMs)
-                ->count();
+                ->where('created_at_ms', '>=', $sinceMs);
+            if ($channel === 'phone') {
+                $leadsBuilder->whereNotNull('phone');
+            } else {
+                $leadsBuilder->whereNotNull('email');
+            }
+            $leads = (int) $leadsBuilder->count();
 
             // Attribution rule: registration within 7 days after lead capture.
-            $emailToReg = (int) $iqmo->table('quiz_leads as l')
-                ->join('users as u', DB::raw('LOWER(u.email)'), '=', DB::raw('LOWER(l.email)'))
-                ->where('l.quiz_id', $quizId)
-                ->where('l.created_at_ms', '>=', $sinceMs)
-                ->whereRaw('u.created_at >= l.created_at_ms')
-                ->whereRaw('u.created_at <= l.created_at_ms + 604800000')
-                ->distinct()
-                ->count(DB::raw('LOWER(l.email)'));
+            // Phone-канал в фазе A не создаёт users → attribution не считается, ставим 0.
+            if ($channel === 'phone') {
+                $emailToReg = 0;
+                $emailToRegPct = null;
+                $quizToRegPct = null;
+            } else {
+                $emailToReg = (int) $iqmo->table('quiz_leads as l')
+                    ->join('users as u', DB::raw('LOWER(u.email)'), '=', DB::raw('LOWER(l.email)'))
+                    ->where('l.quiz_id', $quizId)
+                    ->where('l.created_at_ms', '>=', $sinceMs)
+                    ->whereRaw('u.created_at >= l.created_at_ms')
+                    ->whereRaw('u.created_at <= l.created_at_ms + 604800000')
+                    ->distinct()
+                    ->count(DB::raw('LOWER(l.email)'));
+
+                $emailToRegPct = $leads > 0 ? round(100.0 * $emailToReg / $leads, 1) : null;
+                $quizToRegPct = $starts > 0 ? round(100.0 * $emailToReg / $starts, 1) : null;
+            }
 
             $emailGateDen = max(1, $gateShown > 0 ? $gateShown : $starts);
             $emailGateNum = $gateSubmit > 0 ? $gateSubmit : $leads;
             $emailGatePct = $starts > 0 ? round(100.0 * $emailGateNum / $emailGateDen, 1) : null;
-
-            $emailToRegPct = $leads > 0 ? round(100.0 * $emailToReg / $leads, 1) : null;
-            $quizToRegPct = $starts > 0 ? round(100.0 * $emailToReg / $starts, 1) : null;
 
             $qRows = $iqmo->table('quiz_events')
                 ->selectRaw('q_idx, COUNT(DISTINCT sid) AS sessions')
@@ -200,6 +238,7 @@ final class IqmoAdminQuizMetricsBuilder
             $out['quizzes'][] = [
                 'quizId' => $quizId,
                 'name' => $cfg['name'],
+                'channel' => $channel,
                 'targets' => $cfg['targets'],
                 'counts' => [
                     'starts' => $starts,
