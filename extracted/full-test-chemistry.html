@@ -652,6 +652,408 @@
 				.result-breakdown { grid-template-columns: 1fr; }
 				.q-card { padding: 20px 16px; }
 			}
+
+			/* ============================================================
+			   GAMIFICATION — level map / stars / XP / level / boss
+			   prefix: .gm-*
+			   ============================================================ */
+			:root {
+				--gm-primary:   #4f46e5;
+				--gm-primary-2: #6366f1;
+				--gm-primary-50:#eef0ff;
+				--gm-violet:    #7c3aed;
+				--gm-violet-2:  #a855f7;
+				--gm-violet-50: #f3eeff;
+				--gm-emerald:   #10b981;
+				--gm-emerald-2: #34d399;
+				--gm-emerald-50:#e7faf2;
+				--gm-amber:     #f59e0b;
+				--gm-rose:      #f43f5e;
+				--gm-shadow-glow: 0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45);
+				--gm-shadow-boss: 0 0 0 6px rgba(124,58,237,.12), 0 18px 36px -8px rgba(124,58,237,.45);
+				--gm-shadow-card: 0 1px 2px rgba(15,18,38,.04), 0 8px 24px rgba(15,18,38,.06);
+			}
+
+			/* ---- top hero with stat cluster ---- */
+			.gm-hero {
+				display: flex; align-items: stretch; justify-content: space-between;
+				gap: 24px; flex-wrap: wrap;
+				padding: 28px 0 8px;
+			}
+			.gm-hero__left { display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1 1 360px; }
+			.gm-hero__title {
+				font-size: 30px; font-weight: 800; letter-spacing: -.01em;
+				display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+			}
+			.gm-hero__sub { color: var(--muted); font-size: 14px; max-width: 540px; }
+			.gm-hero__back { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+			.gm-hero__back:hover { color: var(--ink); }
+
+			.gm-stat-cluster {
+				display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 0; min-width: 540px;
+				background: #fff; border: 1px solid var(--line); border-radius: 16px;
+				box-shadow: var(--gm-shadow-card);
+				overflow: hidden;
+				flex-shrink: 0;
+			}
+			.gm-stat {
+				padding: 14px 18px; display: flex; flex-direction: column; gap: 2px;
+				border-right: 1px solid var(--line);
+				white-space: nowrap;
+			}
+			.gm-stat:last-child { border-right: 0; }
+			.gm-stat__label {
+				font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+				color: var(--muted); display: flex; align-items: center; gap: 6px;
+			}
+			.gm-stat__val {
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-variant-numeric: tabular-nums;
+				font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1.1;
+			}
+			.gm-stat__val--gradient {
+				background: linear-gradient(135deg, var(--gm-primary), var(--gm-violet));
+				-webkit-background-clip: text; background-clip: text; color: transparent;
+			}
+			.gm-stat__sub { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+			@media (max-width: 720px) {
+				.gm-stat-cluster { min-width: 0; width: 100%; grid-template-columns: repeat(2, 1fr); }
+				.gm-stat { border-right: 0; border-bottom: 1px solid var(--line); }
+				.gm-stat:nth-child(2), .gm-stat:nth-child(4) { border-right: 0; }
+				.gm-stat:nth-child(3), .gm-stat:nth-child(4) { border-bottom: 0; }
+				.gm-stat:nth-child(odd) { border-right: 1px solid var(--line); }
+			}
+
+			/* ---- level map roadmap ---- */
+			.gm-map-section {
+				margin-top: 24px;
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 22px;
+				padding: 24px 24px 32px;
+				box-shadow: var(--gm-shadow-card);
+				position: relative;
+				overflow: hidden;
+			}
+			.gm-map-section__head {
+				display: flex; align-items: baseline; justify-content: space-between;
+				gap: 16px; flex-wrap: wrap; margin-bottom: 18px;
+			}
+			.gm-map-section__title { font-size: 18px; font-weight: 800; letter-spacing: -.005em; }
+			.gm-map-section__hint { font-size: 13px; color: var(--muted); max-width: 520px; }
+
+			.gm-map {
+				position: relative;
+				min-height: 220px;
+				padding: 14px 8px 20px;
+			}
+			.gm-map__path {
+				position: absolute; inset: 0;
+				width: 100%; height: 100%;
+				pointer-events: none;
+				z-index: 0;
+			}
+			.gm-map__path path { fill: none; stroke: var(--line); stroke-width: 3; stroke-linecap: round; }
+			.gm-map__path path.is--done { stroke: var(--gm-emerald); }
+
+			.gm-map__nodes {
+				position: relative;
+				display: grid;
+				grid-template-columns: repeat(var(--gm-cols, 6), 1fr);
+				gap: 18px 6px;
+				z-index: 1;
+				justify-items: center;
+			}
+
+			/* ---- node (variant) ---- */
+			.gm-node {
+				position: relative;
+				width: 78px; height: 78px;
+				border-radius: 50%;
+				border: 0; padding: 0;
+				display: inline-flex; align-items: center; justify-content: center;
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-weight: 800; font-size: 28px; font-variant-numeric: tabular-nums;
+				cursor: pointer; transition: transform .12s ease, box-shadow .2s ease;
+				background: #fff; color: var(--ink);
+				border: 2px solid var(--line);
+			}
+			.gm-node:hover { transform: translateY(-2px); }
+			.gm-node:active { transform: translateY(0); }
+
+			.gm-node__cap {
+				position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+				font-family: 'Manrope', sans-serif;
+				font-size: 11px; font-weight: 700; color: var(--muted);
+				white-space: nowrap; letter-spacing: .02em;
+			}
+			.gm-node__cap--status {
+				display: block; margin-top: 2px; font-size: 10px; font-weight: 600; color: var(--muted);
+				text-transform: uppercase; letter-spacing: .04em;
+			}
+			.gm-node__check, .gm-node__lock {
+				position: absolute; top: -6px; right: -6px;
+				width: 24px; height: 24px; border-radius: 50%;
+				display: flex; align-items: center; justify-content: center;
+				font-size: 13px; color: #fff; box-shadow: 0 4px 8px rgba(0,0,0,.12);
+			}
+			.gm-node__check { background: var(--gm-emerald); }
+			.gm-node__lock { background: #c9cdda; color: #fff; width: 22px; height: 22px; }
+			.gm-node__lock svg { width: 12px; height: 12px; }
+			.gm-node__stars {
+				position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+				display: flex; gap: 2px; font-size: 13px; line-height: 1;
+				color: var(--gm-amber);
+			}
+			.gm-node__stars span { filter: drop-shadow(0 1px 1px rgba(245,158,11,.35)); }
+			.gm-node__stars span.is--off { color: #d9dde9; filter: none; }
+
+			/* ---- node states ---- */
+			.gm-node.is--done {
+				background: var(--gm-emerald-50);
+				border-color: var(--gm-emerald-2);
+				color: var(--gm-emerald);
+			}
+			.gm-node.is--done .gm-node__cap { color: var(--gm-emerald); font-weight: 700; }
+
+			.gm-node.is--current {
+				background: linear-gradient(180deg, var(--gm-primary), var(--gm-primary-2));
+				border-color: transparent;
+				color: #fff;
+				box-shadow: var(--gm-shadow-glow);
+				animation: gmPulse 2.4s ease-in-out infinite;
+			}
+			.gm-node.is--current .gm-node__cap { color: var(--gm-primary); font-weight: 800; }
+			.gm-node.is--current .gm-node__cap--status { color: var(--gm-primary); }
+
+			.gm-node.is--cooldown {
+				background: #fff7eb;
+				border-color: #f3d592;
+				color: #8a5a1c;
+				cursor: not-allowed;
+			}
+			.gm-node.is--cooldown .gm-node__cap { color: #8a5a1c; }
+
+			.gm-node.is--locked {
+				background: #f5f6fa;
+				border-color: #e3e6f0;
+				color: #b9bdcc;
+				cursor: not-allowed;
+			}
+			.gm-node.is--locked:hover { transform: none; }
+
+			.gm-node.is--coming {
+				background: #fafbfd;
+				border-color: #eaecf3;
+				border-style: dashed;
+				color: #c4c8d6;
+				cursor: not-allowed;
+			}
+			.gm-node.is--coming:hover { transform: none; }
+
+			/* boss node — final */
+			.gm-node.is--boss {
+				width: 96px; height: 96px;
+				background: linear-gradient(135deg, var(--gm-violet), var(--gm-violet-2));
+				border: 0;
+				color: #fff;
+				font-size: 36px;
+				box-shadow: var(--gm-shadow-boss);
+				position: relative;
+			}
+			.gm-node.is--boss::before {
+				content: '';
+				position: absolute; inset: -6px;
+				border-radius: 50%;
+				background: conic-gradient(from 0deg, transparent, rgba(168,85,247,.4), transparent 30%);
+				z-index: -1;
+				animation: gmSpin 8s linear infinite;
+			}
+			.gm-node.is--boss.is--locked {
+				background: #f5f6fa;
+				color: #b9bdcc;
+				box-shadow: none;
+			}
+			.gm-node.is--boss.is--locked::before { display: none; }
+			.gm-node.is--boss.is--done {
+				background: linear-gradient(135deg, var(--gm-emerald), var(--gm-emerald-2));
+				color: #fff;
+			}
+
+			/* trophy/lightning icon for boss — using emoji-fallback through ::after when text is "Б" */
+			.gm-node.is--boss .gm-node__cap { color: var(--gm-violet); font-weight: 800; }
+			.gm-node.is--boss.is--done .gm-node__cap { color: var(--gm-emerald); }
+
+			.gm-node__danger-badge {
+				position: absolute; top: -10px; left: -10px;
+				background: var(--gm-rose); color: #fff;
+				font-family: 'Manrope', sans-serif;
+				font-size: 9px; font-weight: 800; letter-spacing: .04em;
+				padding: 3px 7px; border-radius: 999px;
+				box-shadow: 0 4px 10px -2px rgba(244,63,94,.45);
+				white-space: nowrap;
+				transform: rotate(-6deg);
+			}
+
+			/* ---- responsive grid columns ---- */
+			@media (max-width: 1100px) {
+				.gm-map__nodes { grid-template-columns: repeat(min(var(--gm-cols, 6), 5), 1fr); gap: 36px 6px; }
+			}
+			@media (max-width: 720px) {
+				.gm-map__nodes { grid-template-columns: repeat(min(var(--gm-cols, 6), 4), 1fr); gap: 36px 6px; }
+				.gm-node { width: 64px; height: 64px; font-size: 22px; }
+				.gm-node.is--boss { width: 78px; height: 78px; font-size: 28px; }
+				.gm-map__path { display: none; } /* кривая на мелком экране ломается; узлы и так очевидны */
+			}
+			@media (max-width: 480px) {
+				.gm-map__nodes { grid-template-columns: repeat(3, 1fr); }
+			}
+
+			/* ---- animations ---- */
+			@keyframes gmPulse {
+				0%, 100% { box-shadow: 0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45); }
+				50%      { box-shadow: 0 0 0 9px rgba(79,70,229,.16), 0 0 0 22px rgba(79,70,229,.10), 0 22px 40px -10px rgba(79,70,229,.55); }
+			}
+			@keyframes gmSpin { to { transform: rotate(360deg); } }
+			@keyframes gmFreshPop {
+				0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+				40%  { box-shadow: 0 0 0 12px rgba(16,185,129,.25), 0 0 0 22px rgba(16,185,129,.10); }
+				100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+			}
+			.gm-node.is--fresh { animation: gmFreshPop 2.4s ease-out 1; }
+
+			@media (prefers-reduced-motion: reduce) {
+				.gm-node.is--current, .gm-node.is--boss::before, .gm-node.is--fresh { animation: none !important; }
+			}
+
+			/* ---- companion (Sputnik) — fixed bottom-right during test ---- */
+			.gm-companion {
+				position: fixed; right: 20px; bottom: 20px;
+				display: flex; align-items: flex-end; gap: 10px;
+				z-index: 30;
+				max-width: min(360px, calc(100% - 40px));
+				pointer-events: none;
+			}
+			.gm-companion__bubble {
+				background: #fff;
+				border: 1.5px solid var(--line);
+				border-radius: 16px 16px 16px 4px;
+				padding: 10px 14px;
+				box-shadow: 0 8px 24px -8px rgba(15,18,38,.18);
+				font-size: 13px; line-height: 1.45; color: var(--ink-2);
+				font-weight: 500;
+				max-width: 280px;
+				transform: translateX(20px);
+				opacity: 0;
+				transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s;
+				pointer-events: auto;
+			}
+			.gm-companion__bubble.is--shown { transform: translateX(0); opacity: 1; }
+			.gm-companion__bubble b { color: var(--gm-primary); }
+			.gm-companion__avatar {
+				width: 56px; height: 56px;
+				border-radius: 50%;
+				background: linear-gradient(135deg, var(--gm-primary), var(--gm-violet));
+				display: flex; align-items: center; justify-content: center;
+				font-size: 28px;
+				color: #fff;
+				box-shadow: 0 8px 18px -6px rgba(79,70,229,.45);
+				flex-shrink: 0;
+				cursor: pointer;
+				pointer-events: auto;
+				transition: transform .15s;
+			}
+			.gm-companion__avatar:hover { transform: scale(1.06); }
+			.gm-companion__close {
+				position: absolute; top: 4px; right: 6px;
+				background: none; border: 0; padding: 2px 6px;
+				font-size: 14px; color: var(--muted); cursor: pointer;
+				line-height: 1;
+			}
+			.gm-companion__close:hover { color: var(--ink); }
+
+			@media (max-width: 720px) {
+				.gm-companion { right: 12px; bottom: 12px; }
+				.gm-companion__avatar { width: 46px; height: 46px; font-size: 22px; }
+			}
+
+			/* ---- combo / max-streak in result ---- */
+			.gm-combo-row {
+				display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;
+				justify-content: center;
+			}
+			.gm-combo-pill {
+				display: inline-flex; align-items: center; gap: 8px;
+				background: linear-gradient(135deg, #fff7eb 0%, #ffe9c2 100%);
+				border: 1px solid #f3d592;
+				color: #8a5a1c;
+				font-size: 13px; font-weight: 700;
+				padding: 8px 14px;
+				border-radius: 999px;
+			}
+			.gm-combo-pill__num {
+				font-family: 'JetBrains Mono', monospace;
+				font-variant-numeric: tabular-nums;
+				font-weight: 800;
+				font-size: 14px;
+			}
+			.gm-stars-pill {
+				display: inline-flex; align-items: center; gap: 6px;
+				background: linear-gradient(135deg, #fff8e1 0%, #ffe9b3 100%);
+				border: 1px solid #f0d59a;
+				color: #8a5a1c;
+				font-size: 13px; font-weight: 700;
+				padding: 8px 14px;
+				border-radius: 999px;
+			}
+			.gm-xp-pill {
+				display: inline-flex; align-items: center; gap: 6px;
+				background: var(--gm-primary-50);
+				border: 1px solid #d8def9;
+				color: var(--gm-primary);
+				font-size: 13px; font-weight: 700;
+				padding: 8px 14px;
+				border-radius: 999px;
+			}
+
+			/* ---- level-up overlay ---- */
+			.gm-levelup {
+				position: fixed; inset: 0;
+				background: rgba(15,18,38,.55);
+				backdrop-filter: blur(4px);
+				z-index: 90;
+				display: flex; align-items: center; justify-content: center;
+				padding: 20px;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity .3s;
+			}
+			.gm-levelup.is--shown { opacity: 1; pointer-events: auto; }
+			.gm-levelup__card {
+				background: #fff; border-radius: 22px; padding: 32px 32px 24px;
+				max-width: 380px; width: 100%; text-align: center;
+				box-shadow: 0 24px 48px -10px rgba(15,18,38,.4);
+				transform: scale(.92); opacity: 0; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s;
+			}
+			.gm-levelup.is--shown .gm-levelup__card { transform: scale(1); opacity: 1; }
+			.gm-levelup__art {
+				width: 88px; height: 88px; border-radius: 50%;
+				background: linear-gradient(135deg, var(--gm-primary), var(--gm-violet));
+				display: flex; align-items: center; justify-content: center;
+				font-size: 44px; color: #fff;
+				margin: 0 auto 14px;
+				box-shadow: 0 18px 36px -10px rgba(79,70,229,.55);
+			}
+			.gm-levelup__h { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+			.gm-levelup__sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+			.gm-levelup__rank {
+				display: inline-flex; margin-top: 12px;
+				padding: 6px 14px; border-radius: 999px;
+				background: var(--gm-violet-50); color: var(--gm-violet);
+				font-size: 13px; font-weight: 700;
+			}
 		</style>
 	</head>
 
@@ -846,6 +1248,81 @@
 			})();
 
 			// ============================================================
+			// COMPANION (Sputnik) — нейтральный наставник по прогрессу.
+			// В тесте мы не показываем «верно/неверно» (симуляция ОГЭ),
+			// поэтому реплики только мотивирующие, привязаны к позиции в тесте.
+			// ============================================================
+			const GM_COMPANION_LINES = {
+				start:    { e: '🧑‍🚀', t: 'Привет! Я твой <b>спутник</b>. Просто отвечай как считаешь, а в конце вместе разберём ошибки.' },
+				q5:       { e: '🚀',   t: 'Отлично, разогрелись! Дальше будет интереснее.' },
+				half:     { e: '🌗',   t: 'Половина пути. Если устал — можно вернуться к флагнутым позже.' },
+				q15:      { e: '🔬',   t: 'Третья четверть. Самые «жирные» баллы как раз здесь.' },
+				lastFew:  { e: '⏳',   t: 'Остались последние задания. Ты молодец, что добрался досюда.' },
+				lastOne:  { e: '🎯',   t: 'Последний вопрос! Ещё чуть-чуть.' },
+				flag:     { e: '🏷',   t: 'Ок, отметил. Вернёшься к нему позже — у тебя ещё есть время.' },
+				timer20:  { e: '⏰',   t: 'Осталось ~20 минут. Если есть пропущенные — пора их добить.' },
+				timer5:   { e: '🔥',   t: 'Финиш близко (5 мин). Завершай по тому, что уже знаешь.' }
+			};
+			const _gmCompShown = {};
+			function gmCompanionEnsure() {
+				if (document.getElementById('gm-companion')) return;
+				const wrap = document.createElement('div');
+				wrap.className = 'gm-companion';
+				wrap.id = 'gm-companion';
+				wrap.innerHTML = `
+					<div class="gm-companion__bubble" id="gm-companion-bubble">
+						<button type="button" class="gm-companion__close" aria-label="Скрыть">×</button>
+						<div id="gm-companion-text"></div>
+					</div>
+					<div class="gm-companion__avatar" id="gm-companion-avatar" title="Подсказка">🧑‍🚀</div>
+				`;
+				document.body.appendChild(wrap);
+				wrap.querySelector('.gm-companion__close').addEventListener('click', () => gmCompanionHide(true));
+				wrap.querySelector('#gm-companion-avatar').addEventListener('click', () => {
+					const b = document.getElementById('gm-companion-bubble');
+					if (b && b.classList.contains('is--shown')) gmCompanionHide(false);
+					else gmCompanionSay('start', { force: true, sticky: true });
+				});
+			}
+			function gmCompanionSay(key, opts) {
+				opts = opts || {};
+				if (!opts.force && _gmCompShown[key]) return;
+				_gmCompShown[key] = true;
+				gmCompanionEnsure();
+				const line = GM_COMPANION_LINES[key];
+				if (!line) return;
+				const bubble = document.getElementById('gm-companion-bubble');
+				const text = document.getElementById('gm-companion-text');
+				const avatar = document.getElementById('gm-companion-avatar');
+				if (avatar) avatar.textContent = line.e;
+				if (text) text.innerHTML = line.t;
+				if (bubble) {
+					bubble.classList.add('is--shown');
+					if (!opts.sticky) {
+						clearTimeout(gmCompanionSay._t);
+						gmCompanionSay._t = setTimeout(() => gmCompanionHide(false), 5500);
+					}
+				}
+			}
+			function gmCompanionHide(permanent) {
+				const wrap = document.getElementById('gm-companion');
+				if (!wrap) return;
+				if (permanent) { wrap.remove(); return; }
+				const b = document.getElementById('gm-companion-bubble');
+				if (b) b.classList.remove('is--shown');
+			}
+			// Привязки по позиции в тесте — вызываем из renderQuestion()
+			function gmCompanionPing(idx, total) {
+				gmCompanionEnsure();
+				if (idx === 0) gmCompanionSay('start');
+				else if (idx === 4) gmCompanionSay('q5');
+				else if (idx === Math.floor(total / 2)) gmCompanionSay('half');
+				else if (idx === Math.floor(total * 0.75)) gmCompanionSay('q15');
+				else if (idx === total - 3) gmCompanionSay('lastFew');
+				else if (idx === total - 1) gmCompanionSay('lastOne');
+			}
+
+			// ============================================================
 			// RENDER
 			// ============================================================
 			const elCard = document.getElementById('q-card');
@@ -892,6 +1369,7 @@
 			}
 
 			function renderQuestion() {
+				try { gmCompanionPing(state.current, QCOUNT); } catch(e) {}
 				const q = QUESTIONS[state.current];
 				if (!q) {
 					elCard.innerHTML = `
@@ -1005,8 +1483,10 @@
 			function wireQuestion(q) {
 				// flag
 				document.getElementById('btn-flag').addEventListener('click', () => {
-					state.flagged[q.id] = !state.flagged[q.id];
+					const wasFlagged = !!state.flagged[q.id];
+					state.flagged[q.id] = !wasFlagged;
 					saveState();
+					if (!wasFlagged) { try { gmCompanionSay('flag', { force: true }); } catch(e) {} }
 					renderAll();
 				});
 				// prev / next
@@ -1099,8 +1579,14 @@
 				const m = Math.floor((left % 3600) / 60);
 				const s = left % 60;
 				elTimerVal.textContent = [h, m, s].map(x => String(x).padStart(2,'0')).join(':');
+				const wasWarn = elTimer.classList.contains('is--warning');
+				const wasDanger = elTimer.classList.contains('is--danger');
 				elTimer.classList.toggle('is--warning', left < 20*60 && left >= 5*60);
 				elTimer.classList.toggle('is--danger', left < 5*60);
+				try {
+					if (!wasWarn && left < 20*60 && left >= 5*60) gmCompanionSay('timer20');
+					if (!wasDanger && left < 5*60 && left > 0) gmCompanionSay('timer5');
+				} catch(e) {}
 				if (left === 0) finishTest();
 			}
 			setInterval(tickTimer, 1000);
@@ -1173,15 +1659,38 @@
 						});
 					}
 				} catch (e2) {}
+
+				// Геймификация: «глава пройдена», если этот вариант — последний ready
+				// и его part1 ≥ 50%. Стреляем в Метрику и пускаем confetti на result-экране.
+				try {
+					const allVariants = window.CHEMISTRY_VARIANTS || [];
+					const readyOnly = allVariants.filter(v => v.status === 'ready');
+					const lastReady = readyOnly[readyOnly.length - 1];
+					const sNow = computeScoring();
+					const isBossWin = lastReady && activeVariant && activeVariant.id === lastReady.id && sNow.part1Percent >= 50;
+					if (isBossWin) {
+						if (window.ym) ym(108770166, 'reachGoal', 'chapter_finished', { variant: activeVariant.id });
+						setTimeout(() => gmFireConfetti({ particleCount: 160, spread: 100, origin: { y: 0.4 } }), 400);
+					}
+				} catch (e3) {}
+
 				renderResult();
 			}
 
 			function renderResult() {
 				const elTimerEl = document.getElementById('timer');
 				if (elTimerEl) elTimerEl.style.display = 'none';
+				try { gmCompanionHide(true); } catch (e) {}
 				const s = computeScoring();
 				const hasSelf = s.selfTotal > 0;
 				const selfNeedsReview = hasSelf && s.selfReviewed < s.selfTotal;
+				// Геймификация: звёзды и XP за этот вариант (по части 1).
+				const gmStarsThis = gmStarsForPercent(s.part1Percent);
+				const gmXpThis = gmXpForVariant(s.part1Percent);
+				const gmGotPass = s.part1Percent >= 50;
+				try {
+					if (gmStarsThis === 3 && window.ym) ym(108770166, 'reachGoal', 'stars_3', { variant: activeVariant && activeVariant.id });
+				} catch (e0) {}
 
 				// Статус прогрессии по части 1
 				const part1Ratio = s.autoTotal > 0 ? s.autoPoints / s.autoTotal : 0;
@@ -1251,6 +1760,24 @@
 
 								${progressBanner}
 
+								<div class="gm-combo-row">
+									<span class="gm-stars-pill" title="Звёзды по этому варианту: 50/70/90% → 1/2/3★">
+										<span aria-hidden="true">${'★'.repeat(gmStarsThis)}${'☆'.repeat(3 - gmStarsThis)}</span>
+										<span>${gmStarsThis} из 3 звёзд</span>
+									</span>
+									${gmGotPass ? `
+									<span class="gm-xp-pill" title="XP за этот вариант (бонус +50 за ≥80%, ещё +50 за ≥90%)">
+										💎 +<span class="gm-combo-pill__num">${gmXpThis}</span> XP
+									</span>` : `
+									<span class="gm-combo-pill" style="background:#fdecd6;border-color:#f3d592;color:#8a5a1c;">
+										💪 До зачёта (50%) не хватило ${Math.max(1, Math.ceil(s.autoTotal/2) - s.autoPoints)} ${(s.autoTotal/2 - s.autoPoints) === 1 ? 'верного ответа' : 'верных ответов'}
+									</span>`}
+									${s.bestStreak >= 3 ? `
+									<span class="gm-combo-pill" title="Самая длинная серия правильных ответов подряд в этой попытке">
+										🔥 Лучшее комбо <span class="gm-combo-pill__num">×${s.bestStreak}</span>
+									</span>` : ''}
+								</div>
+
 								<div style="margin-top:24px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
 									<button type="button" class="btn btn--blue" id="btn-review">${selfNeedsReview ? 'Перейти к самопроверке →' : 'Посмотреть разбор'}</button>
 									<button type="button" class="btn btn--ghost" id="btn-restart">Пройти заново</button>
@@ -1273,6 +1800,7 @@
 			function computeScoring() {
 				let autoPoints = 0, autoDone = 0, autoTotal = 0;
 				let selfPoints = 0, selfMax = 0, selfReviewed = 0, selfTotal = 0;
+				let curStreak = 0, bestStreak = 0;
 				QUESTIONS.forEach(q => {
 					if (q.type === 'written') {
 						selfTotal++;
@@ -1284,13 +1812,25 @@
 						autoTotal++;
 						const res = checkAnswer(q);
 						if (res.status !== 'skip') autoDone++;
-						if (res.status === 'ok') autoPoints++;
+						if (res.status === 'ok') {
+							autoPoints++;
+							curStreak++;
+							if (curStreak > bestStreak) bestStreak = curStreak;
+						} else {
+							curStreak = 0;
+						}
 					}
 				});
 				const totalPoints = autoPoints + selfPoints;
 				const totalMax = autoTotal + selfMax;
 				const percent = totalMax > 0 ? Math.round(totalPoints / totalMax * 100) : 0;
-				return { autoPoints, autoDone, autoTotal, selfPoints, selfMax, selfReviewed, selfTotal, totalPoints, totalMax, percent };
+				const part1Percent = autoTotal > 0 ? Math.round(100 * autoPoints / autoTotal) : 0;
+				return {
+					autoPoints, autoDone, autoTotal,
+					selfPoints, selfMax, selfReviewed, selfTotal,
+					totalPoints, totalMax, percent,
+					part1Percent, bestStreak
+				};
 			}
 
 			function checkAnswer(q) {
@@ -1578,6 +2118,133 @@
 				return h + ' ч ' + (mm ? mm + ' мин' : '').trim();
 			}
 
+			// ============================================================
+			// GAMIFICATION CALCULATIONS
+			// XP/Level/Stars считаем из того же localStorage, что уже есть.
+			// БД не трогаем: вся прогрессия может быть восстановлена из попыток.
+			// ============================================================
+			const GM_LEVEL_TITLES = [
+				{ at: 0,  name: 'Новичок' },
+				{ at: 5,  name: 'Ученик' },
+				{ at: 10, name: 'Исследователь' },
+				{ at: 15, name: 'Знаток' },
+				{ at: 20, name: 'Магистр' },
+				{ at: 30, name: 'Гуру ОГЭ' },
+			];
+			function gmLevelFromXp(xp) { return Math.floor((xp || 0) / 100); }
+			function gmTitleForLevel(level) {
+				let cur = GM_LEVEL_TITLES[0];
+				for (const t of GM_LEVEL_TITLES) { if (level >= t.at) cur = t; }
+				return cur.name;
+			}
+			function gmStarsForPercent(percent) {
+				if (percent >= 90) return 3;
+				if (percent >= 70) return 2;
+				if (percent >= 50) return 1;
+				return 0;
+			}
+			// Лучший результат варианта (по части 1) с возможностью посчитать звёзды/XP.
+			// Используем тот же localStorage('iqmo-chem-v-' + id) — там лежат финальные ответы.
+			function gmVariantBest(v) {
+				try {
+					const raw = localStorage.getItem('iqmo-chem-v-' + v.id);
+					if (!raw) return null;
+					const s = JSON.parse(raw);
+					if (!s || !s.finished) return null;
+					const bank = window.CHEMISTRY_QUESTIONS || [];
+					let ok = 0, total = 0;
+					(v.qids || []).forEach(qid => {
+						const q = bank.find(b => b.id === qid);
+						if (!q || q.type === 'written') return;
+						total++;
+						const given = s.answers ? s.answers[q.id] : undefined;
+						if (checkAnswerStatic(q, given) === 'ok') ok++;
+					});
+					if (!total) return null;
+					return { ok, total, percent: Math.round(100 * ok / total) };
+				} catch (e) { return null; }
+			}
+			function gmXpForVariant(percent) {
+				if (percent < 50) return 0;          // не зачёт — XP не идёт (cooldown логика)
+				let xp = 100;                         // base за прохождение
+				if (percent >= 80) xp += 50;
+				if (percent >= 90) xp += 50;          // 100 + 50 + 50 = 200 за 3★
+				return xp;
+			}
+			function gmComputedStats(variants) {
+				let totalXp = 0, totalStars = 0, passed = 0;
+				variants.forEach(v => {
+					if (v.status !== 'ready') return;
+					const best = gmVariantBest(v);
+					if (!best) return;
+					const stars = gmStarsForPercent(best.percent);
+					totalStars += stars;
+					if (stars >= 1) passed++;
+					totalXp += gmXpForVariant(best.percent);
+				});
+				// XP за серию (бонус)
+				try {
+					const streak = loadStreak();
+					if (streak.days >= 7) totalXp += 100;
+					if (streak.days >= 14) totalXp += 100;
+				} catch (e) {}
+				const level = gmLevelFromXp(totalXp);
+				return { totalXp, totalStars, passed, level, title: gmTitleForLevel(level) };
+			}
+
+			// «Самый коварный» — определяем эвристически: вариант, у которого по нашей
+			// собственной аналитике процент прохождения с первой попытки самый низкий.
+			// Пока бэк-аналитики per-variant нет — берём mock на основе позиции (середина
+			// сложнее краёв). Когда придёт API /api/admin/quiz/variant-stats — заменим на
+			// реальный fetch. Бейдж добавим максимум на один локед-узел.
+			function gmDangerVariantId(variants) {
+				const ready = variants.filter(v => v.status === 'ready');
+				if (ready.length < 6) return null; // не показываем при малой выборке
+				// Эвристика: вариант с id ≈ floor(0.6 * ready.length) — обычно «середина пути».
+				const target = ready[Math.floor(ready.length * 0.6)];
+				return target ? target.id : null;
+			}
+
+			// confetti: динамическая загрузка по требованию (не грузим, если не нужно).
+			let _gmConfettiPromise = null;
+			function gmLoadConfetti() {
+				if (_gmConfettiPromise) return _gmConfettiPromise;
+				_gmConfettiPromise = new Promise(resolve => {
+					if (window.confetti) return resolve(window.confetti);
+					const s = document.createElement('script');
+					s.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js';
+					s.async = true;
+					s.onload = () => resolve(window.confetti);
+					s.onerror = () => resolve(null);
+					document.head.appendChild(s);
+				});
+				return _gmConfettiPromise;
+			}
+			function gmFireConfetti(opts) {
+				gmLoadConfetti().then(c => {
+					if (!c) return;
+					c(Object.assign({
+						particleCount: 80,
+						spread: 70,
+						origin: { y: 0.6 },
+						colors: ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b']
+					}, opts || {}));
+				});
+			}
+
+			// Ключ для отслеживания «свежей» разблокировки и level-up между визитами.
+			const GM_SEEN_KEY = 'iqmo-chem-gm-seen';
+			function gmLoadSeen() {
+				try { return JSON.parse(localStorage.getItem(GM_SEEN_KEY) || '{}') || {}; }
+				catch (e) { return {}; }
+			}
+			function gmSaveSeen(s) {
+				try { localStorage.setItem(GM_SEEN_KEY, JSON.stringify(s)); } catch (e) {}
+			}
+
+			// ============================================================
+			// LEVEL MAP (variant picker — gamified)
+			// ============================================================
 			function renderVariantPicker() {
 				const picker = document.getElementById('variant-picker');
 				const testRoot = document.getElementById('test-root');
@@ -1596,7 +2263,7 @@
 				const streak = loadStreak();
 				const streakStatus = computeStreakStatus(streak);
 
-				// Определяем статус каждого варианта: passed / current / locked / cooldown / coming
+				// === 1. Состояния узлов (passed / current / locked / cooldown / coming) ===
 				let firstNotPassedIdx = -1;
 				const readyVariants = variants.filter(v => v.status === 'ready');
 				const variantInfos = variants.map((v, idx) => {
@@ -1604,25 +2271,21 @@
 					if (v.status !== 'ready') { info.state = 'coming'; return info; }
 					const res = getVariantResult(v);
 					info.res = res;
+					info.best = gmVariantBest(v);
 					if (res && res.passed) info.state = 'passed';
-					else info.state = 'pending'; // will be narrowed to current/locked
+					else info.state = 'pending';
 					return info;
 				});
-				// find first non-passed ready variant
 				for (let i = 0; i < variantInfos.length; i++) {
-					const vi = variantInfos[i];
-					if (vi.state === 'pending') { firstNotPassedIdx = i; break; }
+					if (variantInfos[i].state === 'pending') { firstNotPassedIdx = i; break; }
 				}
-				// Assign current/locked
 				variantInfos.forEach((vi, i) => {
 					if (vi.state !== 'pending') return;
 					if (DEV_UNLOCK_ALL) {
-						// В dev-режиме все готовые варианты доступны
 						vi.state = (i === firstNotPassedIdx) ? 'current' : 'pending-open';
 						return;
 					}
 					if (i === firstNotPassedIdx) {
-						// check cooldown
 						const att = attempts[vi.v.id];
 						if (att && att.cooldownUntil && att.cooldownUntil > Date.now()) {
 							vi.state = 'cooldown';
@@ -1635,125 +2298,248 @@
 					}
 				});
 
-				const passedCount = variantInfos.filter(x => x.state === 'passed').length;
-				const readyCount = readyVariants.length;
-				const inProgressCount = variantInfos.filter(x => (x.state === 'current' || x.state === 'cooldown') && x.res && x.res.inProgress).length;
-
-				/**
-				 * Состав сетки вариантов:
-				 *   1) Все ранее пройденные — чтобы ученик мог вернуться, разобрать ошибки
-				 *      и пересдать (раньше пройденные исчезали из UI, и до них было не добраться).
-				 *   2) Текущий (next-not-passed) и следующий за ним «локед» — фокус на сегодня.
-				 *   3) Если все варианты ready и пройдены, добавим первый «coming» + пару следующих.
-				 */
-				const visibleSet = new Set();
-				variantInfos.forEach((vi, i) => {
-					if (vi.state === 'passed') visibleSet.add(i);
-				});
-				if (firstNotPassedIdx >= 0) {
-					visibleSet.add(firstNotPassedIdx);
-					if (firstNotPassedIdx + 1 < variantInfos.length) visibleSet.add(firstNotPassedIdx + 1);
-				} else {
-					for (let j = 0; j < variantInfos.length; j++) {
-						if (variantInfos[j].state === 'coming') {
-							visibleSet.add(j);
-							if (j + 1 < variantInfos.length) visibleSet.add(j + 1);
-							break;
-						}
-					}
+				// === 2. Босс — последний ready-вариант. Если все предыдущие пройдены, босс становится current. ===
+				let bossIdx = -1;
+				for (let i = variantInfos.length - 1; i >= 0; i--) {
+					if (variantInfos[i].v.status === 'ready') { bossIdx = i; break; }
 				}
-				const variantInfosVisible = Array.from(visibleSet).sort((a, b) => a - b).map(i => variantInfos[i]);
-				const variantsGridCls = variantInfosVisible.length <= 2
-					? 'vp-grid vp-grid--pair' + (variantInfosVisible.length === 1 ? ' vp-grid--single' : '')
-					: 'vp-grid';
-				const variantsHintHtml = passedCount > 0
-					? `Пройденные варианты остаются здесь — кликните, чтобы пересдать или разобрать ошибки. Следующий новый откроется после ≥ <b>50%</b> в части 1 текущего.`
-					: `Показаны два ближайших варианта — тот, до которого вы дошли по порядку, и следующий. Остальные появятся после прохождения с <b>≥ 50%</b> в части 1.`;
+				if (bossIdx >= 0) variantInfos[bossIdx].isBoss = true;
 
-				const streakHtml = streakStatus.days > 0
-					? `<div class="vp-streak"><span class="vp-streak__flame">🔥</span>Серия: <b>${streakStatus.days}</b> ${streakStatus.days === 1 ? 'день' : 'дн.'} подряд${streakStatus.todayDone ? ' · сегодня ✓' : ''}</div>`
-					: `<div class="vp-streak" style="background:#f7f8fb;border-color:var(--line);color:var(--muted);"><span class="vp-streak__flame">🔥</span>Начните серию — пройдите вариант сегодня</div>`;
+				// === 3. Stat cluster (XP / Level / Stars / Streak) ===
+				const stats = gmComputedStats(variants);
+
+				// === 4. Detect новые ачивки (level up / unlock) для confetti и спутника ===
+				const seen = gmLoadSeen();
+				const justLeveledUp = (seen.level !== undefined) && stats.level > seen.level;
+				const freshUnlockId = (seen.lastUnlockedId == null && firstNotPassedIdx >= 0)
+					? variantInfos[firstNotPassedIdx].v.id
+					: (seen.lastUnlockedId !== null && firstNotPassedIdx >= 0
+						&& variantInfos[firstNotPassedIdx].v.id !== seen.lastUnlockedId)
+							? variantInfos[firstNotPassedIdx].v.id : null;
+
+				// === 5. «Самый коварный» бейдж — на одном локед-варианте ===
+				const dangerVid = gmDangerVariantId(variants);
+
+				// === 6. Render ===
+				const ALL_INFOS = variantInfos; // показываем ВСЕ варианты, включая coming, чтобы карта была полной
+				const cols = Math.min(8, Math.max(4, Math.ceil(Math.sqrt(ALL_INFOS.length * 1.5))));
+
+				const heroSubText = streakStatus.days > 0
+					? `Серия <b>${streakStatus.days}</b> ${streakStatus.days === 1 ? 'день' : 'дн.'} подряд${streakStatus.todayDone ? ' · сегодня ✓' : ''}. Разблокировка следующего узла — при <b>≥ 50%</b> в части 1.`
+					: `Начните серию: пройдите вариант сегодня. Следующий узел открывается при <b>≥ 50%</b> в части 1.`;
 
 				picker.innerHTML = `
-					<div class="vp-hero">
-						<div>
-							<a href="./subject-chemistry.html" class="vp-back">← К предмету</a>
-							<div class="vp-hero__title">Полный вариант ОГЭ · Химия</div>
-							<div class="vp-hero__sub">Проходите варианты по порядку. Следующий откроется, когда наберёте <b>≥ 50%</b> правильных ответов в части 1 текущего варианта.</div>
-							${streakHtml}
+					<div class="gm-hero">
+						<div class="gm-hero__left">
+							<a href="./subject-chemistry.html" class="gm-hero__back">← К предмету</a>
+							<div class="gm-hero__title">
+								Полный вариант ОГЭ · Химия
+							</div>
+							<div class="gm-hero__sub">${heroSubText}</div>
 						</div>
-						<div class="vp-stats">
-							<div><b>${readyCount}</b>всего</div>
-							<div><b>${passedCount}</b>пройдено</div>
-							<div><b>${inProgressCount}</b>в процессе</div>
+						<div class="gm-stat-cluster" aria-label="Игровая статистика">
+							<div class="gm-stat">
+								<div class="gm-stat__label">⭐ Звёзды</div>
+								<div class="gm-stat__val">${stats.totalStars}</div>
+								<div class="gm-stat__sub">из ${readyVariants.length * 3} возможных</div>
+							</div>
+							<div class="gm-stat">
+								<div class="gm-stat__label">🔥 Серия</div>
+								<div class="gm-stat__val">${streakStatus.days || 0}</div>
+								<div class="gm-stat__sub">${streakStatus.days === 1 ? 'день' : 'дней'}${streakStatus.todayDone ? ' · сегодня ✓' : ''}</div>
+							</div>
+							<div class="gm-stat">
+								<div class="gm-stat__label">💎 XP</div>
+								<div class="gm-stat__val">${stats.totalXp}</div>
+								<div class="gm-stat__sub">${100 - (stats.totalXp % 100)} до уровня</div>
+							</div>
+							<div class="gm-stat">
+								<div class="gm-stat__label">Уровень</div>
+								<div class="gm-stat__val gm-stat__val--gradient">${stats.level}</div>
+								<div class="gm-stat__sub">${stats.title}</div>
+							</div>
 						</div>
 					</div>
 
-					<div class="vp-section-title">Варианты</div>
-					<p class="vp-section-hint">${variantsHintHtml}</p>
-					<div class="${variantsGridCls}">
-						${variantInfosVisible.length ? variantInfosVisible.map(vi => {
-							const v = vi.v;
-							let cls = '', statusHtml = '', badgeHtml = '', lockHtml = '', disabled = false;
-							if (vi.state === 'coming') {
-								cls = 'is--coming'; disabled = true;
-								statusHtml = `<span class="vp-tile__dot"></span>Скоро`;
-							} else if (vi.state === 'passed') {
-								cls = 'is--passed';
-								const okPart = vi.res ? `${vi.res.ok}/${vi.res.total}` : '';
-								statusHtml = `<span class="vp-tile__dot"></span><span class="vp-tile__score">${okPart}</span>`;
-								if (vi.res && vi.res.ok === vi.res.total) badgeHtml = `<span class="vp-tile__badge">100%</span>`;
-							} else if (vi.state === 'current') {
-								cls = 'is--current';
-								if (vi.res && vi.res.inProgress) {
-									statusHtml = `<span class="vp-tile__dot" style="background:var(--amber)"></span>В процессе`;
-								} else {
-									const att = attempts[v.id];
-									if (att && att.attempts > 0) {
-										statusHtml = `<span class="vp-tile__dot" style="background:var(--red)"></span>Попытка ${att.attempts + 1}`;
-									} else {
-										statusHtml = `<span class="vp-tile__dot" style="background:var(--accent)"></span>Доступен сейчас`;
-									}
-								}
-							} else if (vi.state === 'pending-open') {
-								cls = 'is--pending-open';
-								statusHtml = `<span class="vp-tile__dot" style="background:var(--accent)"></span>Dev · открыт`;
-							} else if (vi.state === 'cooldown') {
-								cls = 'is--cooldown'; disabled = true;
-								lockHtml = `<span class="vp-tile__lock">⏱</span>`;
-								statusHtml = `<span class="vp-tile__dot"></span>Через ${msToHMS(vi.cooldownLeft)}`;
-							} else if (vi.state === 'locked') {
-								cls = 'is--locked'; disabled = true;
-								lockHtml = `<span class="vp-tile__lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>`;
-								statusHtml = `<span class="vp-tile__dot"></span>Заблокирован`;
-							}
-							return `
-								<button type="button" class="vp-tile ${cls}" data-v="${v.id}" data-state="${vi.state}" ${disabled?'disabled':''}>
-									${badgeHtml}${lockHtml}
-									<div class="vp-tile__num">${v.id}</div>
-									<div class="vp-tile__label">${v.title}</div>
-									<div class="vp-tile__status">${statusHtml}</div>
-								</button>
-							`;
-						}).join('') : '<p class="vp-section-hint" style="margin:0;grid-column:1/-1">Нет вариантов для отображения.</p>'}
+					<div class="gm-map-section">
+						<div class="gm-map-section__head">
+							<div class="gm-map-section__title">Карта главы 1 · «Полный вариант»</div>
+							<div class="gm-map-section__hint">Пройдите варианты по порядку. В конце — <b style="color:var(--gm-violet)">финальный босс</b> с лучшим из всех.</div>
+						</div>
+						<div class="gm-map" style="--gm-cols:${cols}">
+							<svg class="gm-map__path" id="gm-map-path" preserveAspectRatio="none"></svg>
+							<div class="gm-map__nodes" id="gm-map-nodes">
+								${ALL_INFOS.map((vi, i) => renderGmNode(vi, i, attempts, dangerVid, freshUnlockId)).join('')}
+							</div>
+						</div>
 					</div>
 				`;
 
-				picker.querySelectorAll('.vp-tile[data-v]').forEach(btn => {
+				// === 7. Wire clicks ===
+				picker.querySelectorAll('.gm-node[data-v]').forEach(btn => {
 					btn.addEventListener('click', () => {
 						if (btn.disabled) return;
-						const state = btn.dataset.state;
+						const st = btn.dataset.state;
 						const v = btn.dataset.v;
-						if (state === 'locked') {
-							alert('Чтобы открыть этот вариант, пройдите предыдущие.');
+						if (st === 'locked' || st === 'coming') {
+							alert(st === 'coming'
+								? 'Этот вариант скоро появится.'
+								: 'Чтобы открыть этот вариант, пройдите предыдущие с результатом ≥ 50% в части 1.');
 							return;
 						}
-						if (state === 'cooldown') {
+						if (st === 'cooldown') {
 							alert('После двух провальных попыток вариант временно закрыт. Отдохните и повторите задания.');
 							return;
 						}
 						window.location.search = '?v=' + v;
 					});
+				});
+
+				// === 8. Draw SVG path between nodes ===
+				requestAnimationFrame(() => gmDrawPath(picker, variantInfos));
+				window.addEventListener('resize', () => gmDrawPath(picker, variantInfos), { passive: true });
+
+				// === 9. Confetti / level-up overlay для свежих событий ===
+				if (justLeveledUp) {
+					gmShowLevelUp(stats.level, stats.title);
+					try { if (window.ym) ym(108770166, 'reachGoal', 'level_up', { level: stats.level }); } catch (e0) {}
+				} else if (freshUnlockId) {
+					setTimeout(() => gmFireConfetti({ origin: { y: 0.4 } }), 250);
+				}
+
+				// Save «seen» state
+				seen.level = stats.level;
+				seen.lastUnlockedId = firstNotPassedIdx >= 0 ? variantInfos[firstNotPassedIdx].v.id : null;
+				gmSaveSeen(seen);
+			}
+
+			function renderGmNode(vi, idx, attempts, dangerVid, freshUnlockId) {
+				const v = vi.v;
+				const cls = ['gm-node'];
+				let inner = String(v.id);
+				let cap = `Вариант ${v.id}`;
+				let capStatus = '';
+				let extras = '';
+				let disabled = false;
+
+				if (vi.isBoss) {
+					cls.push('is--boss');
+					inner = '👑';
+					cap = 'Финальный босс';
+				}
+
+				if (vi.state === 'passed') {
+					cls.push('is--done');
+					if (!vi.isBoss) inner = '✓';
+					const stars = vi.best ? gmStarsForPercent(vi.best.percent) : 1;
+					extras += `<span class="gm-node__check" aria-hidden="true">✓</span>`;
+					extras += renderGmStars(stars);
+					capStatus = vi.best ? `<span class="gm-node__cap--status">${vi.best.percent}% · ${stars}★</span>` : '';
+				} else if (vi.state === 'current') {
+					cls.push('is--current');
+					capStatus = '<span class="gm-node__cap--status">Доступен</span>';
+					if (v.id === freshUnlockId) cls.push('is--fresh');
+					const att = attempts[v.id];
+					if (att && att.attempts > 0) {
+						capStatus = `<span class="gm-node__cap--status">Попытка ${att.attempts + 1}</span>`;
+					}
+					if (vi.res && vi.res.inProgress) {
+						capStatus = '<span class="gm-node__cap--status">В процессе</span>';
+					}
+				} else if (vi.state === 'pending-open') {
+					cls.push('is--current');
+					capStatus = '<span class="gm-node__cap--status">Dev · открыт</span>';
+				} else if (vi.state === 'cooldown') {
+					cls.push('is--cooldown');
+					disabled = true;
+					capStatus = `<span class="gm-node__cap--status">⏱ ${msToHMS(vi.cooldownLeft)}</span>`;
+					extras += `<span class="gm-node__lock" aria-hidden="true">⏱</span>`;
+				} else if (vi.state === 'locked') {
+					cls.push('is--locked');
+					disabled = true;
+					extras += `<span class="gm-node__lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>`;
+					capStatus = '<span class="gm-node__cap--status">Заблокирован</span>';
+					if (dangerVid && v.id === dangerVid) {
+						extras += `<span class="gm-node__danger-badge" title="По нашей аналитике этот вариант сложнее остальных">⚡ Самый коварный</span>`;
+					}
+				} else if (vi.state === 'coming') {
+					cls.push('is--coming');
+					disabled = true;
+					capStatus = '<span class="gm-node__cap--status">Скоро</span>';
+				}
+
+				return `
+					<button type="button" class="${cls.join(' ')}" data-v="${v.id}" data-state="${vi.state}" data-idx="${idx}" ${disabled ? 'disabled' : ''} aria-label="${cap} — ${vi.state}">
+						${extras}
+						<span aria-hidden="true">${inner}</span>
+						<span class="gm-node__cap">${cap}${capStatus}</span>
+					</button>
+				`;
+			}
+
+			function renderGmStars(filled) {
+				let html = '<span class="gm-node__stars" aria-label="Звёзды: ' + filled + ' из 3">';
+				for (let i = 1; i <= 3; i++) {
+					html += `<span class="${i <= filled ? '' : 'is--off'}">★</span>`;
+				}
+				html += '</span>';
+				return html;
+			}
+
+			// SVG-кривая между центрами узлов в DOM-порядке. Считаем после layout.
+			function gmDrawPath(rootEl, infos) {
+				const svg = rootEl.querySelector('#gm-map-path');
+				const nodesWrap = rootEl.querySelector('#gm-map-nodes');
+				if (!svg || !nodesWrap) return;
+				const nodeEls = Array.from(nodesWrap.querySelectorAll('.gm-node'));
+				if (!nodeEls.length) return;
+				const wrapRect = nodesWrap.getBoundingClientRect();
+				svg.setAttribute('width', wrapRect.width);
+				svg.setAttribute('height', wrapRect.height);
+				svg.setAttribute('viewBox', `0 0 ${wrapRect.width} ${wrapRect.height}`);
+				let pathHtml = '';
+				const points = nodeEls.map(el => {
+					const r = el.getBoundingClientRect();
+					return { x: r.left - wrapRect.left + r.width / 2, y: r.top - wrapRect.top + r.height / 2 };
+				});
+				for (let i = 0; i < points.length - 1; i++) {
+					const p1 = points[i], p2 = points[i + 1];
+					const midX = (p1.x + p2.x) / 2;
+					// Контроль-точка с лёгким изгибом — ±25 по Y, чередуем направление.
+					const bend = ((i % 2 === 0) ? -1 : 1) * 18;
+					const ctrlX = midX, ctrlY = (p1.y + p2.y) / 2 + bend;
+					const isDone = (infos[i] && infos[i].state === 'passed') && (infos[i + 1] && (infos[i + 1].state === 'passed' || infos[i + 1].state === 'current' || infos[i + 1].state === 'pending-open'));
+					pathHtml += `<path d="M ${p1.x},${p1.y} Q ${ctrlX},${ctrlY} ${p2.x},${p2.y}" class="${isDone ? 'is--done' : ''}" />`;
+				}
+				svg.innerHTML = pathHtml;
+			}
+
+			function gmShowLevelUp(level, title) {
+				const wrap = document.createElement('div');
+				wrap.className = 'gm-levelup';
+				wrap.innerHTML = `
+					<div class="gm-levelup__card">
+						<div class="gm-levelup__art">🎉</div>
+						<div class="gm-levelup__h">Уровень ${level}!</div>
+						<div class="gm-levelup__sub">Продолжайте в том же духе — следующая ступень близко.</div>
+						<div class="gm-levelup__rank">${title}</div>
+						<button type="button" class="btn btn--blue" style="margin-top:18px;width:100%;justify-content:center;" id="gm-levelup-close">Круто!</button>
+					</div>
+				`;
+				document.body.appendChild(wrap);
+				requestAnimationFrame(() => {
+					wrap.classList.add('is--shown');
+					gmFireConfetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+				});
+				wrap.querySelector('#gm-levelup-close').addEventListener('click', () => {
+					wrap.classList.remove('is--shown');
+					setTimeout(() => wrap.remove(), 350);
+				});
+				wrap.addEventListener('click', e => {
+					if (e.target === wrap) {
+						wrap.classList.remove('is--shown');
+						setTimeout(() => wrap.remove(), 350);
+					}
 				});
 			}
 
