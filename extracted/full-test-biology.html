@@ -916,9 +916,11 @@
 				if (q.type === 'single' || q.type === 'multi') {
 					const picked = state.answers[q.id];
 					const pickedSet = new Set(Array.isArray(picked) ? picked : (picked ? [picked] : []));
-					// Перемешиваем варианты ответов при повторах (seeded by variant id + attempt index + qid)
-					const attemptIdx = getAttemptIndex(activeVariant.id);
-					const opts = attemptIdx > 0 ? seededShuffle(q.options.slice(), activeVariant.id * 1000 + attemptIdx * 37 + q.id) : q.options;
+					// Раньше при повторах шаффлили варианты (anti-cheat по позиции), но цифры
+					// слева — это исходные id (1..6 из банка), и шаффл выдавал «5,1,4,2,3»,
+					// что путает: и подсказки вида «верны 2 и 3» ссылаются именно на эти id.
+					// Возвращаем фиксированный порядок: ОГЭ-задания так и устроены.
+					const opts = q.options;
 					inputHtml = `<div class="options" data-role="options" data-multi="${q.type === 'multi' ? '1' : '0'}">
 						${opts.map(o => `
 							<label class="option ${pickedSet.has(o.id) ? 'is--checked' : ''}" data-id="${o.id}">
