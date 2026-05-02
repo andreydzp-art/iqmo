@@ -164,14 +164,37 @@ Route::get('/login', function () {
 })->name('iqmo.portal_login');
 
 // Админ-UI лежит в resources/admin-ui (не в public), иначе Nginx отдаёт public/admin/* без PHP и middleware бессилен.
+//
+// Каноничный URL — `/admin/` (clean URL без `.html` в адресной строке, симметрично
+// /subject-<slug>/). Старый /admin/index.html 301-редиректит на /admin/. Гость на
+// любом URL получает ответ middleware iqmo.portal_admin (403/503) — редирект ему
+// не виден, потому что middleware применяется ДО handler-а.
 Route::middleware('iqmo.portal_admin')->group(function () use ($serveStatic): void {
-    Route::get('/admin', function () {
-        return redirect('/admin/index.html', 302);
-    })->name('iqmo.admin');
+    Route::get('/admin/index.html', function () {
+        return redirect('/admin/', 301);
+    });
 
-    Route::get('/admin/{path}', function (string $path) use ($serveStatic) {
+    $serveAdminIndex = function () use ($serveStatic) {
+        $full = resource_path('admin-ui'.DIRECTORY_SEPARATOR.'index.html');
+        if (! is_file($full)) {
+            abort(404);
+        }
+
+        return $serveStatic($full);
+    };
+
+    // /admin и /admin/ — оба отдают index.html напрямую (Laravel нормализует
+    // trailing slash при роутинге, поэтому одной записи достаточно для обоих URL).
+    Route::get('/admin', $serveAdminIndex)->name('iqmo.admin');
+
+    Route::get('/admin/{path}', function (string $path) use ($serveStatic, $serveAdminIndex) {
         $path = ltrim($path, '/');
-        if ($path === '' || str_ends_with($path, '/')) {
+        // Пустой path = `/admin/` — отдаём index.html (раньше тут был abort(404),
+        // а сам index.html был доступен только по /admin/index.html).
+        if ($path === '') {
+            return $serveAdminIndex();
+        }
+        if (str_ends_with($path, '/')) {
             abort(404);
         }
         if (str_contains($path, '..') || ! preg_match('#^[A-Za-z0-9][A-Za-z0-9_./-]*$#', $path)) {

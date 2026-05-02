@@ -58,10 +58,10 @@ final class LoginRedirectTest extends TestCase
     public function test_authed_user_honors_local_next_param(): void
     {
         $response = $this->withCookies($this->authedCookie())
-            ->get('/login.html?next=/admin/index.html');
+            ->get('/login.html?next=/admin/');
 
         $response->assertStatus(302);
-        $response->assertRedirect('/admin/index.html');
+        $response->assertRedirect('/admin/');
     }
 
     public function test_authed_user_ignores_protocol_relative_next(): void

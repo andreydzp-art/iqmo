@@ -256,17 +256,27 @@ jobs:
             exit 1
           fi
 
-          code_admin=$(curl -sS -o /tmp/smoke-admin.html -w "%{http_code}" "$BASE/admin/index.html" || true)
-          if [ "$code_admin" = "200" ]; then
-            echo "GET /admin/index.html must not return 200 for anonymous (got 200 — check Nginx static bypass / public/admin)"
-            head -c 300 /tmp/smoke-admin.html | cat -v
-            exit 1
-          fi
-          if [ "$code_admin" != "302" ] && [ "$code_admin" != "403" ] && [ "$code_admin" != "503" ]; then
-            echo "GET /admin/index.html expected 302, 403 or 503 for guest, got $code_admin"
-            head -c 300 /tmp/smoke-admin.html | cat -v
-            exit 1
-          fi
+          # Каноничный URL админки — /admin/. Гость не должен видеть содержимое
+          # ни на /admin/, ни на legacy /admin/index.html: middleware iqmo.portal_admin
+          # вступает раньше handler-а с 301-редиректом, поэтому оба URL обязаны
+          # отвечать 302 (на /login.html) / 403 / 503, но не 200 и не 301.
+          for admin_url in "$BASE/admin/" "$BASE/admin/index.html"; do
+            code_admin=$(curl -sS -o /tmp/smoke-admin.html -w "%{http_code}" "$admin_url" || true)
+            if [ "$code_admin" = "200" ]; then
+              echo "GET $admin_url must not return 200 for anonymous (got 200 — check Nginx static bypass / public/admin)"
+              head -c 300 /tmp/smoke-admin.html | cat -v
+              exit 1
+            fi
+            if [ "$code_admin" = "301" ]; then
+              echo "GET $admin_url returned 301 — guests must hit middleware before any redirect"
+              exit 1
+            fi
+            if [ "$code_admin" != "302" ] && [ "$code_admin" != "403" ] && [ "$code_admin" != "503" ]; then
+              echo "GET $admin_url expected 302, 403 or 503 for guest, got $code_admin"
+              head -c 300 /tmp/smoke-admin.html | cat -v
+              exit 1
+            fi
+          done
 
           # Regression guard: POST /api/auth/login must reach Laravel (any 4xx/2xx is fine,
           # but a 404 means routes/iqmo_api.php was not loaded — see bootstrap/app.php).
@@ -306,8 +316,9 @@ jobs:
           fi
 
           # /admin must enforce stricter policy: X-Frame-Options + CSP, even on the
-          # 302/403/503 the middleware sees before auth fires.
-          headers_admin=$(curl -sSI "$BASE/admin/index.html" || true)
+          # 302/403/503 the middleware sees before auth fires. Используем clean URL —
+          # это новый канон, и именно его браузеры будут открывать.
+          headers_admin=$(curl -sSI "$BASE/admin/" || true)
           if ! echo "$headers_admin" | grep -qi "^x-frame-options:.*DENY"; then
             echo "/admin missing X-Frame-Options: DENY"
             echo "$headers_admin"
