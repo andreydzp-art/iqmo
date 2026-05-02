@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="ru" class="page">
 <head>
-	<!-- Экспорт: iqmo-base встроен; Метрика и внешние скрипты сохранены -->
 <!-- Anti-FOUC шапки авторизации: ставим data-iqmo-auth на <html> до парса body, 
      чтобы CSS-правила в iqmo-base.css сразу скрыли «не ту» половину кнопок. 
      Hint пишется iqmo-nav.js после реального ответа /api/me. -->
 <script data-iqmo-fouc-guard="1">try{document.documentElement.setAttribute('data-iqmo-auth',localStorage.getItem('iqmo_auth_hint')==='1'?'authed':'guest');}catch(e){}</script>
+	<!-- Экспорт: iqmo-base встроен; Метрика и внешние скрипты сохранены -->
 <meta charset="utf-8" />
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
@@ -107,22 +107,7 @@ p {
 	display: none !important;
 }
 
-/* Anti-FOUC для шапки авторизации.
- *
- * Базовая разметка отдаёт «гостевую» шапку: #iqmo-nav-login виден,
- * #iqmo-nav-profile/#iqmo-nav-logout — `hidden`, .iqmo-only-guest —
- * виден, .iqmo-only-authed — `hidden`. Дальше iqmo-nav.js делает
- * fetch('/api/me') и переключает их по результату. Между парсом
- * HTML и приходом ответа — те самые ~200мс, когда залогиненный
- * успевает увидеть «Вход» и «Попробовать бесплатно».
- *
- * Лечим так: в head каждой страницы синхронный inline-`<script>`
- * читает localStorage['iqmo_auth_hint'] (его пишет iqmo-nav.js
- * после успешного /api/me) и ставит data-iqmo-auth="authed|guest"
- * на <html>. Эти правила применяются ДО рендера body, и нужный
- * вариант кнопок появляется сразу. Если hint оказался стейл —
- * iqmo-nav.js перерисует обратно после реального /api/me.
- */
+/* Anti-FOUC для шапки авторизации (см. iqmo-base.css). */
 html[data-iqmo-auth='authed'] .iqmo-only-guest,
 html[data-iqmo-auth='authed'] #iqmo-nav-login {
 	display: none !important;
@@ -819,7 +804,20 @@ h1,h2,h3,p{margin:0}
   display:flex;flex-direction:column;
   overflow-y:auto;
 }
-.modal__steps{display:flex;align-items:center;gap:8px;margin-bottom:22px}
+.modal__steps{display:flex;align-items:center;gap:8px;margin-bottom:22px;padding-right:44px}
+.modal__close{
+  position:absolute;top:16px;right:16px;
+  width:36px;height:36px;border-radius:12px;
+  border:1.5px solid var(--line);background:#fff;
+  display:grid;place-items:center;
+  color:var(--muted);
+  cursor:pointer;
+  transition:color .15s ease, border-color .15s ease, transform .12s ease;
+  z-index:3;
+}
+.modal__close:hover{color:var(--ink);border-color:#d8d6cf;transform:translateY(-1px)}
+.modal__close:active{transform:translateY(1px)}
+.modal__close svg{width:16px;height:16px}
 .modal__step-dot{
   flex:1;height:6px;border-radius:99px;background:#ebe7df;position:relative;overflow:hidden;
 }
@@ -900,6 +898,23 @@ h1,h2,h3,p{margin:0}
   .modal__card{border-radius:24px 24px 0 0;max-height:92vh}
 }
 
+/* ----- prod blocks: Продолжить + карточки предметов ----- */
+.he-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;box-shadow:var(--shadow-card);}
+.he-card h2{font-size:18px;font-weight:900;color:var(--ink);margin:0 0 14px;letter-spacing:-.02em;}
+.home-continue.is--empty .he-rows{color:var(--muted);font-size:14px;line-height:1.5;}
+.home-continue__row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--line);}
+.home-continue__row:first-child{padding-top:0;border-top:0;}
+.home-continue__row p{margin:0;flex:1;min-width:140px;color:var(--ink-2);font-size:14px;line-height:1.45;}
+.home-continue__row a{font-weight:800;color:var(--primary);text-decoration:none;white-space:nowrap;}
+.home-continue__row a:hover{text-decoration:underline;}
+.subjects-z{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.scard{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-lg);padding:22px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-card);transition:border-color .15s,transform .1s;color:inherit;text-decoration:none;}
+.scard:hover{border-color:var(--primary);transform:translateY(-2px);}
+.scard--hit{border-color:rgba(91,61,245,.35);}
+.sc-meta{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.sc-title{font-size:17px;font-weight:900;color:var(--ink);}
+.sc-desc{font-size:14px;color:var(--ink-2);line-height:1.45;margin:0;}
+.sc-link{font-size:14px;font-weight:800;color:var(--primary);margin-top:auto;}
 </style>
 </head>
 <body>
@@ -915,6 +930,7 @@ h1,h2,h3,p{margin:0}
       <a href="#how">Как работает</a>
       <a href="#product">Продукт</a>
       <a href="#gamify">Серии и XP</a>
+      <a href="#cases">Кейсы</a>
       <a href="#faq">Вопросы</a>
     </nav>
     <div class="nav__cta">
@@ -929,8 +945,95 @@ h1,h2,h3,p{margin:0}
   </div>
 </header>
 
+<!-- ========== HERO ========== -->
+<section class="hero">
+  <div class="hero__deco"></div>
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <span class="hero__pill"><span class="dot"></span>Сейчас занимается 1 247 человек</span>
+      <h1>
+        Подготовка к ОГЭ —<br/>
+        как <span class="underline">игра</span>,<br/>
+        результат — <span class="accent">пятёрка</span>.
+      </h1>
+      <p class="hero__sub">
+        30 минут в день, реальные задания ФИПИ, серии и уровни.
+        Платформа сама знает, какую тему повторить — вы просто открываете приложение.
+      </p>
+      <div class="hero__cta">
+        <a href="#start" class="btn btn--primary" data-open-register>Начать с разминки — бесплатно</a>
+        <a href="#start" class="btn btn--ghost" data-open-register>7 дней полного доступа</a>
+      </div>
+      <div class="hero__trust">
+        <div class="avatar-stack">
+          <span>А</span><span>М</span><span>К</span><span>+</span>
+        </div>
+        <span><b>2 134</b> школьника готовятся прямо сейчас</span>
+        <span>★ 4,8 / 5 · <b>312</b> отзывов</span>
+      </div>
+    </div>
+
+    <div class="hero__mock">
+      <div class="float float--xp">
+        <div class="float__icon float__icon--xp">★</div>
+        <div>
+          <div class="float__top">XP сегодня</div>
+          <div class="float__num">+240</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="phone__screen">
+          <div class="ph-status"><span>9:41</span><span>●●● 100%</span></div>
+          <div class="ph-top">
+            <span class="ph-streak">🔥 12 дней</span>
+            <span class="ph-xp">★ Уровень 7</span>
+          </div>
+          <div class="ph-progress"></div>
+          <div class="ph-task">
+            <div class="ph-task__lbl">Задание 3 из 8 · Реакции</div>
+            <div class="ph-task__q">Выберите окислитель в реакции:<br/>2KI + Cl₂ → 2KCl + I₂</div>
+            <div class="ph-task__opts">
+              <div class="ph-opt"><span class="ph-opt__bullet">A</span>KI</div>
+              <div class="ph-opt is-correct"><span class="ph-opt__bullet">B</span>Cl₂</div>
+              <div class="ph-opt"><span class="ph-opt__bullet">C</span>KCl</div>
+              <div class="ph-opt"><span class="ph-opt__bullet">D</span>I₂</div>
+            </div>
+          </div>
+          <div class="ph-cta">Проверить</div>
+        </div>
+      </div>
+      <div class="float float--streak">
+        <div class="float__icon float__icon--streak">🔥</div>
+        <div>
+          <div class="float__top">Серия</div>
+          <div class="float__num">12 дней</div>
+        </div>
+      </div>
+      <div class="float float--badge">
+        <div class="float__icon float__icon--badge">★</div>
+        <div>
+          <div class="float__top">Новый бейдж</div>
+          <div class="float__num">Химик-новичок</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" style="margin-top:40px">
+    <div class="proof">
+      <div class="proof__txt">Готовимся по спецификации <b>ФИПИ ОГЭ-2026</b></div>
+      <div class="proof__row">
+        <span>ФИПИ</span><span>·</span>
+        <span>2 000+ заданий</span><span>·</span>
+        <span>10 тем химии</span><span>·</span>
+        <span><a href="/subject-biology/" style="color:inherit;font-weight:700">биология · курс</a></span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ========== HOW IT WORKS ========== -->
-<section class="sec" id="how" style="padding-top:48px">
+<section class="sec" id="how">
   <div class="wrap">
     <div class="sec__head">
       <span class="sec__eyebrow">Как это устроено</span>
@@ -1094,6 +1197,64 @@ h1,h2,h3,p{margin:0}
   </div>
 </section>
 
+<!-- ========== CASES ========== -->
+<section class="sec" id="cases" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec__head">
+      <span class="sec__eyebrow">Кейсы учеников</span>
+      <h2 class="sec__title">3 → <em style="color:var(--mint)">5</em> за пару месяцев</h2>
+      <p class="sec__sub">Реальные результаты школьников, которые занимались на платформе.</p>
+    </div>
+    <div class="cases">
+      <article class="case">
+        <div class="case__top">
+          <div class="case__avatar">АК</div>
+          <div>
+            <div class="case__name">Алина К.</div>
+            <div class="case__meta">9 класс · Казань</div>
+          </div>
+        </div>
+        <div class="case__delta">
+          <span class="from">3</span><span class="arrow">→</span><span class="to">5</span>
+          <span class="lbl">ОГЭ химия</span>
+        </div>
+        <p class="case__quote">До IQMO я не понимала уравнения реакций вообще. Здесь сразу видно, где прокололась, и эта же тема возвращается через день.</p>
+        <span class="case__tag">2 месяца подготовки</span>
+      </article>
+      <article class="case">
+        <div class="case__top">
+          <div class="case__avatar">МС</div>
+          <div>
+            <div class="case__name">Максим С.</div>
+            <div class="case__meta">9 класс · Екатеринбург</div>
+          </div>
+        </div>
+        <div class="case__delta">
+          <span class="from">3</span><span class="arrow">→</span><span class="to" style="color:var(--primary)">4</span>
+          <span class="lbl">пробники</span>
+        </div>
+        <p class="case__quote">Занимался по 30 минут после школы. Через два месяца на пробнике стабильно 28+ из 34 баллов.</p>
+        <span class="case__tag" style="background:var(--primary-soft);color:var(--primary)">Серия 47 дней</span>
+      </article>
+      <article class="case">
+        <div class="case__top">
+          <div class="case__avatar">ЕВ</div>
+          <div>
+            <div class="case__name">Елена В.</div>
+            <div class="case__meta">мама ученика · Москва</div>
+          </div>
+        </div>
+        <div class="case__delta">
+          <span class="from">×5</span><span class="arrow">↓</span><span class="to">в 5 раз</span>
+          <span class="lbl">дешевле</span>
+        </div>
+        <p class="case__quote">Дочка раньше боялась химию. Здесь темы по ФИПИ — мы видим, что именно спрашивают. Репетитор обходился в 5 раз дороже.</p>
+        <span class="case__tag" style="background:var(--sun-soft);color:#a6810a">Сдала на 5</span>
+      </article>
+    </div>
+  </div>
+</section>
+
 <!-- ========== FAQ ========== -->
 <section class="sec" id="faq" style="padding-top:0">
   <div class="wrap">
@@ -1149,13 +1310,125 @@ h1,h2,h3,p{margin:0}
 </footer>
 
 <script src="./iqmo-sync.js"></script>
+<script src="./chem-progress.js"></script>
 <script src="./iqmo-nav.js"></script>
 <script src="./iqmo-regnudge.js?v=3"></script>
+<script>
+(function () {
+	var TOPIC_PARTIAL = [
+		{ key: 'iqmo-chem-topic02-subtopics', href: './topic-atom-structure.html', label: 'Тема 02 · Строение атома' },
+		{ key: 'iqmo-chem-topic03-subtopics', href: './topic-chemical-bond.html', label: 'Тема 03 · Химическая связь' },
+		{ key: 'iqmo-chem-topic04-subtopics', href: './topic-inorganic-classes.html', label: 'Тема 04 · Классы неорганики' },
+		{ key: 'iqmo-chem-topic05-subtopics', href: './topic-chemical-reactions.html', label: 'Тема 05 · Реакции' },
+		{ key: 'iqmo-chem-topic06-subtopics', href: './topic-solutions-dissociation.html', label: 'Тема 06 · Растворы' },
+		{ key: 'iqmo-chem-topic07-subtopics', href: './topic-metals-compounds.html', label: 'Тема 07 · Металлы' },
+		{ key: 'iqmo-chem-topic08-subtopics', href: './topic-nonmetals-compounds.html', label: 'Тема 08 · Неметаллы' },
+		{ key: 'iqmo-chem-topic09-subtopics', href: './topic-organic-substances.html', label: 'Тема 09 · Органика' },
+		{ key: 'iqmo-chem-topic10-subtopics', href: './topic-life-ecology.html', label: 'Тема 10 · Экология' }
+	];
+	function trialContinue() {
+		try {
+			var raw = localStorage.getItem('iqmo-chem-trial-v1');
+			if (!raw) return null;
+			var s = JSON.parse(raw);
+			if (!s || s.finished) return null;
+			var nAns = Object.keys(s.answers || {}).length;
+			if ((s.current || 0) > 0 || nAns > 0) {
+				return {
+					href: './trial-chemistry.html',
+					text: 'Пробник: вопрос ' + Math.min(10, (s.current || 0) + 1) + ' из 10',
+					link: 'Продолжить'
+				};
+			}
+		} catch (e) {}
+		return null;
+	}
+	function partialTopicContinue() {
+		for (var i = 0; i < TOPIC_PARTIAL.length; i++) {
+			var t = TOPIC_PARTIAL[i];
+			try {
+				var raw = localStorage.getItem(t.key);
+				if (!raw) continue;
+				var a = JSON.parse(raw);
+				if (Array.isArray(a) && a.some(function (x) { return x === 1; })) {
+					return {
+						href: t.href,
+						text: t.label + ' — есть разделы «в процессе»',
+						link: 'Открыть тему'
+					};
+				}
+			} catch (e) {}
+		}
+		return null;
+	}
+	function modeRu(mode) {
+		if (mode === 'warmup') return 'Разминка';
+		if (mode === 'trial') return 'Пробник';
+		if (mode === 'full') return 'Полный вариант';
+		return mode || 'Тренировка';
+	}
+	function lastAttemptRow(loggedIn) {
+		if (!loggedIn || !window.ChemProgress) return null;
+		var la = ChemProgress.getLastAttempt();
+		if (!la || la.subject !== 'chemistry') return null;
+		var when = ChemProgress.formatRelativeTime(la.finishedAt);
+		var bit = (la.label ? la.label + ' · ' : '') + la.correct + ' / ' + la.total + ' (' + la.percent + '%) · ' + when;
+		return {
+			href: './profile.html',
+			text: modeRu(la.mode) + ': ' + bit,
+			link: 'Профиль'
+		};
+	}
+	function rowEl(item) {
+		return (
+			'<div class="home-continue__row">' +
+				'<p>' + item.text + '</p>' +
+				'<a href="' + item.href + '">' + item.link + '</a>' +
+			'</div>'
+		);
+	}
+	var root = document.getElementById('home-continue-root');
+	var wrap = document.getElementById('home-continue');
+	if (!root || !wrap) return;
+	function paintHomeContinue(loggedIn) {
+		var rows = [];
+		var t = trialContinue();
+		if (t) rows.push(t);
+		var p = partialTopicContinue();
+		if (p) rows.push(p);
+		var l = lastAttemptRow(loggedIn);
+		if (l) rows.push(l);
+		if (rows.length === 0) {
+			wrap.classList.add('is--empty');
+			root.innerHTML =
+				'<p style="margin:0">Пока нет сохранённого прогресса в этом браузере. Начните с курса по химии или пробника — тогда здесь появятся быстрые ссылки.</p>';
+		} else {
+			wrap.classList.remove('is--empty');
+			root.innerHTML = rows.map(rowEl).join('');
+		}
+	}
+	paintHomeContinue(false);
+	if (window.__iqmoAuthReady) {
+		window.__iqmoAuthReady
+			.then(function (ok) {
+				paintHomeContinue(!!ok);
+			})
+			.catch(function () {
+				paintHomeContinue(false);
+			});
+	}
+})();
+</script>
 
 <!-- ========== REGISTER MODAL ========== -->
 <div class="modal" id="register-modal" role="dialog" aria-modal="true" aria-labelledby="register-title" aria-hidden="true">
   <div class="modal__backdrop"></div>
   <div class="modal__card">
+    <button type="button" class="modal__close" id="register-close" aria-label="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18"></path>
+      </svg>
+    </button>
     <aside class="modal__side">
       <div>
         <span class="modal__eyebrow">★ 7 дней бесплатно</span>
@@ -1243,7 +1516,7 @@ h1,h2,h3,p{margin:0}
       <div class="ring">✓</div>
       <h3>Готово! Серия запущена 🔥</h3>
       <p>Мы отправили подтверждение на email. Через секунду перенесём вас на первую сессию.</p>
-      <a href="./profile.html" class="btn btn--primary" style="margin-top:8px">Открыть кабинет →</a>
+      <a href="/subject-biology/" class="btn btn--primary" style="margin-top:8px">Открыть курс →</a>
     </div>
   </div>
 </div>
@@ -1355,6 +1628,8 @@ tick(); setInterval(tick, 1000);
   const modal = document.getElementById('register-modal');
   const form = document.getElementById('register-form');
   const done = document.getElementById('register-done');
+  const closeBtn = document.getElementById('register-close');
+  const backdrop = modal ? modal.querySelector('.modal__backdrop') : null;
   const stepLabel = document.getElementById('step-label');
   const stepDots = document.querySelectorAll('#step-bar .modal__step-dot');
   const nextBtn = document.getElementById('step-next');
@@ -1379,6 +1654,12 @@ tick(); setInterval(tick, 1000);
     document.querySelector('[data-choice="subject"] [data-val="chem"]').classList.add('is-on');
     document.querySelector('[data-choice="goal"] [data-val="4"]').classList.add('is-on');
     setTimeout(()=>document.getElementById('reg-name').focus(),60);
+  }
+
+  function close(){
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
   }
 
   function setStep(i){
@@ -1431,6 +1712,12 @@ tick(); setInterval(tick, 1000);
     });
   });
 
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  if (backdrop) backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+  });
+
   // chip choice toggling (single-select per group)
   form.querySelectorAll('[data-choice]').forEach(group=>{
     group.addEventListener('click', e=>{
@@ -1449,6 +1736,9 @@ tick(); setInterval(tick, 1000);
       // submit
       form.hidden = true;
       done.hidden = false;
+      setTimeout(() => {
+        try { window.location.href = '/subject-biology/'; } catch (e) {}
+      }, 1100);
     }
   });
   form.addEventListener('submit', e=>e.preventDefault());
