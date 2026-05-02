@@ -152,19 +152,30 @@ jobs:
               && echo "php8.3-fpm reloaded" \
               || echo "WARN: php8.3-fpm reload skipped (need NOPASSWD sudo on the server)"
             # `touch` + optimize:clear не помогают, если opcache настроен с
-            # `validate_timestamps=0` — bytecode `routes/iqmo_api.php` живёт
-            # до явного сброса. Дёргаем internal-роут с loopback (см. routes/web.php),
-            # секрет не нужен — REMOTE_ADDR=127.0.0.1.
-            echo "=== DEPLOY: opcache_reset() via loopback request ==="
-            # Файл `public/_opcache_reset.php` намеренно standalone (не Laravel-роут):
-            # сам routes/web.php лежит в opcache, поэтому новые роуты в нём не видны
-            # до сброса. Standalone PHP-файл, которого раньше не было, opcache
-            # подхватывает сразу. Нгинкс резолвится через --resolve на 127.0.0.1.
-            curl -fsS -k -m 10 -X POST \
-              --resolve www.iqmoschool.ru:443:127.0.0.1 \
-              "https://www.iqmoschool.ru/_opcache_reset.php" \
-              && echo "" \
-              || echo "WARN: opcache reset request failed (file missing or nginx denied access)"
+            # `validate_timestamps=0` — bytecode middleware/контроллеров
+            # живёт до явного сброса. Дёргаем `_opcache_reset.php`, передавая
+            # APP_KEY как X-Deploy-Secret: на VPS за nginx с real_ip_header
+            # REMOTE_ADDR оказывается публичным IP клиента, поэтому
+            # loopback-проверка не срабатывала и предыдущий запрос отбивался
+            # с 403 forbidden — opcache не сбрасывался. APP_KEY уже на VPS
+            # в .env, наружу не уходит, проверяется hash_equals.
+            echo "=== DEPLOY: opcache_reset() via _opcache_reset.php ==="
+            APP_KEY_VALUE="$(grep -E '^APP_KEY=' "${LARAVEL_DIR}/.env" | head -n1 | sed -E 's/^APP_KEY=//; s/^["'\'']//; s/["'\'']$//')"
+            if [ -z "$APP_KEY_VALUE" ]; then
+              echo "WARN: APP_KEY missing in .env — opcache reset skipped"
+            else
+              opcache_response=$(curl -sS -k -m 10 -X POST \
+                --resolve www.iqmoschool.ru:443:127.0.0.1 \
+                -H "X-Deploy-Secret: ${APP_KEY_VALUE}" \
+                -w "\nHTTP_CODE:%{http_code}" \
+                "https://www.iqmoschool.ru/_opcache_reset.php" || true)
+              echo "opcache reset response: ${opcache_response}"
+              if echo "$opcache_response" | grep -q '"ok":true'; then
+                echo "opcache reset OK"
+              else
+                echo "WARN: opcache reset may have failed (workers will refresh by pm.max_requests TTL)"
+              fi
+            fi
             echo "=== DEPLOY: Laravel layer OK ==="
 
   smoke:
