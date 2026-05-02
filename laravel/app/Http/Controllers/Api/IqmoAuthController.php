@@ -33,9 +33,38 @@ final class IqmoAuthController extends Controller
                 'created_at' => $now,
             ]);
         } catch (\Throwable $e) {
-            // ER_DUP_ENTRY
+            // ER_DUP_ENTRY — email уже занят. Раньше отдавали 409 email_taken,
+            // что давало email enumeration: атакующий со списком email'ов
+            // мог отличить «свободен» от «занят» по статус-коду.
+            //
+            // Теперь применяем register-or-login (audit #6): пробуем залогинить
+            // пользователя этим же паролем.
+            //   • Если пароль совпадает — silent login (тот же ответ, что
+            //     register success). Хороший UX: юзер забыл, что у него уже
+            //     есть аккаунт, ввёл «register», по факту попал внутрь.
+            //   • Если пароль не совпадает — отдаём ровно тот же ответ, что
+            //     /api/auth/login на invalid_credentials (401). Атакующий не
+            //     может различить «email свободен» от «email занят, пароль
+            //     не угадан» — оба ответа выглядят одинаково.
+            //
+            // Для нового email атакующий получает 200 OK (создаём аккаунт),
+            // но это тоже не enumeration: rate limit (5/min per IP, см.
+            // throttle:iqmo-auth-register) делает атаку нерентабельной.
             if (str_contains((string) $e->getCode(), '23000') || str_contains($e->getMessage(), 'Duplicate')) {
-                return response()->json(['error' => 'email_taken'], 409);
+                $existing = DB::connection('iqmo')
+                    ->table('users')
+                    ->where('email', $email)
+                    ->first();
+
+                if ($existing && Hash::check($password, (string) $existing->password_hash)) {
+                    $userId = (int) $existing->id;
+                    $this->issueSessionCookie($userId, $email);
+                    $this->ensureProfileRow($userId);
+
+                    return response()->json(['ok' => true, 'email' => $email]);
+                }
+
+                return response()->json(['error' => 'invalid_credentials'], 401);
             }
 
             report($e);

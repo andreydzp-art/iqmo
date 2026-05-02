@@ -92,4 +92,4 @@ jobs:
         # (или вообще не трогают БД), поэтому MySQL не нужен.
         # shivammathur/setup-php@v2 ships pdo_sqlite by default, поэтому
         # дополнительной обвязки не нужно.
-        run: vendor/bin/phpunit --filter='AnalyticsIngestTest|LoginRedirectTest|IqmoAuthThrottleTest|IqmoProfileStateMismatchTest' --no-coverage
+        run: vendor/bin/phpunit --filter='AnalyticsIngestTest|LoginRedirectTest|IqmoAuthThrottleTest|IqmoProfileStateMismatchTest|IqmoAuthRegisterOrLoginTest' --no-coverage
