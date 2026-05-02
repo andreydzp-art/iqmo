@@ -159,14 +159,40 @@ final class IqmoAuthController extends Controller
         }
 
         $uid = (int) $payload['uid'];
+        // Read users row для двух целей: created_at для UI и
+        // token_version для revocation check (audit #3). /api/me
+        // намеренно НЕ под middleware iqmo.jwt — он guest-friendly:
+        // нужен fast-path для anonymous browsing, и middleware всегда
+        // отдаёт 401. Поэтому проверка revocation встроена прямо здесь:
+        // если в users нет такого uid (account deleted) или
+        // token_version разошёлся (logout-everywhere) — отдаём 401, как
+        // если бы JWT был просрочен. Без этого после logout-everywhere
+        // UI продолжал бы показывать юзера как залогиненного, пока
+        // следующий middleware-protected запрос не отдаст 401.
         $createdAt = null;
         try {
-            $row = DB::connection('iqmo')->table('users')->select('created_at')->where('id', $uid)->first();
-            if ($row && $row->created_at !== null) {
+            $row = DB::connection('iqmo')
+                ->table('users')
+                ->select('created_at', 'token_version')
+                ->where('id', $uid)
+                ->first();
+
+            if (!$row) {
+                return response()->json(['error' => 'unauthorized'], 401)->withHeaders($noStore);
+            }
+
+            $serverTv = isset($row->token_version) ? (int) $row->token_version : 1;
+            if ($serverTv !== (int) $payload['tv']) {
+                return response()->json(['error' => 'unauthorized'], 401)->withHeaders($noStore);
+            }
+
+            if ($row->created_at !== null) {
                 $createdAt = (int) $row->created_at;
             }
         } catch (\Throwable $e) {
-            // оставим created_at = null, страница откатится на локальный счётчик
+            // DB unreachable — не валим юзера 401-ом, ограничиваемся подписью.
+            // Это редкий случай и UI продолжит работать; при восстановлении
+            // БД revocation check вернётся.
         }
 
         return response()->json([

@@ -206,6 +206,42 @@ final class IqmoJwtRevocationTest extends TestCase
         $afterCall->assertJson(['error' => 'unauthorized']);
     }
 
+    public function test_me_endpoint_also_enforces_revocation(): void
+    {
+        // /api/me НЕ под iqmo.jwt middleware (guest-friendly endpoint),
+        // но обязан тоже соблюдать revocation. Иначе после
+        // logout-everywhere UI продолжал бы видеть юзера залогиненным,
+        // пока следующий profile/analytics-запрос не вернёт 401.
+        $jwt = $this->jwtFor(self::USER_ID, 1);
+
+        $okResp = $this->withCredentials()
+            ->withCookies(['iqmo_session' => $jwt])
+            ->getJson('/api/me');
+        $okResp->assertStatus(200);
+        $okResp->assertJson(['id' => self::USER_ID]);
+
+        DB::connection('iqmo')->table('users')->where('id', self::USER_ID)->update(['token_version' => 99]);
+
+        $revokedResp = $this->withCredentials()
+            ->withCookies(['iqmo_session' => $jwt])
+            ->getJson('/api/me');
+        $revokedResp->assertStatus(401);
+        $revokedResp->assertJson(['error' => 'unauthorized']);
+    }
+
+    public function test_me_endpoint_rejects_jwt_for_deleted_user(): void
+    {
+        $jwt = $this->jwtFor(self::USER_ID, 1);
+
+        DB::connection('iqmo')->table('profile_state')->where('user_id', self::USER_ID)->delete();
+        DB::connection('iqmo')->table('users')->where('id', self::USER_ID)->delete();
+
+        $resp = $this->withCredentials()
+            ->withCookies(['iqmo_session' => $jwt])
+            ->getJson('/api/me');
+        $resp->assertStatus(401);
+    }
+
     /**
      * Подписывает JWT в legacy-формате (без поля `tv` в payload). Нужен
      * для test_legacy_jwt_without_tv_is_treated_as_tv_1: эмулируем
