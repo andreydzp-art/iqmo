@@ -12,6 +12,11 @@ CREATE TABLE IF NOT EXISTS users (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   email VARCHAR(320) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
+  -- Server-side JWT revocation (audit #3): каждый выпущенный JWT
+  -- содержит token_version на момент выдачи. INCREMENT этого поля
+  -- (logout-everywhere / в будущем — смена пароля) делает все ранее
+  -- выпущенные токены этого юзера невалидными.
+  token_version INT UNSIGNED NOT NULL DEFAULT 1,
   created_at BIGINT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uq_users_email (email)

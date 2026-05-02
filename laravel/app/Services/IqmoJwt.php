@@ -53,7 +53,12 @@ final class IqmoJwt
     }
 
     /**
-     * @param  array{uid:int|string,email:string}  $payload
+     * Подписывает JWT. Поле `tv` — token_version юзера на момент выдачи
+     * (audit #3). Middleware AuthenticateIqmoJwt сверяет его с актуальным
+     * значением в БД; INCREMENT token_version в users (logout-everywhere /
+     * сброс пароля) делает все ранее выпущенные токены невалидными.
+     *
+     * @param  array{uid:int|string,email:string,tv?:int}  $payload
      */
     public function sign(array $payload, int $ttlSeconds = 30 * 86400): string
     {
@@ -62,6 +67,7 @@ final class IqmoJwt
         $body = [
             'uid' => (int) $payload['uid'],
             'email' => (string) $payload['email'],
+            'tv' => isset($payload['tv']) ? (int) $payload['tv'] : 1,
             'iat' => $now,
             'exp' => $now + $ttlSeconds,
         ];
@@ -78,7 +84,12 @@ final class IqmoJwt
     }
 
     /**
-     * @return array{uid:int,email:string,iat:int,exp:int}|null
+     * Возвращает payload или null. Поле `tv` присутствует всегда:
+     * для JWT, выпущенных ДО фикса audit #3 (без `tv` в теле),
+     * возвращаем `tv = 1` — чтобы не разлогинивать существующих
+     * пользователей; в БД у всех users token_version по умолчанию 1.
+     *
+     * @return array{uid:int,email:string,tv:int,iat:int,exp:int}|null
      */
     public function verify(string $token): ?array
     {
@@ -127,6 +138,10 @@ final class IqmoJwt
         return [
             'uid' => $uid,
             'email' => $email,
+            // Backward compat: токены без tv (выпущенные до миграции
+            // audit #3) считаются tv=1, что совпадает с дефолтом колонки
+            // users.token_version. Принудительного разлогина нет.
+            'tv' => isset($payload['tv']) ? (int) $payload['tv'] : 1,
             'iat' => (int) ($payload['iat'] ?? 0),
             'exp' => $exp,
         ];

@@ -104,6 +104,48 @@ final class IqmoAuthController extends Controller
         return $resp;
     }
 
+    /**
+     * POST /api/auth/logout-everywhere — server-side revocation всех
+     * активных JWT этого юзера (audit #3). INCREMENT users.token_version:
+     * любой ранее выпущенный JWT с tv = N перестаёт совпадать с
+     * актуальным tv = N+1 в БД, и AuthenticateIqmoJwt отдаёт 401 на
+     * следующем же запросе с этого токена.
+     *
+     * Сценарии использования:
+     *   • украдено устройство / cookie утёк через XSS — кнопка «Выйти на
+     *     всех устройствах» в profile;
+     *   • при смене пароля (когда endpoint появится) этот же механизм
+     *     вызывается из контроллера автоматически, чтобы старые сессии
+     *     не пережили password rotation.
+     *
+     * Mounted под `iqmo.jwt`: к моменту хендлера middleware уже
+     * подтвердил существующий валидный токен и положил uid в attributes.
+     */
+    public function logoutEverywhere(Request $request)
+    {
+        $userId = (int) $request->attributes->get('iqmo_user_id', 0);
+        if ($userId <= 0) {
+            return response()->json(['error' => 'unauthorized'], 401);
+        }
+
+        try {
+            DB::connection('iqmo')->table('users')->where('id', $userId)->increment('token_version');
+        } catch (\Throwable $e) {
+            // Колонка отсутствует на старом инстансе — миграция не
+            // прокатилась. Без неё нечего инкрементить; отдаём 503,
+            // чтобы клиент мог повторить позже / показать пользователю.
+            report($e);
+
+            return response()->json(['error' => 'revocation_unavailable'], 503);
+        }
+
+        $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
+        $resp = response()->json(['ok' => true]);
+        $resp->headers->clearCookie($cookieName, path: '/');
+
+        return $resp;
+    }
+
     public function me(Request $request)
     {
         $jwt = IqmoJwt::fromConfig();
@@ -188,7 +230,25 @@ final class IqmoAuthController extends Controller
 
     private function issueSessionCookie(int $userId, string $email): void
     {
-        $token = IqmoJwt::fromConfig()->sign(['uid' => $userId, 'email' => $email]);
+        // Включаем актуальный token_version в payload (audit #3). Если
+        // колонки ещё нет (свежий VPS, миграция не прокатилась) или строка
+        // отсутствует — используем 1 как дефолт. Любое расхождение с
+        // users.token_version в middleware = 401.
+        $tv = 1;
+        try {
+            $row = DB::connection('iqmo')
+                ->table('users')
+                ->select('token_version')
+                ->where('id', $userId)
+                ->first();
+            if ($row && isset($row->token_version)) {
+                $tv = (int) $row->token_version;
+            }
+        } catch (\Throwable $e) {
+            // Колонки нет — schema ещё не мигрирована. Подписываем tv=1.
+        }
+
+        $token = IqmoJwt::fromConfig()->sign(['uid' => $userId, 'email' => $email, 'tv' => $tv]);
         $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
         $domain = config('iqmo.cookie_domain');
         if (!is_string($domain) || $domain === '') {

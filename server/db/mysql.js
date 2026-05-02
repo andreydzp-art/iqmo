@@ -36,11 +36,23 @@ CREATE TABLE IF NOT EXISTS users (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   email VARCHAR(320) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
+  token_version INT UNSIGNED NOT NULL DEFAULT 1,
   created_at BIGINT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uq_users_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 `);
+
+	// Если таблица была создана до фикса (audit #3) — догоним колонкой.
+	// IF NOT EXISTS на ADD COLUMN поддерживается MySQL 8.0.29+; для
+	// старее — попробуем добавить и проигнорим ER_DUP_FIELDNAME (1060).
+	try {
+		await pool.query('ALTER TABLE users ADD COLUMN token_version INT UNSIGNED NOT NULL DEFAULT 1 AFTER password_hash');
+	} catch (e) {
+		if (!e || (e.errno !== 1060 && !/Duplicate column name/i.test(String(e.message || '')))) {
+			throw e;
+		}
+	}
 
 	await pool.query(`
 CREATE TABLE IF NOT EXISTS profile_state (

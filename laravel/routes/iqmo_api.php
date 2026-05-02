@@ -37,6 +37,10 @@ Route::prefix('api')->group(function (): void {
         // — clients reuse the same URL they used to identify themselves.
         Route::delete('/auth/me', [IqmoAuthController::class, 'deleteMe']);
 
+        // JWT revocation: INCREMENT users.token_version делает все ранее
+        // выпущенные токены этого юзера невалидными (audit #3).
+        Route::post('/auth/logout-everywhere', [IqmoAuthController::class, 'logoutEverywhere']);
+
         Route::post('/analytics/events', [AnalyticsIngestController::class, 'store'])
             ->middleware('throttle:analytics-ingest');
     });
