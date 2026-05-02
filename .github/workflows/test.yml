@@ -88,9 +88,8 @@ jobs:
         run: node scripts/sync-site.mjs
 
       - name: Run Feature tests (sqlite-only subset)
-        # AnalyticsIngestTest and IqmoAuthThrottleTest swap the `iqmo`
-        # connection to in-memory sqlite; LoginRedirectTest doesn't touch the
-        # DB at all. Все три гоняются без внешнего MySQL.
+        # Все эти тесты подменяют iqmo-connection на in-memory sqlite
+        # (или вообще не трогают БД), поэтому MySQL не нужен.
         # shivammathur/setup-php@v2 ships pdo_sqlite by default, поэтому
         # дополнительной обвязки не нужно.
-        run: vendor/bin/phpunit --filter='AnalyticsIngestTest|LoginRedirectTest|IqmoAuthThrottleTest' --no-coverage
+        run: vendor/bin/phpunit --filter='AnalyticsIngestTest|LoginRedirectTest|IqmoAuthThrottleTest|IqmoProfileStateMismatchTest' --no-coverage

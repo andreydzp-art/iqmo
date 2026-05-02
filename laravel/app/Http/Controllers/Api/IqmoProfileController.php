@@ -39,6 +39,21 @@ final class IqmoProfileController extends Controller
         $userId = (int) $request->attributes->get('iqmo_user_id');
 
         $body = $request->all();
+
+        // Защита от stale-tab race (audit #4): фронт включает в payload
+        // expected_user_id — UID, под которым вкладка стартовала. Если
+        // на сервере request->user_id (берётся из JWT cookie) с ним не
+        // совпадает, значит cookie успела смениться (logout/login другого
+        // юзера в соседней вкладке) — данные первой вкладки нельзя
+        // записывать в state нового аккаунта. Возвращаем 409, фронт на
+        // это просто дропнет push (см. iqmo-sync.js → handlePushResponse).
+        // Параметр опциональный для обратной совместимости: старые
+        // клиенты без expected_user_id всё ещё работают.
+        $expected = $body['expected_user_id'] ?? null;
+        if ($expected !== null && (int) $expected !== $userId) {
+            return response()->json(['error' => 'user_mismatch'], 409);
+        }
+
         $incomingKeys = $body['keys'] ?? null;
         if (!is_array($incomingKeys)) {
             return response()->json(['error' => 'keys_required'], 400);

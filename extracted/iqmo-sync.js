@@ -16,6 +16,18 @@
 	let lastKnownRevision = null;
 	let dirtyTimer = null;
 	let authed = false;
+	// UID, под которым эта вкладка стартовала (записывается в init() после
+	// /api/me). Не меняется в течение жизни вкладки. Используется в двух
+	// местах для защиты от stale-tab race (audit #4):
+	//   1. (client-side) Перед каждым push сравниваем с актуальным значением
+	//      localStorage[LAST_UID_KEY]. Если они разошлись — другая вкладка
+	//      сменила пользователя, и эта вкладка stale: не push'им, иначе
+	//      данные A уйдут под cookie B.
+	//   2. (server-side) Включаем myUid в payload как expected_user_id;
+	//      если на сервере request->user_id (из JWT cookie) с ним не
+	//      совпадает, контроллер отвергает PUT с 409 user_mismatch.
+	let myUid = null;
+	let staleUid = false;
 
 	window.__IQMO_SYNC__ = true;
 
@@ -113,6 +125,30 @@
 		} catch (e) {}
 	}
 
+	// Stale-tab guard (audit #4). Эта вкладка считается stale, если другая
+	// вкладка в этом браузере сменила залогиненного пользователя (logout +
+	// login другого аккаунта без перезагрузки нашей вкладки). Сценарий:
+	//   1. Tab A открыта и init() прошёл под user A → myUid = A.
+	//   2. В tab B пользователь делает logout + login B. iqmo-nav.js
+	//      стирает iqmo-last-uid (logout) → init() в tab B пишет B.
+	//   3. Tab A об этом не знает — её JS уже инициализирован, cookie у
+	//      браузера общая (теперь на B). Без guard'а её следующий push
+	//      (interval/beforeunload) ушёл бы с keys A под cookie B → данные
+	//      A залились бы в state B.
+	// Двойная защита: client-side (этот guard) + server-side
+	// (expected_user_id в payload, контроллер вернёт 409 user_mismatch).
+	function isStale() {
+		if (staleUid) return true;
+		try {
+			const stored = localStorage.getItem(LAST_UID_KEY);
+			if (myUid != null && stored != null && String(stored) !== String(myUid)) {
+				staleUid = true;
+				return true;
+			}
+		} catch (e) {}
+		return false;
+	}
+
 	function applyKeys(obj) {
 		if (!obj || typeof obj !== 'object') return;
 		const incoming = Object.keys(obj);
@@ -154,14 +190,27 @@
 		return { ok: true, revision: j.revision };
 	}
 
+	function buildPushBody(keys) {
+		const body = { baseRevision: lastKnownRevision, keys: keys };
+		// expected_user_id — server-side проверка на stale-tab race.
+		// Бэкенд (IqmoProfileController::statePut) вернёт 409 user_mismatch,
+		// если cookie на проде указывает на другой UID. Не отправляем при
+		// myUid == null (то есть до завершения init или для гостей).
+		if (myUid != null) body.expected_user_id = Number(myUid);
+		return JSON.stringify(body);
+	}
+
 	async function pushState(force) {
 		if (!authed) return;
+		// Stale-tab guard. Если другая вкладка перелогинилась, наш push
+		// уйдёт с данными старого юзера под cookie нового — защищаемся.
+		if (isStale()) return;
 		let keys = collectKeys();
 		let r = await fetch(API + '/api/profile/state', {
 			method: 'PUT',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ baseRevision: lastKnownRevision, keys })
+			body: buildPushBody(keys)
 		});
 		if (r.status === 401) return;
 		if (r.status === 409) {
@@ -169,6 +218,14 @@
 			try {
 				j = await r.json();
 			} catch (e) {}
+			// Сервер тоже ловит stale-tab (defense-in-depth). Если ответ —
+			// user_mismatch, не пытаемся retry: cookie указывает не на нас,
+			// retry с теми же expected_user_id даст ту же 409 — петля без
+			// смысла. Просто отмечаем stale и выходим.
+			if (j && j.error === 'user_mismatch') {
+				staleUid = true;
+				return;
+			}
 			if (j.server && j.server.keys) {
 				applyKeys(j.server.keys);
 				lastKnownRevision = j.server.revision;
@@ -181,7 +238,7 @@
 				method: 'PUT',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ baseRevision: lastKnownRevision, keys })
+				body: buildPushBody(keys)
 			});
 		}
 		if (!r.ok) return;
@@ -249,15 +306,41 @@
 				if (currentUid != null) localStorage.setItem(LAST_UID_KEY, currentUid);
 			} catch (eUid) {}
 
+			// Фиксируем UID этой вкладки до конца её жизни. Любое
+			// несовпадение localStorage[LAST_UID_KEY] с myUid означает, что
+			// другая вкладка успела перелогиниться (см. isStale).
+			myUid = currentUid;
+
+			// storage-event приходит в эту вкладку, когда ДРУГАЯ вкладка
+			// меняет localStorage. В своей же вкладке он не fires. Нам
+			// достаточно поймать момент logout/login в другой вкладке: там
+			// меняется LAST_UID_KEY (writeback в init() новой вкладки) или
+			// он удаляется (logout-handler в iqmo-nav.js). После этого
+			// эта вкладка stale — push'ить нельзя.
+			window.addEventListener('storage', function (ev) {
+				if (!ev || ev.key !== LAST_UID_KEY) return;
+				if (myUid == null) return;
+				if (ev.newValue == null) {
+					// Logout в другой вкладке стёр маркер.
+					staleUid = true;
+					return;
+				}
+				if (String(ev.newValue) !== String(myUid)) {
+					// Другая вкладка залогинила другого юзера.
+					staleUid = true;
+				}
+			});
+
 			setInterval(function () {
 				pushState(false);
 			}, 90000);
 
 			window.addEventListener('beforeunload', function () {
 				if (!authed) return;
+				if (isStale()) return;
 				try {
 					const keys = collectKeys();
-					const body = JSON.stringify({ baseRevision: lastKnownRevision, keys });
+					const body = buildPushBody(keys);
 					fetch(API + '/api/profile/state', {
 						method: 'PUT',
 						credentials: 'include',
