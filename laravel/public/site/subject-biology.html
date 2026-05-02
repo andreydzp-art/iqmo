@@ -33,16 +33,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
 <style>
   :root{
-    --bg:#f6f8f7; --bg-2:#eef3ef; --surface:#fff;
-    --line:#e2ece6; --line-2:#eef3ef;
-    --ink:#0f1f1a; --ink-2:#1f3a30; --muted:#5d7368; --muted-2:#94a89c;
-    --primary:#10b981; --primary-2:#34d399; --primary-50:#d1fae5;
-    --violet:#0ea371; --violet-50:#ecfdf5;
+    /* Унифицированные токены — общие для всех предметов IQMO. Цвет
+       предмета остаётся ТОЛЬКО в .subj-ico (subject-mark) и в тонкой
+       полоске у активного пункта сайдбара. Всё остальное — индиго. */
+    --bg:#f6f7fb; --bg-2:#eef0f7; --surface:#fff;
+    --line:#e6e8f0; --line-2:#eef0f7;
+    --ink:#0f1226; --ink-2:#2a2e4a; --muted:#6b7094; --muted-2:#9aa0bf;
+    --primary:#4f46e5; --primary-2:#6366f1; --primary-50:#eef0ff; --primary-100:#e0e3ff;
+    --violet:#7c3aed; --violet-50:#f3eeff;
     --emerald:#10b981; --emerald-50:#e7faf2;
     --amber:#f59e0b; --amber-50:#fef3c7;
     --rose:#dc2626; --rose-50:#fee2e2;
-    --shadow-sm:0 1px 2px rgba(15,31,26,.04),0 1px 1px rgba(15,31,26,.03);
-    --shadow:0 1px 2px rgba(15,31,26,.04),0 8px 24px rgba(15,31,26,.06);
+    /* Семантика геймификации (одинаковая для всех предметов) */
+    --accent:#f59e0b; --accent-2:#d97706; --accent-50:#fef3c7;
+    --success:#10b981; --success-50:#d1fae5;
+    --danger:#ef4444; --danger-50:#fee2e2;
+    --coral:#dc2626; --coral-50:#fee2e2;
+    /* Subject-marks — ТОЛЬКО для аватаров предметов */
+    --bio-1:#34d399; --bio-2:#10b981;
+    --chem-1:#a78bfa; --chem-2:#7c3aed;
+    --phys-1:#60a5fa; --phys-2:#2563eb;
+    --hist-1:#fb923c; --hist-2:#ea580c;
+    --shadow-sm:0 1px 2px rgba(15,18,38,.04),0 1px 1px rgba(15,18,38,.03);
+    --shadow:0 1px 2px rgba(15,18,38,.04),0 8px 24px rgba(15,18,38,.06);
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -54,7 +67,8 @@
   /* ===== NAV ===== */
   .nav{ display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow-sm);}
   .brand{ display:flex; align-items:center; gap:12px;}
-  .brand-mark{ width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--primary),var(--violet));}
+  /* Бренд-марка одинаковая на всех предметах — индиго→фиолет (бренд IQMO) */
+  .brand-mark{ width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,#4f46e5,#7c3aed);}
   .brand-name{font-weight:800; font-size:15px;}
   .brand-sep{ color:var(--line); margin:0 14px;}
   .breadcrumbs{ color:var(--muted); font-size:13.5px;}
@@ -78,7 +92,8 @@
   .page-head > .ph-info{ grid-area:info; min-width:0;}
   .page-head > .stat-cluster{ grid-area:stats;}
   .page-head > .xp-row{ grid-area:xp;}
-  .page-head::before{ content:""; position:absolute; right:-10%; bottom:-60%; width:520px; height:520px; background:radial-gradient(closest-side,rgba(124,58,237,.10),transparent 70%); pointer-events:none;}
+  /* Едва заметный «mood» — radial-gradient из цвета предмета (через --mood inline) */
+  .page-head::before{ content:""; position:absolute; right:-10%; bottom:-60%; width:520px; height:520px; background:radial-gradient(closest-side,var(--mood,#34d399),transparent 70%); opacity:.10; pointer-events:none;}
 
   /* ===== XP PROGRESS ROW ===== */
   .xp-row{
@@ -120,6 +135,11 @@
   @media (max-width:1100px){ .xp-row{ grid-template-columns:1fr; gap:14px;} .xp-row .xp-lvl.next{ justify-self:end;} }
   .crumb-back{ color:var(--muted); font-size:12.5px; display:inline-flex; align-items:center; gap:6px;}
   .crumb-back:hover{ color:var(--ink-2);}
+  /* «Все предметы» сейчас не ведёт никуда (раздела со списком предметов
+     пока нет). Делаем элемент визуально неактивным — без подчёркивания,
+     ховера и pointer-cursor, чтобы пользователь не кликал в никуда. */
+  .crumb-back.is--disabled{ cursor:default; opacity:.55; text-decoration:none; pointer-events:none; }
+  .crumb-back.is--disabled:hover{ color:var(--muted); }
   .subj{ display:flex; align-items:center; gap:18px; margin-top:8px;}
   .subj-ico{ width:64px; height:64px; border-radius:18px; background:linear-gradient(180deg,#34d399,#059669); color:#fff; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 10px 24px -6px rgba(5,150,105,.55); font-size:30px; font-weight:800;}
   .subj h1{ margin:0; font-size:34px; line-height:1.05; letter-spacing:-.02em; font-weight:800;}
@@ -144,23 +164,23 @@
 
   /* ===== HERO CURRENT ===== */
   .hero-current{
-    background:linear-gradient(135deg,#eafdf3 0%,#dcf6e7 55%,#e6fcef 100%);
-    color:var(--ink); border:1px solid #c8eed8; border-radius:28px; padding:32px 36px 28px; position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#eef0ff 0%,#e9e4ff 55%,#efe6ff 100%);
+    color:var(--ink); border:1px solid #dcd9ff; border-radius:28px; padding:32px 36px 28px; position:relative; overflow:hidden;
     display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:28px; align-items:start;
     box-shadow:var(--shadow-sm);
   }
   .hc-illu{ margin-top:-72px; margin-bottom:-40px; align-self:start; }
-  .hero-current::before{ content:""; position:absolute; right:-150px; top:-80px; width:480px; height:480px; background:radial-gradient(closest-side,rgba(52,211,153,.30),transparent 70%); pointer-events:none;}
-  .hero-current::after{ content:""; position:absolute; left:-100px; bottom:-150px; width:380px; height:380px; background:radial-gradient(closest-side,rgba(16,185,129,.18),transparent 70%); pointer-events:none;}
+  .hero-current::before{ content:""; position:absolute; right:-150px; top:-80px; width:480px; height:480px; background:radial-gradient(closest-side,rgba(167,139,250,.35),transparent 70%); pointer-events:none;}
+  .hero-current::after{ content:""; position:absolute; left:-100px; bottom:-150px; width:380px; height:380px; background:radial-gradient(closest-side,rgba(99,102,241,.18),transparent 70%); pointer-events:none;}
   .hc-inner{ position:relative; z-index:1;}
-  .hc-eye{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#059669; display:inline-flex; align-items:center; gap:8px;}
+  .hc-eye{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--violet); display:inline-flex; align-items:center; gap:8px;}
   .hc-title{ font-size:32px; font-weight:800; letter-spacing:-.02em; margin:8px 0 6px; line-height:1.1; color:var(--ink);}
   .hc-title em{ font-style:normal; background:linear-gradient(180deg,#f59e0b,#d97706); -webkit-background-clip:text; -webkit-text-fill-color:transparent;}
   .hc-sub{ font-size:14.5px; color:var(--ink-2); line-height:1.5; max-width:48ch;}
   .hc-stats{ margin-top:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
   .hc-stat{ background:rgba(255,255,255,.65); border:1px solid rgba(255,255,255,.9); border-radius:14px; padding:12px 14px; backdrop-filter:blur(4px);}
   .hc-stat-num{ font-size:22px; font-weight:800; letter-spacing:-.01em; color:var(--ink);}
-  .hc-stat-lbl{ font-size:11px; color:#059669; margin-top:3px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;}
+  .hc-stat-lbl{ font-size:11px; color:var(--violet); margin-top:3px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;}
   .hc-cta-row{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;}
   .hc-btn{ height:46px; padding:0 22px; border-radius:12px; background:linear-gradient(180deg,var(--primary-2),var(--primary)); color:#fff; border:0; font-weight:700; font-size:14px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 10px 22px -6px rgba(79,70,229,.55);}
   .hc-btn.ghost{ background:rgba(255,255,255,.7); color:var(--ink-2); border:1px solid rgba(15,18,38,.08); box-shadow:none;}
@@ -187,7 +207,7 @@
   .fmt:hover{ transform:translateY(-2px); box-shadow:var(--shadow); border-color:var(--primary-50);}
   .fmt__head{ display:flex; align-items:center; gap:12px;}
   .fmt__icon{ width:44px; height:44px; border-radius:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .fmt__icon.ico-warm{ background:var(--emerald-50); color:var(--emerald);}
+  .fmt__icon.ico-warm{ background:#fff1e7; color:#c2410c;}
   .fmt__icon.ico-quick{ background:var(--primary-50); color:var(--primary);}
   .fmt__icon.ico-full{ background:var(--amber-50); color:#b45309;}
   .fmt__icon.ico-cat{ background:var(--bg-2); color:var(--ink-2);}
@@ -334,7 +354,11 @@
   .subj-item{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; color:var(--ink-2); font-weight:600; font-size:13.5px; transition:background .15s, color .15s; position:relative; cursor:pointer;}
   .subj-item:hover{ background:var(--bg);}
   .subj-item.active{ background:var(--primary-50); color:var(--primary);}
-  .subj-item.active::before{ content:""; position:absolute; left:-14px; top:8px; bottom:8px; width:3px; background:var(--primary); border-radius:0 3px 3px 0;}
+  /* Тонкая accent-полоска — единственное, кроме иконки, что красится в цвет предмета */
+  .subj-item.active::before{ content:""; position:absolute; left:-14px; top:8px; bottom:8px; width:3px; background:var(--mark, var(--primary)); border-radius:0 3px 3px 0;}
+  .subj-item.tone-bio.active::before { background:var(--bio-2);}
+  .subj-item.tone-chem.active::before{ background:var(--chem-2);}
+  .subj-item.tone-phys.active::before{ background:var(--phys-2);}
   .subj-item__ico{ width:30px; height:30px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; background:var(--tone,#eef1f6); color:var(--tone-ink,#2a2f38);}
   .subj-item__ico svg{ width:16px; height:16px;}
   .subj-item__lbl{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -379,12 +403,12 @@
   </header>
 
   <!-- PAGE HEAD -->
-  <section class="page-head">
+  <section class="page-head" style="--mood:#34d399">
     <div class="ph-info">
-      <a href="./index.html" class="crumb-back">
+      <span class="crumb-back is--disabled" aria-disabled="true" title="Раздел «Все предметы» появится позже">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         Все предметы
-      </a>
+      </span>
       <div class="subj">
         <div class="subj-ico" aria-hidden="true">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -810,7 +834,7 @@
 
 <script src="./biology-bank.js?v=11"></script>
 <script src="./biology-variants.js?v=2"></script>
-<script src="./chem-progress.js?v=2"></script>
+<script src="./chem-progress.js?v=3"></script>
 <script src="./mistakes-store.js"></script>
 <script src="./iqmo-sync.js"></script>
 <script src="./iqmo-nav.js"></script>
@@ -895,18 +919,16 @@
     var elS = document.getElementById('pc-streak'); if (elS) elS.textContent = String(streakDays);
     var elP = document.getElementById('pc-points'); if (elP) elP.textContent = fmtPts(pts);
     var elT = document.getElementById('pc-tests'); if (elT) elT.textContent = approxTests > 0 ? String(approxTests) + '+' : '0';
-    // initials
-    var anon = '';
-    try { anon = localStorage.getItem('iqmo-chem-anon-id') || ''; } catch (e) {}
-    var ini = 'ИК';
-    if (anon.length >= 2) {
-      var compact = anon.replace(/[^a-zA-Z0-9]/g, '');
-      if (compact.length >= 2) ini = compact.slice(0, 2).toUpperCase();
-      else ini = anon.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 2).toUpperCase() || 'ИК';
-    }
-    if (ini.length < 2) ini = 'ИК';
-    var av = document.getElementById('pc-avatar');         if (av)  av.textContent = ini;
-    var nav = document.getElementById('nav-avatar');       if (nav) nav.textContent = ini;
+    // Раньше в аватарках в шапке и в карточке профиля показывались
+    // инициалы из anon-id (типа «4В»), и пользователи путали их с
+    // номером класса. По просьбе показываем номер уровня — он коротко
+    // и однозначно говорит «у меня 7-й уровень в IQMO».
+    var lvlText = String(stg);
+    var lvlTitle = 'Уровень ' + stg + (stageTitle ? ' · ' + stageTitle : '');
+    var av = document.getElementById('pc-avatar');
+    if (av) { av.textContent = lvlText; av.setAttribute('title', lvlTitle); av.setAttribute('aria-label', lvlTitle); }
+    var nav = document.getElementById('nav-avatar');
+    if (nav) { nav.textContent = lvlText; nav.setAttribute('title', lvlTitle); nav.setAttribute('aria-label', lvlTitle); }
 
     // days on platform: для авторизованных — от даты регистрации; для гостей — от первого
     // визита в этом браузере (localStorage). createdAt прилетает из /api/me через iqmo-nav.js.
