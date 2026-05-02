@@ -106,19 +106,35 @@
 					});
 				} catch (e2) {}
 				try { localStorage.setItem('iqmo_auth_hint', '0'); } catch (eHint2) {}
-				// Изоляция данных между аккаунтами: при logout стираем
-				// iqmo-chem-* и маркер iqmo-last-uid. Иначе следующий
-				// залогинившийся в этом браузере увидит чужой прогресс
-				// (localStorage переживает logout) и iqmo-sync.js при
-				// первом заходе нового аккаунта запушит его на сервер.
+				// Изоляция данных между аккаунтами: при logout стираем все
+				// user-scoped ключи в localStorage и маркер iqmo-last-uid.
+				// Иначе следующий залогинившийся в этом браузере увидит
+				// чужой прогресс (localStorage переживает logout). Список
+				// должен совпадать с iqmo-sync.js → wipeUserScopedKeys.
+				// Включает: iqmo-chem-* (синкается на сервер), iqmo-bio-*
+				// (живёт только локально — без чистки протекал прогресс
+				// биологии в новый аккаунт), очередь аналитики и nudge.
 				try {
-					var CHEM_PREFIX = 'iqmo-chem-';
+					var WIPE_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
+					var WIPE_KEYS = [
+						'iqmo-analytics-queue-v1',
+						'iqmo-regnudge-dismissed-at',
+						'iqmo-last-uid'
+					];
 					var toWipe = [];
 					for (var i = 0; i < localStorage.length; i++) {
 						var k = localStorage.key(i);
-						if (k && (k.indexOf(CHEM_PREFIX) === 0 || k === 'iqmo-last-uid')) {
-							toWipe.push(k);
+						if (!k) continue;
+						var matched = false;
+						for (var p = 0; p < WIPE_PREFIXES.length; p++) {
+							if (k.indexOf(WIPE_PREFIXES[p]) === 0) { matched = true; break; }
 						}
+						if (!matched) {
+							for (var q = 0; q < WIPE_KEYS.length; q++) {
+								if (k === WIPE_KEYS[q]) { matched = true; break; }
+							}
+						}
+						if (matched) toWipe.push(k);
 					}
 					for (var j = 0; j < toWipe.length; j++) {
 						localStorage.removeItem(toWipe[j]);

@@ -56,15 +56,36 @@
 		return out;
 	}
 
-	// Локальная очистка iqmo-chem-* ключей. Используется при смене пользователя
-	// и при logout. Не трогает iqmo_auth_hint и iqmo-last-uid — это служебные
-	// флаги, ими управляют отдельные кодпути.
-	function wipeChemKeys() {
+	// Все user-scoped ключи, которые нужно стирать при смене пользователя
+	// и при logout. Сюда попадает не только iqmo-chem-* (синхронизируется
+	// на сервер), но и iqmo-bio-* (живёт только локально — для биологии
+	// серверный sync ещё не реализован, поэтому без локальной очистки
+	// прогресс прошлого юзера протекал в новый аккаунт). Плюс несколько
+	// точечных ключей: очередь аналитики (события прошлого юзера могли
+	// быть отправлены от имени нового) и состояние регистрационного
+	// nudge'а (новый юзер должен решать сам, дисмиссить ли).
+	// Не трогаем iqmo_auth_hint и iqmo-last-uid — это служебные флаги,
+	// ими управляют отдельные кодпути.
+	const USER_SCOPED_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
+	const USER_SCOPED_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at'];
+
+	function isUserScopedKey(k) {
+		if (typeof k !== 'string') return false;
+		for (let i = 0; i < USER_SCOPED_PREFIXES.length; i++) {
+			if (k.indexOf(USER_SCOPED_PREFIXES[i]) === 0) return true;
+		}
+		for (let j = 0; j < USER_SCOPED_KEYS.length; j++) {
+			if (k === USER_SCOPED_KEYS[j]) return true;
+		}
+		return false;
+	}
+
+	function wipeUserScopedKeys() {
 		try {
 			const toRemove = [];
 			for (let i = 0; i < localStorage.length; i++) {
 				const k = localStorage.key(i);
-				if (k && k.indexOf(PREFIX) === 0) toRemove.push(k);
+				if (isUserScopedKey(k)) toRemove.push(k);
 			}
 			for (let j = 0; j < toRemove.length; j++) {
 				localStorage.removeItem(toRemove[j]);
@@ -180,7 +201,7 @@
 				const lastUid = localStorage.getItem(LAST_UID_KEY);
 				if (currentUid != null && lastUid != null && lastUid !== currentUid) {
 					userChanged = true;
-					wipeChemKeys();
+					wipeUserScopedKeys();
 				}
 			} catch (eLast) {}
 
