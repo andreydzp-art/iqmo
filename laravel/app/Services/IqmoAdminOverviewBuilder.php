@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -14,6 +15,9 @@ use Illuminate\Support\Facades\Schema;
 final class IqmoAdminOverviewBuilder
 {
     private const ALLOWED_DAYS = [1, 7, 14, 30];
+
+    /** Окно «онлайн» для скользящего счётчика (события / last_activity). */
+    private const ONLINE_WINDOW_MINUTES = 5;
 
     /** @return array<string, mixed> */
     public function build(int $days): array
@@ -210,6 +214,8 @@ final class IqmoAdminOverviewBuilder
             $sessionKpi['delta'] = 'нет событий в окне';
         }
 
+        $onlineKpi = $this->computeOnlineNow($nowMs, $iqmo, $hasAnalytics);
+
         $kpis = [
             [
                 'id' => 'dau',
@@ -238,10 +244,10 @@ final class IqmoAdminOverviewBuilder
             [
                 'id' => 'online',
                 'label' => 'Онлайн сейчас',
-                'value' => '—',
-                'delta' => 'н/д',
+                'value' => $onlineKpi['value'],
+                'delta' => $onlineKpi['delta'],
                 'trend' => 'flat',
-                'hint' => 'Нет счётчика активных сессий (Redis/WebSocket)',
+                'hint' => $onlineKpi['hint'],
             ],
             [
                 'id' => 'started',
@@ -586,6 +592,92 @@ final class IqmoAdminOverviewBuilder
             ];
         } catch (\Throwable $e) {
             return ['median' => null, 'count' => 0];
+        }
+    }
+
+    /**
+     * Скользящий «онлайн»: сначала analytics_events (портал с JWT/событиями),
+     * иначе — Laravel sessions при driver=database.
+     *
+     * @return array{value: string, delta: string, hint: string}
+     */
+    private function computeOnlineNow(int $nowMs, Connection $iqmo, bool $hasAnalytics): array
+    {
+        $w = self::ONLINE_WINDOW_MINUTES;
+        $wLabel = (string) $w;
+
+        try {
+            if ($hasAnalytics) {
+                $sinceMs = $nowMs - $w * 60_000;
+                $c = (int) $iqmo->table('analytics_events')
+                    ->where('occurred_at', '>=', $sinceMs)
+                    ->whereNotNull('user_id')
+                    ->selectRaw('COUNT(DISTINCT user_id) as c')
+                    ->value('c');
+
+                return [
+                    'value' => $this->fmtInt($c),
+                    'delta' => 'последние '.$wLabel.' мин',
+                    'hint' => 'Уникальные user_id с любым событием за последние '.$wLabel
+                        .' мин (analytics_events, соединение iqmo). Гостя без user_id не считаем.',
+                ];
+            }
+        } catch (\Throwable) {
+            // падаем в fallback на sessions
+        }
+
+        if (config('session.driver') !== 'database') {
+            $driver = (string) config('session.driver');
+            $hint = $hasAnalytics
+                ? 'События для онлайн не удалось прочитать, а по sessions fallback недоступен: SESSION_DRIVER=«'.$driver.'».'
+                : 'Нет analytics_events на iqmo: укажите SESSION_DRIVER=database и таблицу sessions, либо WebSocket/Redis-метрику.';
+
+            return [
+                'value' => '—',
+                'delta' => 'н/д',
+                'hint' => $hint,
+            ];
+        }
+
+        $sessionConnection = config('session.connection');
+        $table = (string) config('session.table', 'sessions');
+        $db = $sessionConnection ? DB::connection((string) $sessionConnection) : DB::connection();
+        $schema = $sessionConnection
+            ? Schema::connection((string) $sessionConnection)
+            : Schema::connection((string) config('database.default'));
+
+        if (! $schema->hasTable($table)) {
+            $hint = $hasAnalytics
+                ? 'Таблица «'.$table.'» не найдена на соединении сессий — без неё нет fallback, если запрос к analytics_events завершился ошибкой.'
+                : 'Таблица «'.$table.'» не найдена; на iqmo нет analytics_events — нечего считать.';
+
+            return [
+                'value' => '—',
+                'delta' => 'н/д',
+                'hint' => $hint,
+            ];
+        }
+
+        try {
+            $cutoff = (int) floor($nowMs / 1000) - $w * 60;
+            $c = (int) $db->table($table)
+                ->where('last_activity', '>=', $cutoff)
+                ->whereNotNull('user_id')
+                ->selectRaw('COUNT(DISTINCT user_id) as c')
+                ->value('c');
+
+            return [
+                'value' => $this->fmtInt($c),
+                'delta' => 'последние '.$wLabel.' мин',
+                'hint' => 'Уникальные user_id с сессией Laravel за последние '.$wLabel
+                    .' мин (таблица «'.$table.'»). API-клиенты без веб-сессии лучше смотрите по analytics_events в iqmo.',
+            ];
+        } catch (\Throwable) {
+            return [
+                'value' => '—',
+                'delta' => 'н/д',
+                'hint' => 'Не удалось прочитать '.$table.' для онлайн-счётчика.',
+            ];
         }
     }
 
