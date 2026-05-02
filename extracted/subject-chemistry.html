@@ -120,6 +120,11 @@
   @media (max-width:1100px){ .xp-row{ grid-template-columns:1fr; gap:14px;} .xp-row .xp-lvl.next{ justify-self:end;} }
   .crumb-back{ color:var(--muted); font-size:12.5px; display:inline-flex; align-items:center; gap:6px;}
   .crumb-back:hover{ color:var(--ink-2);}
+  /* «Все предметы» сейчас не ведёт никуда (раздела со списком предметов
+     пока нет). Делаем элемент визуально неактивным — без подчёркивания,
+     ховера и pointer-cursor, чтобы пользователь не кликал в никуда. */
+  .crumb-back.is--disabled{ cursor:default; opacity:.55; text-decoration:none; pointer-events:none; }
+  .crumb-back.is--disabled:hover{ color:var(--muted); }
   .subj{ display:flex; align-items:center; gap:18px; margin-top:8px;}
   .subj-ico{ width:64px; height:64px; border-radius:18px; background:linear-gradient(180deg,#a78bfa,#7c3aed); color:#fff; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 10px 24px -6px rgba(124,58,237,.55); font-size:30px; font-weight:800;}
   .subj h1{ margin:0; font-size:34px; line-height:1.05; letter-spacing:-.02em; font-weight:800;}
@@ -371,10 +376,10 @@
   <!-- PAGE HEAD -->
   <section class="page-head">
     <div class="ph-info">
-      <a href="./index.html" class="crumb-back">
+      <span class="crumb-back is--disabled" aria-disabled="true" title="Раздел «Все предметы» появится позже">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         Все предметы
-      </a>
+      </span>
       <div class="subj">
         <div class="subj-ico">⚗</div>
         <div>
