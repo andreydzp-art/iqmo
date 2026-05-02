@@ -2867,6 +2867,69 @@
 				seen.realLevel = heroStats.level;
 				seen.lastUnlockedId = currentIdx >= 0 ? variantInfos[currentIdx].v.id : (allRegularDone ? bossSlot.id : null);
 				gmSaveSeen(seen);
+
+				// Live-лидерборд: тянем top-4 по XP из /api/leaderboard.
+				try { lmLoadLeaderboard(); } catch (eLB) {}
+			}
+
+			// ── live leaderboard (top по XP) ───────────────────────────────
+			function lmLoadLeaderboard() {
+				var host = document.getElementById('lm-lb-host');
+				if (!host) return;
+				function fmtPts(n) {
+					try { return new Intl.NumberFormat('ru-RU').format(Math.max(0, Math.floor(n || 0))); }
+					catch (e) { return String(Math.max(0, Math.floor(n || 0))); }
+				}
+				function rowHtml(it, isTopRow) {
+					var rank = Number(it.rank) || 0;
+					var rankCls = ['', 'lm-lb-1', 'lm-lb-2', 'lm-lb-3'][rank] || '';
+					var nameRaw = it.is_me ? 'Вы' : (it.display || 'user');
+					var name = String(nameRaw).replace(/[<>&"']/g, function (c) {
+						return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' })[c];
+					});
+					var meStyle = it.is_me ? ' style="background: var(--lm-primary-50); padding: 6px 10px; margin: 0 -10px; border-radius: 10px;"' : '';
+					var nameStyle = it.is_me ? ' style="color: var(--lm-primary)"' : '';
+					var scoreStyle = it.is_me ? ' style="color: var(--lm-primary)"' : '';
+					var rankNode = isTopRow && rankCls
+						? '<div class="lm-lb-rank ' + rankCls + '">' + rank + '</div>'
+						: '<div class="lm-lb-mini"' + (it.is_me ? ' style="background: var(--lm-primary); color: #fff;"' : '') + '>' + rank + '</div>';
+					return '<div class="lm-lb-row"' + meStyle + '>' +
+						rankNode +
+						'<div class="lm-lb-name"' + nameStyle + '>' + name + '</div>' +
+						'<div class="lm-lb-score lm-num"' + scoreStyle + '>' + fmtPts(it.xp) + ' XP</div>' +
+					'</div>';
+				}
+				fetch('/api/leaderboard?limit=4', { credentials: 'include', cache: 'no-store' })
+					.then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+					.then(function (data) {
+						var items = (data && Array.isArray(data.items)) ? data.items : [];
+						if (!items.length) {
+							host.innerHTML = '<div class="lm-lb-row" style="opacity:.85">' +
+								'<div class="lm-lb-mini">—</div>' +
+								'<div class="lm-lb-name" style="color:var(--lm-muted)">Пока никто не набрал XP</div>' +
+								'<div class="lm-lb-score lm-num" style="color:var(--lm-muted)">0 XP</div>' +
+								'</div>';
+							host.removeAttribute('data-loading');
+							return;
+						}
+						var html = items.map(function (it) { return rowHtml(it, true); }).join('');
+						var meIdx = items.findIndex(function (x) { return x && x.is_me; });
+						if (meIdx < 0 && data && data.me && data.me.uid) {
+							html += '<div style="border-top:1px dashed var(--lm-line, var(--line)); margin-top:6px; padding-top:8px;">' +
+								rowHtml({ rank: data.me.rank, xp: data.me.xp, is_me: true, display: 'Вы' }, false) +
+								'</div>';
+						}
+						host.innerHTML = html;
+						host.removeAttribute('data-loading');
+					})
+					.catch(function () {
+						host.innerHTML = '<div class="lm-lb-row" style="opacity:.85">' +
+							'<div class="lm-lb-mini">—</div>' +
+							'<div class="lm-lb-name" style="color:var(--lm-muted)">Не удалось загрузить рейтинг</div>' +
+							'<div class="lm-lb-score lm-num" style="color:var(--lm-muted)">—</div>' +
+							'</div>';
+						host.removeAttribute('data-loading');
+					});
 			}
 
 			// ── helpers (lm-*) ────────────────────────────────────────────
@@ -3183,36 +3246,18 @@
 						</div>
 
 						<div class="lm-card">
-							<h3>Топ недели · группа 9-Б</h3>
-							<div class="lm-lb">
-								<div class="lm-lb-row">
-									<div class="lm-lb-rank lm-lb-1">1</div>
-									<div class="lm-lb-name">Алексей П.</div>
-									<div class="lm-lb-score lm-num">92%</div>
-								</div>
-								<div class="lm-lb-row">
-									<div class="lm-lb-rank lm-lb-2">2</div>
-									<div class="lm-lb-name">Мария Т.</div>
-									<div class="lm-lb-score lm-num">88%</div>
-								</div>
-								<div class="lm-lb-row">
-									<div class="lm-lb-rank lm-lb-3">3</div>
-									<div class="lm-lb-name">Дмитрий В.</div>
-									<div class="lm-lb-score lm-num">85%</div>
-								</div>
-								<div class="lm-lb-row" style="opacity:.85">
-									<div class="lm-lb-mini">4</div>
-									<div class="lm-lb-name" style="color:var(--lm-muted)">София Р.</div>
-									<div class="lm-lb-score lm-num" style="color:var(--lm-muted)">81%</div>
-								</div>
-								<div class="lm-lb-row" style="background: var(--lm-primary-50); padding: 8px 10px; margin: 0 -10px; border-radius: 10px;">
-									<div class="lm-lb-mini" style="background: var(--lm-primary); color: #fff;">12</div>
-									<div class="lm-lb-name" style="color: var(--lm-primary)">Ты</div>
-									<div class="lm-lb-score lm-num" style="color: var(--lm-primary)">${stats.avgScore}%</div>
+							<h3>Лидерборд IQMO <span style="font-weight:500; color:var(--lm-muted); font-size:12px;">· по XP</span></h3>
+							<div class="lm-lb" id="lm-lb-host" data-loading="1">
+								<div class="lm-lb-row" style="opacity:.7">
+									<div class="lm-lb-mini">…</div>
+									<div class="lm-lb-name" style="color:var(--lm-muted)">Загружаем рейтинг…</div>
+									<div class="lm-lb-score lm-num" style="color:var(--lm-muted)">—</div>
 								</div>
 							</div>
 							<div class="lm-card-foot">
-								<span class="lm-link" style="color:var(--lm-muted-2);cursor:default;">Демо-данные · соц. функции скоро</span>
+								<a class="lm-link" href="./profile.html">Профиль
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+								</a>
 							</div>
 						</div>
 
