@@ -817,7 +817,10 @@ h1,h2,h3,p{margin:0}
       <a href="/login.html" class="btn btn--ghost btn--sm" id="iqmo-nav-login">Вход</a>
       <a href="./profile.html" class="btn btn--ghost btn--sm" id="iqmo-nav-profile" hidden>Профиль</a>
       <button type="button" class="btn btn--ghost btn--sm" id="iqmo-nav-logout" hidden>Выйти</button>
-      <a href="#start" class="btn btn--primary btn--sm" data-open-register>Попробовать бесплатно</a>
+      <!-- Гостю — primary CTA на регистрацию; авторизованному — на учёбу.
+           Классы iqmo-only-{guest,authed} переключаются в iqmo-nav.js по /api/me. -->
+      <a href="#start" class="btn btn--primary btn--sm iqmo-only-guest" data-open-register>Попробовать бесплатно</a>
+      <a href="/subject-biology/" class="btn btn--primary btn--sm iqmo-only-authed" id="iqmo-nav-classes" hidden>К занятиям</a>
     </div>
   </div>
 </header>
@@ -1305,8 +1308,23 @@ tick(); setInterval(tick, 1000);
   }
 
   // open triggers
+  // Для залогиненного юзера форма регистрации — бессмыслица: вместо неё ведём
+  // в учёбу. Признак авторизации читаем из DOM (атрибут hidden у #iqmo-nav-profile
+  // снимается в iqmo-nav.js после успешного /api/me) — это синхронно и не задерживает
+  // клик на время сетевого запроса.
+  function isAuthedFromDom() {
+    var p = document.getElementById('iqmo-nav-profile');
+    return !!(p && !p.hasAttribute('hidden'));
+  }
   document.querySelectorAll('[data-open-register]').forEach(el=>{
-    el.addEventListener('click', e=>{ e.preventDefault(); open(); });
+    el.addEventListener('click', e=>{
+      e.preventDefault();
+      if (isAuthedFromDom()) {
+        location.href = '/subject-biology/';
+        return;
+      }
+      open();
+    });
   });
 
   // chip choice toggling (single-select per group)
