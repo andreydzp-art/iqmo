@@ -218,9 +218,19 @@ final class IqmoAuthController extends Controller
     private function ensureProfileRow(int $userId): void
     {
         $now = (int) (microtime(true) * 1000);
-        DB::connection('iqmo')->statement(
-            'INSERT IGNORE INTO profile_state (user_id, keys_json, revision, updated_at) VALUES (?, CAST(? AS JSON), 0, ?)',
-            [$userId, '{}', $now]
-        );
+        // Был raw 'INSERT IGNORE INTO ... CAST(? AS JSON)' — это MySQL-syntax,
+        // на sqlite (Feature-тесты) падал «syntax error near IGNORE».
+        // insertOrIgnore у Laravel прозрачно мапится на:
+        //   MySQL    → INSERT IGNORE INTO ...
+        //   SQLite   → INSERT OR IGNORE INTO ...
+        //   Postgres → INSERT ... ON CONFLICT DO NOTHING
+        // На MySQL колонка keys_json типа JSON — он сам парсит '{}' как валидный
+        // JSON, явный CAST не нужен.
+        DB::connection('iqmo')->table('profile_state')->insertOrIgnore([
+            'user_id' => $userId,
+            'keys_json' => '{}',
+            'revision' => 0,
+            'updated_at' => $now,
+        ]);
     }
 }

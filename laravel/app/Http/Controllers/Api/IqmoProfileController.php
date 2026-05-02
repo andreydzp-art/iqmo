@@ -170,10 +170,15 @@ final class IqmoProfileController extends Controller
     private function ensureProfileRow(int $userId): void
     {
         $now = (int) (microtime(true) * 1000);
-        DB::connection('iqmo')->statement(
-            'INSERT IGNORE INTO profile_state (user_id, keys_json, revision, updated_at) VALUES (?, CAST(? AS JSON), 0, ?)',
-            [$userId, '{}', $now]
-        );
+        // Был raw 'INSERT IGNORE INTO ... CAST(? AS JSON)' — MySQL-syntax,
+        // на sqlite в Feature-тестах падал. insertOrIgnore прозрачно даёт
+        // правильный SQL для каждого драйвера (см. IqmoAuthController).
+        DB::connection('iqmo')->table('profile_state')->insertOrIgnore([
+            'user_id' => $userId,
+            'keys_json' => '{}',
+            'revision' => 0,
+            'updated_at' => $now,
+        ]);
     }
 
     private function snapshotHistory(int $userId, ?string $prevKeysJson, int $prevRevision): void
