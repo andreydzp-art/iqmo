@@ -362,7 +362,11 @@
 						return null;
 					}
 				}
-				const REDIRECT = safeNextUrl() || '/index.html';
+				// Дефолт — корень, а НЕ /index.html: канонический URL главной — `/`,
+				// и /index.html сейчас 301-редиректит туда же. Если оставить тут
+				// /index.html, после успешного логина браузер делает лишний хоп
+				// (POST → 302 на /index.html → 301 на /).
+				const REDIRECT = safeNextUrl() || '/';
 
 				formLogin.addEventListener('submit', async function (e) {
 					e.preventDefault();

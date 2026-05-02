@@ -354,7 +354,9 @@
 						return null;
 					}
 				}
-				const REDIRECT = safeNextUrl() || '/index.html';
+				// Дефолт — корень, а НЕ /index.html (см. extracted/login.html: иначе после
+				// логина получаем лишний хоп /index.html → /).
+				const REDIRECT = safeNextUrl() || '/';
 
 				formLogin.addEventListener('submit', async function (e) {
 					e.preventDefault();
