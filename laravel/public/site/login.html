@@ -16,6 +16,14 @@
 		<!-- /Yandex.Metrika counter -->
 
 		<meta charset="UTF-8" />
+		<script>
+			// Canonicalize legacy alias in the browser (keep server 200 for smoke tests).
+			try {
+				if (location && location.pathname === '/uploads/login.html') {
+					location.replace('/login.html' + (location.search || '') + (location.hash || ''));
+				}
+			} catch (e) {}
+		</script>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>IQMO - Войти</title>
@@ -153,11 +161,11 @@
 		<!-- Header -->
 		<header class="header">
 			<div class="container header__container">
-				<a href="/index.html" class="logo header__logo" aria-label="IQMO — главная">
+				<a href="/" class="logo header__logo" aria-label="IQMO — главная">
 					<img loading="lazy" src="/uploads/img/logo.svg" width="90" height="24" alt="IQMO" />
 				</a>
 				<div class="header__btns">
-					<a href="/index.html" class="btn header__btn header__btn--back">Назад</a>
+					<a href="/" class="btn header__btn header__btn--back">Назад</a>
 				</div>
 			</div>
 		</header>

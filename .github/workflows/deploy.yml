@@ -192,6 +192,23 @@ jobs:
             exit 1
           fi
 
+          # /index.html — legacy URL для главной. Сейчас 301 на /, чтобы не было
+          # двух URL с идентичным контентом (SEO-дубль). Если кто-то добавит
+          # отдельный handler для /index.html, отдающий 200 — этот guard упадёт.
+          code_legacy_index=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/index.html" || true)
+          if [ "$code_legacy_index" != "301" ]; then
+            echo "Legacy /index.html expected 301 (SEO redirect to /), got $code_legacy_index"
+            exit 1
+          fi
+          loc_legacy_index=$(curl -sSI "$BASE/index.html" | grep -i '^location:' | tr -d '\r' | awk '{print $2}')
+          loc_legacy_index_path=$(echo "$loc_legacy_index" | sed -E 's|^https?://[^/]+||' | sed 's|/*$||')
+          # Пустой path = `/` после нормализации. Допускаем «/» или «» (если
+          # Laravel вернул только корень).
+          if [ "$loc_legacy_index_path" != "" ] && [ "$loc_legacy_index_path" != "/" ]; then
+            echo "Legacy /index.html should redirect to /, got Location: $loc_legacy_index"
+            exit 1
+          fi
+
           # Subject pages: caнoничeский URL — clean-URL без .html
           # (/subject-chemistry/, /subject-biology/), а /subject-{name}.html
           # должен 301-редиректить на новый URL для сохранения SEO.

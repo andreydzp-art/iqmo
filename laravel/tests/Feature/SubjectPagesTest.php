@@ -115,4 +115,23 @@ final class SubjectPagesTest extends TestCase
         $this->get('/full-test-math/')->assertStatus(404);
         $this->get('/full-test-physics.html')->assertStatus(404);
     }
+
+    public function test_root_serves_homepage(): void
+    {
+        // Каноничный URL главной — `/`. Должен отдавать HTML, а не редирект.
+        $response = $this->get('/');
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+    }
+
+    public function test_legacy_index_html_redirects_301_to_root(): void
+    {
+        // /index.html раньше отдавал ту же страницу, что и /, и оставлял в индексе
+        // два URL с идентичным контентом. Теперь — 301 на /.
+        $response = $this->get('/index.html');
+
+        $response->assertStatus(301);
+        $response->assertRedirect('/');
+    }
 }

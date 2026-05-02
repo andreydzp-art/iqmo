@@ -150,8 +150,12 @@ Route::get('/', function () use ($serveStatic) {
     return $serveStatic(public_path('site/index-standalone-design.html'));
 })->name('home');
 
-Route::get('/index.html', function () use ($serveStatic) {
-    return $serveStatic(public_path('site/index-standalone-design.html'));
+// Каноничный URL главной — `/` (без `.html`), симметрично subject-/full-test-/admin-
+// страницам. Старый `/index.html` 301-редиректит — поисковая выдача и внешние
+// ссылки переезжают без потерь, и в браузере не остаётся «двух главных» с
+// одинаковым контентом (дубль для индекса — антипаттерн SEO).
+Route::get('/index.html', function () {
+    return redirect('/', 301);
 })->name('iqmo.site_index');
 
 Route::get('/profile.html', function () use ($serveStatic) {
