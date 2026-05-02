@@ -1205,7 +1205,7 @@
 			.lm-nodes {
 				position: absolute; inset: 0;
 				display: grid;
-				grid-template-columns: repeat(8, 1fr);  /* 7 узлов + 1 босс = 8 ячеек */
+				grid-template-columns: repeat(7, 1fr);  /* 6 узлов + 1 босс = 7 ячеек */
 				align-items: center;
 			}
 			.lm-cell {
@@ -2670,14 +2670,14 @@
 
 				const allVariants = window.CHEMISTRY_VARIANTS || [];
 				const ready = allVariants.filter(v => v.status === 'ready');
-				// Глава 1 = первые 7 ready + 8-й как финальный босс. Если ready < 8, босс
-				// делается из последнего ready, остальные ячейки пустыми (но обычно у нас
-				// ready >> 8). Если ready < 2 — fallback-list.
+				// Глава 1 = первые 6 ready + 7-й как финальный босс (как в референсе
+				// _tmp_ft6/level-map.html — там 6 узлов + 1 boss = 7 ячеек).
+				// Если ready < 2 — fallback-list.
 				if (ready.length < 2) {
 					_renderVariantPickerFallback(picker);
 					return;
 				}
-				const chapterReady = ready.slice(0, 8); // максимум 8
+				const chapterReady = ready.slice(0, 7); // максимум 7 ячеек: 6 + босс
 				const bossId = chapterReady[chapterReady.length - 1].id;
 				const variantSlots = chapterReady.slice(0, -1); // обычные узлы
 				const bossSlot = chapterReady[chapterReady.length - 1];
@@ -2989,7 +2989,7 @@
 					`;
 				}
 				if (state === 'locked') {
-					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 7 вариантов</div>`;
+					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 6 вариантов</div>`;
 					return `<div class="lm-cap-status">Заблокирован</div>`;
 				}
 				return '';
