@@ -232,6 +232,32 @@ jobs:
             echo "Following legacy redirect gave HTTP $final_code (expected 200)"
             exit 1
           fi
+
+          # Полный пробный вариант — clean URL и 301 со старого .html, идентично
+          # /subject-<slug>/. Файлы в public/site/full-test-<slug>/index.html
+          # синхронизируются sync-site.mjs.
+          for ft in chemistry biology; do
+            code_ft=$(curl -sS -o /tmp/smoke-ft.html -w "%{http_code}" "$BASE/full-test-$ft/" || true)
+            if [ "$code_ft" != "200" ]; then
+              echo "GET /full-test-$ft/ expected 200, got $code_ft"
+              exit 1
+            fi
+            if ! grep -q "108770166" /tmp/smoke-ft.html; then
+              echo "/full-test-$ft/ missing Yandex Metrika counter — possibly stale public/$ft.html bypassing Laravel"
+              exit 1
+            fi
+            code_ft_legacy=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/full-test-$ft.html" || true)
+            if [ "$code_ft_legacy" != "301" ]; then
+              echo "Legacy /full-test-$ft.html expected 301, got $code_ft_legacy"
+              exit 1
+            fi
+            ft_final=$(curl -sSL -o /dev/null -w "%{http_code}" "$BASE/full-test-$ft.html" || true)
+            if [ "$ft_final" != "200" ]; then
+              echo "Following /full-test-$ft.html redirect gave HTTP $ft_final (expected 200)"
+              exit 1
+            fi
+          done
+
           # Проверка меню «Биология» намеренно не в smoke: сразу после deploy edge/CDN
           # может кратковременно отдавать старую HTML — ложные падения. Статика
           # гарантируется `sync-site` из `extracted/` на APP_DIR (см. docs/DEPLOY.md).

@@ -213,10 +213,10 @@ Route::get('/cabinet', function () use ($serveStatic) {
     return $serveStatic(public_path('site/profile.html'));
 })->name('cabinet');
 
-// Root-level static files referenced by pages served at `/<page>.html`.
-// Example: `full-test-chemistry.html` includes `<script src="./exam-config.js">`,
-// which resolves to `/exam-config.js` in the browser. We serve these from `public/site/`
-// to avoid duplicating files into `public/`.
+// Root-level static files referenced by pages served at `/<page>` (clean URL)
+// or `/<page>.html` (legacy). Example: страницы full-test-* подключают
+// `<script src="/exam-config.js">`, и этот маршрут отдаёт его из public/site/,
+// не дублируя файлы в public/.
 Route::get('/{file}', function (string $file) use ($serveStatic) {
     if ($file !== basename($file) || ! preg_match('/^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(js|css|map|json)$/', $file)) {
         abort(404);
@@ -265,6 +265,35 @@ Route::get('/subject-{slug}', function (string $slug) use ($serveStatic, $SUBJEC
         abort(404);
     }
     $full = public_path('site/subject-'.$slug.'/index.html');
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+})->where('slug', '[a-z0-9-]+');
+
+// `full-test-{slug}` — полный пробный вариант ОГЭ (геймифицированная карта
+// уровней + сам тест с вопросами, тот же подход к clean URL, что и у
+// /subject-<slug>/). Файлы — `public/site/full-test-<slug>/index.html`,
+// синхронизируются из `extracted/full-test-<slug>/index.html`.
+$FULL_TESTS = ['chemistry', 'biology'];
+
+Route::get('/full-test-{slug}.html', function (string $slug) use ($FULL_TESTS) {
+    if (! in_array($slug, $FULL_TESTS, true)) {
+        abort(404);
+    }
+
+    return redirect('/full-test-'.$slug.'/', 301);
+})->where('slug', '[a-z0-9-]+');
+
+Route::get('/full-test-{slug}', function (string $slug) use ($serveStatic, $FULL_TESTS) {
+    if (! preg_match('/^[a-z0-9-]+$/', $slug)) {
+        abort(404);
+    }
+    if (! in_array($slug, $FULL_TESTS, true)) {
+        abort(404);
+    }
+    $full = public_path('site/full-test-'.$slug.'/index.html');
     if (! is_file($full)) {
         abort(404);
     }

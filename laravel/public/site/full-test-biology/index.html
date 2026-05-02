@@ -22,11 +22,13 @@
 		     `no-store` стоит дешевле, чем неверная подсказка. На JS-баке кэш по-прежнему
 		     контролируется через ?v=N. -->
 		<meta http-equiv="Cache-Control" content="no-store" />
-		<title>IQMO — Полный вариант ОГЭ · Химия</title>
+		<title>IQMO — Полный вариант ОГЭ · Биология</title>
+		<link rel="canonical" href="https://www.iqmoschool.ru/full-test-biology/" />
+		<meta property="og:url" content="https://www.iqmoschool.ru/full-test-biology/" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-		<link rel="stylesheet" href="./iqmo-base.css?v=1" />
+		<link rel="stylesheet" href="/iqmo-base.css?v=1" />
 		<style>
 
 
@@ -1471,7 +1473,7 @@
 		</style>
 	</head>
 
-	<body data-exam-subject="chemistry">
+	<body data-exam-subject="biology">
 		<!-- Top -->
 		<header class="topbar">
 			<div class="topbar__head">
@@ -1479,9 +1481,9 @@
 					<div class="topbar__left">
 						<div class="brand">
 							<div class="brand-mark" aria-hidden="true"></div>
-							<a href="./index.html" class="brand-name" style="text-decoration:none; color:inherit;">IQMO</a>
+							<a href="/" class="brand-name" style="text-decoration:none; color:inherit;">IQMO</a>
 							<span class="brand-sep">/</span>
-							<div class="breadcrumbs">Химия · ОГЭ 2026 — <b>Полный вариант</b></div>
+							<div class="breadcrumbs">Биология · ОГЭ 2026 — <b>Полный вариант</b></div>
 						</div>
 					</div>
 					<div class="topbar__center">
@@ -1492,9 +1494,9 @@
 					</div>
 					<div class="topbar__right">
 						<div class="header__btns" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-							<a href="./index.html" class="btn btn--ghost">Главная</a>
+							<a href="/" class="btn btn--ghost">Главная</a>
 							<a href="/login.html" class="btn btn--ghost" id="iqmo-nav-login">Вход</a>
-							<a href="./profile.html" class="btn btn--ghost" id="iqmo-nav-profile" hidden>Профиль</a>
+							<a href="/profile.html" class="btn btn--ghost" id="iqmo-nav-profile" hidden>Профиль</a>
 							<button type="button" class="btn btn--ghost" id="iqmo-nav-logout" hidden>Выйти</button>
 						</div>
 						<button type="button" class="btn btn--ghost" id="btn-quit-exam" style="margin-left:8px;">Прервать</button>
@@ -1539,18 +1541,17 @@
 			</div>
 		</main>
 
-		<script src="./exam-config.js"></script>
-		<script src="./chemistry-bank.js?v=11"></script>
-		<script src="./chemistry-banks-bundle.js?v=9"></script>
-		<script src="./chemistry-variants.js?v=10"></script>
-		<script src="./iqmo-sync.js"></script>
-		<script src="./iqmo-nav.js"></script>
-		<script src="./iqmo-regnudge.js?v=3"></script>
-		<script src="./mistakes-store.js"></script>
-		<script src="./chem-progress.js?v=3"></script>
+		<script src="/exam-config.js"></script>
+		<script src="/biology-bank.js?v=21"></script>
+		<script src="/biology-variants.js?v=4"></script>
+		<script src="/iqmo-sync.js"></script>
+		<script src="/iqmo-nav.js"></script>
+		<script src="/iqmo-regnudge.js?v=3"></script>
+		<script src="/mistakes-store.js"></script>
+		<script src="/chem-progress.js?v=3"></script>
 		<script>
 			// ============================================================
-			// QUESTION BANK (loaded from chemistry-bank.js)
+			// QUESTION BANK (loaded from biology-bank.js)
 			// Structure per question:
 			//   id: task number (1..23)
 			//   type: 'single' | 'multi' | 'input' | 'match' | 'open'
@@ -1565,8 +1566,8 @@
 			//   matchLeft, matchRight: for 'match' type
 			//   hint: optional string
 			// ============================================================
-			const BANK = window.CHEMISTRY_QUESTIONS || [];
-			const VARIANTS = window.CHEMISTRY_VARIANTS || [];
+			const BANK = window.BIOLOGY_QUESTIONS || [];
+			const VARIANTS = window.BIOLOGY_VARIANTS || [];
 
 			// ============================================================
 			// ROUTING: variant picker vs. test
@@ -1601,14 +1602,14 @@
 			// Update subject label with variant
 			try {
 				const subj = document.querySelector('.breadcrumbs') || document.querySelector('.topbar__subject');
-				if (subj) subj.innerHTML = `Химия · ОГЭ 2026 — <b>${activeVariant.title}</b>`;
+				if (subj) subj.innerHTML = `Биология · ОГЭ 2026 — <b>${activeVariant.title}</b>`;
 			} catch(e) {}
 
 			// ============================================================
 			// STATE
 			// ============================================================
-			const LS_KEY = 'iqmo-chem-v-' + activeVariant.id;
-			const EXAM_SUBJECT = (document.body && document.body.dataset.examSubject) || 'chemistry';
+			const LS_KEY = 'iqmo-bio-v-' + activeVariant.id;
+			const EXAM_SUBJECT = (document.body && document.body.dataset.examSubject) || 'biology';
 			const FULL_MIN = window.getExamTimerMinutes ? getExamTimerMinutes(EXAM_SUBJECT, 'full') : 180;
 			const TEST_SECONDS = FULL_MIN * 60;
 			const state = loadState();
@@ -1671,7 +1672,12 @@
 			// поэтому реплики только мотивирующие, привязаны к позиции в тесте.
 			// ============================================================
 			const GM_COMPANION_LINES = {
-				start:    { e: '🧑‍🚀', t: 'Привет! Я твой <b>спутник</b>. Просто отвечай как считаешь, а в конце вместе разберём ошибки.' },
+				// Реплика для стартового экрана с картой уровней — не привязана к
+				// позиции в тесте, а здоровается и объясняет, что происходит. Без
+				// неё спутник появляется только после клика «Начать вариант» и
+				// пользователь успевает решить, что персонаж пропал.
+				hub:      { e: '🧑‍🚀', t: 'Привет! Я твой <b>спутник</b>. Выбери вариант — буду рядом во время теста и подскажу, на каком ты сейчас вопросе.' },
+				start:    { e: '🧑‍🚀', t: 'Поехали! Просто отвечай как считаешь, а в конце вместе разберём ошибки.' },
 				q5:       { e: '🚀',   t: 'Отлично, разогрелись! Дальше будет интереснее.' },
 				half:     { e: '🌗',   t: 'Половина пути. Если устал — можно вернуться к флагнутым позже.' },
 				q15:      { e: '🔬',   t: 'Третья четверть. Самые «жирные» баллы как раз здесь.' },
@@ -2040,12 +2046,12 @@
 					const COOLDOWN = 60 * 60 * 1000;
 					const vid = activeVariant.id;
 					let attempts = {};
-					try { attempts = JSON.parse(localStorage.getItem('iqmo-chem-attempts') || '{}') || {}; } catch(e){}
+					try { attempts = JSON.parse(localStorage.getItem('iqmo-bio-attempts') || '{}') || {}; } catch(e){}
 					const cur = attempts[vid] || { attempts: 0 };
 					if (ratio >= PASS) {
 						// Вариант пройден — сбрасываем счётчик, обновляем стрик
 						attempts[vid] = { attempts: 0, passedAt: Date.now() };
-						localStorage.setItem('iqmo-chem-attempts', JSON.stringify(attempts));
+						localStorage.setItem('iqmo-bio-attempts', JSON.stringify(attempts));
 					} else {
 						// Провал — увеличиваем счётчик
 						const newCount = (cur.attempts || 0) + 1;
@@ -2055,7 +2061,7 @@
 							entry.attempts = 0; // сбрасываем после активации cooldown
 						}
 						attempts[vid] = entry;
-						localStorage.setItem('iqmo-chem-attempts', JSON.stringify(attempts));
+						localStorage.setItem('iqmo-bio-attempts', JSON.stringify(attempts));
 					}
 				} catch(e) { console.error('progress update failed', e); }
 				try {
@@ -2081,7 +2087,7 @@
 				// Геймификация: «глава пройдена», если этот вариант — последний ready
 				// и его part1 ≥ 50%. Стреляем в Метрику и пускаем confetti на result-экране.
 				try {
-					const allVariants = window.CHEMISTRY_VARIANTS || [];
+					const allVariants = window.BIOLOGY_VARIANTS || [];
 					const readyOnly = allVariants.filter(v => v.status === 'ready');
 					const lastReady = readyOnly[readyOnly.length - 1];
 					const sNow = computeScoring();
@@ -2115,10 +2121,10 @@
 				const passedPart1 = part1Ratio >= 0.5;
 				let progressBanner = '';
 				try {
-					const attempts = JSON.parse(localStorage.getItem('iqmo-chem-attempts') || '{}') || {};
+					const attempts = JSON.parse(localStorage.getItem('iqmo-bio-attempts') || '{}') || {};
 					const cur = attempts[activeVariant.id];
 					if (passedPart1) {
-						const nextV = (window.CHEMISTRY_VARIANTS || []).find(v => v.id === activeVariant.id + 1 && v.status === 'ready');
+						const nextV = (window.BIOLOGY_VARIANTS || []).find(v => v.id === activeVariant.id + 1 && v.status === 'ready');
 						progressBanner = `
 							<div class="result-hint" style="background:#e7f6ec;color:#1f6b3b;border-left:3px solid var(--green);margin-top:16px;">
 								✅ Вариант пройден · <b>${s.autoPoints}/${s.autoTotal}</b> в части 1 (≥ 50%).${nextV ? ` Вариант ${nextV.id} разблокирован.` : ''}
@@ -2199,7 +2205,7 @@
 								<div style="margin-top:24px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
 									<button type="button" class="btn btn--blue" id="btn-review">${selfNeedsReview ? 'Перейти к самопроверке →' : 'Посмотреть разбор'}</button>
 									<button type="button" class="btn btn--ghost" id="btn-restart">Пройти заново</button>
-									<a href="./full-test-chemistry.html" class="btn btn--ghost">← К вариантам</a>
+									<a href="/full-test-biology/" class="btn btn--ghost">← К вариантам</a>
 								</div>
 							</div>
 						</div>
@@ -2375,7 +2381,7 @@
 						<div class="review-list">${listHtml}</div>
 						${part2Count > 0 ? `
 							<div class="sc-note">
-								📋 В реальном ОГЭ также есть <b>задание №23</b> — практическая работа в лаборатории (оксиды, соли, наблюдения). В онлайн-тренажёре оно пропущено. Рекомендуем отработать его со школьным учителем или в видео-демонстрациях.
+								📋 В реальном ОГЭ по биологии также встречаются задания с <b>анализом результатов эксперимента</b> и работы с биологической схемой/таблицей. В онлайн-тренажёре их меньше, чем в очной форме — стоит дополнительно потренироваться с учителем или по сборникам ФИПИ.
 							</div>
 						` : ''}
 					</div>
@@ -2455,7 +2461,7 @@
 			// quit
 			document.getElementById('btn-quit-exam').addEventListener('click', () => {
 				if (confirm('Прервать вариант? Ответы сохранятся, вы сможете вернуться.')) {
-					window.location.href = './full-test-chemistry.html';
+					window.location.href = '/full-test-biology/';
 				}
 			});
 			document.getElementById('btn-finish').addEventListener('click', () => {
@@ -2479,7 +2485,7 @@
 			// var (а не const) — иначе TDZ при вызовах из renderVariantPicker, который
 			// исполняется из IIFE раньше места объявления.
 			var STREAK_KEY = 'iqmo-chem-streak';
-			var ATTEMPTS_KEY = 'iqmo-chem-attempts'; // { [vid]: { attempts: n, lastFailAt: ts, cooldownUntil: ts } }
+			var ATTEMPTS_KEY = 'iqmo-bio-attempts'; // { [vid]: { attempts: n, lastFailAt: ts, cooldownUntil: ts } }
 
 			function loadAttempts() {
 				try { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '{}') || {}; }
@@ -2506,11 +2512,11 @@
 			function getVariantResult(v) {
 				// returns { passed, ok, total, ratio, inProgress } or null
 				try {
-					const raw = localStorage.getItem('iqmo-chem-v-' + v.id);
+					const raw = localStorage.getItem('iqmo-bio-v-' + v.id);
 					if (!raw) return null;
 					const s = JSON.parse(raw);
 					if (!s) return null;
-					const bank = window.CHEMISTRY_QUESTIONS || [];
+					const bank = window.BIOLOGY_QUESTIONS || [];
 					let ok = 0, total = 0;
 					(v.qids || []).forEach(qid => {
 						const q = bank.find(b => b.id === qid);
@@ -2566,14 +2572,14 @@
 				return 0;
 			}
 			// Лучший результат варианта (по части 1) с возможностью посчитать звёзды/XP.
-			// Используем тот же localStorage('iqmo-chem-v-' + id) — там лежат финальные ответы.
+			// Используем тот же localStorage('iqmo-bio-v-' + id) — там лежат финальные ответы.
 			function gmVariantBest(v) {
 				try {
-					const raw = localStorage.getItem('iqmo-chem-v-' + v.id);
+					const raw = localStorage.getItem('iqmo-bio-v-' + v.id);
 					if (!raw) return null;
 					const s = JSON.parse(raw);
 					if (!s || !s.finished) return null;
-					const bank = window.CHEMISTRY_QUESTIONS || [];
+					const bank = window.BIOLOGY_QUESTIONS || [];
 					let ok = 0, total = 0;
 					(v.qids || []).forEach(qid => {
 						const q = bank.find(b => b.id === qid);
@@ -2657,7 +2663,7 @@
 
 			// Ключ для отслеживания «свежей» разблокировки и level-up между визитами.
 			// var (а не const) — иначе TDZ при вызовах из renderVariantPicker.
-			var GM_SEEN_KEY = 'iqmo-chem-gm-seen';
+			var GM_SEEN_KEY = 'iqmo-bio-gm-seen';
 			function gmLoadSeen() {
 				try { return JSON.parse(localStorage.getItem(GM_SEEN_KEY) || '{}') || {}; }
 				catch (e) { return {}; }
@@ -2690,7 +2696,7 @@
 			}
 			function _renderVariantPickerFallback(host) {
 				if (!host) return;
-				const variants = window.CHEMISTRY_VARIANTS || [];
+				const variants = window.BIOLOGY_VARIANTS || [];
 				const ready = variants.filter(v => v.status === 'ready');
 				host.innerHTML = ready.map(v => `<a href="?v=${v.id}" style="display:inline-block;margin:4px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);text-decoration:none;font-weight:600;">${v.title || ('Вариант ' + v.id)}</a>`).join('');
 			}
@@ -2715,25 +2721,28 @@
 				picker.style.display = 'block';
 				picker.classList.add('lm');
 
-				const allVariants = window.CHEMISTRY_VARIANTS || [];
+				const allVariants = window.BIOLOGY_VARIANTS || [];
 				const ready = allVariants.filter(v => v.status === 'ready');
-				// Карта уровней = первые 6 ready + 7-й как финальный босс (как в
-				// референсе _tmp_ft6/level-map.html — 6 узлов + 1 boss = 7 ячеек).
-				// Если ready < 2 — fallback-list.
-				if (ready.length < 2) {
+				// Карта уровней = первые 6 вариантов главы + 7-й как финальный
+				// босс (как в _tmp_ft6/level-map.html — 6 узлов + 1 boss).
+				// Берём первые 7 вариантов независимо от статуса: ready=играют,
+				// coming=locked. Так карта остаётся целой даже на ранних
+				// этапах банка (биология), а в химии (29 ready) — без изменений.
+				if (allVariants.length < 7 || ready.length < 1) {
 					_renderVariantPickerFallback(picker);
 					return;
 				}
-				const chapterReady = ready.slice(0, 7); // максимум 7 ячеек: 6 + босс
-				const bossId = chapterReady[chapterReady.length - 1].id;
-				const variantSlots = chapterReady.slice(0, -1); // обычные узлы
-				const bossSlot = chapterReady[chapterReady.length - 1];
+				const chapterReady = allVariants.slice(0, 7);
+				const bossId = chapterReady[6].id;
+				const variantSlots = chapterReady.slice(0, 6); // обычные узлы
+				const bossSlot = chapterReady[6];
 
 				// Для каждого узла считаем done/current/locked.
 				const attempts = loadAttempts();
 				const streak = loadStreak();
 				const streakStatus = computeStreakStatus(streak);
 				const passOf = v => {
+					if (!v || v.status !== 'ready') return null;
 					const best = gmVariantBest(v);
 					return best && best.percent >= 50 ? best : null;
 				};
@@ -2741,22 +2750,26 @@
 					const best = passOf(v);
 					return { v, i, isBoss: false, best };
 				});
-				// Состояния обычных узлов: первый non-done = current, остальные после = locked
+				// Состояния обычных узлов: первый ready non-done = current,
+				// остальные ready после него и все coming = locked.
 				let currentIdx = -1;
 				for (let i = 0; i < variantInfos.length; i++) {
-					if (!variantInfos[i].best) { currentIdx = i; break; }
+					const vi = variantInfos[i];
+					if (vi.v.status === 'ready' && !vi.best) { currentIdx = i; break; }
 				}
 				variantInfos.forEach((vi, i) => {
 					if (vi.best) vi.state = 'done';
 					else if (i === currentIdx) vi.state = 'current';
 					else vi.state = 'locked';
 				});
-				// Босс
+				// Босс. Открыт только когда ВСЕ обычные пройдены и сам босс
+				// уже опубликован (status === 'ready').
 				const allRegularDone = variantInfos.every(vi => vi.state === 'done');
 				const bossBest = passOf(bossSlot);
+				const bossReady = bossSlot && bossSlot.status === 'ready';
 				const bossInfo = {
 					v: bossSlot, i: variantInfos.length, isBoss: true, best: bossBest,
-					state: bossBest ? 'done' : (allRegularDone ? 'current' : 'locked'),
+					state: bossBest ? 'done' : (allRegularDone && bossReady ? 'current' : 'locked'),
 				};
 
 				// Метрики карты уровней: XP, звёзды, ср. балл.
@@ -2870,7 +2883,7 @@
 						e.preventDefault();
 						const v = btn.dataset.v;
 						if (!v) return;
-						try { if (window.ym) ym(108770166, 'reachGoal', 'chem_full_hero_cta', { v }); } catch(e0) {}
+						try { if (window.ym) ym(108770166, 'reachGoal', 'bio_full_hero_cta', { v }); } catch(e0) {}
 						window.location.search = '?v=' + v;
 					});
 				});
@@ -2891,6 +2904,11 @@
 
 				// Live-лидерборд: тянем top-4 по XP из /api/leaderboard.
 				try { lmLoadLeaderboard(); } catch (eLB) {}
+
+				// Спутник встречает на витрине вариантов. Sticky — чтобы не
+				// исчезал через 5.5 с, пока пользователь читает карту уровней;
+				// крестик/клик по аватару закрывают как обычно.
+				try { gmCompanionSay('hub', { sticky: true, force: true }); } catch (eC) {}
 			}
 
 			// ── live leaderboard (top по XP) ───────────────────────────────
@@ -2994,18 +3012,18 @@
 				return `
 					<section class="lm-hero">
 						<div>
-							<a href="/subject-chemistry/" class="lm-back">
+							<a href="/subject-biology/" class="lm-back">
 								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
 								К предмету
 							</a>
-							<h1>Полный вариант ОГЭ <span class="lm-dot">·</span> Химия</h1>
+							<h1>Полный вариант ОГЭ <span class="lm-dot">·</span> Биология</h1>
 							<p class="lm-lead">${heroLead}</p>
 							<div class="lm-cta-row">
 								<button class="lm-btn lm-btn-streak" type="button" ${heroCtaAttrs}>
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="#ea580c"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7zM12 19.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
 									${heroCtaLabel}
 								</button>
-								<a href="/subject-chemistry/" class="lm-btn">
+								<a href="/subject-biology/" class="lm-btn">
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
 									Расписание
 								</a>
@@ -3229,7 +3247,7 @@
 								</div>
 							</div>
 							<div class="lm-card-foot">
-								<a class="lm-link" href="./profile.html">Подробнее
+								<a class="lm-link" href="/profile.html">Подробнее
 									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
 								</a>
 							</div>
@@ -3260,7 +3278,7 @@
 								</div>
 							</div>
 							<div class="lm-card-foot">
-								<a class="lm-link" href="./profile.html">Профиль
+								<a class="lm-link" href="/profile.html">Профиль
 									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
 								</a>
 							</div>
@@ -3276,7 +3294,7 @@
 								</div>
 							</div>
 							<div class="lm-card-foot">
-								<a class="lm-link" href="./profile.html">Профиль
+								<a class="lm-link" href="/profile.html">Профиль
 									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
 								</a>
 							</div>
@@ -3288,7 +3306,7 @@
 								${lmAchievementsHtml(stats, streakStatus)}
 							</div>
 							<div class="lm-card-foot">
-								<a class="lm-link" href="./profile.html">Все достижения
+								<a class="lm-link" href="/profile.html">Все достижения
 									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
 								</a>
 							</div>
@@ -3503,7 +3521,7 @@
 
 			function getAttemptIndex(vid) {
 				try {
-					const attempts = JSON.parse(localStorage.getItem('iqmo-chem-attempts') || '{}') || {};
+					const attempts = JSON.parse(localStorage.getItem('iqmo-bio-attempts') || '{}') || {};
 					const cur = attempts[vid];
 					return cur ? (cur.attempts || 0) : 0;
 				} catch(e){ return 0; }

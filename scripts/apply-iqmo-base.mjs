@@ -55,15 +55,20 @@ for (const f of topics) {
 }
 
 // --- trial + full-test (1220, JetBrains in URL - still Manrope first link) ---
-for (const f of ['trial-chemistry.html', 'full-test-chemistry.html']) {
-	const p = path.join(EX, f);
+// full-test-chemistry переехал в clean-URL папку (extracted/full-test-chemistry/index.html),
+// поэтому отдельная запись с явным path; trial остался плоским файлом.
+const trialFullPaths = [
+	path.join(EX, 'trial-chemistry.html'),
+	path.join(EX, 'full-test-chemistry', 'index.html'),
+];
+for (const p of trialFullPaths) {
 	let s = fs.readFileSync(p, 'utf8');
 	s = insertLinkAfterManrope(s);
 	if (BLOCK_1220.test(s)) {
 		s = s.replace(BLOCK_1220, '');
 	}
 	fs.writeFileSync(p, s, 'utf8');
-	console.log('patched', f);
+	console.log('patched', path.relative(EX, p).replaceAll('\\', '/'));
 }
 
 // --- subject-chemistry: :root..container, ul, and [hidden] before .cru ---
