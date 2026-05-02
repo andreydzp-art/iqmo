@@ -2779,9 +2779,17 @@
 					: (currentIdx >= 0 && variantInfos[currentIdx].v.id !== seen.lastUnlockedId
 						? variantInfos[currentIdx].v.id : null);
 
+				// Куда ведёт CTA «Начните серию» в hero: первый недопройденный
+				// обычный вариант → босс, если все 6 пройдены → первый вариант
+				// для перепрохождения, если пройдено всё, включая босса.
+				let nextActionId = null;
+				if (currentIdx >= 0) nextActionId = variantInfos[currentIdx].v.id;
+				else if (allRegularDone && !bossBest) nextActionId = bossSlot.id;
+				else if (variantInfos.length) nextActionId = variantInfos[0].v.id;
+
 				picker.innerHTML = `
 					<div class="lm-shell">
-						${lmHeroHtml({ heroLead, stats, globalStats, streakStatus })}
+						${lmHeroHtml({ heroLead, stats, globalStats, streakStatus, nextActionId })}
 						${lmMapHtml({ variantInfos, bossInfo, currentIdx })}
 						${lmGrid4Html({ stats, globalStats, streakStatus })}
 						${lmTipHtml(stats, bossInfo)}
@@ -2804,6 +2812,16 @@
 					btn.addEventListener('click', e => {
 						e.stopPropagation();
 						window.location.search = '?v=' + btn.dataset.v;
+					});
+				});
+				// CTA в hero «Начните серию / Серия N дней» → текущий вариант
+				picker.querySelectorAll('.lm-btn-streak[data-v]').forEach(btn => {
+					btn.addEventListener('click', e => {
+						e.preventDefault();
+						const v = btn.dataset.v;
+						if (!v) return;
+						try { if (window.ym) ym(108770166, 'reachGoal', 'chem_full_hero_cta', { v }); } catch(e0) {}
+						window.location.search = '?v=' + v;
 					});
 				});
 
@@ -2843,7 +2861,13 @@
 				};
 			}
 
-			function lmHeroHtml({ heroLead, stats, globalStats, streakStatus }) {
+			function lmHeroHtml({ heroLead, stats, globalStats, streakStatus, nextActionId }) {
+				const heroCtaAttrs = nextActionId
+					? `data-v="${nextActionId}" title="Открыть текущий вариант" style="cursor:pointer;"`
+					: `disabled aria-disabled="true" style="opacity:.7; cursor:default;"`;
+				const heroCtaLabel = streakStatus.days > 0
+					? 'Серия ' + streakStatus.days + ' ' + (streakStatus.days === 1 ? 'день' : 'дн.') + (streakStatus.todayDone ? ' · сегодня ✓ — продолжить' : ' — продолжить')
+					: 'Начните серию — пройдите вариант сегодня';
 				return `
 					<section class="lm-hero">
 						<div>
@@ -2854,11 +2878,9 @@
 							<h1>Полный вариант ОГЭ <span class="lm-dot">·</span> Химия</h1>
 							<p class="lm-lead">${heroLead}</p>
 							<div class="lm-cta-row">
-								<button class="lm-btn lm-btn-streak" type="button">
+								<button class="lm-btn lm-btn-streak" type="button" ${heroCtaAttrs}>
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="#ea580c"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7zM12 19.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
-									${streakStatus.days > 0
-										? 'Серия ' + streakStatus.days + ' ' + (streakStatus.days === 1 ? 'день' : 'дн.') + (streakStatus.todayDone ? ' · сегодня ✓' : '')
-										: 'Начните серию — пройдите вариант сегодня'}
+									${heroCtaLabel}
 								</button>
 								<a href="./subject-chemistry.html" class="lm-btn">
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
