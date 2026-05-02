@@ -16,6 +16,25 @@ laravel/storage/framework/views/
 # we don't want to track again.
 laravel/public/uploads/
 
+# Generated mirror of the static site. Source of truth is `extracted/` (in git);
+# `laravel/public/site/` пересоздаётся на каждом деплое скриптом
+# `scripts/sync-site.mjs` (локально — `npm run sync`). До 2026-05 в репо
+# жило ~127 файлов зеркала, и каждый раз приходилось решать «коммитить
+# mirror руками или нет»: получалось частично committed, частично untracked,
+# `git status` шумел, и единая точка истины размывалась. Теперь зеркало
+# целиком игнорируется, CI пересоздаёт его перед rsync
+# (см. .github/workflows/deploy.yml). Локально перед `php artisan serve`
+# обязательно запустить `npm run sync` — иначе 404 на статике.
+laravel/public/site/
+
+# Картинки заданий лежат в `extracted/img/`. На сайте они отдаются
+# Laravel-роутом `/img/{path}` из `public/site/img/`. Если те же файлы
+# случайно появятся в `public/img/`, на VPS nginx начнёт отдавать их
+# как статику ДО Laravel — minimum это лишний дубль на rsync, maximum
+# это обход обновлённого пути из `extracted/img/` (старая копия в
+# `public/img/` живёт «вечно»). Симметрично `public/uploads/` выше.
+laravel/public/img/
+
 # OS / IDE
 Thumbs.db
 .DS_Store
