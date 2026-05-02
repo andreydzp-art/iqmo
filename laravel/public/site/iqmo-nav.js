@@ -13,10 +13,34 @@
 		document.head.appendChild(s);
 	}
 
+	var meResolve;
+	window.__iqmoMe = new Promise(function (res) { meResolve = res; });
+	function publishMe(data) {
+		try { meResolve && meResolve(data || null); } catch (e) {}
+		// Следующий вызов run() (после iqmo-sync-ready) должен переоткрыть Promise,
+		// иначе мы залипнем на первом результате.
+		window.__iqmoMe = Promise.resolve(data || null);
+		meResolve = null;
+	}
+
 	async function run() {
 		ensureHiddenCss();
+		// Старая вёрстка: «Биология» в сайдбаре вела на index.html. Исправляем без перезаливки всей страницы.
+		(function fixSidebarBiologyHref() {
+			try {
+				var a = document.querySelector('aside a.subjects__item.tone-bio')
+					|| document.querySelector('a.subjects__item.tone-bio');
+				if (!a) return;
+				var h = (a.getAttribute('href') || '').trim();
+				if (!h || /subject-biology/.test(h)) return;
+				if (h.indexOf('index.html') !== -1) {
+					a.setAttribute('href', '/subject-biology.html');
+				}
+			} catch (eFix) {}
+		})();
 
 		var loggedIn = false;
+		var meData = null;
 		try {
 			var ac = new AbortController();
 			var tid = setTimeout(function () {
@@ -41,9 +65,11 @@
 					var j = await mr.json();
 					// Должно совпадать с iqmo-sync.js (там authed = me.ok): иначе шапка «Вход» при живой сессии.
 					loggedIn = !(j && j.error);
+					if (loggedIn) meData = j;
 				}
 			}
 		} catch (e) {}
+		publishMe(meData);
 
 		var loginBtn = document.getElementById('iqmo-nav-login');
 		var profBtn = document.getElementById('iqmo-nav-profile');
@@ -85,6 +111,81 @@
 			else el.removeAttribute('hidden');
 		});
 
+		// Навигация для авторизованных:
+		//   • кнопка «Главная» в шапке: ведёт в первый предмет (учебный продукт, лендинг
+		//     им бесполезен), а сам ярлык переименовываем в «К занятиям» — текст точнее
+		//     описывает действие.
+		//   • первая крошка «Главная» в breadcrumbs: дубль шапки → прячем вместе с «/».
+		//   • вторая крошка «Предметы»: страницы списка предметов нет, ссылка ведёт на
+		//     лендинг → конвертируем в неактивный <span>, чтобы крошка просто помечала
+		//     текущий уровень иерархии.
+		// Эвристика «своего предмета»: если URL уже в subject-/full-test-/category-/topic-
+		// химии — ведём на химию, иначе на биологию (биология — первый предмет в сайдбаре).
+		// Маркер `data-iqmo-keep-href` отключает подмену для конкретной ссылки на случай,
+		// если где-то понадобится явный возврат на лендинг (например, Лого).
+		if (loggedIn) {
+			try {
+				var preferred = '/subject-biology.html';
+				if (/(^|\/)(subject|full-test|category|topic)[-_].*chem/i.test(location.pathname)) {
+					preferred = '/subject-chemistry.html';
+				}
+				// Жёсткий список «домашних» URL: чтобы случайно не переписать ссылку
+				// на статью с заголовком «Главная» в каком-нибудь будущем разделе.
+				var HOME_HREF_RE = /^(\/|#|\.\/index(-[a-z0-9-]+)?\.html|\/index(-[a-z0-9-]+)?\.html|index(-[a-z0-9-]+)?\.html)$/i;
+				var BREADCRUMB_SEL = 'nav.crumbs, nav[aria-label="breadcrumbs"], .breadcrumbs';
+
+				// Найдём breadcrumbs-контейнеры и пометим их, чтобы потом не подменять
+				// ссылки внутри (там «Главная» прячется, а не переименовывается).
+				var crumbContainers = Array.from(document.querySelectorAll(BREADCRUMB_SEL));
+
+				// Заменяем текстовый узел «Главная» на «К занятиям» — без потери svg/иконок.
+				function relabelHomeTo(a, label) {
+					var w = document.createTreeWalker(a, NodeFilter.SHOW_TEXT, null);
+					var n;
+					while ((n = w.nextNode())) {
+						if (n.nodeValue && /главная/i.test(n.nodeValue)) {
+							n.nodeValue = n.nodeValue.replace(/главная/i, label);
+						}
+					}
+				}
+
+				document.querySelectorAll('a').forEach(function (a) {
+					if (a.dataset.iqmoKeepHref === '1') return;
+					var text = (a.textContent || '').trim().toLowerCase();
+					if (text !== 'главная') return;
+					var href = (a.getAttribute('href') || '').trim();
+					if (!HOME_HREF_RE.test(href)) return;
+					var inCrumbs = crumbContainers.some(function (c) { return c.contains(a); });
+					if (inCrumbs) return; // breadcrumbs обрабатываются отдельным проходом
+					a.setAttribute('href', preferred);
+					relabelHomeTo(a, 'К занятиям');
+					a.setAttribute('aria-label', 'К занятиям');
+				});
+
+				// breadcrumbs: «Главная» прячем, «Предметы» превращаем в <span>.
+				crumbContainers.forEach(function (nav) {
+					nav.querySelectorAll('a').forEach(function (a) {
+						if (a.dataset.iqmoKeepHref === '1') return;
+						var text = (a.textContent || '').trim().toLowerCase();
+						var href = (a.getAttribute('href') || '').trim();
+						if (!HOME_HREF_RE.test(href)) return;
+						if (text === 'главная') {
+							a.style.display = 'none';
+							var sep = a.nextElementSibling;
+							if (sep && sep.classList && (sep.classList.contains('crumbs__sep') || sep.classList.contains('breadcrumbs__sep'))) {
+								sep.style.display = 'none';
+							}
+						} else if (text === 'предметы') {
+							var span = document.createElement('span');
+							if (a.className) span.className = a.className;
+							span.textContent = a.textContent;
+							a.parentNode.replaceChild(span, a);
+						}
+					});
+				});
+			} catch (eHome) {}
+		}
+
 		return loggedIn;
 	}
 
@@ -95,6 +196,7 @@
 		window.__iqmoAuthReady.then(function (navAuthed) {
 			var syncAuthed = !!(window.IqmoSync && typeof window.IqmoSync.isAuthed === 'function' && window.IqmoSync.isAuthed());
 			if (navAuthed !== syncAuthed) {
+				window.__iqmoMe = new Promise(function (res) { meResolve = res; });
 				window.__iqmoAuthReady = run();
 			}
 		});

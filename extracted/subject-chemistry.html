@@ -510,15 +510,11 @@
 
         <div>
           <div class="pcard__friends-h">
-            <span>Рейтинг друзей</span>
-            <span class="hint">демо · неделя</span>
+            <span>Рейтинг IQMO</span>
+            <span class="hint" id="pc-friends-hint">по очкам · все время</span>
           </div>
-          <div class="pcard__friends">
-            <div class="pf pf--1"><span class="pf__rank">1</span><span class="pf__avatar" style="background:#10b981">МК</span><span class="pf__name">Максим К.</span><span class="pf__score">2 140</span></div>
-            <div class="pf pf--2 pf--me"><span class="pf__rank">2</span><span class="pf__avatar" id="pc-friend-avatar" style="background:linear-gradient(135deg,var(--primary),var(--violet))">ИК</span><span class="pf__name">Вы</span><span class="pf__score" id="pc-friend-me-score">0</span></div>
-            <div class="pf pf--3"><span class="pf__rank">3</span><span class="pf__avatar" style="background:#f59e0b">ДС</span><span class="pf__name">Дима С.</span><span class="pf__score">1 560</span></div>
-            <div class="pf"><span class="pf__rank">4</span><span class="pf__avatar" style="background:#8a93a3">ЛП</span><span class="pf__name">Лена П.</span><span class="pf__score">1 340</span></div>
-            <div class="pf"><span class="pf__rank">5</span><span class="pf__avatar" style="background:#a78bfa">НВ</span><span class="pf__name">Никита В.</span><span class="pf__score">1 120</span></div>
+          <div class="pcard__friends" id="pc-friends-list">
+            <div class="pf"><span class="pf__rank">…</span><span class="pf__avatar" style="background:#cbd5e1">…</span><span class="pf__name" style="color:var(--muted)">Загружаем рейтинг…</span><span class="pf__score">—</span></div>
           </div>
         </div>
 
@@ -887,9 +883,6 @@
     var elS = document.getElementById('pc-streak'); if (elS) elS.textContent = String(streakDays);
     var elP = document.getElementById('pc-points'); if (elP) elP.textContent = fmtPts(pts);
     var elT = document.getElementById('pc-tests'); if (elT) elT.textContent = approxTests > 0 ? String(approxTests) + '+' : '0';
-    var meSc = document.getElementById('pc-friend-me-score');
-    if (meSc) meSc.textContent = fmtPts(weekPts > 0 ? weekPts : Math.min(pts, 99999));
-
     // initials
     var anon = '';
     try { anon = localStorage.getItem('iqmo-chem-anon-id') || ''; } catch (e) {}
@@ -901,15 +894,82 @@
     }
     if (ini.length < 2) ini = 'ИК';
     var av = document.getElementById('pc-avatar');         if (av)  av.textContent = ini;
-    var fav = document.getElementById('pc-friend-avatar'); if (fav) fav.textContent = ini;
     var nav = document.getElementById('nav-avatar');       if (nav) nav.textContent = ini;
 
-    // days on platform
-    var fk = 'iqmo-chem-first-visit';
-    var first = localStorage.getItem(fk);
-    if (!first) { first = String(Date.now()); try { localStorage.setItem(fk, first); } catch (e) {} }
-    var daysOn = Math.max(1, Math.floor((Date.now() - Number(first)) / 86400000) + 1);
-    var elD = document.getElementById('pc-days'); if (elD) elD.textContent = String(daysOn);
+    // days on platform: для авторизованных — от даты регистрации; для гостей — от первого
+    // визита в этом браузере (localStorage). createdAt прилетает из /api/me через iqmo-nav.js.
+    function paintDays(createdAt) {
+      var fk = 'iqmo-chem-first-visit';
+      var anchor = null;
+      if (createdAt && Number.isFinite(Number(createdAt))) {
+        anchor = Number(createdAt);
+      } else {
+        var first = localStorage.getItem(fk);
+        if (!first) { first = String(Date.now()); try { localStorage.setItem(fk, first); } catch (e) {} }
+        anchor = Number(first);
+      }
+      var daysOn = Math.max(1, Math.floor((Date.now() - anchor) / 86400000) + 1);
+      var elD = document.getElementById('pc-days'); if (elD) elD.textContent = String(daysOn);
+    }
+    paintDays(null);
+    if (window.__iqmoMe && typeof window.__iqmoMe.then === 'function') {
+      window.__iqmoMe.then(function (me) {
+        if (me && me.created_at) paintDays(me.created_at);
+      }).catch(function () {});
+    }
+  })();
+
+  // Leaderboard (top-5 по XP, маска email). Без auth — гости тоже видят.
+  (function loadLeaderboard() {
+    var list = document.getElementById('pc-friends-list');
+    if (!list) return;
+    function avatarBg(seed, isMe) {
+      if (isMe) return 'linear-gradient(135deg,var(--primary),var(--violet))';
+      var palette = ['#10b981','#6366f1','#f59e0b','#ec4899','#0ea371','#a78bfa','#0891b2','#65a30d','#d97706','#db2777'];
+      var h = 0; for (var i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
+      return palette[Math.abs(h) % palette.length];
+    }
+    fetch('/api/leaderboard?limit=5', { credentials: 'include', cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (data) {
+        var items = (data && Array.isArray(data.items)) ? data.items : [];
+        if (!items.length) {
+          list.innerHTML = '<div class="pf"><span class="pf__rank">—</span><span class="pf__avatar" style="background:#cbd5e1">…</span><span class="pf__name" style="color:var(--muted)">Пока никто не набрал XP</span><span class="pf__score">0</span></div>';
+          return;
+        }
+        var meIdx = items.findIndex(function (x) { return x && x.is_me; });
+        list.innerHTML = items.map(function (it, idx) {
+          var rankCls = ['', 'pf--1', 'pf--2', 'pf--3'][it.rank] || '';
+          var meCls = it.is_me ? ' pf--me' : '';
+          var seed = String(it.uid || it.display || idx);
+          var bg = avatarBg(seed, it.is_me);
+          var ini = (it.initials || '?').slice(0, 2);
+          var name = it.is_me ? 'Вы' : (it.display || 'user');
+          return '<div class="pf ' + rankCls + meCls + '">' +
+            '<span class="pf__rank">' + it.rank + '</span>' +
+            '<span class="pf__avatar" style="background:' + bg + '">' + ini + '</span>' +
+            '<span class="pf__name">' + name + '</span>' +
+            '<span class="pf__score">' + fmtPts(it.xp) + '</span>' +
+            '</div>';
+        }).join('');
+        // Если меня нет в топе, но я авторизован — добавим строку «Вы · #N»
+        if (meIdx < 0 && data && data.me && data.me.uid) {
+          var me = data.me;
+          var bg = avatarBg(String(me.uid), true);
+          var ini = (me.initials || 'ИК').slice(0, 2);
+          list.insertAdjacentHTML('beforeend',
+            '<div class="pf pf--me" style="border-top:1px dashed var(--line); margin-top:6px; padding-top:8px;">' +
+            '<span class="pf__rank">#' + me.rank + '</span>' +
+            '<span class="pf__avatar" style="background:' + bg + '">' + ini + '</span>' +
+            '<span class="pf__name">Вы</span>' +
+            '<span class="pf__score">' + fmtPts(me.xp) + '</span>' +
+            '</div>'
+          );
+        }
+      })
+      .catch(function () {
+        list.innerHTML = '<div class="pf"><span class="pf__rank">—</span><span class="pf__avatar" style="background:#cbd5e1">…</span><span class="pf__name" style="color:var(--muted)">Не удалось загрузить</span><span class="pf__score">—</span></div>';
+      });
   })();
 
   // Hero last result

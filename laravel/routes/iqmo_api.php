@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AdminQuizzesController;
 use App\Http\Controllers\Api\AdminUsersController;
 use App\Http\Controllers\Api\AnalyticsIngestController;
 use App\Http\Controllers\Api\IqmoAuthController;
+use App\Http\Controllers\Api\IqmoLeaderboardController;
 use App\Http\Controllers\Api\IqmoProfileController;
 use App\Http\Controllers\Api\QuizLeadController;
 use App\Http\Controllers\Api\QuizTrackController;
@@ -17,6 +18,8 @@ Route::prefix('api')->group(function (): void {
     Route::post('/auth/logout', [IqmoAuthController::class, 'logout']);
 
     Route::get('/me', [IqmoAuthController::class, 'me']);
+
+    Route::get('/leaderboard', [IqmoLeaderboardController::class, 'index']);
 
     Route::middleware(['iqmo.jwt'])->group(function (): void {
         Route::get('/profile/state', [IqmoProfileController::class, 'stateGet']);

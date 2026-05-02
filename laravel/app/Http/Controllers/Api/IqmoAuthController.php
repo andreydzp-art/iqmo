@@ -87,7 +87,22 @@ final class IqmoAuthController extends Controller
             return response()->json(['error' => 'unauthorized'], 401)->withHeaders($noStore);
         }
 
-        return response()->json(['id' => $payload['uid'], 'email' => $payload['email']])->withHeaders($noStore);
+        $uid = (int) $payload['uid'];
+        $createdAt = null;
+        try {
+            $row = DB::connection('iqmo')->table('users')->select('created_at')->where('id', $uid)->first();
+            if ($row && $row->created_at !== null) {
+                $createdAt = (int) $row->created_at;
+            }
+        } catch (\Throwable $e) {
+            // оставим created_at = null, страница откатится на локальный счётчик
+        }
+
+        return response()->json([
+            'id' => $uid,
+            'email' => $payload['email'],
+            'created_at' => $createdAt,
+        ])->withHeaders($noStore);
     }
 
     /**

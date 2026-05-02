@@ -13,6 +13,16 @@
 		document.head.appendChild(s);
 	}
 
+	var meResolve;
+	window.__iqmoMe = new Promise(function (res) { meResolve = res; });
+	function publishMe(data) {
+		try { meResolve && meResolve(data || null); } catch (e) {}
+		// Следующий вызов run() (после iqmo-sync-ready) должен переоткрыть Promise,
+		// иначе мы залипнем на первом результате.
+		window.__iqmoMe = Promise.resolve(data || null);
+		meResolve = null;
+	}
+
 	async function run() {
 		ensureHiddenCss();
 		// Старая вёрстка: «Биология» в сайдбаре вела на index.html. Исправляем без перезаливки всей страницы.
@@ -30,6 +40,7 @@
 		})();
 
 		var loggedIn = false;
+		var meData = null;
 		try {
 			var ac = new AbortController();
 			var tid = setTimeout(function () {
@@ -54,9 +65,11 @@
 					var j = await mr.json();
 					// Должно совпадать с iqmo-sync.js (там authed = me.ok): иначе шапка «Вход» при живой сессии.
 					loggedIn = !(j && j.error);
+					if (loggedIn) meData = j;
 				}
 			}
 		} catch (e) {}
+		publishMe(meData);
 
 		var loginBtn = document.getElementById('iqmo-nav-login');
 		var profBtn = document.getElementById('iqmo-nav-profile');
@@ -183,6 +196,7 @@
 		window.__iqmoAuthReady.then(function (navAuthed) {
 			var syncAuthed = !!(window.IqmoSync && typeof window.IqmoSync.isAuthed === 'function' && window.IqmoSync.isAuthed());
 			if (navAuthed !== syncAuthed) {
+				window.__iqmoMe = new Promise(function (res) { meResolve = res; });
 				window.__iqmoAuthReady = run();
 			}
 		});
