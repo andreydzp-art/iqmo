@@ -211,15 +211,25 @@ jobs:
             echo "Subject page missing Yandex Metrika counter (108770166) — likely a stale page bypassing Laravel"
             exit 1
           fi
-          # Старый URL должен отдавать 301 Location: /subject-chemistry/.
+          # Старый URL должен 301-редиректить на новый (Laravel может
+          # канонизировать URL без trailing slash и/или превратить в абсолютный
+          # — поэтому сравниваем нормализованный path-сегмент, а не точную строку).
           code_legacy=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/subject-chemistry.html" || true)
           if [ "$code_legacy" != "301" ]; then
             echo "Legacy /subject-chemistry.html expected 301 (SEO redirect), got $code_legacy"
             exit 1
           fi
           loc_legacy=$(curl -sSI "$BASE/subject-chemistry.html" | grep -i '^location:' | tr -d '\r' | awk '{print $2}')
-          if [ "$loc_legacy" != "/subject-chemistry/" ] && [ "$loc_legacy" != "$BASE/subject-chemistry/" ]; then
-            echo "Legacy redirect Location should point to /subject-chemistry/, got: $loc_legacy"
+          # Нормализуем: убираем https://host префикс и trailing-слеш в конце.
+          loc_path=$(echo "$loc_legacy" | sed -E 's|^https?://[^/]+||' | sed 's|/*$||')
+          if [ "$loc_path" != "/subject-chemistry" ]; then
+            echo "Legacy redirect should land on /subject-chemistry[/], got: $loc_legacy"
+            exit 1
+          fi
+          # Цепочка с -L должна отдать 200 — конечная страница доступна.
+          final_code=$(curl -sSL -o /dev/null -w "%{http_code}" "$BASE/subject-chemistry.html" || true)
+          if [ "$final_code" != "200" ]; then
+            echo "Following legacy redirect gave HTTP $final_code (expected 200)"
             exit 1
           fi
           # Проверка меню «Биология» намеренно не в smoke: сразу после deploy edge/CDN
