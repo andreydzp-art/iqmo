@@ -1021,12 +1021,19 @@
 					) {
 						return;
 					}
-					const PREFIX = 'iqmo-chem-';
+					// Кнопка «Сбросить данные ПО ХИМИИ» — не трогаем bio/прочее.
+					// Префикс iqmo:chem: добавлен из-за warmup-chemistry
+					// (iqmo:chem:catWrong:<id>) — это тоже chem-данные.
+					const CHEM_PREFIXES = ['iqmo-chem-', 'iqmo:chem:'];
 					try {
 						for (let i = localStorage.length - 1; i >= 0; i--) {
 							const k = localStorage.key(i);
-							if (k && k.indexOf(PREFIX) === 0) {
-								localStorage.removeItem(k);
+							if (!k) continue;
+							for (let p = 0; p < CHEM_PREFIXES.length; p++) {
+								if (k.indexOf(CHEM_PREFIXES[p]) === 0) {
+									localStorage.removeItem(k);
+									break;
+								}
 							}
 						}
 					} catch (e) {
@@ -1092,13 +1099,37 @@
 							deleteBtn.disabled = false;
 							return;
 						}
+						// Удаление аккаунта — полная локальная зачистка.
+						// Списки должны совпадать с iqmo-nav.js (logout) и
+						// iqmo-sync.js → wipeUserScopedKeys.
 						try {
-							var PREFIX = 'iqmo-chem-';
+							var WIPE_PREFIXES = [
+								'iqmo-chem-',
+								'iqmo-bio-',
+								'iqmo:chem:',
+								'iqmo_purchase_',
+								'iqmo_express_start_'
+							];
+							var WIPE_KEYS = [
+								'iqmo-analytics-queue-v1',
+								'iqmo-regnudge-dismissed-at',
+								'iqmo-last-uid',
+								'iqmo_auth_hint'
+							];
 							for (var i = localStorage.length - 1; i >= 0; i--) {
 								var k = localStorage.key(i);
-								if (k && k.indexOf(PREFIX) === 0) localStorage.removeItem(k);
+								if (!k) continue;
+								var matched = false;
+								for (var p = 0; p < WIPE_PREFIXES.length; p++) {
+									if (k.indexOf(WIPE_PREFIXES[p]) === 0) { matched = true; break; }
+								}
+								if (!matched) {
+									for (var q = 0; q < WIPE_KEYS.length; q++) {
+										if (k === WIPE_KEYS[q]) { matched = true; break; }
+									}
+								}
+								if (matched) localStorage.removeItem(k);
 							}
-							localStorage.removeItem('iqmo-analytics-queue-v1');
 						} catch (e4) {}
 						location.href = '/';
 					});

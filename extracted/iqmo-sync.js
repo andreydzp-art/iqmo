@@ -66,7 +66,22 @@
 	// nudge'а (новый юзер должен решать сам, дисмиссить ли).
 	// Не трогаем iqmo_auth_hint и iqmo-last-uid — это служебные флаги,
 	// ими управляют отдельные кодпути.
-	const USER_SCOPED_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
+	// Префиксы и точечные ключи для wipe при logout / смене пользователя.
+	// Если добавляешь сюда — синхронно дополняй такие же массивы в
+	// iqmo-nav.js (logout) и в delete-обработчике в extracted/profile/index.html.
+	// Префиксы покрывают:
+	//   iqmo-chem-*           — прогресс химии (синкается на сервер)
+	//   iqmo-bio-*            — прогресс биологии (только локально, серверный sync ещё не реализован)
+	//   iqmo:chem:*           — двоеточная схема (warmup-chemistry, iqmo:chem:catWrong:<id>)
+	//   iqmo_purchase_*       — commerce-dedup (uploads/thank.html: iqmo_purchase_done_<date>, _id)
+	//   iqmo_express_start_*  — easy-test express stage (uploads/easy-test.html)
+	const USER_SCOPED_PREFIXES = [
+		'iqmo-chem-',
+		'iqmo-bio-',
+		'iqmo:chem:',
+		'iqmo_purchase_',
+		'iqmo_express_start_'
+	];
 	const USER_SCOPED_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at'];
 
 	function isUserScopedKey(k) {

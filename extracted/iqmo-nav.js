@@ -105,21 +105,28 @@
 						headers: { Accept: 'application/json' }
 					});
 				} catch (e2) {}
-				try { localStorage.setItem('iqmo_auth_hint', '0'); } catch (eHint2) {}
 				// Изоляция данных между аккаунтами: при logout стираем все
-				// user-scoped ключи в localStorage и маркер iqmo-last-uid.
-				// Иначе следующий залогинившийся в этом браузере увидит
-				// чужой прогресс (localStorage переживает logout). Список
-				// должен совпадать с iqmo-sync.js → wipeUserScopedKeys.
-				// Включает: iqmo-chem-* (синкается на сервер), iqmo-bio-*
-				// (живёт только локально — без чистки протекал прогресс
-				// биологии в новый аккаунт), очередь аналитики и nudge.
+				// user-scoped ключи в localStorage. Иначе следующий
+				// залогинившийся в этом браузере увидит чужой прогресс
+				// (localStorage переживает logout). Списки должны
+				// совпадать с iqmo-sync.js → wipeUserScopedKeys и с
+				// delete-обработчиком в extracted/profile/index.html.
+				// iqmo_auth_hint попадает сюда же (вместо setItem('0')):
+				// после redirect/reload nav.js всё равно проставит '0',
+				// а до того момента отсутствие ключа корректно даёт guest.
 				try {
-					var WIPE_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
+					var WIPE_PREFIXES = [
+						'iqmo-chem-',
+						'iqmo-bio-',
+						'iqmo:chem:',
+						'iqmo_purchase_',
+						'iqmo_express_start_'
+					];
 					var WIPE_KEYS = [
 						'iqmo-analytics-queue-v1',
 						'iqmo-regnudge-dismissed-at',
-						'iqmo-last-uid'
+						'iqmo-last-uid',
+						'iqmo_auth_hint'
 					];
 					var toWipe = [];
 					for (var i = 0; i < localStorage.length; i++) {
