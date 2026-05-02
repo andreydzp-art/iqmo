@@ -22,7 +22,8 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="./iqmo-base.css?v=1" />
-		<style>
+		<style>
+
 
 			/* ---- top bar ---- */
 			.topbar {
@@ -814,7 +815,7 @@
 								<div style="margin-top:24px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
 									<button type="button" class="btn btn--blue" id="btn-review">Посмотреть разбор</button>
 									<button type="button" class="btn btn--ghost" id="btn-restart">Пройти ещё раз</button>
-									<a href="./subject-chemistry.html" class="btn btn--ghost">К предмету</a>
+									<a href="/subject-chemistry/" class="btn btn--ghost">К предмету</a>
 								</div>
 							</div>
 						</div>
@@ -970,7 +971,7 @@
 			// quit
 			document.getElementById('btn-quit').addEventListener('click', () => {
 				if (confirm('Выйти из теста? Прогресс сохранится, вы сможете вернуться и продолжить.')) {
-					window.location.href = './subject-chemistry.html';
+					window.location.href = '/subject-chemistry/';
 				}
 			});
 			document.getElementById('btn-finish').addEventListener('click', () => {
