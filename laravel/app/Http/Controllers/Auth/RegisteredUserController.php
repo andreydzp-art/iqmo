@@ -46,6 +46,12 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Защита от session fixation: ротируем session ID после первичного
+        // присваивания личности (зеркалит то, что AuthenticatedSessionController
+        // делает после login). Без этого предзаписанный гостевой session ID
+        // переживёт регистрацию и attacker может зайти под этим ID.
+        $request->session()->regenerate();
+
         return redirect(route('dashboard', absolute: false));
     }
 }
