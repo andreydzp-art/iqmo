@@ -905,6 +905,10 @@
 		getLevelDetail: function (totalXp) {
 			return computeLevelDetail(totalXp);
 		},
+		// Алиас для обратной совместимости (используется на subject-pages).
+		computeLevelDetail: function (totalXp) {
+			return computeLevelDetail(totalXp);
+		},
 		getLevelTitle: levelTitleRu,
 		MAX_LEVEL,
 		startActivityTracking
