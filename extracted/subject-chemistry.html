@@ -888,18 +888,16 @@
     var elS = document.getElementById('pc-streak'); if (elS) elS.textContent = String(streakDays);
     var elP = document.getElementById('pc-points'); if (elP) elP.textContent = fmtPts(pts);
     var elT = document.getElementById('pc-tests'); if (elT) elT.textContent = approxTests > 0 ? String(approxTests) + '+' : '0';
-    // initials
-    var anon = '';
-    try { anon = localStorage.getItem('iqmo-chem-anon-id') || ''; } catch (e) {}
-    var ini = 'ИК';
-    if (anon.length >= 2) {
-      var compact = anon.replace(/[^a-zA-Z0-9]/g, '');
-      if (compact.length >= 2) ini = compact.slice(0, 2).toUpperCase();
-      else ini = anon.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 2).toUpperCase() || 'ИК';
-    }
-    if (ini.length < 2) ini = 'ИК';
-    var av = document.getElementById('pc-avatar');         if (av)  av.textContent = ini;
-    var nav = document.getElementById('nav-avatar');       if (nav) nav.textContent = ini;
+    // Раньше в аватарках в шапке и в карточке профиля показывались
+    // инициалы из anon-id (типа «4В»), и пользователи путали их с
+    // номером класса. По просьбе показываем номер уровня — он коротко
+    // и однозначно говорит «у меня 7-й уровень в IQMO».
+    var lvlText = String(stg);
+    var lvlTitle = 'Уровень ' + stg + (stageTitle ? ' · ' + stageTitle : '');
+    var av = document.getElementById('pc-avatar');
+    if (av) { av.textContent = lvlText; av.setAttribute('title', lvlTitle); av.setAttribute('aria-label', lvlTitle); }
+    var nav = document.getElementById('nav-avatar');
+    if (nav) { nav.textContent = lvlText; nav.setAttribute('title', lvlTitle); nav.setAttribute('aria-label', lvlTitle); }
 
     // days on platform: для авторизованных — от даты регистрации; для гостей — от первого
     // визита в этом браузере (localStorage). createdAt прилетает из /api/me через iqmo-nav.js.
