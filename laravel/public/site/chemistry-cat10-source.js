@@ -543,7 +543,9 @@ if (typeof module !== 'undefined' && module.exports) {
 	if (!Array.isArray(IQMO_CAT10_QUESTIONS)) return;
 
 	function isPick2(q) {
-		return /Выберите\s+(два|две)\b/i.test(q && q.question ? q.question : '');
+		// JS-regex \b не срабатывает на кириллице (см. cat01). Используем
+		// безопасный lookahead на пробел/EOS.
+		return /Выберите\s+(два|две)(?=\s|$)/i.test(q && q.question ? q.question : '');
 	}
 
 	function toHtml(s) {
