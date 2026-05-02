@@ -2695,7 +2695,7 @@
 				host.innerHTML = ready.map(v => `<a href="?v=${v.id}" style="display:inline-block;margin:4px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);text-decoration:none;font-weight:600;">${v.title || ('Вариант ' + v.id)}</a>`).join('');
 			}
 			// ============================================================
-			// LEVEL MAP v2 — карта Главы 1 («Полный вариант ОГЭ»)
+			// LEVEL MAP v2 — карта уровней («Полный вариант ОГЭ»)
 			// 7 обычных узлов + 1 финальный босс. Реализация 1:1 по
 			// _tmp_ft6/level-map.html. Старый код (renderGmNode и т.п.)
 			// больше не используется и оставлен мёртвым кодом, чтобы не
@@ -2717,8 +2717,8 @@
 
 				const allVariants = window.CHEMISTRY_VARIANTS || [];
 				const ready = allVariants.filter(v => v.status === 'ready');
-				// Глава 1 = первые 6 ready + 7-й как финальный босс (как в референсе
-				// _tmp_ft6/level-map.html — там 6 узлов + 1 boss = 7 ячеек).
+				// Карта уровней = первые 6 ready + 7-й как финальный босс (как в
+				// референсе _tmp_ft6/level-map.html — 6 узлов + 1 boss = 7 ячеек).
 				// Если ready < 2 — fallback-list.
 				if (ready.length < 2) {
 					_renderVariantPickerFallback(picker);
@@ -2759,7 +2759,7 @@
 					state: bossBest ? 'done' : (allRegularDone ? 'current' : 'locked'),
 				};
 
-				// Метрики Главы 1: XP, звёзды, ср. балл, время.
+				// Метрики карты уровней: XP, звёзды, ср. балл.
 				const stats = lmComputeChapterStats([...variantInfos, bossInfo]);
 				// Глобальный уровень и серия — берём как раньше.
 				const globalStats = gmComputedStats(allVariants);
@@ -2767,9 +2767,9 @@
 				const dashOffset = Math.max(0, Math.round(226 * (1 - ringPct / 100)));
 
 				const heroLead = (allRegularDone && !bossBest)
-					? 'Все варианты Главы 1 пройдены. Открыт финальный босс — победите его, чтобы открыть Главу 2.'
+					? 'Все варианты пройдены. Открыт финальный босс — победите его, чтобы получить мастер-уровень.'
 					: (bossBest)
-						? 'Глава 1 завершена. Можно перерешать любой вариант, чтобы поднять звёзды.'
+						? 'Все варианты пройдены. Можно перерешать любой вариант, чтобы поднять звёзды.'
 						: 'Проходите варианты по порядку. Следующий открывается, когда вы набираете не менее 50 % правильных ответов в части 1 текущего варианта.';
 
 				const seen = gmLoadSeen();
@@ -2884,7 +2884,7 @@
 								</button>
 								<a href="./subject-chemistry.html" class="lm-btn">
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-									К расписанию глав
+									Расписание
 								</a>
 							</div>
 						</div>
@@ -2895,7 +2895,7 @@
 								</div>
 								<div>
 									<div class="lm-stat-val"><span class="lm-num">${stats.totalStars}</span> <span style="color:var(--lm-muted);font-size:12px;font-weight:600">/ ${stats.maxStars}</span></div>
-									<div class="lm-stat-lbl">Звёзд в главе</div>
+									<div class="lm-stat-lbl">Звёзд получено</div>
 								</div>
 							</div>
 							<div class="lm-stat">
@@ -2938,7 +2938,7 @@
 					<section class="lm-map-card">
 						<div class="lm-map-head">
 							<div>
-								<div class="lm-map-title">Карта Главы 1 · «Полный вариант»</div>
+								<div class="lm-map-title">Карта уровней</div>
 								<div class="lm-map-sub">${variantInfos.length} ${_lmPlural(variantInfos.length, ['этап', 'этапа', 'этапов'])} · 1 финальный босс</div>
 							</div>
 							<div class="lm-legend">
@@ -3113,10 +3113,10 @@
 						</div>
 
 						<div class="lm-card">
-							<h3>Статистика главы</h3>
+							<h3>Статистика</h3>
 							<div class="lm-stat-list">
 								<div class="lm-stat-row">
-									<span class="lm-k"><span class="lm-stat-bullet" style="background:#6366f1"></span>Всего узлов</span>
+									<span class="lm-k"><span class="lm-stat-bullet" style="background:#6366f1"></span>Всего вариантов</span>
 									<span class="lm-v lm-num">${stats.totalNodes}</span>
 								</div>
 								<div class="lm-stat-row">
@@ -3244,7 +3244,7 @@
 				if (bossInfo.state === 'current' && !bossInfo.best) {
 					text = '<b>Босс открыт.</b> Финальный вариант сложнее обычных — повторите слабые задания перед боем.';
 				} else if (bossInfo.state === 'done') {
-					text = '<b>Глава 1 завершена!</b> Можно перерешивать варианты для повышения звёзд. Скоро откроется Глава 2.';
+					text = '<b>Все варианты пройдены!</b> Можно перерешивать варианты, чтобы поднять звёзды и общий уровень.';
 				}
 				return `
 					<div class="lm-tip">
