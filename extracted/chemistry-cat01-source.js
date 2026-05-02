@@ -600,7 +600,10 @@ if (typeof module !== 'undefined' && module.exports) {
 	if (!Array.isArray(IQMO_CAT01_QUESTIONS)) return;
 
 	function isPick2(q) {
-		return /Выберите\s+(два|две)\b/i.test(q && q.question ? q.question : '');
+		// JS-regex \b считает word-boundary только по [A-Za-z0-9_], для
+		// кириллицы он не срабатывает: /два\b/i.test('два утверждения')
+		// возвращает false. Используем безопасный lookahead на пробел/EOS.
+		return /Выберите\s+(два|две)(?=\s|$)/i.test(q && q.question ? q.question : '');
 	}
 
 	function toHtml(s) {
