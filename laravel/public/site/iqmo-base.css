@@ -72,6 +72,32 @@ p {
 	display: none !important;
 }
 
+/* Anti-FOUC для шапки авторизации.
+ *
+ * Базовая разметка отдаёт «гостевую» шапку: #iqmo-nav-login виден,
+ * #iqmo-nav-profile/#iqmo-nav-logout — `hidden`, .iqmo-only-guest —
+ * виден, .iqmo-only-authed — `hidden`. Дальше iqmo-nav.js делает
+ * fetch('/api/me') и переключает их по результату. Между парсом
+ * HTML и приходом ответа — те самые ~200мс, когда залогиненный
+ * успевает увидеть «Вход» и «Попробовать бесплатно».
+ *
+ * Лечим так: в head каждой страницы синхронный inline-`<script>`
+ * читает localStorage['iqmo_auth_hint'] (его пишет iqmo-nav.js
+ * после успешного /api/me) и ставит data-iqmo-auth="authed|guest"
+ * на <html>. Эти правила применяются ДО рендера body, и нужный
+ * вариант кнопок появляется сразу. Если hint оказался стейл —
+ * iqmo-nav.js перерисует обратно после реального /api/me.
+ */
+html[data-iqmo-auth='authed'] .iqmo-only-guest,
+html[data-iqmo-auth='authed'] #iqmo-nav-login {
+	display: none !important;
+}
+html[data-iqmo-auth='guest'] .iqmo-only-authed,
+html[data-iqmo-auth='guest'] #iqmo-nav-profile,
+html[data-iqmo-auth='guest'] #iqmo-nav-logout {
+	display: none !important;
+}
+
 .container {
 	width: 100%;
 	max-width: 1220px;

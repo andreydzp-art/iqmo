@@ -71,6 +71,16 @@
 		} catch (e) {}
 		publishMe(meData);
 
+		// Anti-FOUC hint: запоминаем, был ли пользователь залогинен в прошлый раз,
+		// и синхронно (до парса body) читаем этот флаг inline-скриптом в head, чтобы
+		// сразу показать правильную шапку. См. правила [data-iqmo-auth] в iqmo-base.css.
+		try {
+			localStorage.setItem('iqmo_auth_hint', loggedIn ? '1' : '0');
+		} catch (eHint) {}
+		try {
+			document.documentElement.setAttribute('data-iqmo-auth', loggedIn ? 'authed' : 'guest');
+		} catch (eAttr) {}
+
 		var loginBtn = document.getElementById('iqmo-nav-login');
 		var profBtn = document.getElementById('iqmo-nav-profile');
 		var logoutBtn = document.getElementById('iqmo-nav-logout');
@@ -95,6 +105,7 @@
 						headers: { Accept: 'application/json' }
 					});
 				} catch (e2) {}
+				try { localStorage.setItem('iqmo_auth_hint', '0'); } catch (eHint2) {}
 				var redir = logoutBtn.getAttribute('data-iqmo-after-logout');
 				if (redir) location.href = redir;
 				else location.reload();

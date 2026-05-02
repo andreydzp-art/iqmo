@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="ru" class="page">
 <head>
+<!-- Anti-FOUC шапки авторизации: ставим data-iqmo-auth на <html> до парса body, 
+     чтобы CSS-правила в iqmo-base.css сразу скрыли «не ту» половину кнопок. 
+     Hint пишется iqmo-nav.js после реального ответа /api/me. -->
+<script data-iqmo-fouc-guard="1">try{document.documentElement.setAttribute('data-iqmo-auth',localStorage.getItem('iqmo_auth_hint')==='1'?'authed':'guest');}catch(e){}</script>
 <meta charset="utf-8" />
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
