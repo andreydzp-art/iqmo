@@ -125,7 +125,11 @@ final class IqmoLeaderboardController extends Controller
         }
     }
 
-    /** Маска: `a***y@g***.com` (не раскрываем email даже для самого пользователя). */
+    /**
+     * Маска: первые 3 символа локалки видны, дальше `***`. Домен сохраняем
+     * приватным (первая буква + `***` + TLD): `and***@g***.com`.
+     * Если локалка ≤ 3 символов — показываем её целиком без обрезки.
+     */
     private function maskEmail(string $email): string
     {
         $email = trim($email);
@@ -135,9 +139,14 @@ final class IqmoLeaderboardController extends Controller
         }
         $local = substr($email, 0, $at);
         $domain = substr($email, $at + 1);
-        $maskedLocal = mb_strlen($local) <= 2
-            ? mb_substr($local, 0, 1) . '***'
-            : mb_substr($local, 0, 1) . '***' . mb_substr($local, -1);
+
+        $localLen = mb_strlen($local);
+        if ($localLen <= 3) {
+            $maskedLocal = $local . '***';
+        } else {
+            $maskedLocal = mb_substr($local, 0, 3) . '***';
+        }
+
         $dot = strrpos($domain, '.');
         if ($dot === false || $dot < 1) {
             $maskedDomain = mb_substr($domain, 0, 1) . '***';
