@@ -5925,7 +5925,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена модель атома химического элемента.</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant16-q2-atom.png" alt="Модель атома: ядро (+Z) и электроны на оболочках" style="max-width:220px; width: 100%; height:auto;">
+							<img src="/assets/variant16-q2-atom.png" alt="Модель атома: ядро (+Z) и электроны на оболочках" style="max-width:220px; width: 100%; height:auto;">
 						</p>
 						<p>Запишите в таблицу величину заряда ядра (<b>X</b>) атома и номер периода (<b>Y</b>), в котором расположен данный химический элемент.</p>
 						<p style="color:var(--muted);font-size:14px;">Ответ: сначала X, затем Y, без пробелов и запятых.</p>
@@ -6327,7 +6327,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена схема строения электронных оболочек атома химического элемента.</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant17-q2-shells.png" alt="Схема электронных оболочек: 2e, 8e, 14e, 2e" style="max-width:360px; width: 100%; height:auto;">
+							<img src="/assets/variant17-q2-shells.png" alt="Схема электронных оболочек: 2e, 8e, 14e, 2e" style="max-width:360px; width: 100%; height:auto;">
 						</p>
 						<p><b>Распределение электронов:</b> 2e, 8e, 14e, 2e.</p>
 						<p>Запишите номер периода (<b>X</b>) и величину заряда ядра (<b>Y</b>) его атома.</p>
@@ -6722,7 +6722,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена модель ядра атома химического элемента.</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant18-q2-nucleus.png" alt="Модель ядра: протоны и нейтроны" style="max-width:420px; width: 100%; height:auto;">
+							<img src="/assets/variant18-q2-nucleus.png" alt="Модель ядра: протоны и нейтроны" style="max-width:420px; width: 100%; height:auto;">
 						</p>
 						<p>Запишите номер периода (<b>X</b>) и число электронов во внешнем электронном слое (<b>Y</b>) атома этого элемента.</p>
 						<p style="color:var(--muted);font-size:14px;">Ответ: сначала X, затем Y, без пробелов и запятых.</p>
@@ -7116,7 +7116,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена модель атома химического элемента (один электронный слой).</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant19-q2-atom.png" alt="Модель атома: один электронный слой" style="max-width:220px; width: 100%; height:auto;">
+							<img src="/assets/variant19-q2-atom.png" alt="Модель атома: один электронный слой" style="max-width:220px; width: 100%; height:auto;">
 						</p>
 						<p>Запишите величину заряда ядра (<b>X</b>) атома и номер периода (<b>Y</b>), в котором расположен данный химический элемент.</p>
 						<p style="color:var(--muted);font-size:14px;">Ответ: сначала X, затем Y, без пробелов и запятых.</p>
@@ -7510,7 +7510,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена ячейка периодической системы с данными о химическом элементе.</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant20-q2-cell.png" alt="Ячейка таблицы: 20 Ca 40,078" style="max-width:260px; width: 100%; height:auto;">
+							<img src="/assets/variant20-q2-cell.png" alt="Ячейка таблицы: 20 Ca 40,078" style="max-width:260px; width: 100%; height:auto;">
 						</p>
 						<p>Запишите номер периода (<b>X</b>), в котором расположен данный химический элемент, и число электронов (<b>Y</b>) в его атоме.</p>
 						<p style="color:var(--muted);font-size:14px;">Ответ: сначала X, затем Y, без пробелов и запятых.</p>
@@ -7904,7 +7904,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена модель атома химического элемента (3 электронных слоя).</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant21-q2-atom.png" alt="Модель атома: 3 электронных слоя" style="max-width:260px; width: 100%; height:auto;">
+							<img src="/assets/variant21-q2-atom.png" alt="Модель атома: 3 электронных слоя" style="max-width:260px; width: 100%; height:auto;">
 						</p>
 						<p>Запишите величину заряда ядра (<b>X</b>) атома и номер группы (<b>Y</b>), в которой расположен данный химический элемент.</p>
 						<p style="color:var(--muted);font-size:14px;">Ответ: сначала X, затем Y, без пробелов и запятых.</p>
@@ -8297,7 +8297,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена модель ядра атома химического элемента.</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant22-q2-nucleus.png" alt="Модель ядра: протоны и нейтроны" style="max-width:420px; width: 100%; height:auto;">
+							<img src="/assets/variant22-q2-nucleus.png" alt="Модель ядра: протоны и нейтроны" style="max-width:420px; width: 100%; height:auto;">
 						</p>
 						<p>Запишите номер периода (<b>X</b>), в котором расположен данный химический элемент, и число электронных слоёв (<b>Y</b>) в атоме этого элемента.</p>
 						<p style="color:var(--muted);font-size:14px;">Ответ: сначала X, затем Y, без пробелов и запятых.</p>
@@ -8690,7 +8690,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На рисунке изображена модель атома химического элемента (3 электронных слоя).</p>
 						<p style="display:flex; justify-content:center; margin: 12px 0 8px;">
-							<img src="./assets/variant23-q2-atom.png" alt="Модель атома: 3 электронных слоя" style="max-width:300px; width: 100%; height:auto;">
+							<img src="/assets/variant23-q2-atom.png" alt="Модель атома: 3 электронных слоя" style="max-width:300px; width: 100%; height:auto;">
 						</p>
 						<p>Запишите величину заряда ядра (<b>X</b>) атома и номер группы (<b>Y</b>), в которой расположен данный химический элемент.</p>
 						<p style="color:var(--muted);font-size:14px;">Ответ: сначала X, затем Y, без пробелов и запятых.</p>
