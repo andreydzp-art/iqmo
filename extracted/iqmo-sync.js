@@ -4,6 +4,13 @@
 	'use strict';
 
 	const PREFIX = 'iqmo-chem-';
+	// Маркер «последний залогиненный пользователь» в этом браузере. Нужен для
+	// изоляции прогресса между аккаунтами: без него localStorage остаётся от
+	// предыдущего юзера, и при первом заходе нового аккаунта (state на сервере
+	// пуст, локально — данные старого) `init()` бы запушил эти данные на новый
+	// аккаунт. Перевели на отдельный ключ, а не на iqmo-chem-, чтобы он не
+	// попал в reset «Сбросить данные химии» в профиле.
+	const LAST_UID_KEY = 'iqmo-last-uid';
 	const API = typeof window.__IQMO_API_BASE__ === 'string' ? window.__IQMO_API_BASE__ : '';
 
 	let lastKnownRevision = null;
@@ -47,6 +54,22 @@
 			}
 		} catch (e) {}
 		return out;
+	}
+
+	// Локальная очистка iqmo-chem-* ключей. Используется при смене пользователя
+	// и при logout. Не трогает iqmo_auth_hint и iqmo-last-uid — это служебные
+	// флаги, ими управляют отдельные кодпути.
+	function wipeChemKeys() {
+		try {
+			const toRemove = [];
+			for (let i = 0; i < localStorage.length; i++) {
+				const k = localStorage.key(i);
+				if (k && k.indexOf(PREFIX) === 0) toRemove.push(k);
+			}
+			for (let j = 0; j < toRemove.length; j++) {
+				localStorage.removeItem(toRemove[j]);
+			}
+		} catch (e) {}
 	}
 
 	function applyKeys(obj) {
@@ -139,19 +162,51 @@
 			authed = me.ok;
 			if (!authed) return;
 
+			// Кто сейчас залогинен и кто был залогинен в прошлый раз на этом
+			// устройстве. Если это разные аккаунты — локальные iqmo-chem-* нельзя
+			// доверять (это прогресс ушедшего юзера), и нельзя пушить их на сервер
+			// нового аккаунта. Сценарий, который этот блок предотвращает: админ
+			// разлогинился, регистрируется новый андроид@…; до фикса его профиль
+			// сразу показывал XP/уровни/серию админа, потому что серверный state
+			// был пуст, а локальный — нет, и init() заливал старое на новый аккаунт.
+			let currentUid = null;
+			try {
+				const meData = await me.json();
+				if (meData && meData.id != null) currentUid = String(meData.id);
+			} catch (eMe) {}
+
+			let userChanged = false;
+			try {
+				const lastUid = localStorage.getItem(LAST_UID_KEY);
+				if (currentUid != null && lastUid != null && lastUid !== currentUid) {
+					userChanged = true;
+					wipeChemKeys();
+				}
+			} catch (eLast) {}
+
 			const st = await fetch(API + '/api/profile/state', { credentials: 'include' });
 			if (!st.ok) return;
 			const j = await st.json();
 			const local = collectKeys();
 			const serverKeys = j.keys || {};
 			const serverEmpty = Object.keys(serverKeys).length === 0;
-			if (serverEmpty && Object.keys(local).length > 0) {
+			// «Server пуст + local не пуст → push» оставляем только когда юзер
+			// не менялся: это нормальный сценарий «гость накопил прогресс →
+			// залогинился впервые → синхронизируем гостевой прогресс на аккаунт».
+			// При смене юзера local уже очищен выше; всё равно идём в else-ветку
+			// и принимаем сервер как источник правды (в т.ч. пустой → у нового
+			// аккаунта чистый старт).
+			if (serverEmpty && Object.keys(local).length > 0 && !userChanged) {
 				lastKnownRevision = j.revision;
 				await pushState(true);
 			} else {
 				applyKeys(serverKeys);
 				lastKnownRevision = j.revision;
 			}
+
+			try {
+				if (currentUid != null) localStorage.setItem(LAST_UID_KEY, currentUid);
+			} catch (eUid) {}
 
 			setInterval(function () {
 				pushState(false);

@@ -106,6 +106,24 @@
 					});
 				} catch (e2) {}
 				try { localStorage.setItem('iqmo_auth_hint', '0'); } catch (eHint2) {}
+				// Изоляция данных между аккаунтами: при logout стираем
+				// iqmo-chem-* и маркер iqmo-last-uid. Иначе следующий
+				// залогинившийся в этом браузере увидит чужой прогресс
+				// (localStorage переживает logout) и iqmo-sync.js при
+				// первом заходе нового аккаунта запушит его на сервер.
+				try {
+					var CHEM_PREFIX = 'iqmo-chem-';
+					var toWipe = [];
+					for (var i = 0; i < localStorage.length; i++) {
+						var k = localStorage.key(i);
+						if (k && (k.indexOf(CHEM_PREFIX) === 0 || k === 'iqmo-last-uid')) {
+							toWipe.push(k);
+						}
+					}
+					for (var j = 0; j < toWipe.length; j++) {
+						localStorage.removeItem(toWipe[j]);
+					}
+				} catch (eWipe) {}
 				var redir = logoutBtn.getAttribute('data-iqmo-after-logout');
 				if (redir) location.href = redir;
 				else location.reload();
