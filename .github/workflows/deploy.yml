@@ -192,9 +192,12 @@ jobs:
             exit 1
           fi
 
-          code_subj=$(curl -sS -o /tmp/smoke-subj.html -w "%{http_code}" "$BASE/subject-chemistry.html" || true)
+          # Subject pages: caнoничeский URL — clean-URL без .html
+          # (/subject-chemistry/, /subject-biology/), а /subject-{name}.html
+          # должен 301-редиректить на новый URL для сохранения SEO.
+          code_subj=$(curl -sS -o /tmp/smoke-subj.html -w "%{http_code}" "$BASE/subject-chemistry/" || true)
           if [ "$code_subj" != "200" ]; then
-            echo "GET /subject-chemistry.html expected 200, got $code_subj"
+            echo "GET /subject-chemistry/ expected 200, got $code_subj"
             exit 1
           fi
           if ! grep -qi "хими" /tmp/smoke-subj.html; then
@@ -203,9 +206,20 @@ jobs:
             exit 1
           fi
           # Регрессия: stale-копии в laravel/public/*.html nginx-ом отдавались без Метрики
-          # (counter id 108770166). Источник правды — public/site/*.html через Laravel-роуты.
+          # (counter id 108770166). Источник правды — public/site/subject-chemistry/index.html.
           if ! grep -q "108770166" /tmp/smoke-subj.html; then
-            echo "Subject page missing Yandex Metrika counter (108770166) — likely a stale laravel/public/subject-chemistry.html bypassing Laravel"
+            echo "Subject page missing Yandex Metrika counter (108770166) — likely a stale page bypassing Laravel"
+            exit 1
+          fi
+          # Старый URL должен отдавать 301 Location: /subject-chemistry/.
+          code_legacy=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/subject-chemistry.html" || true)
+          if [ "$code_legacy" != "301" ]; then
+            echo "Legacy /subject-chemistry.html expected 301 (SEO redirect), got $code_legacy"
+            exit 1
+          fi
+          loc_legacy=$(curl -sSI "$BASE/subject-chemistry.html" | grep -i '^location:' | tr -d '\r' | awk '{print $2}')
+          if [ "$loc_legacy" != "/subject-chemistry/" ] && [ "$loc_legacy" != "$BASE/subject-chemistry/" ]; then
+            echo "Legacy redirect Location should point to /subject-chemistry/, got: $loc_legacy"
             exit 1
           fi
           # Проверка меню «Биология» намеренно не в smoke: сразу после deploy edge/CDN

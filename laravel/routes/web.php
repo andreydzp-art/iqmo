@@ -95,7 +95,7 @@ $skipIfAuthed = function (Request $request) use ($serveStatic): \Symfony\Compone
             && ! str_starts_with($next, '//')
             && ! str_contains($next, "\r")
             && ! str_contains($next, "\n");
-        $target = $safe ? $next : '/subject-biology.html';
+        $target = $safe ? $next : '/subject-biology/';
 
         return redirect($target, 302);
     }
@@ -206,8 +206,52 @@ Route::get('/{file}', function (string $file) use ($serveStatic) {
     return $serveStatic($full);
 })->where('file', '[A-Za-z0-9][A-Za-z0-9_.-]*\\.(js|css|map|json)');
 
-// Остальные страницы портала (`subject-chemistry.html`, `trial-chemistry.html`, …): ссылки от главной
-// идут с корня сайта, а файлы лежат в `public/site/` — без этого маршрута под `php artisan serve` везде 404.
+// === Subject pages: clean URLs ===
+// Каноничный URL — `/subject-<slug>/` (без `.html` в адресной строке).
+// Файл лежит в `public/site/subject-<slug>/index.html` (синхронизируется
+// из `extracted/subject-<slug>/index.html` через `node scripts/sync-site.mjs`).
+//
+// Старый плоский URL `/subject-<slug>.html` 301-редиректит на новый —
+// поисковая выдача и внешние ссылки переезжают без потерь. Делать через
+// nginx/.htaccess не получается: на VPS стоит nginx, который не читает
+// .htaccess, и все запросы и так проходят через Laravel index.php.
+//
+// Добавить новый предмет (math, russian, physics, history, …):
+//   1. Создать `extracted/subject-<slug>/index.html` (можно скопировать
+//      `extracted/subject-biology/index.html` как стартовый каркас).
+//      Все ассетные пути в этом index.html должны быть АБСОЛЮТНЫМИ
+//      (`/iqmo-base.css`, `/img/...`), потому что страница лежит в
+//      подпапке.
+//   2. Прописать slug в массив `$SUBJECTS` ниже.
+//   3. `node scripts/sync-site.mjs` → коммит → пуш.
+$SUBJECTS = ['chemistry', 'biology'];
+
+Route::get('/subject-{slug}.html', function (string $slug) use ($SUBJECTS) {
+    if (! in_array($slug, $SUBJECTS, true)) {
+        abort(404);
+    }
+
+    return redirect('/subject-'.$slug.'/', 301);
+})->where('slug', '[a-z0-9-]+');
+
+Route::get('/subject-{slug}', function (string $slug) use ($serveStatic, $SUBJECTS) {
+    if (! preg_match('/^[a-z0-9-]+$/', $slug)) {
+        abort(404);
+    }
+    if (! in_array($slug, $SUBJECTS, true)) {
+        abort(404);
+    }
+    $full = public_path('site/subject-'.$slug.'/index.html');
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+})->where('slug', '[a-z0-9-]+');
+
+// Остальные страницы портала (`trial-chemistry.html`, `warmup-chemistry.html`,
+// `topic-*.html`, …): ссылки от главной идут с корня сайта, а файлы лежат
+// в `public/site/` — без этого маршрута под `php artisan serve` везде 404.
 Route::get('/{html}', function (string $html) use ($serveStatic) {
     if ($html !== basename($html) || ! preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*\\.html$/', $html)) {
         abort(404);
@@ -215,25 +259,6 @@ Route::get('/{html}', function (string $html) use ($serveStatic) {
     $full = public_path('site/'.$html);
     if (! is_file($full)) {
         abort(404);
-    }
-
-    // Старые копии `subject-chemistry.html` вели «Биология» на index.html. Пока `sync-site` на VPS
-    // не прогнали, подменяем ссылку при отдаче через Laravel (запрос должен дойти до index.php).
-    if ($html === 'subject-chemistry.html') {
-        $raw = @file_get_contents($full);
-        if ($raw !== false) {
-            $patched = preg_replace(
-                '/<a\\s+href="[^"]*index\\.html"\\s+class="subjects__item\\s+tone-bio"/',
-                '<a href="/subject-biology.html" class="subjects__item tone-bio"',
-                $raw,
-                1
-            );
-            if ($patched !== $raw) {
-                return response($patched, 200)
-                    ->header('Content-Type', 'text/html; charset=UTF-8')
-                    ->header('Cache-Control', 'private, no-cache');
-            }
-        }
     }
 
     return $serveStatic($full);

@@ -34,7 +34,7 @@
 				var h = (a.getAttribute('href') || '').trim();
 				if (!h || /subject-biology/.test(h)) return;
 				if (h.indexOf('index.html') !== -1) {
-					a.setAttribute('href', '/subject-biology.html');
+					a.setAttribute('href', '/subject-biology/');
 				}
 			} catch (eFix) {}
 		})();
@@ -125,9 +125,9 @@
 		// если где-то понадобится явный возврат на лендинг (например, Лого).
 		if (loggedIn) {
 			try {
-				var preferred = '/subject-biology.html';
+				var preferred = '/subject-biology/';
 				if (/(^|\/)(subject|full-test|category|topic)[-_].*chem/i.test(location.pathname)) {
-					preferred = '/subject-chemistry.html';
+					preferred = '/subject-chemistry/';
 				}
 				// Жёсткий список «домашних» URL: чтобы случайно не переписать ссылку
 				// на статью с заголовком «Главная» в каком-нибудь будущем разделе.

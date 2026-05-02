@@ -112,7 +112,7 @@ php artisan serve         # дальше как обычно
 **Что сделать**
 
 1. Убедиться, что [Deploy to VPS] на последнем коммите в `main` **зелёный**.
-2. Проверить не редактором, а факт: `curl -sS https://www.iqmoschool.ru/subject-chemistry.html | findstr /i subject-biology` (или в Linux `grep subject-biology`).
+2. Проверить не редактором, а факт: `curl -sS https://www.iqmoschool.ru/subject-chemistry/ | findstr /i subject-biology` (или в Linux `grep subject-biology`). Старый URL `/subject-chemistry.html` должен 301-редиректить на `/subject-chemistry/`.
 3. Править статику **только** в `extracted/` в репозитории, не вручную в `laravel/public/site/` на сервере (следующий sync перетрёт).
 4. Вручную: с машины, где установлен **Node ≥18** — `cd` в корень репозитория, `node scripts/sync-site.mjs`, затем скопируйте `laravel/public/site/` на сервер (или `git pull` в `APP_DIR` и `sync` на той же машине, если репозиторий один).
 5. Чтобы путь в панели совпадал с продом, уточните у хостинга, не ссылка ли `/var/www/iqmoschool.ru/...` на `.../iqmoschool_r_usr/data/...` (`readlink -f` / сравнение inodes).

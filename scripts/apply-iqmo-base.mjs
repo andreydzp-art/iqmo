@@ -67,7 +67,9 @@ for (const f of ['trial-chemistry.html', 'full-test-chemistry.html']) {
 }
 
 // --- subject-chemistry: :root..container, ul, and [hidden] before .cru ---
-const subjectPath = path.join(EX, 'subject-chemistry.html');
+// Page moved from extracted/subject-chemistry.html into a clean-URL folder
+// (extracted/subject-chemistry/index.html) — this script targets the new path.
+const subjectPath = path.join(EX, 'subject-chemistry', 'index.html');
 {
 	let s = fs.readFileSync(subjectPath, 'utf8');
 	s = insertLinkAfterManrope(s);
@@ -79,7 +81,7 @@ const subjectPath = path.join(EX, 'subject-chemistry.html');
 		'\n',
 	);
 	fs.writeFileSync(subjectPath, s, 'utf8');
-	console.log('patched subject-chemistry.html');
+	console.log('patched subject-chemistry/index.html');
 }
 
 // --- index: multiline, h1-h3 p only, no h4 in old block ---

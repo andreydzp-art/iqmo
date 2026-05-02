@@ -121,7 +121,7 @@
 			+ '<polyline points="5 12 10 17 19 7"/></svg>Рейтинг друзей и серия дней</div>'
 			+ '</div>'
 			+ '<div class="regnudge__cta-row">'
-			+ '<a href="/login.html?next=/profile.html&register=1" class="regnudge__cta" id="regnudge-go">'
+			+ '<a href="/login.html?next=/subject-biology/&register=1" class="regnudge__cta" id="regnudge-go">'
 			+ 'Зарегистрироваться →</a>'
 			+ '<button type="button" class="regnudge__later" id="regnudge-later">Позже</button>'
 			+ '</div>'
