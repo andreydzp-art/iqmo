@@ -2763,6 +2763,32 @@
 				const stats = lmComputeChapterStats([...variantInfos, bossInfo]);
 				// Глобальный уровень и серия — берём как раньше.
 				const globalStats = gmComputedStats(allVariants);
+				// Реальный профиль игрока (XP/уровень/название) — из chem-progress.js,
+				// чтобы цифры в hero совпадали с subject-страницей. Если ChemProgress
+				// недоступен (например, до загрузки скрипта) — падаем на gmComputedStats.
+				const realStats = (function () {
+					try {
+						if (window.ChemProgress && typeof ChemProgress.getGamificationSnapshot === 'function') {
+							const snap = ChemProgress.getGamificationSnapshot();
+							const lv = snap && snap.level ? snap.level : null;
+							return {
+								totalPoints: Math.max(0, Number(snap && snap.totalPoints) || 0),
+								level: lv && lv.current ? lv.current : 1,
+								title: (snap && snap.levelTitle) || 'Новик',
+								xpToNext: lv && lv.xpToNext != null ? Math.max(0, lv.xpToNext) : 0,
+								isMax: !!(lv && lv.nextThreshold == null)
+							};
+						}
+					} catch (eRS) {}
+					return null;
+				})();
+				const heroStats = realStats || {
+					totalPoints: globalStats.totalXp,
+					level: globalStats.level,
+					title: globalStats.title,
+					xpToNext: 100 - (globalStats.totalXp % 100),
+					isMax: false
+				};
 				const ringPct = stats.totalNodes ? Math.round(100 * stats.passed / stats.totalNodes) : 0;
 				const dashOffset = Math.max(0, Math.round(226 * (1 - ringPct / 100)));
 
@@ -2773,7 +2799,10 @@
 						: 'Проходите варианты по порядку. Следующий открывается, когда вы набираете не менее 50 % правильных ответов в части 1 текущего варианта.';
 
 				const seen = gmLoadSeen();
-				const justLeveledUp = (seen.level !== undefined) && globalStats.level > seen.level;
+				// «realLevel» — отдельное поле, чтобы новая (реальная) шкала уровней
+				// не давала ложных level-up на пользователях, у которых seen.level
+				// был сохранён по старой формуле gmComputedStats.
+				const justLeveledUp = (seen.realLevel !== undefined) && heroStats.level > seen.realLevel;
 				const freshUnlockId = (seen.lastUnlockedId == null && currentIdx >= 0)
 					? variantInfos[currentIdx].v.id
 					: (currentIdx >= 0 && variantInfos[currentIdx].v.id !== seen.lastUnlockedId
@@ -2789,7 +2818,7 @@
 
 				picker.innerHTML = `
 					<div class="lm-shell">
-						${lmHeroHtml({ heroLead, stats, globalStats, streakStatus, nextActionId })}
+						${lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId })}
 						${lmMapHtml({ variantInfos, bossInfo, currentIdx })}
 						${lmGrid4Html({ stats, globalStats, streakStatus })}
 						${lmTipHtml(stats, bossInfo)}
@@ -2827,14 +2856,15 @@
 
 				// Confetti / level-up
 				if (justLeveledUp) {
-					gmShowLevelUp(globalStats.level, globalStats.title);
-					try { if (window.ym) ym(108770166, 'reachGoal', 'level_up', { level: globalStats.level }); } catch (e0) {}
+					gmShowLevelUp(heroStats.level, heroStats.title);
+					try { if (window.ym) ym(108770166, 'reachGoal', 'level_up', { level: heroStats.level }); } catch (e0) {}
 				} else if (freshUnlockId) {
 					setTimeout(() => gmFireConfetti({ origin: { y: 0.4 } }), 250);
 				}
 
 				// Save seen state
 				seen.level = globalStats.level;
+				seen.realLevel = heroStats.level;
 				seen.lastUnlockedId = currentIdx >= 0 ? variantInfos[currentIdx].v.id : (allRegularDone ? bossSlot.id : null);
 				gmSaveSeen(seen);
 			}
@@ -2861,13 +2891,22 @@
 				};
 			}
 
-			function lmHeroHtml({ heroLead, stats, globalStats, streakStatus, nextActionId }) {
+			function lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId }) {
 				const heroCtaAttrs = nextActionId
 					? `data-v="${nextActionId}" title="Открыть текущий вариант" style="cursor:pointer;"`
 					: `disabled aria-disabled="true" style="opacity:.7; cursor:default;"`;
 				const heroCtaLabel = streakStatus.days > 0
 					? 'Серия ' + streakStatus.days + ' ' + (streakStatus.days === 1 ? 'день' : 'дн.') + (streakStatus.todayDone ? ' · сегодня ✓ — продолжить' : ' — продолжить')
 					: 'Начните серию — пройдите вариант сегодня';
+				// Реальные XP/уровень — приоритет, иначе fallback на устаревшую формулу.
+				const hs = heroStats || {
+					totalPoints: globalStats.totalXp,
+					level: globalStats.level,
+					title: globalStats.title,
+					xpToNext: 100 - (globalStats.totalXp % 100),
+					isMax: false
+				};
+				const xpToNextLabel = hs.isMax ? 'Максимальный уровень' : ('Уровень · ' + hs.xpToNext + ' XP до след.');
 				return `
 					<section class="lm-hero">
 						<div>
@@ -2912,17 +2951,17 @@
 									<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 3 8l9 6 9-6-9-6zM3 14l9 6 9-6"/></svg>
 								</div>
 								<div>
-									<div class="lm-stat-val"><span class="lm-num">${globalStats.totalXp}</span> <span style="font-size:12px; color:var(--lm-muted); font-weight:600; letter-spacing:.05em;">XP</span></div>
+									<div class="lm-stat-val"><span class="lm-num">${hs.totalPoints}</span> <span style="font-size:12px; color:var(--lm-muted); font-weight:600; letter-spacing:.05em;">XP</span></div>
 									<div class="lm-stat-lbl">Опыт</div>
 								</div>
 							</div>
 							<div class="lm-stat">
 								<div class="lm-stat-ico lm-ico-lvl" style="background:transparent;">
-									<div class="lm-stat-lvl-num lm-num">${globalStats.level}</div>
+									<div class="lm-stat-lvl-num lm-num">${hs.level}</div>
 								</div>
 								<div>
-									<div class="lm-stat-val" style="font-size:14px;">${globalStats.title}</div>
-									<div class="lm-stat-lbl">Уровень · ${100 - (globalStats.totalXp % 100)} XP до след.</div>
+									<div class="lm-stat-val" style="font-size:14px;">${hs.title}</div>
+									<div class="lm-stat-lbl">${xpToNextLabel}</div>
 								</div>
 							</div>
 						</div>
