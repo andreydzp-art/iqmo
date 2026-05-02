@@ -38,5 +38,26 @@ composer-setup.php
 # CI debugging artefacts
 .gh-jobs.json
 .git_commit_msg.txt
+.git-commit-msg.tmp
 gh.json
 laravel/composer
+
+# Скрэтчи и снапшоты — всё, что мы временно качаем curl'ом с прода или
+# распаковываем из присланных архивов, чтобы посравнивать. В git им
+# делать нечего (исходники этих файлов уже есть в `extracted/`).
+/_tmp_*/
+/b.js
+/body.js
+/body.txt
+/ft.html
+/ftb.html
+/ftc.html
+/nav.js
+/*.zip
+/node_modules/
+
+# Локальный snapshot редизайна, который пришёл архивом из чата:
+# исходники, что нам нужны, уже разложены по `extracted/` отдельными
+# коммитами; саму папку держать в репо незачем.
+extracted/_rd/
+laravel/public/site/_rd/
