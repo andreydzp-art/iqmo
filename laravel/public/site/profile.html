@@ -485,6 +485,9 @@
 				</a>
 				<div class="header__btns">
 					<a href="/login.html" class="btn btn--ghost" id="iqmo-nav-login">Вход</a>
+					<!-- Быстрый возврат к учёбе из профиля. iqmo-nav.js (через .iqmo-only-authed) -->
+					<!-- покажет кнопку только авторизованным; гостю учебных страниц нет. -->
+					<a href="/subject-biology.html" class="btn btn--ghost iqmo-only-authed" id="iqmo-nav-classes" hidden>К занятиям</a>
 					<a href="./profile.html" class="btn btn--ghost" id="iqmo-nav-profile" hidden aria-current="page">Профиль</a>
 					<button type="button" class="btn btn--ghost" id="iqmo-nav-logout" hidden data-iqmo-after-logout="./index.html">
 						Выйти
@@ -613,7 +616,7 @@
 						профиле; не стоит гнаться за XP в ущерб глубокому пониманию тем.
 					</div>
 					<p>
-						<strong>Баллы прогресса</strong> и <strong>уровень (1–50)</strong> считаются от одной суммы XP. Уровень растёт ступенями: чем выше уровень, тем больше нужно XP до следующего. Подпись под уровнем (например, «Новичок» или «Практик») меняется по номеру уровня.
+						<strong>Баллы прогресса</strong> и <strong>уровень (1–50)</strong> считаются от одной суммы XP. Уровень растёт ступенями: чем выше уровень, тем больше нужно XP до следующего. Подпись под уровнем (например, «Новик» или «Точность») меняется по номеру уровня.
 					</p>
 					<p style="margin-top: 10px"><strong>Что добавляет XP</strong></p>
 					<ul>

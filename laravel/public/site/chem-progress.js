@@ -105,13 +105,6 @@
 		return s === 'biology' || s === 'bio' ? 'bio' : 'chem';
 	}
 
-	// Subject -> namespace для имён событий аналитики. Биология шлёт `bio.*`,
-	// всё остальное (включая отсутствующий subject) - `chem.*` (исторический префикс).
-	function eventNamespaceForSubject(subject) {
-		var s = subject == null ? '' : String(subject).toLowerCase();
-		return s === 'biology' || s === 'bio' ? 'bio' : 'chem';
-	}
-
 	function flushAnalyticsQueue() {
 		if (iqmoAnalyticsFlushing || typeof fetch !== 'function') return;
 		const queue = loadAnalyticsQueue();
@@ -364,16 +357,23 @@
 		};
 	}
 
+	const LEVEL_TITLES_RU = [
+		'',
+		'Новик', 'Ученик', 'Старт', 'Вход', 'Игрок',
+		'Путь', 'Режим', 'Темп', 'Рывок', 'Сдвиг',
+		'Контур', 'Баланс', 'Фокус', 'Ритм', 'Поток',
+		'Вектор', 'Захват', 'Синхр', 'Навык', 'Драйв',
+		'Точность', 'Расчёт', 'Логика', 'Система', 'Контроль',
+		'Сборка', 'Предел', 'Опора', 'Сигнал', 'Ядро',
+		'Влияние', 'Давление', 'Чтение', 'Прорыв', 'Захват',
+		'Напор', 'Разбор', 'Анализ', 'Вынос', 'Штурм',
+		'Элита', 'Мастер', 'Эксперт', 'Профи', 'Титан',
+		'Вершина', 'Лидер', 'Легенд', 'Абсолют', 'Пик'
+	];
+
 	function levelTitleRu(level) {
 		const l = Math.min(MAX_LEVEL, Math.max(1, Number(level) || 1));
-		if (l >= 46) return 'Легенда';
-		if (l >= 41) return 'Мастер';
-		if (l >= 36) return 'Эксперт';
-		if (l >= 28) return 'Знаток';
-		if (l >= 20) return 'Практик';
-		if (l >= 13) return 'Уверенный';
-		if (l >= 7) return 'Ученик';
-		return 'Новичок';
+		return LEVEL_TITLES_RU[l] || 'Новик';
 	}
 
 	function ensureDailyGoal() {
