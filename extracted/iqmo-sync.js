@@ -26,21 +26,26 @@
 		}, 3500);
 	}
 
+	// Перехватываем мутации только у window.localStorage (instance-shadowing),
+	// а не у Storage.prototype: иначе любой sessionStorage.clear()/setItem()
+	// тоже будет триггерить markDirty() через общий прототип. Sync-у нужно
+	// знать только о записи в долговременное хранилище — в sessionStorage
+	// мы ничего не синхронизируем.
 	try {
-		const proto = Storage.prototype;
-		const origSet = proto.setItem;
-		const origRemove = proto.removeItem;
-		const origClear = proto.clear;
-		proto.setItem = function (key, val) {
-			origSet.call(this, key, val);
+		const ls = window.localStorage;
+		const origSet = ls.setItem.bind(ls);
+		const origRemove = ls.removeItem.bind(ls);
+		const origClear = ls.clear.bind(ls);
+		ls.setItem = function (key, val) {
+			origSet(key, val);
 			if (typeof key === 'string' && key.indexOf(PREFIX) === 0) markDirty();
 		};
-		proto.removeItem = function (key) {
-			origRemove.call(this, key);
+		ls.removeItem = function (key) {
+			origRemove(key);
 			if (typeof key === 'string' && key.indexOf(PREFIX) === 0) markDirty();
 		};
-		proto.clear = function () {
-			origClear.call(this);
+		ls.clear = function () {
+			origClear();
 			markDirty();
 		};
 	} catch (e) {}
