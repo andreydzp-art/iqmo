@@ -275,6 +275,30 @@ jobs:
             fi
           done
 
+          # /profile/ — clean URL кабинета (см. routes/web.php). Старый
+          # /profile.html обязан 301-редиректить на /profile/ — это часть
+          # SEO-канонизации (как у subject/full-test).
+          code_prof=$(curl -sS -o /tmp/smoke-prof.html -w "%{http_code}" "$BASE/profile/" || true)
+          if [ "$code_prof" != "200" ]; then
+            echo "GET /profile/ expected 200, got $code_prof"
+            exit 1
+          fi
+          if ! grep -q "108770166" /tmp/smoke-prof.html; then
+            echo "/profile/ missing Yandex Metrika counter — likely stale public/profile.html bypassing Laravel"
+            exit 1
+          fi
+          code_prof_legacy=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/profile.html" || true)
+          if [ "$code_prof_legacy" != "301" ]; then
+            echo "Legacy /profile.html expected 301, got $code_prof_legacy"
+            exit 1
+          fi
+          loc_prof=$(curl -sSI "$BASE/profile.html" | grep -i '^location:' | tr -d '\r' | awk '{print $2}')
+          loc_prof_path=$(echo "$loc_prof" | sed -E 's|^https?://[^/]+||' | sed 's|/*$||')
+          if [ "$loc_prof_path" != "/profile" ]; then
+            echo "Legacy /profile.html should land on /profile[/], got: $loc_prof"
+            exit 1
+          fi
+
           # Проверка меню «Биология» намеренно не в smoke: сразу после deploy edge/CDN
           # может кратковременно отдавать старую HTML — ложные падения. Статика
           # гарантируется `sync-site` из `extracted/` на APP_DIR (см. docs/DEPLOY.md).

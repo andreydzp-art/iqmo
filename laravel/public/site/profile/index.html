@@ -25,10 +25,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>IQMO — Профиль</title>
 		<meta name="description" content="Прогресс по химии ОГЭ: темы, попытки, вехи и банк ошибок." />
+		<link rel="canonical" href="https://www.iqmoschool.ru/profile/" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://www.iqmoschool.ru/profile/" />
+		<meta property="og:title" content="IQMO — Профиль" />
+		<meta property="og:description" content="Прогресс по химии ОГЭ: темы, попытки, вехи и банк ошибок." />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-		<link rel="stylesheet" href="./iqmo-base.css?v=1" />
+		<link rel="stylesheet" href="/iqmo-base.css?v=1" />
 		<style>
 			:root {
 				--bg: #f3f5f8;
@@ -493,7 +498,7 @@
 					<!-- Быстрый возврат к учёбе из профиля. iqmo-nav.js (через .iqmo-only-authed) -->
 					<!-- покажет кнопку только авторизованным; гостю учебных страниц нет. -->
 					<a href="/subject-biology/" class="btn btn--ghost iqmo-only-authed" id="iqmo-nav-classes" hidden>К занятиям</a>
-					<a href="./profile.html" class="btn btn--ghost" id="iqmo-nav-profile" hidden aria-current="page">Профиль</a>
+					<a href="/profile/" class="btn btn--ghost" id="iqmo-nav-profile" hidden aria-current="page">Профиль</a>
 					<button type="button" class="btn btn--ghost" id="iqmo-nav-logout" hidden data-iqmo-after-logout="/">
 						Выйти
 					</button>
@@ -549,7 +554,7 @@
 						<h2>Банк ошибок</h2>
 						<div class="stat-big" id="prof-mistakes">0</div>
 						<p class="stat-label">
-							<a class="link" href="./mistakes-chemistry.html">Открыть работу над ошибками →</a>
+							<a class="link" href="/mistakes-chemistry.html">Открыть работу над ошибками →</a>
 						</p>
 					</div>
 					<div class="card">
@@ -657,23 +662,23 @@
 			</div>
 		</footer>
 
-		<script src="./iqmo-sync.js"></script>
-		<script src="./iqmo-nav.js"></script>
-		<script src="./chem-progress.js"></script>
-		<script src="./mistakes-store.js"></script>
+		<script src="/iqmo-sync.js"></script>
+		<script src="/iqmo-nav.js"></script>
+		<script src="/chem-progress.js"></script>
+		<script src="/mistakes-store.js"></script>
 		<script>
 			(function () {
 				const TOPICS = [
-					{ key: 'iqmo-chem-topic01-subtopics', n: 6, href: './topic-periodic-table.html', label: '01 · Периодическая система' },
-					{ key: 'iqmo-chem-topic02-subtopics', n: 6, href: './topic-atom-structure.html', label: '02 · Строение атома' },
-					{ key: 'iqmo-chem-topic03-subtopics', n: 7, href: './topic-chemical-bond.html', label: '03 · Химическая связь' },
-					{ key: 'iqmo-chem-topic04-subtopics', n: 6, href: './topic-inorganic-classes.html', label: '04 · Классы неорганики' },
-					{ key: 'iqmo-chem-topic05-subtopics', n: 6, href: './topic-chemical-reactions.html', label: '05 · Реакции' },
-					{ key: 'iqmo-chem-topic06-subtopics', n: 6, href: './topic-solutions-dissociation.html', label: '06 · Растворы' },
-					{ key: 'iqmo-chem-topic07-subtopics', n: 6, href: './topic-metals-compounds.html', label: '07 · Металлы' },
-					{ key: 'iqmo-chem-topic08-subtopics', n: 7, href: './topic-nonmetals-compounds.html', label: '08 · Неметаллы' },
-					{ key: 'iqmo-chem-topic09-subtopics', n: 7, href: './topic-organic-substances.html', label: '09 · Органика' },
-					{ key: 'iqmo-chem-topic10-subtopics', n: 7, href: './topic-life-ecology.html', label: '10 · Экология' }
+					{ key: 'iqmo-chem-topic01-subtopics', n: 6, href: '/topic-periodic-table.html', label: '01 · Периодическая система' },
+					{ key: 'iqmo-chem-topic02-subtopics', n: 6, href: '/topic-atom-structure.html', label: '02 · Строение атома' },
+					{ key: 'iqmo-chem-topic03-subtopics', n: 7, href: '/topic-chemical-bond.html', label: '03 · Химическая связь' },
+					{ key: 'iqmo-chem-topic04-subtopics', n: 6, href: '/topic-inorganic-classes.html', label: '04 · Классы неорганики' },
+					{ key: 'iqmo-chem-topic05-subtopics', n: 6, href: '/topic-chemical-reactions.html', label: '05 · Реакции' },
+					{ key: 'iqmo-chem-topic06-subtopics', n: 6, href: '/topic-solutions-dissociation.html', label: '06 · Растворы' },
+					{ key: 'iqmo-chem-topic07-subtopics', n: 6, href: '/topic-metals-compounds.html', label: '07 · Металлы' },
+					{ key: 'iqmo-chem-topic08-subtopics', n: 7, href: '/topic-nonmetals-compounds.html', label: '08 · Неметаллы' },
+					{ key: 'iqmo-chem-topic09-subtopics', n: 7, href: '/topic-organic-substances.html', label: '09 · Органика' },
+					{ key: 'iqmo-chem-topic10-subtopics', n: 7, href: '/topic-life-ecology.html', label: '10 · Экология' }
 				];
 
 				function readArr(key, n) {
@@ -818,7 +823,7 @@
 							.replace(/</g, '&lt;');
 						const icon =
 							meta.img ?
-								'<img class="prof-badge-tile__icon" src="./badges/' +
+								'<img class="prof-badge-tile__icon" src="/badges/' +
 								meta.img +
 								'" alt="" width="80" height="80" loading="lazy" />'
 							:	'';
@@ -941,14 +946,14 @@
 						}
 						const s = JSON.parse(raw);
 						if (s.finished) {
-							el.innerHTML = 'Последний пробник <strong>завершён</strong>. <a class="link" href="./trial-chemistry.html">Пройти снова →</a>';
+							el.innerHTML = 'Последний пробник <strong>завершён</strong>. <a class="link" href="/trial-chemistry.html">Пройти снова →</a>';
 							return;
 						}
 						const answered = Object.keys(s.answers || {}).length;
 						el.innerHTML =
 							'Пробник <strong>в процессе</strong>: ответов ' +
 							answered +
-							' из 10. <a class="link" href="./trial-chemistry.html">Продолжить →</a>';
+							' из 10. <a class="link" href="/trial-chemistry.html">Продолжить →</a>';
 					} catch (e) {
 						el.textContent = 'Не удалось прочитать состояние пробника.';
 					}

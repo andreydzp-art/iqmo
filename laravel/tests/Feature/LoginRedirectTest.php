@@ -12,7 +12,7 @@ use Tests\TestCase;
  *
  * Без него залогиненный пользователь видит форму логина на ~200 мс — пока
  * клиентский JS не сделает /api/me и не редиректит. Гард читает iqmo_session
- * cookie на стороне Laravel и сразу 302-ит в /profile.html (или в sanitized
+ * cookie на стороне Laravel и сразу 302-ит в /subject-biology/ (или в sanitized
  * ?next=, если он указывает на локальный путь).
  *
  * Тесты заодно фиксируют open-redirect инвариант: ?next= с протокольно-

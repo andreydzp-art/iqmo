@@ -81,7 +81,7 @@ Route::get('/img/{path}', function (string $path) use ($serveStatic) {
 })->where('path', '.*');
 
 // Server-side guard: если у пользователя уже валидная JWT-кука iqmo_session, страница
-// логина не показывается — сразу 302 на /profile.html (или на sanitized ?next=, если есть).
+// логина не показывается — сразу 302 на /subject-biology/ (или на sanitized ?next=, если есть).
 // Без этого залогиненный юзер на ~200 мс видит форму, прежде чем JS делает /api/me.
 // Применяется к каноничному /login.html и к alias /uploads/login.html.
 $skipIfAuthed = function (Request $request) use ($serveStatic): \Symfony\Component\HttpFoundation\Response {
@@ -158,9 +158,20 @@ Route::get('/index.html', function () {
     return redirect('/', 301);
 })->name('iqmo.site_index');
 
-Route::get('/profile.html', function () use ($serveStatic) {
-    return $serveStatic(public_path('site/profile.html'));
+// `/profile/` — clean URL (симметрично /subject-<slug>/, /full-test-<slug>/).
+// Старый /profile.html 301-редиректит на каноничный URL, чтобы внешние
+// ссылки и закладки не отваливались, а в адресной строке у пользователей
+// оставался только один вариант.
+Route::get('/profile.html', function () {
+    return redirect('/profile/', 301);
 })->name('iqmo.profile_html');
+
+$serveProfileIndex = function () use ($serveStatic) {
+    return $serveStatic(public_path('site/profile/index.html'));
+};
+// `/profile` и `/profile/` — оба отдают index.html; Laravel нормализует
+// trailing slash при роутинге, одной записи достаточно.
+Route::get('/profile', $serveProfileIndex)->name('iqmo.profile');
 
 Route::get('/login', function () {
     // Canonical login entrypoint is `/login.html` (served from `public/site/login.html`).
@@ -213,8 +224,8 @@ Route::middleware('iqmo.portal_admin')->group(function () use ($serveStatic): vo
     })->where('path', '.*');
 });
 
-Route::get('/cabinet', function () use ($serveStatic) {
-    return $serveStatic(public_path('site/profile.html'));
+Route::get('/cabinet', function () use ($serveProfileIndex) {
+    return $serveProfileIndex();
 })->name('cabinet');
 
 // Root-level static files referenced by pages served at `/<page>` (clean URL)
@@ -324,9 +335,15 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Breeze-стек кабинета (его UI лежит в resources/views/profile/*.blade.php).
+// На клиентском сайте мы его не используем — пользователи открывают свой
+// IQMO-профиль по `/profile/` (см. выше). Чтобы оба кабинета не дрались
+// за один URL, Breeze переехал на `/account/*`. Имена роутов
+// (`profile.edit`/`profile.update`/`profile.destroy`) сохраняются — все
+// Blade-views и `route('profile.edit')` продолжают работать без правок.
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/account', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/account', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/account', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

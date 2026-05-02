@@ -107,14 +107,14 @@ const subjectPath = path.join(EX, 'subject-chemistry', 'index.html');
 
 // --- profile ---
 {
-	const p = path.join(EX, 'profile.html');
+	const p = path.join(EX, 'profile', 'index.html');
 	let s = fs.readFileSync(p, 'utf8');
 	s = insertLinkAfterManrope(s);
 	const profBlock =
 		/\n\t\t\t:root \{[\s\S]*?\n\t\t\th1,\n\t\t\th2,\n\t\t\th3,\n\t\t\tp \{[\s\S]*?\n\t\t\t\}\n\n\t\t\t\.container \{[\s\S]*?\n\t\t\t\}/;
 	if (profBlock.test(s)) s = s.replace(profBlock, '');
 	fs.writeFileSync(p, s, 'utf8');
-	console.log('patched profile.html');
+	console.log('patched profile/index.html');
 }
 
 // --- legal (smaller :root) ---

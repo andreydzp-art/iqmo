@@ -134,4 +134,28 @@ final class SubjectPagesTest extends TestCase
         $response->assertStatus(301);
         $response->assertRedirect('/');
     }
+
+    public function test_profile_clean_url_serves_page(): void
+    {
+        // /profile/ — каноничный URL кабинета (симметрично subject/full-test).
+        $response = $this->get('/profile/');
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+    }
+
+    public function test_profile_clean_url_without_trailing_slash_also_works(): void
+    {
+        $this->get('/profile')->assertStatus(200);
+    }
+
+    public function test_legacy_profile_html_redirects_301(): void
+    {
+        // /profile.html переехал на /profile/. 301, чтобы старые ссылки и
+        // закладки шли в каноничное место и не плодили дубль в индексе.
+        $response = $this->get('/profile.html');
+
+        $response->assertStatus(301);
+        $response->assertRedirect('/profile/');
+    }
 }
