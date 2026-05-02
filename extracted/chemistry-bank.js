@@ -24,7 +24,7 @@ window.CHEMISTRY_QUESTIONS = [
 					body: `
 						<p>На приведённом рисунке изображена схема строения электронных оболочек атома.</p>
 						<div style="margin: 18px 0; display: flex; justify-content: center;">
-							<img src="./img/chemistry-q2-electron-shells.png" width="360" alt="Схема электронных оболочек: ядро +8, внутренний уровень 2 e⁻, внешний уровень 6 e⁻" style="max-width: 100%; height: auto; display: block;" />
+							<img src="/img/chemistry-q2-electron-shells.png" width="360" alt="Схема электронных оболочек: ядро +8, внутренний уровень 2 e⁻, внешний уровень 6 e⁻" style="max-width: 100%; height: auto; display: block;" />
 						</div>
 						<p>Запишите в поле ответа номер периода (<b>X</b>) и номер группы (<b>Y</b>), в которых расположен химический элемент, схема строения которого изображена на рисунке.</p>
 						<p style="color: var(--muted); font-size: 14px;">Для записи ответа используйте арабские цифры, без пробелов и запятых: сначала <b>X</b>, затем <b>Y</b>.</p>
