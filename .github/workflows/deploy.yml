@@ -159,23 +159,22 @@ jobs:
             # loopback-проверка не срабатывала и предыдущий запрос отбивался
             # с 403 forbidden — opcache не сбрасывался. APP_KEY уже на VPS
             # в .env, наружу не уходит, проверяется hash_equals.
+            #
+            # Без if/else: drone-ssh оборачивает каждую команду в проверку
+            # exit-кода и прерывает скрипт на любом ненулевом — обычная
+            # bash-конструкция if [ -z ... ]; then в этом контексте падает
+            # сама по себе. Поэтому всё через цепочку `&& / ||` (как у
+            # `systemctl reload` выше).
             echo "=== DEPLOY: opcache_reset() via _opcache_reset.php ==="
-            APP_KEY_VALUE="$(grep -E '^APP_KEY=' "${LARAVEL_DIR}/.env" | head -n1 | sed -E 's/^APP_KEY=//; s/^["'\'']//; s/["'\'']$//')"
-            if [ -z "$APP_KEY_VALUE" ]; then
-              echo "WARN: APP_KEY missing in .env — opcache reset skipped"
-            else
-              opcache_response=$(curl -sS -k -m 10 -X POST \
-                --resolve www.iqmoschool.ru:443:127.0.0.1 \
-                -H "X-Deploy-Secret: ${APP_KEY_VALUE}" \
-                -w "\nHTTP_CODE:%{http_code}" \
-                "https://www.iqmoschool.ru/_opcache_reset.php" || true)
-              echo "opcache reset response: ${opcache_response}"
-              if echo "$opcache_response" | grep -q '"ok":true'; then
-                echo "opcache reset OK"
-              else
-                echo "WARN: opcache reset may have failed (workers will refresh by pm.max_requests TTL)"
-              fi
-            fi
+            APP_KEY_VALUE="$(grep -E '^APP_KEY=' "${LARAVEL_DIR}/.env" | head -n1 | sed -E 's/^APP_KEY=//; s/^["'\'']//; s/["'\'']$//' || true)"
+            opcache_response=$(curl -sS -k -m 10 -X POST \
+              --resolve www.iqmoschool.ru:443:127.0.0.1 \
+              -H "X-Deploy-Secret: ${APP_KEY_VALUE:-NO_SECRET}" \
+              "https://www.iqmoschool.ru/_opcache_reset.php" 2>&1 || echo "CURL_FAILED")
+            echo "opcache reset response: ${opcache_response}"
+            echo "$opcache_response" | grep -q '"ok":true' \
+              && echo "opcache reset OK" \
+              || echo "WARN: opcache reset may have failed (workers will refresh by pm.max_requests TTL)"
             echo "=== DEPLOY: Laravel layer OK ==="
 
   smoke:
