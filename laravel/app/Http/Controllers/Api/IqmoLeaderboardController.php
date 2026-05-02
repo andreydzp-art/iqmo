@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\DB;
  * поэтому никаких отдельных таблиц XP не требуется.
  *
  * Endpoint доступен и гостям (чтобы блок «Рейтинг» рендерился без логина), но email
- * других пользователей всегда замаскирован (a***y@g***.com), а полный email мы вообще
- * не отдаём — даже о себе. Поле `is_me` — единственный признак, по которому фронт
- * подсвечивает «Вы».
+ * других пользователей всегда замаскирован (andre***@g***.com — первые 5 символов
+ * локалки + первая буква домена + TLD), а полный email мы вообще не отдаём — даже
+ * о себе. Поле `is_me` — единственный признак, по которому фронт подсвечивает «Вы».
  */
 final class IqmoLeaderboardController extends Controller
 {
@@ -126,9 +126,9 @@ final class IqmoLeaderboardController extends Controller
     }
 
     /**
-     * Маска: первые 3 символа локалки видны, дальше `***`. Домен сохраняем
-     * приватным (первая буква + `***` + TLD): `and***@g***.com`.
-     * Если локалка ≤ 3 символов — показываем её целиком без обрезки.
+     * Маска: первые 5 символов локалки видны, дальше `***`. Домен сохраняем
+     * приватным (первая буква + `***` + TLD): `andre***@g***.com`.
+     * Если локалка ≤ 5 символов — показываем её целиком без обрезки.
      */
     private function maskEmail(string $email): string
     {
@@ -141,10 +141,10 @@ final class IqmoLeaderboardController extends Controller
         $domain = substr($email, $at + 1);
 
         $localLen = mb_strlen($local);
-        if ($localLen <= 3) {
+        if ($localLen <= 5) {
             $maskedLocal = $local . '***';
         } else {
-            $maskedLocal = mb_substr($local, 0, 3) . '***';
+            $maskedLocal = mb_substr($local, 0, 5) . '***';
         }
 
         $dot = strrpos($domain, '.');
