@@ -38,5 +38,25 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute(120)->by($key);
         });
+
+        // /api/auth/login — защита от credential stuffing. Ключ: IP + email (если
+        // прислан в body). Так brute-force ОДНОГО email с одного IP ловится строго,
+        // а распределённая атака на разные email'ы с одного IP — мягче. Лимит
+        // 10/мин совпадает с порогом Breeze LoginRequest для /laravel/login.
+        RateLimiter::for('iqmo-auth-login', function (Request $request) {
+            $email = strtolower((string) $request->input('email', ''));
+            $key = sha1($request->ip().'|'.$email);
+
+            return Limit::perMinute(10)->by($key);
+        });
+
+        // /api/auth/register — защита от registration flood (создание юзеров,
+        // загаживание users-таблицы и enumeration через email_taken). Ключ:
+        // только IP — email специально игнорируем, иначе атакующий с одного
+        // IP получит N лимитов на N разных email'ов. 5/мин достаточно для
+        // легитимного UX (опечатка в email, повтор), но не для перебора.
+        RateLimiter::for('iqmo-auth-register', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
     }
 }

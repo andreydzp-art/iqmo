@@ -13,8 +13,13 @@ use App\Http\Controllers\Api\QuizTrackController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->group(function (): void {
-    Route::post('/auth/register', [IqmoAuthController::class, 'register']);
-    Route::post('/auth/login', [IqmoAuthController::class, 'login']);
+    // Throttle определён в AppServiceProvider::boot().
+    // Lock-out (429) на login прерывает credential stuffing; на register
+    // — registration flood и email enumeration (см. также audit #6).
+    Route::post('/auth/register', [IqmoAuthController::class, 'register'])
+        ->middleware('throttle:iqmo-auth-register');
+    Route::post('/auth/login', [IqmoAuthController::class, 'login'])
+        ->middleware('throttle:iqmo-auth-login');
     Route::post('/auth/logout', [IqmoAuthController::class, 'logout']);
 
     Route::get('/me', [IqmoAuthController::class, 'me']);
