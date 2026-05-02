@@ -167,8 +167,13 @@ jobs:
             # `systemctl reload` выше).
             echo "=== DEPLOY: opcache_reset() via _opcache_reset.php ==="
             APP_KEY_VALUE="$(grep -E '^APP_KEY=' "${LARAVEL_DIR}/.env" | head -n1 | sed -E 's/^APP_KEY=//; s/^["'\'']//; s/["'\'']$//' || true)"
-            opcache_response=$(curl -sS -k -m 10 -X POST \
-              --resolve www.iqmoschool.ru:443:127.0.0.1 \
+            # Без --resolve: nginx на этом VPS не слушает 127.0.0.1:443,
+            # поэтому loopback-curl падал с "Failed to connect to ... port 443".
+            # Идём через публичный URL — это лишний DNS+TLS, но один раз
+            # на деплой не страшно. REMOTE_ADDR на сервере при этом всё
+            # равно будет публичный IP клиента (NAT'а), поэтому работает
+            # secret-ветка авторизации.
+            opcache_response=$(curl -sS -m 10 -X POST \
               -H "X-Deploy-Secret: ${APP_KEY_VALUE:-NO_SECRET}" \
               "https://www.iqmoschool.ru/_opcache_reset.php" 2>&1 || echo "CURL_FAILED")
             echo "opcache reset response: ${opcache_response}"
