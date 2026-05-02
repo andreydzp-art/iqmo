@@ -72,6 +72,21 @@ jobs:
         # Pure PHP test — no Laravel boot, no .env needed.
         run: vendor/bin/phpunit --testsuite=Unit --no-coverage
 
+      # Зеркало `laravel/public/site/` теперь не лежит в git — оно
+      # генерируется из `extracted/` (см. .gitignore + scripts/sync-site.mjs).
+      # LoginRedirectTest читает `public/site/login.html` через
+      # response()->file(...), поэтому без сборки зеркала Feature-тесты
+      # падают с FileNotFoundException. Симметрично шагу «Build static
+      # (sync-site)» в .github/workflows/deploy.yml.
+      - name: Setup Node (for sync-site)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build static (sync-site)
+        working-directory: ${{ github.workspace }}
+        run: node scripts/sync-site.mjs
+
       - name: Run Feature tests (sqlite-only subset)
         # AnalyticsIngestTest swaps the `iqmo` connection to in-memory sqlite,
         # LoginRedirectTest doesn't touch the DB at all. Both run without any
