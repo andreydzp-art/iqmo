@@ -30,29 +30,71 @@
 		<style>
 
 
-			/* ---- top bar ---- */
+			/* ---- top bar ---- (стиль навбара из референса _tmp_ft6/level-map.html) */
 			.topbar {
-				background: #fff;
+				background: transparent;
 				padding: 0;
-				position: sticky;
+				position: relative;
 				top: 0;
 				z-index: 20;
 			}
-			/* Полоса под заголовком — только под строкой с кнопкой, не пересекается с «Выйти» */
 			.topbar__head {
-				border-bottom: 1px solid var(--line);
-				padding: 14px 0;
+				border-bottom: 0;
+				padding: 16px 0 0;
+			}
+			.topbar__head > .container {
+				background: #fff;
+				border: 1px solid var(--line);
+				border-radius: 16px;
+				box-shadow: 0 1px 2px rgba(15,18,38,.04), 0 1px 1px rgba(15,18,38,.03);
+				padding: 8px 14px;
 			}
 			.topbar__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 			.topbar__right { display: flex; align-items: center; flex-shrink: 0; }
-			.topbar__left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+			.topbar__left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+			.brand { display:flex; align-items:center; gap:12px; min-width: 0; }
+			.brand-mark {
+				width: 30px; height: 30px; border-radius: 9px;
+				background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+				position: relative; flex-shrink: 0;
+				box-shadow: 0 6px 14px -4px rgba(79,70,229,.55);
+			}
+			.brand-mark::after {
+				content:""; position:absolute; inset:6px;
+				background: #fff;
+				-webkit-mask:
+					radial-gradient(circle at 30% 30%, #000 0 35%, transparent 36%),
+					radial-gradient(circle at 70% 70%, #000 0 35%, transparent 36%);
+				-webkit-mask-composite: source-over;
+				        mask-composite: add;
+				border-radius: 4px;
+				opacity: .95;
+			}
+			.brand-name { font-weight: 800; letter-spacing: -.01em; font-size: 15px; color: var(--ink); }
+			.brand-sep { color: var(--line); margin: 0 4px; }
+			.breadcrumbs {
+				color: var(--muted); font-size: 13.5px;
+				overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+			}
+			.breadcrumbs b { color: #2a2e4a; font-weight: 600; }
+			/* Старые имена для обратной совместимости */
 			.logo { font-weight: 800; font-size: 18px; letter-spacing: .02em; }
 			.topbar__subject {
-				font-size: 13px; color: var(--muted); padding-left: 14px;
-				border-left: 1px solid var(--line);
+				font-size: 13.5px; color: var(--muted);
 				overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 			}
-			.topbar__subject b { color: var(--ink); font-weight: 700; }
+			.topbar__subject b { color: #2a2e4a; font-weight: 600; }
+			/* Pill-кнопки в шапке (без затрагивания .btn в карточках теста) */
+			.topbar .btn--ghost {
+				height: 36px; padding: 0 14px;
+				border-radius: 999px;
+				border: 1px solid var(--line);
+				background: #fff;
+				color: #2a2e4a;
+				font-size: 13px; font-weight: 500;
+			}
+			.topbar .btn--ghost:hover { background: #eef0f7; border-color: var(--line); }
+			.topbar .btn--ghost.is--alert { color: #b23e3e; }
 			.topbar__center { display: flex; align-items: center; gap: 14px; }
 			.timer {
 				display: inline-flex; align-items: center; gap: 8px;
@@ -647,6 +689,7 @@
 
 			@media (max-width: 600px) {
 				.topbar__subject { display: none; }
+				.brand-sep, .breadcrumbs { display: none; }
 				.q-title { font-size: 19px; }
 				.nav-tasks__grid { grid-template-columns: repeat(8, 1fr); }
 				.result-breakdown { grid-template-columns: 1fr; }
@@ -1434,8 +1477,12 @@
 			<div class="topbar__head">
 				<div class="container topbar__row">
 					<div class="topbar__left">
-						<div class="logo">IQMO</div>
-						<div class="topbar__subject"><b>Химия · ОГЭ 2026</b> — Полный вариант</div>
+						<div class="brand">
+							<div class="brand-mark" aria-hidden="true"></div>
+							<a href="./index.html" class="brand-name" style="text-decoration:none; color:inherit;">IQMO</a>
+							<span class="brand-sep">/</span>
+							<div class="breadcrumbs">Химия · ОГЭ 2026 — <b>Полный вариант</b></div>
+						</div>
 					</div>
 					<div class="topbar__center">
 						<div class="timer" id="timer">
@@ -1553,8 +1600,8 @@
 
 			// Update subject label with variant
 			try {
-				const subj = document.querySelector('.topbar__subject');
-				if (subj) subj.innerHTML = `<b>Химия · ОГЭ 2026</b> — ${activeVariant.title}`;
+				const subj = document.querySelector('.breadcrumbs') || document.querySelector('.topbar__subject');
+				if (subj) subj.innerHTML = `Химия · ОГЭ 2026 — <b>${activeVariant.title}</b>`;
 			} catch(e) {}
 
 			// ============================================================
