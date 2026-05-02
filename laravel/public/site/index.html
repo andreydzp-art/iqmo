@@ -5,6 +5,7 @@
      чтобы CSS-правила в iqmo-base.css сразу скрыли «не ту» половину кнопок. 
      Hint пишется iqmo-nav.js после реального ответа /api/me. -->
 <script data-iqmo-fouc-guard="1">try{document.documentElement.setAttribute('data-iqmo-auth',localStorage.getItem('iqmo_auth_hint')==='1'?'authed':'guest');}catch(e){}</script>
+<style data-iqmo-fouc-guard="1">html[data-iqmo-auth='authed'] .iqmo-only-guest,html[data-iqmo-auth='authed'] #iqmo-nav-login{display:none!important}html[data-iqmo-auth='guest'] .iqmo-only-authed,html[data-iqmo-auth='guest'] #iqmo-nav-profile,html[data-iqmo-auth='guest'] #iqmo-nav-logout{display:none!important}</style>
 <meta charset="utf-8" />
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
