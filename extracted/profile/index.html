@@ -608,6 +608,15 @@
 				</div>
 
 				<div class="actions iqmo-only-authed" hidden style="margin-top: 14px">
+					<h2>Выйти на всех устройствах</h2>
+					<p>
+						Завершит активные сессии на всех устройствах и в браузерах, где вы заходили. Полезно, если устройство потеряно, или вы заходили на чужом компьютере. Вход на этом устройстве после нажатия тоже будет завершён — введите пароль заново, чтобы продолжить.
+					</p>
+					<button type="button" class="btn btn--ghost" id="prof-logout-everywhere">Выйти на всех устройствах</button>
+					<p id="prof-logout-everywhere-status" class="stat-label" style="margin-top: 8px" hidden></p>
+				</div>
+
+				<div class="actions iqmo-only-authed" hidden style="margin-top: 14px">
 					<h2>Удалить аккаунт</h2>
 					<p>
 						Полное и безвозвратное удаление учётной записи: e-mail, пароль, прогресс на сервере и история событий аналитики. Локальные данные в этом браузере не затрагиваются — для них есть кнопка «Сбросить данные» выше. Подробнее в
@@ -1052,6 +1061,86 @@
 					} catch (e2) {}
 					location.reload();
 				});
+
+				// «Выйти на всех устройствах» — server-side JWT revocation
+				// (audit #3). Триггерит INCREMENT users.token_version в БД,
+				// что мгновенно инвалидирует все ранее выпущенные iqmo_session
+				// JWT этого юзера: на любом authed-запросе с других вкладок/
+				// устройств middleware AuthenticateIqmoJwt и /api/me отдадут
+				// 401, и iqmo-nav.js там переключит UI в guest-режим.
+				// Эта вкладка тоже разлогинивается полным local-wipe + redirect
+				// на /login.html.
+				var logoutEverywhereBtn = document.getElementById('prof-logout-everywhere');
+				var logoutEverywhereStatus = document.getElementById('prof-logout-everywhere-status');
+				if (logoutEverywhereBtn) {
+					logoutEverywhereBtn.addEventListener('click', async function () {
+						if (
+							!confirm(
+								'Завершить сессии на всех устройствах? На этом устройстве вход тоже будет завершён, и для возврата нужно будет ввести пароль.'
+							)
+						) {
+							return;
+						}
+						logoutEverywhereBtn.disabled = true;
+						if (logoutEverywhereStatus) {
+							logoutEverywhereStatus.hidden = false;
+							logoutEverywhereStatus.textContent = 'Завершаем сессии…';
+						}
+						try {
+							var r = await fetch('/api/auth/logout-everywhere', {
+								method: 'POST',
+								credentials: 'include',
+								headers: { Accept: 'application/json' }
+							});
+							if (!r.ok) {
+								if (logoutEverywhereStatus) {
+									logoutEverywhereStatus.textContent = 'Не удалось (HTTP ' + r.status + '). Попробуйте ещё раз.';
+								}
+								logoutEverywhereBtn.disabled = false;
+								return;
+							}
+						} catch (eLE) {
+							if (logoutEverywhereStatus) {
+								logoutEverywhereStatus.textContent = 'Сеть недоступна. Попробуйте ещё раз.';
+							}
+							logoutEverywhereBtn.disabled = false;
+							return;
+						}
+						// Local-wipe идентичный обычному logout (см. iqmo-nav.js)
+						// и delete-account ниже. Списки нужно держать
+						// синхронизированными во всех трёх местах.
+						try {
+							var WIPE_PREFIXES_LE = [
+								'iqmo-chem-',
+								'iqmo-bio-',
+								'iqmo:chem:',
+								'iqmo_purchase_',
+								'iqmo_express_start_'
+							];
+							var WIPE_KEYS_LE = [
+								'iqmo-analytics-queue-v1',
+								'iqmo-regnudge-dismissed-at',
+								'iqmo-last-uid',
+								'iqmo_auth_hint'
+							];
+							for (var iLE = localStorage.length - 1; iLE >= 0; iLE--) {
+								var kLE = localStorage.key(iLE);
+								if (!kLE) continue;
+								var matchedLE = false;
+								for (var pLE = 0; pLE < WIPE_PREFIXES_LE.length; pLE++) {
+									if (kLE.indexOf(WIPE_PREFIXES_LE[pLE]) === 0) { matchedLE = true; break; }
+								}
+								if (!matchedLE) {
+									for (var qLE = 0; qLE < WIPE_KEYS_LE.length; qLE++) {
+										if (kLE === WIPE_KEYS_LE[qLE]) { matchedLE = true; break; }
+									}
+								}
+								if (matchedLE) localStorage.removeItem(kLE);
+							}
+						} catch (eLE2) {}
+						location.href = '/login.html';
+					});
+				}
 
 				// Account deletion is irreversible: double-confirm with a typed phrase so an
 				// accidental Enter on the dialog can't wipe an account.
