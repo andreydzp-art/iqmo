@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\IqmoAuditLogger;
 use App\Services\IqmoJwt;
 use Closure;
 use Illuminate\Http\Request;
@@ -39,6 +40,20 @@ final class EnsureIqmoPortalAdmin
         if ($email === '' || ! in_array($email, $allowed, true)) {
             abort(403, 'Forbidden');
         }
+
+        // Audit (audit #12): фиксируем КАЖДЫЙ доступ к /admin/* — каждое
+        // GET /api/admin/users, открытие /admin/index.html и т.п. Это
+        // даёт полный forensic-trail активности админа. Объём записей
+        // ограничен — admin'ов мало, и страницы редко открываются;
+        // если станет шумно, в будущем можно будет фильтровать по
+        // типу запроса (сейчас context.path помогает группировать).
+        IqmoAuditLogger::record(
+            IqmoAuditLogger::ADMIN_ACCESS,
+            (int) $payload['uid'],
+            $email,
+            ['path' => $request->path(), 'method' => $request->method()],
+            $request
+        );
 
         return $next($request);
     }

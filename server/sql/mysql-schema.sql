@@ -61,3 +61,21 @@ CREATE TABLE IF NOT EXISTS analytics_events (
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Security audit log (audit #12): кто залогинился, удалил аккаунт,
+-- сделал logout-everywhere, попал в /admin/. Намеренно БЕЗ FK на users:
+-- account_delete пишет запись после удаления users-row, и FK не дал бы
+-- сохранить событие. actor_email — best-effort идентификация.
+CREATE TABLE IF NOT EXISTS audit_log (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  actor_user_id BIGINT UNSIGNED NULL,
+  actor_email VARCHAR(320) NULL,
+  action VARCHAR(64) NOT NULL,
+  context_json JSON NULL,
+  ip VARCHAR(45) NULL,
+  user_agent VARCHAR(255) NULL,
+  created_at BIGINT NOT NULL,
+  PRIMARY KEY (id),
+  KEY idx_audit_actor_time (actor_user_id, created_at),
+  KEY idx_audit_action_time (action, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

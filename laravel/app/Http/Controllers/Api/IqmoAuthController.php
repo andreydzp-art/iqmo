@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\IqmoAuditLogger;
 use App\Services\IqmoJwt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -56,27 +57,45 @@ final class IqmoAuthController extends Controller
                     ->where('email', $email)
                     ->first();
 
-                if ($existing && Hash::check($password, (string) $existing->password_hash)) {
-                    $userId = (int) $existing->id;
+                            if ($existing && Hash::check($password, (string) $existing->password_hash)) {
+                                $userId = (int) $existing->id;
+                                $this->issueSessionCookie($userId, $email);
+                                $this->ensureProfileRow($userId);
+                                // Silent login через register endpoint: пишем как
+                                // обычный auth.login, не register — это не создание
+                                // нового аккаунта. Контекст помогает отличить от
+                                // прямого /api/auth/login (полезно при анализе фуннела).
+                                IqmoAuditLogger::record(
+                                    IqmoAuditLogger::AUTH_LOGIN,
+                                    $userId,
+                                    $email,
+                                    ['source' => 'register_or_login'],
+                                    $request
+                                );
+
+                                return response()->json(['ok' => true, 'email' => $email]);
+                            }
+
+                            return response()->json(['error' => 'invalid_credentials'], 401);
+                        }
+
+                        report($e);
+
+                        return response()->json(['error' => 'server'], 500);
+                    }
+
                     $this->issueSessionCookie($userId, $email);
                     $this->ensureProfileRow($userId);
+                    IqmoAuditLogger::record(
+                        IqmoAuditLogger::AUTH_REGISTER,
+                        $userId,
+                        $email,
+                        [],
+                        $request
+                    );
 
                     return response()->json(['ok' => true, 'email' => $email]);
                 }
-
-                return response()->json(['error' => 'invalid_credentials'], 401);
-            }
-
-            report($e);
-
-            return response()->json(['error' => 'server'], 500);
-        }
-
-        $this->issueSessionCookie($userId, $email);
-        $this->ensureProfileRow($userId);
-
-        return response()->json(['ok' => true, 'email' => $email]);
-    }
 
     public function login(Request $request)
     {
@@ -91,13 +110,35 @@ final class IqmoAuthController extends Controller
         $userId = (int) $row->id;
         $this->issueSessionCookie($userId, $email);
         $this->ensureProfileRow($userId);
+        IqmoAuditLogger::record(
+            IqmoAuditLogger::AUTH_LOGIN,
+            $userId,
+            $email,
+            [],
+            $request
+        );
 
         return response()->json(['ok' => true, 'email' => $email]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        // Пытаемся определить actor для audit-row до того, как стираем
+        // cookie. Без middleware iqmo.jwt здесь, поэтому разбираем сами.
+        $jwt = IqmoJwt::fromConfig();
         $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
+        $token = (string) ($request->cookies->get($cookieName) ?? '');
+        $payload = $jwt->verify($token);
+        if ($payload) {
+            IqmoAuditLogger::record(
+                IqmoAuditLogger::AUTH_LOGOUT,
+                (int) $payload['uid'],
+                (string) ($payload['email'] ?? ''),
+                [],
+                $request
+            );
+        }
+
         $resp = response()->json(['ok' => true]);
         $resp->headers->clearCookie($cookieName, path: '/');
 
@@ -138,6 +179,14 @@ final class IqmoAuthController extends Controller
 
             return response()->json(['error' => 'revocation_unavailable'], 503);
         }
+
+        IqmoAuditLogger::record(
+            IqmoAuditLogger::AUTH_LOGOUT_EVERYWHERE,
+            $userId,
+            (string) $request->attributes->get('iqmo_user_email'),
+            [],
+            $request
+        );
 
         $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
         $resp = response()->json(['ok' => true]);
@@ -225,6 +274,23 @@ final class IqmoAuthController extends Controller
         if ($userId <= 0) {
             return response()->json(['error' => 'unauthorized'], 401);
         }
+
+        $email = (string) $request->attributes->get('iqmo_user_email');
+        // Пишем audit-row ДО удаления users-row: после DELETE FROM users
+        // FK не дал бы записать (если бы он был); кроме того, эту запись
+        // мы хотим иметь даже если удаление упадёт по transaction-rollback —
+        // тогда останется forensic-trail, что попытка была.
+        // actor_user_id оставляем (юзер ещё существует на момент записи),
+        // но и actor_email положим — это compliance-важная информация
+        // («Кто запросил удаление?»), а после стирания users-row никакой
+        // другой источник email уже не покажет.
+        IqmoAuditLogger::record(
+            IqmoAuditLogger::AUTH_ACCOUNT_DELETE,
+            $userId,
+            $email,
+            [],
+            $request
+        );
 
         try {
             DB::connection('iqmo')->transaction(function () use ($userId): void {
