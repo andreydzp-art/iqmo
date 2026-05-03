@@ -3611,6 +3611,11 @@
 				const isEmpty = given === undefined || given === '' ||
 					(Array.isArray(given) && given.filter(x => x).length === 0);
 				if (isEmpty) return 'skip';
+				const norm = (s) => String(s).trim().toLowerCase();
+				if (q.type === 'input') {
+					const variants = Array.isArray(correct) ? correct : [correct];
+					return variants.some((v) => norm(given) === norm(v)) ? 'ok' : 'wrong';
+				}
 				if (Array.isArray(correct)) {
 					if (q.type === 'match') {
 						const g = Array.isArray(given) ? given.map(x => x || '').join(',') : '';
@@ -3620,7 +3625,7 @@
 					const c = [...correct].sort().join(',');
 					return g === c ? 'ok' : 'wrong';
 				}
-				return String(given).trim().toLowerCase() === String(correct).trim().toLowerCase() ? 'ok' : 'wrong';
+				return norm(given) === norm(correct) ? 'ok' : 'wrong';
 			}
 		</script>
 	</body>
