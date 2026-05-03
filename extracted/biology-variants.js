@@ -2,6 +2,7 @@
 // Вариант 1: 21 задание из biology-bank.js (qid 1–21).
 // Вариант 2: 23 задания (qid 22–33, 43, 44, 34–42). qid 43 — placeholder для
 // позиции 13 (условие ещё не получено), qid 44 — «Орган слуха» (ОГЭ-14).
+// Вариант 3: 21 задание (qid 45–65), интегрировано из variant3_bio.js.
 // Остальные варианты — в разработке.
 window.BIOLOGY_VARIANTS = (function () {
 	const variants = [];
@@ -17,7 +18,13 @@ window.BIOLOGY_VARIANTS = (function () {
 		qids: [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 43, 44, 34, 35, 36, 37, 38, 39, 40, 41, 42],
 		status: 'ready',
 	});
-	for (let i = 3; i <= 29; i++) {
+	variants.push({
+		id: 3,
+		title: 'Вариант 3',
+		qids: [45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65],
+		status: 'ready',
+	});
+	for (let i = 4; i <= 29; i++) {
 		variants.push({
 			id: i,
 			title: 'Вариант ' + i,
