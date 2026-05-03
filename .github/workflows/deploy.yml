@@ -396,6 +396,27 @@ jobs:
             echo "$headers_home"
             exit 1
           fi
+          # HSTS должен присутствовать на HTTPS — критично для защиты от SSL-strip.
+          # Если этого header'а нет на проде, любая MITM-точка может перенаправить
+          # юзера на http:// и забрать cookie/credentials до того, как браузер
+          # узнает, что сайт умеет HTTPS.
+          if ! echo "$headers_home" | grep -qi "^strict-transport-security:.*max-age="; then
+            echo "Homepage missing Strict-Transport-Security — SSL-strip protection отключена"
+            echo "$headers_home"
+            exit 1
+          fi
+          # Clickjacking-защита для публичной части. SAMEORIGIN — discord старее,
+          # frame-ancestors 'self' — в CSP. Нужен хоть один.
+          if ! echo "$headers_home" | grep -qi "^x-frame-options:.*SAMEORIGIN"; then
+            echo "Homepage missing X-Frame-Options: SAMEORIGIN — clickjacking-защита открыта"
+            echo "$headers_home"
+            exit 1
+          fi
+          if ! echo "$headers_home" | grep -qi "^content-security-policy:.*frame-ancestors"; then
+            echo "Homepage missing CSP frame-ancestors — clickjacking-защита открыта"
+            echo "$headers_home"
+            exit 1
+          fi
 
           # /admin must enforce stricter policy: X-Frame-Options + CSP, even on the
           # 302/403/503 the middleware sees before auth fires. Используем clean URL —

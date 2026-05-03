@@ -39,6 +39,22 @@ final class SecurityHeaders
             false
         );
 
+        // HSTS — отправляется только на HTTPS (на HTTP браузер игнорирует
+        // и это лишняя строка в plaintext). 1 год + includeSubDomains.
+        // БЕЗ preload: preload-список делает изменения необратимыми
+        // (удаление из chrome:hsts требует месяцев), пока что мы не
+        // готовы дать такую гарантию. Если когда-то понадобится не-HTTPS
+        // на iqmoschool.ru — отзыв preload занял бы месяцы.
+        if ($request->isSecure()) {
+            $response->headers->set(
+                'Strict-Transport-Security',
+                'max-age=31536000; includeSubDomains',
+                false
+            );
+        }
+
+        $isAdmin = str_starts_with(ltrim($request->path(), '/'), 'admin');
+
         // /admin/* is internal: lock it down harder than the public site.
         // - X-Frame-Options: DENY — admin must never be iframed, even by ourselves.
         // - frame-ancestors 'none' is the modern replacement; we send both for
@@ -55,7 +71,7 @@ final class SecurityHeaders
         // - mc.yandex.ru is whitelisted because the Metrika counter snippet
         //   loads tag.js from there and sends beacons back; remove if Metrika
         //   gets dropped from /admin.
-        if (str_starts_with(ltrim($request->path(), '/'), 'admin')) {
+        if ($isAdmin) {
             $response->headers->set('X-Frame-Options', 'DENY', false);
             $response->headers->set(
                 'Content-Security-Policy',
@@ -72,6 +88,18 @@ final class SecurityHeaders
                     "form-action 'self'",
                     "object-src 'none'",
                 ]),
+                false
+            );
+        } else {
+            // Публичная часть: только clickjacking-щит. SAMEORIGIN для
+            // legacy-браузеров и frame-ancestors 'self' для современных.
+            // НЕ ставим script-src/style-src — публичные страницы используют
+            // инлайн-скрипты (Yandex Metrika counter, dataLayer, форма
+            // квиза), полный CSP для них — отдельная задача (аудит #10).
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN', false);
+            $response->headers->set(
+                'Content-Security-Policy',
+                "frame-ancestors 'self'",
                 false
             );
         }
