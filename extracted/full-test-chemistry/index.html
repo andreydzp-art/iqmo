@@ -230,6 +230,31 @@
 			.q-body .chem { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 15px; }
 			.q-body sub { font-size: 0.75em; }
 			.q-body sup { font-size: 0.75em; }
+			/* Картинки внутри тела вопроса. По умолчанию иллюстрации идут в
+			   натуральных пикселях (≈1000×1000) и на десктопе занимают
+			   половину экрана, оттесняя варианты ответа вниз. Держим их
+			   в компактной центрированной рамке (≤ 380 px по ширине,
+			   ≤ 360 px по высоте) — этого хватает для схем, графиков и
+			   фотографий. Для модификатора .q-figure--wide (широкие графики
+			   с длинными осями) лимит выше. Распространяется на ВСЕ задания
+			   химии — и на текущие, и на будущие. */
+			.q-body .q-figure {
+				margin: 12px auto 14px;
+				max-width: min(100%, 380px);
+				width: 100%;
+			}
+			.q-body .q-figure--wide { max-width: min(100%, 520px); }
+			.q-body .q-figure__img,
+			.q-body img {
+				display: block;
+				width: 100%;
+				max-width: 100%;
+				max-height: 360px;
+				height: auto;
+				object-fit: contain;
+				border-radius: 10px;
+				box-shadow: 0 6px 18px -12px rgba(20, 28, 44, 0.25);
+			}
 
 			/* options */
 			.options { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }

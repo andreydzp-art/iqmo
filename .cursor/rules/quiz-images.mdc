@@ -1,0 +1,61 @@
+---
+description: Sizing rule for illustrations inside quiz questions (chemistry/biology full tests)
+globs: extracted/full-test-*/**, extracted/*-bank.js
+alwaysApply: false
+---
+
+# Картинки в заданиях полного теста — правила
+
+## Контекст
+
+В `extracted/biology-bank.js` и `extracted/chemistry-bank.js` иллюстрации
+вставляются как `<figure class="q-figure"><img class="q-figure__img" .../></figure>`
+внутри `body` вопроса. SVG/PNG лежат в натуральных пикселях (часто
+≈1000×1000) и без CSS-ограничений занимают пол-экрана у ученика, оттесняя
+варианты ответа далеко вниз.
+
+Глобальный лимит уже задан в:
+- `extracted/full-test-biology/index.html` (CSS `.q-body .q-figure`, `.q-body img`)
+- `extracted/full-test-chemistry/index.html` (CSS `.q-body .q-figure`, `.q-body img`)
+
+Лимиты:
+- `.q-figure` — `max-width: min(100%, 380px)`
+- `.q-figure--wide` — `max-width: min(100%, 520px)` (для широких графиков)
+- любой `<img>` в `.q-body` — `max-height: 360px`, `object-fit: contain`,
+  `width: 100%`, центрирован через `margin: 12px auto 14px`
+
+## Правила для контента
+
+1. **Не задавай inline `width`/`height`** на `<img>` или `<figure>` —
+   глобальный CSS уже всё ограничивает. Inline-размеры ломают консистентность.
+2. **Используй `.q-figure--wide` только для широких графиков** (числовые
+   оси, длинные временные шкалы). Дефолтный класс `.q-figure` подходит для
+   90% задач — схем, фотографий, диаграмм.
+3. **Не вставляй `<img>` напрямую в `body` без `<figure class="q-figure">`** —
+   обёртка нужна для семантики и для будущего `<figcaption>`.
+4. **SVG предпочтительнее PNG**, особенно для схем — они масштабируются
+   без потерь и весят меньше.
+
+## Пример
+
+```html
+<!-- ✅ ХОРОШО -->
+<p>На схеме показан процесс деления...</p>
+<figure class="q-figure">
+  <img class="q-figure__img" src="/path/to/schema.svg" alt="Схема деления клетки">
+</figure>
+
+<!-- ❌ ПЛОХО — inline-размеры -->
+<img src="schema.png" width="900" height="900">
+
+<!-- ❌ ПЛОХО — нет обёртки -->
+<img class="q-figure__img" src="schema.svg">
+```
+
+## Что делать, если правило нужно изменить
+
+Меняй CSS **в обоих** файлах одновременно:
+- `extracted/full-test-biology/index.html`
+- `extracted/full-test-chemistry/index.html`
+
+Иначе курсы разъедутся визуально.
