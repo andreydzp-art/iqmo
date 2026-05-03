@@ -63,6 +63,12 @@ jobs:
         with:
           node-version: "20"
 
+      # Регрессионный гард на банк вопросов: блокирует деплой если
+      # placeholder совпал с correct (утечка ответа в input-поле) или
+      # появились дубликаты qid. См. scripts/validate-chemistry-bank.mjs.
+      - name: Validate chemistry bank
+        run: node scripts/validate-chemistry-bank.mjs
+
       - name: Build static (sync-site)
         run: node scripts/sync-site.mjs
 

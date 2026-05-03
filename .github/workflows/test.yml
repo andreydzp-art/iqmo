@@ -83,6 +83,10 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Validate chemistry bank
+        working-directory: ${{ github.workspace }}
+        run: node scripts/validate-chemistry-bank.mjs
+
       - name: Build static (sync-site)
         working-directory: ${{ github.workspace }}
         run: node scripts/sync-site.mjs
