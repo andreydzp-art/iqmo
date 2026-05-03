@@ -2385,6 +2385,12 @@
 
 				const tp = scoring.totalPoints, tm = scoring.totalMax;
 
+				const nextVariant = (VARIANTS
+					.filter(v => v && v.id > activeVariant.id && v.status === 'ready' && Array.isArray(v.qids) && v.qids.length)
+					.sort((a, b) => a.id - b.id))[0] || null;
+				const part1Passed = scoring.autoTotal > 0 && (scoring.autoPoints / scoring.autoTotal) >= PASS_THRESHOLD;
+				const showNextBtn = !!nextVariant && part1Passed;
+
 				document.querySelector('.page__main').innerHTML = `
 					<div class="container" style="padding-top: 18px; padding-bottom: 48px;">
 						<div class="review-head">
@@ -2400,7 +2406,8 @@
 							</div>
 							<div class="review-actions">
 								<button type="button" class="btn btn--ghost" id="btn-back-summary">← К сводке</button>
-								<button type="button" class="btn btn--blue" id="btn-restart-2">Пройти заново</button>
+								<button type="button" class="btn ${showNextBtn ? 'btn--ghost' : 'btn--blue'}" id="btn-restart-2">Пройти заново</button>
+								${showNextBtn ? `<a href="/full-test-biology/?v=${nextVariant.id}" class="btn btn--blue" id="btn-next-variant" title="Перейти к следующему варианту">${nextVariant.title || ('Вариант ' + nextVariant.id)} →</a>` : ''}
 							</div>
 						</div>
 						<div class="review-list">${listHtml}</div>
