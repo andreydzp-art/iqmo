@@ -1584,6 +1584,33 @@
 			var DEV_UNLOCK_ALL = false;
 			var PASS_THRESHOLD = 0.5;
 			var COOLDOWN_MS = 60 * 60 * 1000;
+			// При первом рендере карты уровней localStorage может быть ещё
+			// пустым: iqmo-sync.js подтягивает iqmo-chem-streak / результаты
+			// вариантов с сервера асинхронно. Без этого подписчика юзер
+			// видел бы «0 дней подряд» и уже пройденные варианты как
+			// заблокированные, пока не обновит страницу. Перерисовываем
+			// карту уровней, как только iqmo-sync обновил localStorage.
+			//
+			// Подписку ставим один раз на странице (как в profile/index.html):
+			// слушатели идемпотентны, повторные вызовы renderVariantPicker
+			// просто перестроят DOM.
+			(function bindSyncRerender() {
+				if (variantParam) return; // только для экрана выбора вариантов
+				let scheduled = false;
+				function rerender() {
+					if (scheduled) return;
+					scheduled = true;
+					// requestAnimationFrame, чтобы не дёргать DOM по каждому
+					// 'iqmo-sync' событию подряд (push сразу за pull и т.п.).
+					requestAnimationFrame(function () {
+						scheduled = false;
+						try { renderVariantPicker(); } catch (e) {}
+					});
+				}
+				window.addEventListener('iqmo-sync', rerender);
+				window.addEventListener('iqmo-sync-ready', rerender);
+			})();
+
 			(function runApp() {
 			if (!variantParam) {
 				renderVariantPicker();

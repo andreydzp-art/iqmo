@@ -873,7 +873,10 @@
   }
 
   // Profile + page-head stats
-  (function fillProfile() {
+  // Перерисовываем после iqmo-sync.js (асинхронной подтяжки streak / XP
+  // / уровней с сервера), иначе при первом заходе на устройство юзер
+  // увидел бы «0 дней подряд» и нулевой XP, пока iqmo-sync не дотянет.
+  function fillProfile() {
     if (!window.ChemProgress) return;
     try { ChemProgress.ensureAnonId && ChemProgress.ensureAnonId(); } catch (e) {}
     var snap = {};
@@ -970,6 +973,20 @@
         if (me && me.created_at) paintDays(me.created_at);
       }).catch(function () {});
     }
+  }
+  fillProfile();
+  (function bindFillProfileToSync() {
+    var scheduled = false;
+    function rerender() {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(function () {
+        scheduled = false;
+        try { fillProfile(); } catch (e) {}
+      });
+    }
+    window.addEventListener('iqmo-sync', rerender);
+    window.addEventListener('iqmo-sync-ready', rerender);
   })();
 
   // Leaderboard (top-5 по XP, маска email). Без auth — гости тоже видят.
