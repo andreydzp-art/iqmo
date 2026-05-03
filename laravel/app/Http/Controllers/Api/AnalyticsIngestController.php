@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\ApiErrorCode;
 use App\Http\Controllers\Controller;
 use App\Services\IqmoJwt;
 use Illuminate\Http\Request;
@@ -59,7 +60,7 @@ class AnalyticsIngestController extends Controller
     {
         $userId = IqmoJwt::userIdFromCookie($request);
         if ($userId === null) {
-            return response()->json(['error' => 'unauthorized'], 401);
+            return response()->json(['error' => ApiErrorCode::UNAUTHORIZED], 401);
         }
 
         // Размер тела проверяем через Content-Length, ДО `$request->all()` —
@@ -68,16 +69,16 @@ class AnalyticsIngestController extends Controller
         // приходит из `fetch` — это нормально для веб-клиентов.
         $contentLength = (int) $request->header('Content-Length', '0');
         if ($contentLength > self::MAX_BODY_BYTES) {
-            return response()->json(['error' => 'payload_too_large'], 413);
+            return response()->json(['error' => ApiErrorCode::PAYLOAD_TOO_LARGE], 413);
         }
 
         $body = $request->all();
         $list = $body['events'] ?? null;
         if (! is_array($list) || count($list) === 0) {
-            return response()->json(['error' => 'events_required'], 400);
+            return response()->json(['error' => ApiErrorCode::EVENTS_REQUIRED], 400);
         }
         if (count($list) > 24) {
-            return response()->json(['error' => 'too_many_events'], 400);
+            return response()->json(['error' => ApiErrorCode::TOO_MANY_EVENTS], 400);
         }
 
         $now = (int) (microtime(true) * 1000);
@@ -126,7 +127,7 @@ class AnalyticsIngestController extends Controller
         }
 
         if ($rows === []) {
-            return response()->json(['error' => 'no_valid_events'], 400);
+            return response()->json(['error' => ApiErrorCode::NO_VALID_EVENTS], 400);
         }
 
         // Same connection as IqmoAuthController/IqmoAdminOverviewBuilder so the FK to users

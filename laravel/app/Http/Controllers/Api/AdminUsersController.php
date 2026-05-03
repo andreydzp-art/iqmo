@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\ApiErrorCode;
 use App\Http\Controllers\Controller;
 use App\Services\IqmoAdminUsersBuilder;
 use Illuminate\Http\JsonResponse;
@@ -38,7 +39,7 @@ final class AdminUsersController extends Controller
     public function show(Request $request, int $id, IqmoAdminUsersBuilder $builder): JsonResponse
     {
         if ($id < 1) {
-            return response()->json(['meta' => ['source' => 'error', 'error' => 'invalid_id']], 422);
+            return response()->json(['meta' => ['source' => 'error', 'error' => ApiErrorCode::INVALID_ID]], 422);
         }
 
         try {
@@ -49,7 +50,7 @@ final class AdminUsersController extends Controller
 
         if ($payload === null) {
             return response()->json([
-                'meta' => ['source' => 'not_found', 'error' => 'user_not_found', 'id' => $id],
+                'meta' => ['source' => 'not_found', 'error' => ApiErrorCode::USER_NOT_FOUND, 'id' => $id],
             ], 404);
         }
 
@@ -75,7 +76,7 @@ final class AdminUsersController extends Controller
         return response()->json([
             'meta' => [
                 'source' => 'error',
-                'error' => 'build_failed',
+                'error' => ApiErrorCode::BUILD_FAILED,
                 'errorMessage' => $e->getMessage(),
                 'errorClass' => get_class($e),
                 'errorAt' => basename($e->getFile()).':'.$e->getLine(),

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\ApiErrorCode;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,17 +29,17 @@ final class QuizLeadController extends Controller
 
         if ($email !== null) {
             if (strlen($email) > 190 || ! preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]+$/', $email)) {
-                return response()->json(['error' => 'invalid_email'], 400);
+                return response()->json(['error' => ApiErrorCode::INVALID_EMAIL], 400);
             }
         }
         if ($phone === false) {
-            return response()->json(['error' => 'invalid_phone'], 400);
+            return response()->json(['error' => ApiErrorCode::INVALID_PHONE], 400);
         }
         if ($email === null && $phone === null) {
-            return response()->json(['error' => 'no_contact'], 400);
+            return response()->json(['error' => ApiErrorCode::NO_CONTACT], 400);
         }
         if (! in_array($quizId, self::ALLOWED_QUIZ_IDS, true)) {
-            return response()->json(['error' => 'invalid_quiz_id'], 400);
+            return response()->json(['error' => ApiErrorCode::INVALID_QUIZ_ID], 400);
         }
 
         // 2. score / total / wrong_topics — как было.

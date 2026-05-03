@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\ApiErrorCode;
 use App\Http\Controllers\Controller;
 use App\Services\IqmoAuditLogger;
 use App\Services\IqmoJwt;
@@ -310,7 +311,7 @@ final class IqmoAuthController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return response()->json(['error' => 'server'], 500);
+            return response()->json(['error' => ApiErrorCode::SERVER], 500);
         }
 
         $cookieName = (string) config('iqmo.cookie_name', 'iqmo_session');
@@ -318,6 +319,26 @@ final class IqmoAuthController extends Controller
         $resp->headers->clearCookie($cookieName, path: '/');
 
         return $resp;
+    }
+
+    /**
+     * Список admin-email'ов в нижнем регистре, без пробелов и пустых
+     * значений. Возвращает то же самое, что использует EnsureIqmoPortalAdmin
+     * — единая правда о том, кто admin.
+     *
+     * @return list<string>
+     */
+    private function adminEmails(): array
+    {
+        $allowed = config('iqmo.admin_emails', []);
+        if (! is_array($allowed)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map(
+            static fn (mixed $e): string => strtolower(trim((string) $e)),
+            $allowed
+        ))));
     }
 
     private function issueSessionCookie(int $userId, string $email): void
@@ -352,6 +373,21 @@ final class IqmoAuthController extends Controller
             $secure = Str::startsWith($appUrl, 'https://');
         }
 
+        // SameSite=strict для admin-email (audit #16). Защита от CSRF
+        // на admin-actions: даже если злоумышленник заведёт сайт
+        // example.com с <form action="https://iqmoschool.ru/admin/...">
+        // или <img src="https://...?delete=1"> — браузер не отправит
+        // cookie, потому что SameSite=strict запрещает cross-site
+        // sending для всех типов запросов, включая top-level navigation.
+        //
+        // Минус strict: admin, кликнувший на iqmoschool.ru с внешнего
+        // сайта (поисковик, мессенджер), увидит первый запрос как
+        // guest. Это приемлемо: дальнейшая навигация уже same-origin,
+        // и cookie возвращается. Для обычных юзеров оставляем lax —
+        // strict бы раздражал на каждой ссылке из почты/мессенджера.
+        $isAdmin = in_array(strtolower($email), $this->adminEmails(), true);
+        $sameSite = $isAdmin ? 'strict' : 'lax';
+
         cookie()->queue(
             cookie(
                 name: $cookieName,
@@ -362,7 +398,7 @@ final class IqmoAuthController extends Controller
                 secure: (bool) $secure,
                 httpOnly: true,
                 raw: false,
-                sameSite: 'lax'
+                sameSite: $sameSite
             )
         );
     }

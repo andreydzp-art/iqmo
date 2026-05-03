@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Constants\ApiErrorCode;
 use App\Services\IqmoJwt;
 use Closure;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ final class AuthenticateIqmoJwt
         $jwt = IqmoJwt::fromConfig();
         $payload = $jwt->verify($token);
         if (!$payload) {
-            return response()->json(['error' => 'unauthorized'], 401);
+            return response()->json(['error' => ApiErrorCode::UNAUTHORIZED], 401);
         }
 
         // Server-side revocation (audit #3). Раньше middleware был
@@ -49,12 +50,12 @@ final class AuthenticateIqmoJwt
         }
 
         if (!$row) {
-            return response()->json(['error' => 'unauthorized'], 401);
+            return response()->json(['error' => ApiErrorCode::UNAUTHORIZED], 401);
         }
 
         $serverTv = isset($row->token_version) ? (int) $row->token_version : 1;
         if ($serverTv !== (int) $payload['tv']) {
-            return response()->json(['error' => 'unauthorized'], 401);
+            return response()->json(['error' => ApiErrorCode::UNAUTHORIZED], 401);
         }
 
         $request->attributes->set('iqmo_user_id', $payload['uid']);

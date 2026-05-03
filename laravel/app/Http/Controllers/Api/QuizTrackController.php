@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\ApiErrorCode;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,18 +23,18 @@ final class QuizTrackController extends Controller
         $payload = $request->input('payload', null);
 
         if (! in_array($quizId, self::ALLOWED_QUIZ_IDS, true)) {
-            return response()->json(['error' => 'invalid_quiz_id'], 400);
+            return response()->json(['error' => ApiErrorCode::INVALID_QUIZ_ID], 400);
         }
         if (! in_array($event, self::ALLOWED_EVENTS, true)) {
-            return response()->json(['error' => 'invalid_event'], 400);
+            return response()->json(['error' => ApiErrorCode::INVALID_EVENT], 400);
         }
         if ($qIdx !== null) {
             if (! is_numeric($qIdx)) {
-                return response()->json(['error' => 'invalid_q_idx'], 400);
+                return response()->json(['error' => ApiErrorCode::INVALID_Q_IDX], 400);
             }
             $qIdx = (int) $qIdx;
             if ($qIdx < 1 || $qIdx > 15) {
-                return response()->json(['error' => 'invalid_q_idx'], 400);
+                return response()->json(['error' => ApiErrorCode::INVALID_Q_IDX], 400);
             }
         } else {
             $qIdx = null;
@@ -43,12 +44,12 @@ final class QuizTrackController extends Controller
         $payloadJson = null;
         if ($payload !== null) {
             if (! is_array($payload)) {
-                return response()->json(['error' => 'invalid_payload'], 400);
+                return response()->json(['error' => ApiErrorCode::INVALID_PAYLOAD], 400);
             }
             // Hard cap to keep rows small and safe.
             $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE);
             if (! is_string($payloadJson) || strlen($payloadJson) > 4096) {
-                return response()->json(['error' => 'payload_too_large'], 413);
+                return response()->json(['error' => ApiErrorCode::PAYLOAD_TOO_LARGE], 413);
             }
         }
 

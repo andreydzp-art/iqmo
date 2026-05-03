@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\ApiErrorCode;
 use App\Http\Controllers\Controller;
 use App\Services\IqmoAdminQuizMetricsBuilder;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +31,7 @@ final class AdminQuizzesController extends Controller
                 'meta' => [
                     'source' => 'error',
                     'days' => $days,
-                    'error' => 'build_failed',
+                    'error' => ApiErrorCode::BUILD_FAILED,
                     'errorMessage' => $e->getMessage(),
                     'errorClass' => get_class($e),
                     'errorAt' => basename($e->getFile()).':'.$e->getLine(),

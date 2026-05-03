@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\ApiErrorCode;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ final class IqmoProfileController extends Controller
 
         $row = DB::connection('iqmo')->table('profile_state')->where('user_id', $userId)->first();
         if (!$row) {
-            return response()->json(['error' => 'no_state'], 500);
+            return response()->json(['error' => ApiErrorCode::NO_STATE], 500);
         }
 
         $keys = $row->keys_json;
@@ -51,12 +52,12 @@ final class IqmoProfileController extends Controller
         // клиенты без expected_user_id всё ещё работают.
         $expected = $body['expected_user_id'] ?? null;
         if ($expected !== null && (int) $expected !== $userId) {
-            return response()->json(['error' => 'user_mismatch'], 409);
+            return response()->json(['error' => ApiErrorCode::USER_MISMATCH], 409);
         }
 
         $incomingKeys = $body['keys'] ?? null;
         if (!is_array($incomingKeys)) {
-            return response()->json(['error' => 'keys_required'], 400);
+            return response()->json(['error' => ApiErrorCode::KEYS_REQUIRED], 400);
         }
 
         $baseRevision = array_key_exists('baseRevision', $body) ? $body['baseRevision'] : null;
@@ -64,7 +65,7 @@ final class IqmoProfileController extends Controller
 
         $row = DB::connection('iqmo')->table('profile_state')->where('user_id', $userId)->first();
         if (!$row) {
-            return response()->json(['error' => 'no_state'], 500);
+            return response()->json(['error' => ApiErrorCode::NO_STATE], 500);
         }
 
         $serverRev = (int) ($row->revision ?? 0);
@@ -79,7 +80,7 @@ final class IqmoProfileController extends Controller
             }
 
             return response()->json([
-                'error' => 'revision_mismatch',
+                'error' => ApiErrorCode::REVISION_MISMATCH,
                 'server' => [
                     'revision' => $serverRev,
                     'keys' => $keys,
@@ -130,17 +131,17 @@ final class IqmoProfileController extends Controller
         $userId = (int) $request->attributes->get('iqmo_user_id');
         $hid = (int) $request->input('historyId', 0);
         if ($hid <= 0) {
-            return response()->json(['error' => 'historyId_required'], 400);
+            return response()->json(['error' => ApiErrorCode::HISTORY_ID_REQUIRED], 400);
         }
 
         $hist = DB::connection('iqmo')->table('profile_history')->where('user_id', $userId)->where('id', $hid)->first();
         if (!$hist) {
-            return response()->json(['error' => 'not_found'], 404);
+            return response()->json(['error' => ApiErrorCode::NOT_FOUND], 404);
         }
 
         $cur = DB::connection('iqmo')->table('profile_state')->where('user_id', $userId)->first();
         if (!$cur) {
-            return response()->json(['error' => 'no_state'], 500);
+            return response()->json(['error' => ApiErrorCode::NO_STATE], 500);
         }
 
         $prevJson = is_string($cur->keys_json) ? $cur->keys_json : json_encode($cur->keys_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
