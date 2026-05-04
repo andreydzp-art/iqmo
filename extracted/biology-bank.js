@@ -1305,7 +1305,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>Какое явление из жизни растений изображено на рисунке?</p>' +
 			'<figure class="q-figure" role="group" aria-label="Осенний лес: листопад">' +
-			'<img class="q-figure__img" src="/img/biology/q87-listopad.png" alt="Осенний лес: дорожка, усыпанная жёлтыми опавшими листьями, деревья с золотистой листвой, солнечный свет" loading="lazy" decoding="async" />' +
+			'<img class="q-figure__img" src="/img/biology/q87-listopad.png?v=47" alt="Осенний лес: дорожка, усыпанная жёлтыми опавшими листьями, деревья с золотистой листвой, солнечный свет" loading="lazy" decoding="async" />' +
 			'</figure>' +
 			'<p>Запишите ответ <b>одним словом</b> в именительном падеже.</p>',
 		placeholder: 'слово',
