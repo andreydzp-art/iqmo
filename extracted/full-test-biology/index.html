@@ -360,6 +360,34 @@
 			.rb-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
 			.result-hint { margin-top: 20px; font-size: 13px; color: var(--muted); text-align: left; }
 
+			.gm-ch1-overlay {
+				position: fixed; inset: 0; z-index: 20020;
+				background: rgba(15, 18, 38, 0.46);
+				display: flex; align-items: center; justify-content: center;
+				padding: 20px;
+			}
+			.gm-ch1-panel {
+				max-width: 400px; width: 100%;
+				background: #fff; border-radius: 18px; box-shadow: 0 24px 48px rgba(15, 18, 38, 0.18);
+				padding: 26px 24px 22px; text-align: center;
+				border: 1px solid var(--line);
+			}
+			.gm-ch1-title { margin: 0 0 6px; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+			.gm-ch1-lead { margin: 0 0 14px; font-size: 14px; color: var(--muted); line-height: 1.45; }
+			.gm-ch1-badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 18px; }
+			.gm-ch1-badge {
+				display: inline-flex; align-items: center; gap: 6px;
+				padding: 6px 12px; border-radius: 999px;
+				background: #eef0ff; color: #4338ca; font-weight: 700; font-size: 13px;
+			}
+
+			.iqmo-ft-toast {
+				position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 19990;
+				max-width: min(520px, 92vw); padding: 12px 16px; border-radius: 12px;
+				background: #0f1226; color: #fff; font-size: 13.5px; line-height: 1.4;
+				box-shadow: 0 12px 28px rgba(15, 18, 38, 0.28);
+			}
+
 			/* ---- review page ---- */
 			.review-head {
 				background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
@@ -2144,14 +2172,17 @@
 					}
 				} catch (e2) {}
 
-				// Геймификация: «глава пройдена», если этот вариант — последний ready
-				// и его part1 ≥ 50%. Стреляем в Метрику и пускаем confetti на result-экране.
+				// Геймификация: победа над боссом Главы 1 (7-й вариант первой семёрки).
 				try {
-					const allVariants = window.BIOLOGY_VARIANTS || [];
-					const readyOnly = allVariants.filter(v => v.status === 'ready');
-					const lastReady = readyOnly[readyOnly.length - 1];
+					const allVar = window.BIOLOGY_VARIANTS || [];
+					const bossSlot = allVar.length >= 7 ? allVar[6] : null;
 					const sNow = computeScoring();
-					const isBossWin = lastReady && activeVariant && activeVariant.id === lastReady.id && sNow.part1Percent >= 50;
+					const isBossWin =
+						bossSlot &&
+						bossSlot.status === 'ready' &&
+						activeVariant &&
+						activeVariant.id === bossSlot.id &&
+						sNow.part1Percent >= 50;
 					if (isBossWin) {
 						if (window.ym) ym(108770166, 'reachGoal', 'chapter_finished', { variant: activeVariant.id });
 						setTimeout(() => gmFireConfetti({ particleCount: 160, spread: 100, origin: { y: 0.4 } }), 400);
@@ -2202,6 +2233,36 @@
 							</div>`;
 					}
 				} catch(e){}
+
+				let chapter1BossModal = '';
+				try {
+					const bossCh1 = gmChapter1BossSlotBio();
+					if (
+						bossCh1 &&
+						bossCh1.status === 'ready' &&
+						activeVariant &&
+						activeVariant.id === bossCh1.id &&
+						passedPart1
+					) {
+						chapter1BossModal = `
+							<div id="gm-ch1-overlay" class="gm-ch1-overlay" role="dialog" aria-modal="true" aria-labelledby="gm-ch1-title">
+								<div class="gm-ch1-panel">
+									<div style="font-size:42px;line-height:1;margin-bottom:8px" aria-hidden="true">🏆</div>
+									<h2 id="gm-ch1-title" class="gm-ch1-title">Глава 1 пройдена!</h2>
+									<p class="gm-ch1-lead">Победа над финальным боссом. Дальше — демо-варианты ФИПИ во 2-й главе.</p>
+									<div class="gm-ch1-badges">
+										<span class="gm-ch1-badge">Часть 1 · ${s.part1Percent}%</span>
+										<span class="gm-ch1-badge">${gmStarsThis} ★</span>
+										<span class="gm-ch1-badge">+${gmXpThis} XP</span>
+									</div>
+									<div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;margin-top:4px;">
+										<a href="/full-test-biology/chapter-2/" class="btn btn--blue" id="gm-ch1-open">Открыть главу 2 →</a>
+										<button type="button" class="btn btn--ghost" id="gm-ch1-dismiss">Позже</button>
+									</div>
+								</div>
+							</div>`;
+					}
+				} catch (_eM) {}
 
 				document.querySelector('.page__main').innerHTML = `
 					<div class="container">
@@ -2268,6 +2329,7 @@
 									<a href="/full-test-biology/" class="btn btn--ghost">← К вариантам</a>
 								</div>
 							</div>
+							${chapter1BossModal}
 						</div>
 					</div>
 				`;
@@ -2279,6 +2341,14 @@
 						location.reload();
 					}
 				});
+				try {
+					const ov = document.getElementById('gm-ch1-overlay');
+					const dis = document.getElementById('gm-ch1-dismiss');
+					if (ov && dis) {
+						dis.addEventListener('click', () => ov.remove());
+						ov.addEventListener('click', (e) => { if (e.target === ov) ov.remove(); });
+					}
+				} catch (_eL) {}
 			}
 
 			function computeScoring() {
@@ -2726,6 +2796,11 @@
 				try { localStorage.setItem(GM_SEEN_KEY, JSON.stringify(s)); } catch (e) {}
 			}
 
+			function gmChapter1BossSlotBio() {
+				const all = window.BIOLOGY_VARIANTS || [];
+				return all.length >= 7 ? all[6] : null;
+			}
+
 			// ============================================================
 			// LEVEL MAP (variant picker — gamified)
 			// ============================================================
@@ -2754,6 +2829,27 @@
 				const ready = variants.filter(v => v.status === 'ready');
 				host.innerHTML = ready.map(v => `<a href="?v=${v.id}" style="display:inline-block;margin:4px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);text-decoration:none;font-weight:600;">${v.title || ('Вариант ' + v.id)}</a>`).join('');
 			}
+			function iqmoShowCh2DeniedToastBio() {
+				try {
+					if (sessionStorage.getItem('iqmo_ch2_denied_toast') !== '1') return;
+					sessionStorage.removeItem('iqmo_ch2_denied_toast');
+					let t = document.getElementById('iqmo-ft-toast');
+					if (!t) {
+						t = document.createElement('div');
+						t.id = 'iqmo-ft-toast';
+						t.className = 'iqmo-ft-toast';
+						t.setAttribute('role', 'status');
+						document.body.appendChild(t);
+					}
+					t.textContent =
+						'Глава 2 откроется после победы над финальным боссом главы 1 и входа в аккаунт.';
+					setTimeout(function () {
+						try {
+							t.remove();
+						} catch (eR) {}
+					}, 7800);
+				} catch (e0) {}
+			}
 			// ============================================================
 			// LEVEL MAP v2 — карта уровней («Полный вариант ОГЭ»)
 			// 7 обычных узлов + 1 финальный босс. Реализация 1:1 по
@@ -2774,6 +2870,7 @@
 				if (!picker) return;
 				picker.style.display = 'block';
 				picker.classList.add('lm');
+				iqmoShowCh2DeniedToastBio();
 
 				const allVariants = window.BIOLOGY_VARIANTS || [];
 				const ready = allVariants.filter(v => v.status === 'ready');

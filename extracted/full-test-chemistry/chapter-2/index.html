@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<script data-iqmo-fouc-guard="1">try{document.documentElement.setAttribute('data-iqmo-auth',localStorage.getItem('iqmo_auth_hint')==='1'?'authed':'guest');}catch(e){}</script>
+<style data-iqmo-fouc-guard="1">html[data-iqmo-auth='authed'] .iqmo-only-guest,html[data-iqmo-auth='authed'] #iqmo-nav-login{display:none!important}html[data-iqmo-auth='guest'] .iqmo-only-authed,html[data-iqmo-auth='guest'] #iqmo-nav-profile,html[data-iqmo-auth='guest'] #iqmo-nav-logout{display:none!important}</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>IQMO — ОГЭ Химия · Глава 2</title>
+<link rel="canonical" href="https://www.iqmoschool.ru/full-test-chemistry/chapter-2/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/iqmo-base.css?v=1" />
+<style>
+  :root{
+    --bg:#f6f7fb; --bg-2:#eef0f7; --surface:#fff;
+    --line:#e6e8f0; --line-2:#eef0f7;
+    --ink:#0f1226; --ink-2:#2a2e4a; --muted:#6b7094; --muted-2:#9aa0bf;
+    --primary:#4f46e5; --primary-2:#6366f1; --primary-50:#eef0ff;
+    --violet:#7c3aed; --violet-2:#a855f7; --violet-50:#f3eeff;
+    --emerald:#10b981; --emerald-50:#e7faf2;
+    --amber:#f59e0b; --amber-50:#fef3c7;
+    --rose:#f43f5e; --teal:#0d9488; --teal-50:#ccfbf1;
+    --shadow-sm:0 1px 2px rgba(15,18,38,.04),0 1px 1px rgba(15,18,38,.03);
+    --shadow:0 1px 2px rgba(15,18,38,.04),0 8px 24px rgba(15,18,38,.06);
+    --shadow-glow:0 0 0 6px rgba(79,70,229,.10),0 0 0 14px rgba(79,70,229,.06),0 18px 36px -10px rgba(79,70,229,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+    background:var(--bg); color:var(--ink);
+    -webkit-font-smoothing:antialiased; font-feature-settings:"ss01","cv11";
+  }
+  .num{font-family:'JetBrains Mono',ui-monospace,monospace; font-variant-numeric: tabular-nums;}
+  .shell{ max-width:1280px; margin:0 auto; padding:24px 28px 56px; }
+
+  /* nav */
+  .nav{ display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow-sm); }
+  .brand{ display:flex; align-items:center; gap:12px;}
+  .brand-mark{ width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--primary),var(--violet)); box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
+  .brand-name{font-weight:800; font-size:15px;}
+  .brand-sep{ color:var(--line); margin:0 14px;}
+  .breadcrumbs{ color:var(--muted); font-size:13.5px;}
+  .breadcrumbs b{ color:var(--ink-2); font-weight:600;}
+  .nav-right{ display:flex; align-items:center; gap:8px;}
+  .pill{ height:36px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink-2); font-size:13px; font-weight:500; display:inline-flex; align-items:center; gap:8px; cursor:pointer;}
+  .pill:hover{ background:var(--bg-2);}
+  .avatar{ width:30px; height:30px; border-radius:999px; background:linear-gradient(135deg,#a5b4fc,#7c3aed); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px;}
+
+  /* CHAPTER STEPPER */
+  .chapter-stepper{
+    margin-top:18px;
+    background:var(--surface); border:1px solid var(--line); border-radius:24px;
+    padding:18px 24px; box-shadow:var(--shadow-sm);
+    display:flex; align-items:center; gap:10px;
+  }
+  .ch-pill{
+    flex:1;
+    display:flex; align-items:center; gap:14px;
+    padding:14px 18px; border-radius:16px;
+    border:1px solid var(--line); background:#fafbff;
+    cursor:pointer; transition:all .15s;
+    position:relative;
+  }
+  .ch-pill:hover{ background:var(--bg-2);}
+  .ch-pill.done{ border-color:#bbf7d0; background:linear-gradient(180deg,#f0fdf4,#dcfce7);}
+  .ch-pill.active{ border-color:transparent; background:linear-gradient(180deg,#eef0ff,#e0e7ff); box-shadow:0 0 0 2px var(--primary), 0 8px 20px -8px rgba(79,70,229,.4);}
+  .ch-pill.locked{ background:var(--bg-2); opacity:.7;}
+  .ch-num{
+    width:42px; height:42px; border-radius:12px;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:16px; flex-shrink:0;
+  }
+  .ch-pill.done .ch-num{ background:var(--emerald); color:#fff;}
+  .ch-pill.active .ch-num{ background:linear-gradient(180deg,var(--primary-2),var(--primary)); color:#fff;}
+  .ch-pill.locked .ch-num{ background:#e3e6f1; color:var(--muted-2);}
+  .ch-meta{ flex:1; min-width:0;}
+  .ch-label{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
+  .ch-pill.done .ch-label{ color:#047857;}
+  .ch-pill.active .ch-label{ color:var(--primary);}
+  .ch-title{ font-size:15px; font-weight:700; color:var(--ink); margin-top:2px;}
+  .ch-pill.locked .ch-title{ color:var(--muted-2);}
+  .ch-sub{ font-size:12px; color:var(--muted); margin-top:2px;}
+  .ch-tag{
+    position:absolute; top:10px; right:12px;
+    font-size:10.5px; font-weight:700; letter-spacing:.04em;
+    padding:3px 8px; border-radius:999px;
+  }
+  .ch-pill.done .ch-tag{ background:#fff; color:#047857; border:1px solid #bbf7d0;}
+  .ch-pill.active .ch-tag{ background:var(--primary); color:#fff;}
+  .ch-arrow{ color:var(--muted-2); flex-shrink:0;}
+
+  /* hero (compact) */
+  .hero{
+    margin-top:18px; background:var(--surface); border:1px solid var(--line);
+    border-radius:28px; padding:24px 28px; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:minmax(0,1fr) auto; gap:24px; align-items:center;
+    position:relative; overflow:hidden;
+  }
+  .hero::before{ content:""; position:absolute; right:-10%; bottom:-60%; width:520px; height:520px; background:radial-gradient(closest-side,rgba(124,58,237,.10),transparent 70%); pointer-events:none;}
+  .crumb-back{ color:var(--muted); font-size:12.5px; display:inline-flex; align-items:center; gap:6px; text-decoration:none;}
+  .ch-eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(180deg,#eef0ff,#e0e7ff);
+    color:var(--primary); border:1px solid #c7d2fe;
+    padding:5px 12px; border-radius:999px;
+    font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .hero h1{ margin:6px 0 8px; font-size:34px; line-height:1.08; letter-spacing:-.02em; font-weight:800;}
+  .hero h1 .dot{ color:var(--muted-2); margin:0 6px; font-weight:400;}
+  .hero p.lead{ margin:0 0 16px; color:var(--muted); font-size:14.5px; line-height:1.55; max-width:60ch;}
+  .cta-row{ display:flex; gap:10px; flex-wrap:wrap;}
+  .btn{ height:42px; padding:0 16px; border-radius:12px; border:1px solid var(--line); background:var(--surface); font-weight:600; font-size:13.5px; color:var(--ink-2); display:inline-flex; align-items:center; gap:8px; cursor:pointer;}
+  .btn:hover{ background:var(--bg-2);}
+  .btn-primary{ background:linear-gradient(180deg,var(--primary-2),var(--primary)); border-color:transparent; color:#fff; box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
+  .btn-primary:hover{ filter:brightness(1.05);}
+
+  .stat-cluster{
+    display:grid; grid-template-columns:repeat(4,auto); gap:0;
+    border:1px solid var(--line); border-radius:18px;
+    background:linear-gradient(180deg,#fff,#fafbff); overflow:hidden;
+    min-width:620px;
+  }
+  .stat{ padding:16px 20px; display:flex; align-items:center; gap:12px; border-right:1px solid var(--line-2); white-space:nowrap;}
+  .stat:last-child{ border-right:none;}
+  .stat-ico{ width:38px; height:38px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .ico-trophy{ background:#fff7d6; color:#b45309;}
+  .ico-fire{ background:#ffe4e1; color:#dc2626;}
+  .ico-xp{ background:var(--violet-50); color:var(--violet);}
+  .ico-lvl{ background:var(--primary-50); color:var(--primary);}
+  .stat-val{ font-size:19px; font-weight:800; line-height:1; color:var(--ink); white-space:nowrap;}
+  .stat-lbl{ font-size:11.5px; color:var(--muted); margin-top:4px; white-space:nowrap;}
+  .stat-lvl-num{ font-size:26px; font-weight:800; background:linear-gradient(180deg,var(--primary),var(--violet)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; line-height:1;}
+
+  /* archive of chapter 1 */
+  .archive{
+    margin-top:22px; background:linear-gradient(180deg,#f0fdf4 0%,#ecfdf5 100%);
+    border:1px solid #bbf7d0; border-radius:24px; padding:20px 24px;
+    display:flex; align-items:center; gap:20px; box-shadow:var(--shadow-sm);
+  }
+  .archive-trophy{
+    width:56px; height:56px; border-radius:16px;
+    background:linear-gradient(180deg,#fbbf24,#d97706);
+    color:#fff; display:inline-flex; align-items:center; justify-content:center;
+    flex-shrink:0; box-shadow:0 8px 18px -4px rgba(217,119,6,.45);
+  }
+  .archive-meta{ flex:1; min-width:0;}
+  .archive-eye{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#047857;}
+  .archive-title{ font-size:16px; font-weight:700; color:var(--ink); margin-top:2px;}
+  .archive-stats{ display:flex; gap:18px; margin-top:8px; flex-wrap:wrap;}
+  .archive-stat{ font-size:12.5px; color:var(--ink-2); display:inline-flex; align-items:center; gap:5px;}
+  .archive-stat b{ color:var(--ink); font-weight:700;}
+  .archive-stat svg{ color:#047857;}
+  .archive-actions{ display:flex; gap:8px; flex-shrink:0;}
+  .archive-btn{
+    height:34px; padding:0 14px; border-radius:10px;
+    border:1px solid #bbf7d0; background:#fff; color:#065f46;
+    font-size:12.5px; font-weight:600; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .archive-btn:hover{ background:#f0fdf4;}
+
+  /* MAP */
+  .map-card{
+    margin-top:20px; background:var(--surface); border:1px solid var(--line);
+    border-radius:28px; padding:26px 28px 30px; box-shadow:var(--shadow);
+    position:relative; overflow:hidden;
+  }
+  .map-head{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:6px;}
+  .map-title{ font-size:18px; font-weight:700; letter-spacing:-.01em; display:inline-flex; align-items:center; gap:10px; white-space:nowrap;}
+  .map-title .ch-badge{
+    font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px;
+    background:var(--primary-50); color:var(--primary); letter-spacing:.05em; text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .map-sub{ font-size:12.5px; color:var(--muted);}
+  .legend{ display:flex; gap:14px; align-items:center;}
+  .legend-item{ font-size:12px; color:var(--muted); display:inline-flex; align-items:center; gap:6px;}
+  .legend-dot{ width:8px; height:8px; border-radius:999px;}
+  .legend-now{ background:var(--primary); box-shadow:0 0 0 3px rgba(79,70,229,.18);}
+  .legend-lock{ background:#c8cce0;}
+  .legend-boss{ background:var(--violet);}
+
+  .map-wrap{ position:relative; height:320px; margin-top:18px;}
+  .map-svg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
+  .nodes{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(7,1fr); align-items:center;}
+  .node-cell{ display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; height:100%;}
+  .node-cell .label-top{ position:absolute; top:6px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;}
+  .label-top.next{ color:var(--primary);}
+  .label-top.boss{ color:var(--violet);}
+  .label-top.new{ color:var(--teal);}
+
+  .node{
+    width:78px; height:78px; border-radius:999px;
+    background:var(--surface); border:2px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; font-weight:800; color:var(--muted-2);
+    position:relative; z-index:2;
+  }
+  .node.current{
+    background:linear-gradient(180deg,var(--primary-2),var(--primary));
+    border-color:transparent; color:#fff;
+    box-shadow:0 18px 36px -10px rgba(79,70,229,.55);
+  }
+  /* Two emanating ring waves around available node */
+  .node.current::before,
+  .node.current::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%;
+    border:2px solid rgba(79,70,229,.55);
+    pointer-events:none;
+    animation:ringWave 1.8s ease-out infinite;
+  }
+  .node.current::after{ animation-delay:.9s;}
+  @keyframes ringWave{
+    0%{   transform:scale(1);    opacity:.7; border-width:2px;}
+    70%{  transform:scale(1.55); opacity:0;  border-width:1px;}
+    100%{ transform:scale(1.55); opacity:0;  border-width:1px;}
+  }
+  /* tiny breathing of the node itself */
+  .node.current{ animation:nodeBreathe 2.2s ease-in-out infinite;}
+  @keyframes nodeBreathe{
+    0%,100%{ transform:scale(1);    box-shadow:0 18px 36px -10px rgba(79,70,229,.45);}
+    50%    { transform:scale(1.06); box-shadow:0 22px 44px -10px rgba(79,70,229,.65);}
+  }
+  .node.locked{ background:#f3f4fb; color:var(--muted-2);}
+  .node.locked .lock{ width:22px; height:22px;}
+
+  .node.boss{
+    width:88px; height:88px;
+    background:linear-gradient(180deg,#8b5cf6,#6d28d9);
+    border-color:transparent; color:#fff;
+    box-shadow:0 0 0 6px rgba(124,58,237,.12),0 18px 36px -8px rgba(124,58,237,.45);
+  }
+  .node.boss .boss-lock{
+    position:absolute; right:-2px; top:-2px;
+    width:24px; height:24px; border-radius:999px; background:#fff;
+    color:var(--violet); display:inline-flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 10px -2px rgba(124,58,237,.45),0 0 0 3px #fff;
+  }
+
+  .cap{ margin-top:14px; text-align:center; display:flex; flex-direction:column; gap:5px;}
+  .cap-name{ font-size:13.5px; font-weight:600; color:var(--ink);}
+  .cap-status{ font-size:12px; color:var(--muted); white-space:nowrap;}
+  .cap-status.now{ color:var(--primary); font-weight:600;}
+  .cap-tier{ font-size:11px; color:var(--muted-2); white-space:nowrap;}
+  .cap-tier b{ color:var(--ink-2);}
+
+  .start-btn{ margin-top:10px; height:34px; padding:0 14px; border-radius:10px; border:0; background:linear-gradient(180deg,var(--primary-2),var(--primary)); color:#fff; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
+
+  .boss-hint{ margin-top:10px; max-width:130px; text-align:center; font-size:11.5px; color:var(--muted); line-height:1.4;}
+
+  /* split: adaptive + daily */
+  .grid-2{ margin-top:22px; display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+
+  .adaptive{
+    background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%);
+    color:#fff; border-radius:24px; padding:26px 28px;
+    position:relative; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .adaptive::after{
+    content:""; position:absolute; right:-100px; top:-100px; width:340px; height:340px;
+    background:radial-gradient(closest-side,rgba(124,58,237,.45),transparent 70%);
+    pointer-events:none;
+  }
+  .adaptive::before{
+    content:""; position:absolute; left:-60px; bottom:-80px; width:240px; height:240px;
+    background:radial-gradient(closest-side,rgba(20,184,166,.35),transparent 70%);
+    pointer-events:none;
+  }
+  .adaptive-inner{ position:relative; z-index:1;}
+  .adaptive-eye{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#a5b4fc;}
+  .adaptive-title{ font-size:24px; font-weight:800; letter-spacing:-.01em; margin:6px 0 8px;}
+  .adaptive-lead{ font-size:13.5px; color:#cbd5e1; line-height:1.5; max-width:46ch;}
+  .weak-row{ display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;}
+  .weak-chip{
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);
+    color:#fff; padding:7px 12px; border-radius:999px;
+    font-size:12px; font-weight:500;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .weak-chip .pct{ color:#fca5a5; font-weight:700; font-family:'JetBrains Mono',monospace;}
+  .adaptive-cta{
+    margin-top:18px; height:44px; padding:0 18px; border-radius:12px;
+    background:#fff; color:#0f172a; border:0; font-weight:700; font-size:13.5px;
+    cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    box-shadow:0 8px 20px -4px rgba(0,0,0,.4);
+  }
+  .adaptive-cta:hover{ filter:brightness(.97);}
+
+  /* daily card */
+  .daily{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:24px; padding:24px; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column;
+  }
+  .daily-eye{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--amber);}
+  .daily h3{ margin:6px 0 4px; font-size:18px; font-weight:700;}
+  .daily-sub{ font-size:13px; color:var(--muted); margin-bottom:14px;}
+  .daily-progress{
+    background:var(--bg-2); border-radius:12px; padding:14px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+  }
+  .daily-bar{ flex:1; height:8px; background:#fff; border:1px solid var(--line); border-radius:999px; overflow:hidden;}
+  .daily-bar i{ display:block; height:100%; width:60%; background:linear-gradient(90deg,#f59e0b,#f43f5e); border-radius:999px;}
+  .daily-num{ font-size:13px; font-weight:700; color:var(--ink);}
+  .daily-streak{ display:flex; gap:6px; margin-top:14px;}
+  .day-dot{
+    flex:1; aspect-ratio:1/1; max-width:32px;
+    border-radius:8px; background:var(--bg-2);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:10.5px; font-weight:700; color:var(--muted);
+  }
+  .day-dot.on{ background:linear-gradient(180deg,#fb923c,#ea580c); color:#fff;}
+  .day-dot.today{ background:linear-gradient(180deg,#fbbf24,#d97706); color:#fff; box-shadow:0 0 0 3px #fef3c7;}
+  .daily-cta{
+    margin-top:16px; height:40px; border-radius:10px;
+    background:linear-gradient(180deg,#fb923c,#ea580c); color:#fff;
+    border:0; font-weight:700; font-size:13.5px;
+    cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    box-shadow:0 6px 14px -4px rgba(234,88,12,.55);
+  }
+
+  /* small foot stats */
+  .grid-4{
+    margin-top:22px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px;
+  }
+  .stat-list{ list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .stat-list li{ display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--ink-2); padding:0;}
+  .stat-list li::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--primary); display:inline-block; margin-right:10px; flex-shrink:0;}
+  .stat-list li.dot-em::before{ background:var(--emerald);}
+  .stat-list li.dot-am::before{ background:var(--amber);}
+  .stat-list li.dot-ro::before{ background:var(--rose);}
+  .stat-list .lab{ flex:1; min-width:0;}
+  .stat-list .val{ font-family:'JetBrains Mono',monospace; font-weight:800; color:var(--ink); font-size:13px;}
+  .leader-list{ display:flex; flex-direction:column; gap:6px; margin-top:6px;}
+  .lead-row{ display:grid; grid-template-columns:24px 1fr auto; gap:10px; align-items:center; padding:7px 8px; border-radius:10px;}
+  .lead-row.me{ background:linear-gradient(90deg,#fef3c7,#fde68a);}
+  .lead-rank{ width:22px; height:22px; border-radius:6px; background:var(--bg-2); color:var(--muted-2); font-weight:800; font-size:11px; display:inline-flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace;}
+  .lead-row.me .lead-rank{ background:#f59e0b; color:#fff;}
+  .lead-name{ color:var(--ink-2); font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;}
+  .lead-row.me .lead-name{ font-weight:800;}
+  .lead-xp{ font-family:'JetBrains Mono',monospace; font-weight:800; color:var(--ink); font-size:12px; white-space:nowrap;}
+  .lead-xp small{ color:var(--muted); font-weight:600; margin-left:2px;}
+  .ach-row{ display:grid; grid-template-columns:32px 1fr 18px; gap:10px; align-items:center; padding:8px 0;}
+  .ach-row + .ach-row{ border-top:1px solid var(--line-2);}
+  .ach-row .a-ico{ width:32px; height:32px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .ach-row .a-ico.ok{ background:var(--emerald-50); color:var(--emerald);}
+  .ach-row .a-ico.amb{ background:var(--amber-50); color:#b45309;}
+  .ach-row .a-ico.vio{ background:var(--violet-50); color:var(--violet);}
+  .ach-row .a-ico.lock{ background:var(--bg-2); color:var(--muted-2);}
+  .ach-row.locked{ opacity:.5;}
+  .ach-name{ font-size:13px; font-weight:700; color:var(--ink-2); line-height:1.2;}
+  .ach-desc{ font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .ach-check{ width:16px; height:16px; border-radius:50%; background:var(--emerald); color:#fff; display:inline-flex; align-items:center; justify-content:center;}
+  .card-foot{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line-2); font-size:12px; font-weight:700;}
+  .card-foot a{ color:var(--primary); display:inline-flex; align-items:center; gap:4px;}
+  .card{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:20px; padding:20px; box-shadow:var(--shadow-sm);
+  }
+  .card h3{ font-size:14px; font-weight:700; margin:0 0 14px;}
+
+  .ring-row{ display:flex; align-items:center; gap:16px;}
+  .ring{ width:86px; height:86px; flex-shrink:0; position:relative;}
+  .ring svg{ transform:rotate(-90deg);}
+  .ring .pct{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:18px; font-weight:800;}
+  .ring .pct small{ font-size:10px; font-weight:600; color:var(--muted); margin-top:2px;}
+  .kv{ display:flex; flex-direction:column; gap:8px; flex:1;}
+  .kv-row{ display:flex; align-items:center; justify-content:space-between; font-size:13px;}
+  .kv-row .k{ color:var(--muted);}
+  .kv-row .v{ color:var(--ink); font-weight:700;}
+
+  .ach-list{ display:flex; flex-direction:column; gap:10px;}
+  .ach{ display:flex; align-items:center; gap:12px;}
+  .ach-ico{ width:36px; height:36px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .ach-ico.a1{ background:var(--emerald-50); color:var(--emerald);}
+  .ach-ico.a2{ background:var(--primary-50); color:var(--primary);}
+  .ach-ico.a3{ background:var(--violet-50); color:var(--violet);}
+  .ach-text{ flex:1; min-width:0;}
+  .ach-name{ font-weight:700; font-size:13px; color:var(--ink);}
+  .ach-desc{ font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .ach-check{ width:18px; height:18px; border-radius:999px; background:var(--emerald); display:inline-flex; align-items:center; justify-content:center;}
+
+  .skill-list{ display:flex; flex-direction:column; gap:12px;}
+  .skill{ font-size:12.5px;}
+  .skill-head{ display:flex; justify-content:space-between; margin-bottom:6px; gap:8px;}
+  .skill-name{ color:var(--ink-2); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;}
+  .skill-pct{ font-weight:700; color:var(--ink); font-family:'JetBrains Mono',monospace; flex-shrink:0;}
+  .skill-bar{ height:6px; background:var(--bg-2); border-radius:999px; overflow:hidden;}
+  .skill-bar i{ display:block; height:100%; border-radius:999px;}
+  .b-good{ background:linear-gradient(90deg,#10b981,#34d399);}
+  .b-mid{  background:linear-gradient(90deg,#6366f1,#a855f7);}
+  .b-low{  background:linear-gradient(90deg,#f59e0b,#f43f5e);}
+
+  .h-stack{ display:flex; align-items:center; gap:8px;}
+  .nav-right a.pill, .nav-right button.pill { text-decoration:none; color:inherit; font:inherit; cursor:pointer; }
+  #ch2-body.ch2-denied { visibility:visible; }
+  #ch2-body.ch2-denied .shell { filter:blur(6px); pointer-events:none; user-select:none; }
+  .ch2-guard-loader {
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(246,247,251,.92); z-index:9998; font-family:Inter,system-ui,sans-serif; color:var(--muted);
+    font-weight:600; font-size:14px;
+  }
+  .iqmo-toast-ch2 {
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:9999;
+    max-width:min(520px,92vw); padding:12px 16px; border-radius:12px;
+    background:#0f1226; color:#fff; font-size:13.5px; line-height:1.4;
+    box-shadow:0 12px 28px rgba(15,18,38,.28); display:none;
+    font-family:Inter,system-ui,sans-serif;
+  }
+  .iqmo-toast-ch2.is--show { display:block; }
+  @media (max-width: 980px) {
+    .hero{ grid-template-columns:1fr; }
+    .stat-cluster{ min-width:0; width:100%; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  }
+  @media (max-width: 768px) {
+    .chapter-stepper{ flex-wrap:wrap; }
+    .shell { padding:16px 16px 40px; }
+    .nodes{ grid-template-columns:1fr !important; height:auto !important; row-gap:18px; }
+    .map-wrap{ height:auto !important; min-height:0 !important; padding-bottom:12px; }
+    .node-cell{ min-height:0; }
+    .map-svg{ display:none; }
+    .grid-4{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body data-exam-subject="chemistry" style="visibility:hidden" id="ch2-body">
+
+<div id="ch2-guard-loader" class="ch2-guard-loader" aria-live="polite">Загрузка…</div>
+<div id="iqmo-toast-ch2" class="iqmo-toast-ch2" role="status"></div>
+
+<div class="shell" id="ch2-shell">
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <a href="/" class="brand-name" style="text-decoration:none;color:inherit">IQMO</a>
+      <span class="brand-sep">/</span>
+      <div class="breadcrumbs">Химия · ОГЭ 2026 — <b>Глава 2: Демо-варианты ФИПИ</b></div>
+    </div>
+    <div class="nav-right">
+      <a href="/subject-chemistry/" class="pill">К предмету</a>
+      <a href="/" class="pill">Главная</a>
+      <a href="/login.html" class="pill iqmo-only-guest" id="iqmo-nav-login">Вход</a>
+      <a href="/profile/" class="pill iqmo-only-authed" id="iqmo-nav-profile" hidden>Профиль</a>
+      <button type="button" class="pill iqmo-only-authed" id="iqmo-nav-logout" hidden>Выйти</button>
+    </div>
+  </header>
+
+  <!-- CHAPTER STEPPER -->
+  <section class="chapter-stepper" aria-label="Главы">
+    <a href="/full-test-chemistry/" class="ch-pill done" style="text-decoration:none;color:inherit">
+      <div class="ch-num">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ch-meta">
+        <div class="ch-label">Глава 1</div>
+        <div class="ch-title">Полный вариант ОГЭ</div>
+        <div class="ch-sub">7 вариантов + босс · 21/21 ★</div>
+      </div>
+      <div class="ch-tag">Завершено</div>
+    </a>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa0bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    <div class="ch-pill active">
+      <div class="ch-num">2</div>
+      <div class="ch-meta">
+        <div class="ch-label">Глава 2 · Текущая</div>
+        <div class="ch-title">Демо-варианты ФИПИ 2026</div>
+        <div class="ch-sub">6 вариантов + супер-босс · 0/18 ★</div>
+      </div>
+      <div class="ch-tag">Сейчас</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa0bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    <div class="ch-pill locked">
+      <div class="ch-num">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </div>
+      <div class="ch-meta">
+        <div class="ch-label">Глава 3</div>
+        <div class="ch-title">Тематические подборки</div>
+        <div class="ch-sub">Откроется после Главы 2</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <a href="/subject-chemistry/" class="crumb-back">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        К предмету
+      </a>
+      <div class="ch-eyebrow">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>
+        Новая глава · Уровень сложности +1
+      </div>
+      <h1>Демо-варианты ФИПИ <span class="dot">·</span> 2026</h1>
+      <p class="lead">Свежие официальные демо-версии ОГЭ. Сложнее предыдущей главы: больше задач на расчёты и реакции. За победу над супер-боссом — бейдж «Магистр химии» и доступ к Главе 3.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" id="ch2-cta-variant1" href="/full-test-chemistry/chapter-2/variant/1/">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
+          Начать вариант 1 главы 2
+        </a>
+        <a class="btn" href="/subject-chemistry/">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Расписание
+        </a>
+      </div>
+    </div>
+
+    <div class="stat-cluster">
+      <div class="stat">
+        <div class="stat-ico ico-trophy">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 9H4a2 2 0 0 1-2-2V5h4M18 9h2a2 2 0 0 0 2-2V5h-4M6 4h12v6a6 6 0 0 1-12 0V4zM12 15v4M8 21h8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="stat-val"><span class="num" id="ch2-stat-trophy">1</span></div>
+          <div class="stat-lbl">Трофей · Глава 1</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-ico ico-fire">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7z"/></svg>
+        </div>
+        <div>
+          <div class="stat-val"><span class="num" id="ch2-streak-days">—</span></div>
+          <div class="stat-lbl">Дней подряд</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-ico ico-xp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 3 8l9 6 9-6-9-6zM3 14l9 6 9-6"/></svg>
+        </div>
+        <div>
+          <div class="stat-val"><span class="num" id="ch2-total-xp">—</span> <span style="font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.05em;">XP</span></div>
+          <div class="stat-lbl" id="ch2-xp-hint">Опыт</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-ico ico-lvl" style="background:transparent;">
+          <div class="stat-lvl-num num" id="ch2-level-num">—</div>
+        </div>
+        <div>
+          <div class="stat-val" style="font-size:14px;" id="ch2-level-title">—</div>
+          <div class="stat-lbl" id="ch2-level-sub">Уровень</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHIVE OF CHAPTER 1 -->
+  <section class="archive">
+    <div class="archive-trophy">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9H4a2 2 0 0 1-2-2V5h4M18 9h2a2 2 0 0 0 2-2V5h-4M6 4h12v6a6 6 0 0 1-12 0V4zM12 15v4M8 21h8"/>
+      </svg>
+    </div>
+    <div class="archive-meta">
+      <div class="archive-eye" id="ch2-archive-eyebrow">★ Глава 1 · Завершена</div>
+      <div class="archive-title" id="ch2-archive-title">«Полный вариант ОГЭ» — 7 вариантов + босс пройдены</div>
+      <div class="archive-stats">
+        <span class="archive-stat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <b class="num" id="ch2-arch-variants">7/7</b> вариантов
+        </span>
+        <span class="archive-stat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>
+          <b class="num" id="ch2-arch-stars">—</b> звёзд
+        </span>
+        <span class="archive-stat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-5"/></svg>
+          <b class="num" id="ch2-arch-avg">—</b> средний балл
+        </span>
+        <span class="archive-stat" style="white-space:nowrap;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <b>14 ч 22 м</b> практики
+        </span>
+      </div>
+    </div>
+    <div class="archive-actions">
+      <a class="archive-btn" href="/full-test-chemistry/" style="text-decoration:none;color:inherit">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        Открыть архив главы 1
+      </a>
+      <a class="archive-btn" href="/profile/" style="text-decoration:none;color:inherit">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Профиль
+      </a>
+    </div>
+  </section>
+
+  <!-- MAP OF CHAPTER 2 -->
+  <section class="map-card">
+    <div class="map-head">
+      <div>
+        <div class="map-title">
+          Карта уровней
+          <span class="ch-badge">Глава 2</span>
+        </div>
+        <div class="map-sub">6 демо-вариантов · 1 супер-босс · сложность повышенная</div>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot legend-now"></span> Доступен</span>
+        <span class="legend-item"><span class="legend-dot legend-lock"></span> Заблокирован</span>
+        <span class="legend-item"><span class="legend-dot legend-boss"></span> Супер-босс</span>
+      </div>
+    </div>
+
+    <div class="map-wrap">
+      <svg class="map-svg" viewBox="0 0 1220 280" preserveAspectRatio="none">
+        <defs>
+          <pattern id="dashed" x="0" y="0" width="14" height="2" patternUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="8" height="2" fill="#cdd2e6"/>
+          </pattern>
+        </defs>
+        <path d="M 87 140 C 220 90, 320 190, 435 140 S 600 90, 700 140 S 870 190, 960 140 S 1100 90, 1180 140"
+              fill="none" stroke="url(#dashed)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+
+      <div class="nodes">
+        <!-- Demo 1 — current -->
+        <div class="node-cell">
+          <div class="label-top new">★ Старт главы</div>
+          <div class="node current">1</div>
+          <div class="cap">
+            <div class="cap-name">Демо-вариант 1</div>
+            <div class="cap-status now">Доступен сейчас</div>
+            <div class="cap-tier">Сложность: <b>средняя</b></div>
+            <a class="start-btn" id="ch2-node1-start" href="/full-test-chemistry/chapter-2/variant/1/" style="text-decoration:none;color:#fff;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
+              Начать
+            </a>
+          </div>
+        </div>
+
+        <!-- 2-5 locked -->
+        <div class="node-cell">
+          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <div class="cap"><div class="cap-name">Демо-вариант 2</div><div class="cap-status">Откроется после №1</div><div class="cap-tier">Сложность: <b>средняя</b></div></div>
+        </div>
+        <div class="node-cell">
+          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <div class="cap"><div class="cap-name">Демо-вариант 3</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
+        </div>
+        <div class="node-cell">
+          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <div class="cap"><div class="cap-name">Демо-вариант 4</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
+        </div>
+        <div class="node-cell">
+          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <div class="cap"><div class="cap-name">Демо-вариант 5</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
+        </div>
+        <div class="node-cell">
+          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <div class="cap"><div class="cap-name">Демо-вариант 6</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>экстра</b></div></div>
+        </div>
+
+        <!-- Super-boss -->
+        <div class="node-cell">
+          <div class="label-top boss">⚡ Супер-босс</div>
+          <div class="node boss">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/>
+            </svg>
+            <div class="boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          </div>
+          <div class="cap">
+            <div class="cap-name">Магистр химии</div>
+            <div class="cap-status">Заблокирован</div>
+            <div class="boss-hint">Открывает Главу 3 + бейдж «Магистр»</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECONDARY CARDS — как на проде -->
+  <section class="grid-4">
+
+    <!-- 1. Твой прогресс -->
+    <div class="card">
+      <h3>Твой прогресс <small style="font-weight:600;color:var(--muted);font-size:11px;">(Глава 1)</small></h3>
+      <div class="ring-row">
+        <div class="ring">
+          <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
+            <circle cx="43" cy="43" r="36" fill="none" stroke="#eef0f7" stroke-width="9"/>
+            <circle id="ch2-prog-ring" cx="43" cy="43" r="36" fill="none" stroke="url(#g2)" stroke-width="9"
+                    stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="0"/>
+            <defs><linearGradient id="g2" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#4f46e5"/></linearGradient></defs>
+          </svg>
+          <div class="pct"><span class="num" id="ch2-prog-pct">100%</span><small>Глава 1</small></div>
+        </div>
+        <div class="kv">
+          <div class="kv-row"><span class="k">Узлов</span><span class="v num"><b id="ch2-kv-nodes">7</b> / 7</span></div>
+          <div class="kv-row"><span class="k">Звёзды</span><span class="v num"><b id="ch2-kv-stars">—</b> / <span id="ch2-kv-stars-max">21</span></span></div>
+          <div class="kv-row"><span class="k">Средний балл</span><span class="v num" style="color:var(--emerald)" id="ch2-kv-avg">—</span></div>
+        </div>
+      </div>
+      <div class="card-foot"><a href="/full-test-chemistry/">Карта главы 1 →</a></div>
+    </div>
+
+    <!-- 2. Статистика -->
+    <div class="card">
+      <h3>Статистика <small style="font-weight:600;color:var(--muted);font-size:11px;">(Глава 2)</small></h3>
+      <ul class="stat-list">
+        <li><span class="lab">Всего узлов</span><span class="val" id="ch2-stat-nodes">7</span></li>
+        <li class="dot-em"><span class="lab">Пройдено</span><span class="val" id="ch2-stat-done">0</span></li>
+        <li class="dot-am"><span class="lab">В процессе</span><span class="val">0</span></li>
+        <li class="dot-em"><span class="lab">Средний балл</span><span class="val" style="color:var(--muted)" id="ch2-stat-avg">—</span></li>
+        <li><span class="lab">Заработано XP</span><span class="val" id="ch2-stat-xp">0</span></li>
+      </ul>
+      <div class="card-foot"><a href="/profile/">Профиль →</a></div>
+    </div>
+
+    <!-- 3. Лидерборд IQMO -->
+    <div class="card">
+      <h3>Лидерборд IQMO <small style="font-weight:600; color:var(--muted); font-size:11px;">по XP</small></h3>
+      <div class="leader-list" id="ch2-leaderboard" data-loading="1">
+        <div class="lead-row" style="opacity:.75">
+          <div class="lead-rank">—</div>
+          <div class="lead-name">Загрузка…</div>
+          <div class="lead-xp">—</div>
+        </div>
+      </div>
+      <div class="card-foot"><a href="/profile/">Профиль →</a></div>
+    </div>
+
+    <!-- 4. Достижения -->
+    <div class="card">
+      <h3>Достижения</h3>
+      <div class="ach-row">
+        <div class="a-ico ok">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div>
+          <div class="ach-name">Первые шаги</div>
+          <div class="ach-desc">Пройдите первый вариант</div>
+        </div>
+        <div class="ach-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="ach-row locked">
+        <div class="a-ico amb">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg>
+        </div>
+        <div>
+          <div class="ach-name">Серия 5 дней</div>
+          <div class="ach-desc">Решайте каждый день</div>
+        </div>
+        <div></div>
+      </div>
+      <div class="ach-row">
+        <div class="a-ico vio">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <div>
+          <div class="ach-name">Точность</div>
+          <div class="ach-desc">Наберите 70% в среднем</div>
+        </div>
+        <div class="ach-check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="ach-row locked">
+        <div class="a-ico lock">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <div>
+          <div class="ach-name">Покоритель</div>
+          <div class="ach-desc">Победите финального босса</div>
+        </div>
+        <div></div>
+      </div>
+      <div class="card-foot"><a href="/profile/">Бейджи в профиле →</a></div>
+    </div>
+
+  </section>
+
+</div>
+
+<script src="/exam-config.js"></script>
+<script src="/chemistry-bank.js?v=11"></script>
+<script src="/chemistry-banks-bundle.js?v=9"></script>
+<script src="/chemistry-variants.js?v=10"></script>
+<script src="/iqmo-chapter2-access.js?v=1"></script>
+<script src="/iqmo-sync.js"></script>
+<script src="/iqmo-nav.js"></script>
+<script src="/chem-progress.js?v=3"></script>
+<script>
+(function () {
+	var SUBJ = 'chemistry';
+	var BASE = '/full-test-chemistry';
+
+	function formatRu(ts) {
+		if (!ts) return '';
+		try {
+			return new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+		} catch (e) {
+			return '';
+		}
+	}
+
+	function loadStreakDays() {
+		try {
+			var s = JSON.parse(localStorage.getItem('iqmo-chem-streak') || 'null') || { days: 0 };
+			return s.days || 0;
+		} catch (e) {
+			return 0;
+		}
+	}
+
+	function fmtNum(n) {
+		return String(Math.round(n)).replace(/\s/g, '\u00a0');
+	}
+
+	function setText(id, t) {
+		var el = document.getElementById(id);
+		if (el) el.textContent = t;
+	}
+
+	function denyGuest() {
+		location.replace('/login.html?next=' + encodeURIComponent(BASE + '/chapter-2/'));
+	}
+
+	function denyLocked() {
+		try {
+			sessionStorage.setItem('iqmo_ch2_denied_toast', '1');
+		} catch (e) {}
+		location.replace(BASE + '/');
+	}
+
+	function fillArchive(summary) {
+		if (!summary) return;
+		var ts = window.IqmoChapter2Access.chapter1BossPassedAt(SUBJ);
+		setText('ch2-archive-eyebrow', '★ Глава 1 · Завершена' + (ts ? ' ' + formatRu(ts) : ''));
+		setText('ch2-arch-variants', '7/7');
+		setText('ch2-arch-stars', summary.totalStars + '/' + summary.maxStars);
+		setText('ch2-arch-avg', summary.avgPercent + '%');
+	}
+
+	function fillProgressCards(arch) {
+		if (!arch) return;
+		setText('ch2-kv-stars', String(arch.totalStars));
+		setText('ch2-kv-stars-max', String(arch.maxStars));
+		setText('ch2-kv-avg', arch.avgPercent + '%');
+		var ring = document.getElementById('ch2-prog-ring');
+		if (ring) {
+			var c = 226 * (1 - 1);
+			ring.setAttribute('stroke-dashoffset', String(c));
+		}
+		setText('ch2-prog-pct', '100%');
+	}
+
+	function fillCh2StatsPlaceholder() {
+		setText('ch2-stat-nodes', '7');
+		setText('ch2-stat-done', '0');
+		setText('ch2-stat-avg', '—');
+		setText('ch2-stat-xp', '0');
+	}
+
+	function fillLeaderboard() {
+		var host = document.getElementById('ch2-leaderboard');
+		if (!host) return;
+		fetch('/api/leaderboard?limit=4', { credentials: 'include', cache: 'no-store' })
+			.then(function (r) {
+				return r.ok ? r.json() : Promise.reject();
+			})
+			.then(function (data) {
+				var items = data && Array.isArray(data.items) ? data.items : [];
+				if (!items.length) {
+					host.innerHTML = '<div class="lead-row" style="opacity:.85"><div class="lead-rank">—</div><div class="lead-name">Пока никто не набрал XP</div><div class="lead-xp">0 XP</div></div>';
+					host.removeAttribute('data-loading');
+					return;
+				}
+				function row(it, isMe) {
+					var xp = it.xp != null ? it.xp : 0;
+					var rank = it.rank != null ? it.rank : '—';
+					var name = it.display || it.email || '—';
+					var cls = isMe || it.is_me ? 'lead-row me' : 'lead-row';
+					return (
+						'<div class="' +
+						cls +
+						'"><div class="lead-rank">' +
+						rank +
+						'</div><div class="lead-name">' +
+						String(name).replace(/</g, '&lt;') +
+						'</div><div class="lead-xp">' +
+						fmtNum(xp) +
+						' <small>XP</small></div></div>'
+					);
+				}
+				var html = items.map(function (it) {
+					return row(it);
+				}).join('');
+				if (data && data.me && data.me.uid && items.every(function (x) { return !x.is_me; })) {
+					html +=
+						'<div style="border-top:1px dashed var(--line);margin-top:6px;padding-top:8px;">' +
+						row({ rank: data.me.rank, xp: data.me.xp, display: 'Вы', is_me: true }, true) +
+						'</div>';
+				}
+				host.innerHTML = html;
+				host.removeAttribute('data-loading');
+			})
+			.catch(function () {
+				host.innerHTML =
+					'<div class="lead-row" style="opacity:.85"><div class="lead-rank">—</div><div class="lead-name">Не удалось загрузить</div><div class="lead-xp">—</div></div>';
+				host.removeAttribute('data-loading');
+			});
+	}
+
+	function fillHeroGamification() {
+		try {
+			if (!window.ChemProgress) return;
+			var snap = ChemProgress.getGamificationSnapshot();
+			if (!snap) return;
+			setText('ch2-total-xp', fmtNum(snap.totalPoints || 0));
+			setText('ch2-xp-hint', 'Опыт');
+			var lv = snap.level || {};
+			setText('ch2-level-num', String(lv.current != null ? lv.current : '—'));
+			setText('ch2-level-title', snap.levelTitle || '—');
+			var nx = lv.nextThreshold != null ? lv.nextThreshold : null;
+			var curXp = snap.totalPoints || 0;
+			var sub =
+				nx != null
+					? 'Уровень · до след.: ' + fmtNum(Math.max(0, nx - curXp)) + ' XP'
+					: 'Уровень';
+			setText('ch2-level-sub', sub);
+		} catch (e) {}
+		setText('ch2-streak-days', String(loadStreakDays()));
+		setText('ch2-stat-trophy', '1');
+	}
+
+	async function init() {
+		var loader = document.getElementById('ch2-guard-loader');
+		try {
+			var r = await fetch('/api/me', {
+				credentials: 'include',
+				cache: 'no-store',
+				headers: { Accept: 'application/json' }
+			});
+			var j = r.ok ? await r.json() : null;
+			var authed = r.ok && j && !j.error;
+			if (!authed) {
+				if (loader) loader.style.display = 'none';
+				denyGuest();
+				return;
+			}
+			if (!window.IqmoChapter2Access || !IqmoChapter2Access.isChapter1Complete(SUBJ)) {
+				if (loader) loader.style.display = 'none';
+				denyLocked();
+				return;
+			}
+			var arch = IqmoChapter2Access.chapter1ArchiveSummary(SUBJ);
+			fillArchive(arch);
+			fillProgressCards(arch);
+			fillCh2StatsPlaceholder();
+			fillHeroGamification();
+			fillLeaderboard();
+			try {
+				if (window.ym) ym(108770166, 'reachGoal', 'chapter_2_opened', { subject: SUBJ });
+			} catch (ymE) {}
+		} finally {
+			if (loader) loader.style.display = 'none';
+			document.getElementById('ch2-body').style.visibility = 'visible';
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
+})();
+</script>
+
+</body>
+</html>

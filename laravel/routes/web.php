@@ -316,6 +316,53 @@ Route::get('/full-test-{slug}', function (string $slug) use ($serveStatic, $FULL
     return $serveStatic($full);
 })->where('slug', '[a-z0-9-]+');
 
+// Глава 2 — карта демо-вариантов (вложенные URL под /full-test-{slug}/)
+Route::get('/full-test-{slug}/chapter-2', function (string $slug) use ($FULL_TESTS) {
+    if (! preg_match('/^[a-z0-9-]+$/', $slug) || ! in_array($slug, $FULL_TESTS, true)) {
+        abort(404);
+    }
+
+    return redirect('/full-test-'.$slug.'/chapter-2/', 301);
+})->where('slug', '[a-z0-9-]+');
+
+Route::get('/full-test-{slug}/chapter-2/', function (string $slug) use ($serveStatic, $FULL_TESTS) {
+    if (! preg_match('/^[a-z0-9-]+$/', $slug) || ! in_array($slug, $FULL_TESTS, true)) {
+        abort(404);
+    }
+    $full = public_path('site/full-test-'.$slug.'/chapter-2/index.html');
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+})->where('slug', '[a-z0-9-]+');
+
+Route::get('/full-test-{slug}/chapter-2/variant/{vid}', function (string $slug, string $vid) use ($FULL_TESTS) {
+    if (! preg_match('/^[a-z0-9-]+$/', $slug) || ! in_array($slug, $FULL_TESTS, true)) {
+        abort(404);
+    }
+    if (! preg_match('/^[0-9]+$/', $vid)) {
+        abort(404);
+    }
+
+    return redirect('/full-test-'.$slug.'/chapter-2/variant/'.$vid.'/', 301);
+})->where('slug', '[a-z0-9-]+');
+
+Route::get('/full-test-{slug}/chapter-2/variant/{vid}/', function (string $slug, string $vid) use ($serveStatic, $FULL_TESTS) {
+    if (! preg_match('/^[a-z0-9-]+$/', $slug) || ! in_array($slug, $FULL_TESTS, true)) {
+        abort(404);
+    }
+    if (! preg_match('/^[0-9]+$/', $vid)) {
+        abort(404);
+    }
+    $full = public_path('site/full-test-'.$slug.'/chapter-2/variant/'.$vid.'/index.html');
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+})->where('slug', '[a-z0-9-]+');
+
 // Остальные страницы портала (`trial-chemistry.html`, `warmup-chemistry.html`,
 // `topic-*.html`, …): ссылки от главной идут с корня сайта, а файлы лежат
 // в `public/site/` — без этого маршрута под `php artisan serve` везде 404.
