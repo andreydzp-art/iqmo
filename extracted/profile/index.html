@@ -521,7 +521,7 @@
 
 		<script src="/iqmo-sync.js"></script>
 		<script src="/iqmo-nav.js"></script>
-		<script src="/chem-progress.js"></script>
+		<script src="/chem-progress.js?v=4"></script>
 		<script src="/mistakes-store.js"></script>
 		<script>
 			(function () {
@@ -603,6 +603,7 @@
 
 				const BADGE_ORDER = [
 					'welcome',
+					'three_tests',
 					'ten_tests',
 					'perfect_run',
 					'streak7',
@@ -614,6 +615,11 @@
 						title: 'Старт',
 						text: 'Вы начали пользоваться курсом в этом браузере (анонимный профиль).',
 						img: 'welcome.png'
+					},
+					three_tests: {
+						title: 'Тройка тестов',
+						text: 'Завершено не менее 3 учтённых тестов на портале (разминка, быстрый тест, пробник, полный вариант — в любых сочетаниях и предметах).',
+						img: 'three-tests.png'
 					},
 					ten_tests: {
 						title: 'Десятка',
@@ -703,6 +709,126 @@
 					el.innerHTML = html;
 				}
 
+				function iqmoBadgeFireworks() {
+					function toast(msg) {
+						var t = document.createElement('div');
+						t.setAttribute('role', 'status');
+						t.setAttribute('aria-live', 'polite');
+						t.textContent = msg;
+						t.style.cssText =
+							'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10001;' +
+							'background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:12px 20px;' +
+							'border-radius:14px;font-weight:700;font-size:14px;box-shadow:0 12px 36px rgba(79,70,229,.42);' +
+							'max-width:min(400px,calc(100vw - 32px));text-align:center';
+						document.body.appendChild(t);
+						window.setTimeout(function () {
+							t.style.opacity = '0';
+							t.style.transition = 'opacity .45s ease';
+							window.setTimeout(function () {
+								t.remove();
+							}, 460);
+						}, 2600);
+					}
+					try {
+						if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+							toast('Награда «Тройка тестов» — вы завершили 3 тренировки на портале!');
+							return;
+						}
+					} catch (eR) {}
+
+					var canvas = document.createElement('canvas');
+					canvas.setAttribute('aria-hidden', 'true');
+					canvas.style.cssText =
+						'position:fixed;inset:0;z-index:9998;pointer-events:none;width:100%;height:100%';
+					document.body.appendChild(canvas);
+					var dpr = Math.min(2, window.devicePixelRatio || 1);
+					var ctx = canvas.getContext('2d');
+					if (!ctx) {
+						toast('Награда «Тройка тестов»!');
+						return;
+					}
+
+					var particles = [];
+					var burstCount = 0;
+
+					function resize() {
+						var ww = window.innerWidth;
+						var hh = window.innerHeight;
+						canvas.width = Math.floor(ww * dpr);
+						canvas.height = Math.floor(hh * dpr);
+						canvas.style.width = ww + 'px';
+						canvas.style.height = hh + 'px';
+						ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+					}
+					resize();
+
+					function addBurst(px, py) {
+						var n = 44;
+						for (var ii = 0; ii < n; ii++) {
+							var angle = (Math.PI * 2 * ii) / n + Math.random() * 0.45;
+							var spd = 2.6 + Math.random() * 4.8;
+							particles.push({
+								x: px,
+								y: py,
+								vx: Math.cos(angle) * spd,
+								vy: Math.sin(angle) * spd - 1.5,
+								gravity: 0.095 + Math.random() * 0.06,
+								life: 50 + Math.random() * 48,
+								hue: Math.random() < 0.42 ? 38 + Math.random() * 20 : 268 + Math.random() * 32,
+								size: 1.6 + Math.random() * 2.4,
+								decay: 0.986 + Math.random() * 0.009
+							});
+						}
+					}
+
+					var start = typeof performance !== 'undefined' ? performance.now() : Date.now();
+					var lastBurst = start;
+
+					function onFrame(nowVal) {
+						var nowTs = typeof nowVal === 'number' ? nowVal : Date.now();
+						var w = window.innerWidth;
+						var h = window.innerHeight;
+						var elapsed = nowTs - start;
+						if (elapsed > 4000) {
+							canvas.remove();
+							window.removeEventListener('resize', resize);
+							return;
+						}
+						ctx.clearRect(0, 0, w, h);
+
+						if (burstCount < 10 && nowTs - lastBurst > 300) {
+							lastBurst = nowTs;
+							burstCount++;
+							addBurst(w * (0.2 + Math.random() * 0.6), h * (0.18 + Math.random() * 0.35));
+						}
+
+						var i, p;
+						for (i = particles.length - 1; i >= 0; i--) {
+							p = particles[i];
+							p.x += p.vx;
+							p.y += p.vy;
+							p.vy += p.gravity;
+							p.vx *= p.decay;
+							p.life--;
+							if (p.life <= 0 || p.y > h + 50 || p.x < -80 || p.x > w + 80) {
+								particles.splice(i, 1);
+								continue;
+							}
+							ctx.globalAlpha = Math.min(1, p.life / 42);
+							ctx.fillStyle = 'hsl(' + Math.round(p.hue) + ',87%,61%)';
+							ctx.beginPath();
+							ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+							ctx.fill();
+						}
+						ctx.globalAlpha = 1;
+						requestAnimationFrame(onFrame);
+					}
+
+					window.addEventListener('resize', resize);
+					requestAnimationFrame(onFrame);
+					toast('Награда «Тройка тестов»!');
+				}
+
 				function paintProfileBody() {
 				if (window.ChemProgress) {
 					try {
@@ -785,6 +911,18 @@
 							rank <= 1 ? 'Лучшая неделя за выбранный период.' : 'До места выше: +' + gap + ' балл.';
 
 						renderProfBadges(snap);
+
+						try {
+							var badgesSnap = snap && snap.badges;
+							if (
+								badgesSnap &&
+								badgesSnap.three_tests &&
+								typeof ChemProgress.consumeProfileCelebration === 'function' &&
+								ChemProgress.consumeProfileCelebration('three_tests')
+							) {
+								iqmoBadgeFireworks();
+							}
+						} catch (eFw) {}
 					}
 				} catch (e) {}
 

@@ -19,6 +19,8 @@
 	const KEY_ATTEMPT_STATS = 'iqmo-chem-attempt-stats-v1';
 	const KEY_TOTAL_TASKS = 'iqmo-chem-total-tasks-v1';
 	const KEY_BADGES = 'iqmo-chem-badges-v1';
+	/** Очередь «покажи салют в профиле» после первого открытия награды. */
+	const KEY_BADGE_CELEBRATE = 'iqmo-badge-celebrate-queue-v1';
 
 	/** Чеклисты тем (все подтемы = 2 → веха «Мастер темы»). */
 	const TOPIC_CHECKLIST = [
@@ -230,12 +232,45 @@
 		return b && typeof b === 'object' ? b : {};
 	}
 
+	function queueProfileCelebration(badgeId) {
+		if (!badgeId) return;
+		try {
+			const raw = localStorage.getItem(KEY_BADGE_CELEBRATE);
+			const arr = raw ? JSON.parse(raw) : [];
+			if (!Array.isArray(arr)) return;
+			if (arr.indexOf(badgeId) === -1) arr.push(badgeId);
+			localStorage.setItem(KEY_BADGE_CELEBRATE, JSON.stringify(arr));
+		} catch (e) {}
+	}
+
+	function consumeProfileCelebration(badgeId) {
+		if (!badgeId) return false;
+		try {
+			const raw = localStorage.getItem(KEY_BADGE_CELEBRATE);
+			let arr = raw ? JSON.parse(raw) : [];
+			if (!Array.isArray(arr)) return false;
+			const i = arr.indexOf(badgeId);
+			if (i === -1) return false;
+			arr.splice(i, 1);
+			if (arr.length) localStorage.setItem(KEY_BADGE_CELEBRATE, JSON.stringify(arr));
+			else localStorage.removeItem(KEY_BADGE_CELEBRATE);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
 	function unlockBadge(id) {
 		if (!id) return;
 		const b = loadBadges();
 		if (b[id]) return;
 		b[id] = Date.now();
 		lsSet(KEY_BADGES, b);
+		if (id === 'three_tests') {
+			try {
+				queueProfileCelebration('three_tests');
+			} catch (eQ) {}
+		}
 	}
 
 	function migrateLegacyBadgeKeys() {
@@ -289,6 +324,9 @@
 			unlockBadge('streak7');
 		}
 		const ast = loadAttemptStatsRaw();
+		if (ast.total >= 3) {
+			unlockBadge('three_tests');
+		}
 		if (ast.total >= 10) {
 			unlockBadge('ten_tests');
 		}
@@ -759,6 +797,9 @@
 
 		try {
 			const astAfter = loadAttemptStatsRaw();
+			if (astAfter.total >= 3) {
+				unlockBadge('three_tests');
+			}
 			if (astAfter.total >= 10) {
 				unlockBadge('ten_tests');
 			}
@@ -899,6 +940,7 @@
 		},
 		getAttemptStats: loadAttemptStatsRaw,
 		getBadges: loadBadges,
+		consumeProfileCelebration,
 		getTotalTasksLifetime: function () {
 			return Math.max(0, Number(lsGet(KEY_TOTAL_TASKS, 0)) || 0);
 		},

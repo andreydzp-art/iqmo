@@ -57,6 +57,7 @@ class IqmoDemoStudentSeeder extends Seeder
             'iqmo-chem-total-tasks-v1' => json_encode(47, JSON_UNESCAPED_UNICODE),
             'iqmo-chem-badges-v1' => json_encode([
                 'welcome' => $now - 86400000 * 5,
+                'three_tests' => $now - 86400000 * 4,
                 'ten_tests' => $now - 86400000 * 2,
             ], JSON_UNESCAPED_UNICODE),
             'iqmo-chem-weekly-points-v1' => json_encode([$weekKey => 120], JSON_UNESCAPED_UNICODE),
