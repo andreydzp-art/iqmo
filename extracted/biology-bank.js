@@ -1304,10 +1304,9 @@ window.BIOLOGY_QUESTIONS = [
 		title: 'Явление из жизни растений',
 		body:
 			'<p>Какое явление из жизни растений изображено на рисунке?</p>' +
-			'<figure class="q-figure" role="group" aria-label="Иллюстрация: листопад лиственных деревьев">' +
-			'<div style="padding:18px;background:linear-gradient(180deg,#e8f4fc 0%,#f5e8c8 100%);border-radius:12px;text-align:center;font-size:15px;color:#3d4f5f;">' +
-			'Условная иллюстрация к заданию (как в каталоге ОГЭ): деревья с жёлтой листвой, листья опадают на землю.' +
-			'</div></figure>' +
+			'<figure class="q-figure" role="group" aria-label="Осенний лес: листопад">' +
+			'<img class="q-figure__img" src="/img/biology/q87-listopad.png" alt="Осенний лес: дорожка, усыпанная жёлтыми опавшими листьями, деревья с золотистой листвой, солнечный свет" loading="lazy" decoding="async" />' +
+			'</figure>' +
 			'<p>Запишите ответ <b>одним словом</b> в именительном падеже.</p>',
 		placeholder: 'слово',
 		correct: 'листопад',
