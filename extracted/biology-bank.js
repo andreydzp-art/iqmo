@@ -960,10 +960,11 @@ window.BIOLOGY_QUESTIONS = [
 	// ────────────────────────────────────────────────────────────────
 	// Вариант 4 ОГЭ по биологии (qid 66–86, всего 21 задание).
 	// Источник: variant4_bio.js (handoff от автора).
-	// TODO[bio-v4-images]: qid 66 — PNG в /img/biology/q66-babochka-zhiznennyj-tsikl.png;
-	// qid 69 — PNG в /img/biology/q69-grafik-intensivnost-obmena-distanciya.png.
+	// TODO[bio-v4-images]: qid 66 — q66-babochka-zhiznennyj-tsikl.png;
+	// qid 69 — q69-grafik-intensivnost-obmena-distanciya.png;
+	// qid 71 — q71-kruglodonnaya-kolba.png.
 	// Далее SVG/PNG:
-	// 71 (task06_flask), 78 (task13_horse), 79 (task14_digestive),
+	// 78 (task13_horse), 79 (task14_digestive),
 	// 81 (task16_chest), 84/85/86 (task19_21_oak_ecosystem). До их
 	// загрузки задания сформулированы текстом так, чтобы оставаться
 	// решаемыми без картинок. Когда SVG приедут — положить в
@@ -1036,7 +1037,7 @@ window.BIOLOGY_QUESTIONS = [
 		id: 71,
 		type: 'single',
 		title: 'Лабораторная посуда: колба',
-		body: '<p>Как называют лабораторную посуду, изображённую на рисунке (округлый прозрачный сосуд с длинным узким горлом)?</p>',
+		body: '<figure class="q-figure" role="group" aria-label="Лабораторная колба"><img class="q-figure__img" src="/img/biology/q71-kruglodonnaya-kolba.png" alt="Стеклянная круглодонная колба с длинным узким горлом, частично заполнена жидкостью" loading="lazy" decoding="async" /></figure><p>Как называют лабораторную посуду, изображённую на рисунке (округлый прозрачный сосуд с длинным узким горлом)?</p>',
 		options: [
 			{ id: '1', label: 'Пробирка' },
 			{ id: '2', label: 'Колба' },
