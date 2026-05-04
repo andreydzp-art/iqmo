@@ -1225,38 +1225,7 @@
 				margin: 0 0 18px; color: var(--lm-muted);
 				font-size: 14.5px; line-height: 1.55; max-width: 56ch;
 			}
-			.lm-cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
-			.lm-ch2-next {
-				margin-top: 16px;
-				padding: 14px 16px;
-				border-radius: 14px;
-				border: 1px solid #c7d2fe;
-				background: linear-gradient(180deg, #eef0ff 0%, #e0e7ff 100%);
-				box-shadow: 0 4px 14px -6px rgba(79, 70, 229, 0.35);
-			}
-			.lm-ch2-next__eyebrow {
-				display: block;
-				font-size: 11px;
-				font-weight: 700;
-				letter-spacing: 0.06em;
-				text-transform: uppercase;
-				color: #4f46e5;
-				margin-bottom: 6px;
-			}
-			.lm-ch2-next__row {
-				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				justify-content: space-between;
-				gap: 12px;
-			}
-			.lm-ch2-next__txt {
-				flex: 1 1 220px;
-				font-size: 14px;
-				line-height: 1.45;
-				color: var(--ink);
-				margin: 0;
-			}
+			.lm-cta-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 			a.lm-btn-ch2-cta {
 				display: inline-flex;
 				align-items: center;
@@ -2287,20 +2256,36 @@
 				try {
 					const bossSlotCh1 = gmChapter1BossSlotChem();
 					if (bossSlotCh1 && activeVariant && activeVariant.id === bossSlotCh1.id && passedPart1) {
+						let ch1Stars = 0, ch1StarMax = 21, ch1XpSum = 0, ch1Avg = s.part1Percent;
+						try {
+							const ready = (window.CHEMISTRY_VARIANTS || []).filter(v => v.status === 'ready').slice(0, 7);
+							ch1StarMax = Math.max(1, ready.length) * 3;
+							let pctSum = 0, pctN = 0;
+							ready.forEach(v => {
+								const best = gmVariantBest(v);
+								if (best && best.percent >= 50) {
+									ch1Stars += gmStarsForPercent(best.percent);
+									ch1XpSum += gmXpForVariant(best.percent);
+									pctSum += best.percent;
+									pctN++;
+								}
+							});
+							if (pctN) ch1Avg = Math.round(pctSum / pctN);
+						} catch (_c1) {}
 						chapter1BossModal = `
 							<div id="gm-ch1-overlay" class="gm-ch1-overlay" role="dialog" aria-modal="true" aria-labelledby="gm-ch1-title">
 								<div class="gm-ch1-panel">
 									<div style="font-size:42px;line-height:1;margin-bottom:8px" aria-hidden="true">🏆</div>
 									<h2 id="gm-ch1-title" class="gm-ch1-title">Глава 1 пройдена!</h2>
-									<p class="gm-ch1-lead">Победа над финальным боссом. Дальше — демо-варианты ФИПИ во 2-й главе.</p>
+									<p class="gm-ch1-lead">${ch1Stars} / ${ch1StarMax} ★ · ${ch1Avg}% · финальная попытка: +${gmXpThis} XP</p>
 									<div class="gm-ch1-badges">
 										<span class="gm-ch1-badge">Часть 1 · ${s.part1Percent}%</span>
-										<span class="gm-ch1-badge">${gmStarsThis} ★</span>
-										<span class="gm-ch1-badge">+${gmXpThis} XP</span>
+										<span class="gm-ch1-badge">${gmStarsThis} ★ за босса</span>
+										<span class="gm-ch1-badge">+${ch1XpSum} XP за главу</span>
 									</div>
 									<div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;margin-top:4px;">
-										<a href="/full-test-chemistry/chapter-2/" class="btn btn--blue" id="gm-ch1-open">Открыть главу 2 →</a>
-										<button type="button" class="btn btn--ghost" id="gm-ch1-dismiss">Позже</button>
+										<a href="/full-test-chemistry/chapter-2/" class="btn btn--blue" id="gm-ch1-open">Открыть Главу 2 →</a>
+										<button type="button" class="btn btn--ghost" id="gm-ch1-dismiss">Остаться в Главе 1</button>
 									</div>
 								</div>
 							</div>`;
@@ -3081,6 +3066,12 @@
 						window.location.search = '?v=' + v;
 					});
 				});
+				const ch2Hero = picker.querySelector('#lm-ch2-hero-cta');
+				if (ch2Hero) {
+					ch2Hero.addEventListener('click', () => {
+						try { if (window.ym) ym(108770166, 'reachGoal', 'chem_ch2_from_hero', {}); } catch (e0) {}
+					});
+				}
 
 				// Confetti / level-up
 				if (justLeveledUp) {
@@ -3213,6 +3204,7 @@
 							<h1>Полный вариант ОГЭ <span class="lm-dot">·</span> Химия</h1>
 							<p class="lm-lead">${heroLead}</p>
 							<div class="lm-cta-row">
+								${chapter2Unlocked ? `<a href="/full-test-chemistry/chapter-2/" class="lm-btn-ch2-cta" id="lm-ch2-hero-cta">Открыть Главу 2 →</a>` : ''}
 								<button class="lm-btn lm-btn-streak" type="button" ${heroCtaAttrs}>
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="#ea580c"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7zM12 19.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
 									${heroCtaLabel}
@@ -3222,14 +3214,6 @@
 									Расписание
 								</a>
 							</div>
-							${chapter2Unlocked ? `
-							<div class="lm-ch2-next" role="region" aria-label="Переход ко 2 главе">
-								<span class="lm-ch2-next__eyebrow">Следующий этап</span>
-								<div class="lm-ch2-next__row">
-									<p class="lm-ch2-next__txt">Глава 2 · демо-варианты ФИПИ — новая карта: 6 вариантов и супер-босс.</p>
-									<a href="/full-test-chemistry/chapter-2/" class="lm-btn-ch2-cta">Перейти в главу 2 →</a>
-								</div>
-							</div>` : ''}
 						</div>
 						<div class="lm-stat-cluster" role="group" aria-label="Прогресс">
 							<div class="lm-stat">
