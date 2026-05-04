@@ -2321,30 +2321,17 @@
 				const given = state.answers[q.id];
 				const correct = q.correct;
 				if (q.type === 'written') {
-					// Не автопроверяется. Статус «selfcheck» с баллами из state.selfScores.
 					const scores = (state.selfScores && state.selfScores[q.id]) || {};
 					const earned = (q.criteria || []).reduce((s, c) => s + (scores[c.id] ? (c.points || 0) : 0), 0);
 					const reviewed = !!(state.selfScores && state.selfScores[q.id] && state.selfScores[q.id].__reviewed);
 					return { status: 'selfcheck', given, reviewed, earned, max: q.maxPoints || (q.criteria||[]).reduce((s,c)=>s+(c.points||0),0) };
 				}
-				const isEmpty = given === undefined || given === '' ||
-					(Array.isArray(given) && given.filter(x => x).length === 0);
-				if (isEmpty) return { status: 'skip', given, correct };
-				let ok = false;
-				if (Array.isArray(correct)) {
-					if (q.type === 'match') {
-						const g = Array.isArray(given) ? given.map(x => x || '').join(',') : '';
-						const c = correct.join(',');
-						ok = g === c;
-					} else {
-						const g = (Array.isArray(given) ? [...given] : []).sort().join(',');
-						const c = [...correct].sort().join(',');
-						ok = g === c;
-					}
-				} else {
-					ok = String(given).trim().toLowerCase() === String(correct).trim().toLowerCase();
-				}
-				return { status: ok ? 'ok' : 'wrong', given, correct };
+				// Делегируем сравнение в checkAnswerStatic — единая точка истины
+				// для проверки ответов. Без этого экран ревью использовал свою
+				// устаревшую логику (без нормализации «.» ↔ «,» и без поддержки
+				// массива альтернативных текстовых вариантов для input).
+				const status = checkAnswerStatic(q, given);
+				return { status, given, correct };
 			}
 
 			function formatAnswer(q, val) {
