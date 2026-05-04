@@ -1,0 +1,60 @@
+---
+description: Always bump ?v= cache version when bank content changes
+globs: extracted/biology-bank.js, extracted/chemistry-bank.js, extracted/biology-variants.js, extracted/chemistry-variants.js, extracted/full-test-*/index.html
+alwaysApply: true
+---
+
+# Кэш-бастинг банков и вариантов
+
+## Контекст
+
+`extracted/full-test-biology/index.html` и `full-test-chemistry/index.html`
+подгружают банки и списки вариантов через query-параметр версии:
+
+```html
+<script src="/biology-bank.js?v=22"></script>
+<script src="/biology-variants.js?v=4"></script>
+```
+
+Этот `?v=N` — **единственный сигнал** для браузера и CDN, что файл изменился.
+Сам контент `biology-bank.js` под этим URL может меняться сколько угодно,
+но пока `?v=N` не сменился, **браузер не сделает повторный запрос** — он
+отдаст старую версию из disk-cache. То же самое делает CDN.
+
+## Правило
+
+После любого изменения содержимого `biology-bank.js`, `chemistry-bank.js`,
+`biology-variants.js` или `chemistry-variants.js` **обязательно** инкрементируй
+`?v=N` в подключающем `index.html`:
+
+- меняешь `biology-bank.js` → бампни `<script src="/biology-bank.js?v=N">` в
+  `extracted/full-test-biology/index.html`
+- меняешь `chemistry-bank.js` → бампни в `full-test-chemistry/index.html`
+- то же для `*-variants.js`
+
+Если правки в банке **и** в варианте — бампай оба.
+
+## Почему `curl` тебя обманет
+
+Команда `curl https://.../biology-bank.js?v=21` всегда покажет свежий
+контент (CDN при request с no-cache идёт к origin). Но реальный пользователь
+с открытой вкладкой получает file из disk-cache, потому что URL `?v=21`
+у него уже закэширован.
+
+Поэтому НЕДОСТАТОЧНО проверить «свежесть» файла через `curl`. Нужно
+проверить, что `?v=N` в HTML обновлён.
+
+## Чек-лист после правки банка
+
+- [ ] Изменил `extracted/{biology|chemistry}-bank.js`
+- [ ] Бампнул `?v=N` в `extracted/full-test-{biology|chemistry}/index.html`
+- [ ] Запустил `node scripts/sync-site.mjs`
+- [ ] Закоммитил оба файла одним коммитом
+- [ ] После деплоя проверил `curl https://.../full-test-biology/?v=3` —
+      содержит ли HTML новое значение `?v=N`
+
+## Альтернативы (на будущее)
+
+Можно перейти на content-hash вместо инкрементного `?v=N` — например,
+sha8 банка. Это автоматизируется в `sync-site.mjs`. Пока этого нет —
+ручной bump обязателен.
