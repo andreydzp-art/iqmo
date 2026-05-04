@@ -3,6 +3,11 @@ name: Deploy to VPS
 on:
   push:
     branches: ["main"]
+    # Документация и правила Cursor не трогают VPS; не тратим раннер при чисто «мета»-коммитах.
+    # Смешанный коммит (код + docs) по-прежнему запускает деплой.
+    paths-ignore:
+      - ".cursor/**"
+      - "docs/**"
   workflow_dispatch: {}
 
 concurrency:

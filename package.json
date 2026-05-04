@@ -14,6 +14,7 @@
 		"web:install": "npm --prefix laravel install",
 		"web:dev": "npm --prefix laravel run dev",
 		"web:build": "npm --prefix laravel run build",
-		"lint": "node --check scripts/sync-site.mjs && node --check server/index.js && node --check extracted/chem-progress.js && node --check extracted/iqmo-nav.js"
+		"lint": "node --check scripts/sync-site.mjs && node --check server/index.js && node --check extracted/chem-progress.js && node --check extracted/iqmo-nav.js",
+		"deploy:push": "node scripts/git-push-main.mjs"
 	}
 }
