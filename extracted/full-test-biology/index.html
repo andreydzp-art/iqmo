@@ -1226,6 +1226,53 @@
 				font-size: 14.5px; line-height: 1.55; max-width: 56ch;
 			}
 			.lm-cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+			.lm-ch2-next {
+				margin-top: 16px;
+				padding: 14px 16px;
+				border-radius: 14px;
+				border: 1px solid #c7d2fe;
+				background: linear-gradient(180deg, #eef0ff 0%, #e0e7ff 100%);
+				box-shadow: 0 4px 14px -6px rgba(79, 70, 229, 0.35);
+			}
+			.lm-ch2-next__eyebrow {
+				display: block;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: #4f46e5;
+				margin-bottom: 6px;
+			}
+			.lm-ch2-next__row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+			}
+			.lm-ch2-next__txt {
+				flex: 1 1 220px;
+				font-size: 14px;
+				line-height: 1.45;
+				color: var(--ink);
+				margin: 0;
+			}
+			a.lm-btn-ch2-cta {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				padding: 10px 18px;
+				border-radius: 999px;
+				font-weight: 700;
+				font-size: 14px;
+				text-decoration: none;
+				white-space: nowrap;
+				background: linear-gradient(180deg, #6366f1, #4f46e5);
+				color: #fff;
+				box-shadow: 0 6px 18px -8px rgba(79, 70, 229, 0.65);
+			}
+			a.lm-btn-ch2-cta:hover { filter: brightness(1.05); }
 			.lm-btn {
 				height: 42px; padding: 0 16px; border-radius: 12px;
 				border: 1px solid var(--lm-line); background: var(--lm-surface);
@@ -2980,7 +3027,7 @@
 				const heroLead = (allRegularDone && !bossBest)
 					? 'Все варианты пройдены. Открыт финальный босс — победите его, чтобы получить мастер-уровень.'
 					: (bossBest)
-						? 'Все варианты пройдены. Можно перерешать любой вариант, чтобы поднять звёзды.'
+						? 'Глава 1 завершена. Доступна глава 2 — демо-варианты ФИПИ (кнопка ниже). Здесь можно перерешивать варианты, чтобы поднять звёзды.'
 						: 'Проходите варианты по порядку. Следующий открывается, когда вы набираете не менее 50 % правильных ответов в части 1 текущего варианта.';
 
 				const seen = gmLoadSeen();
@@ -3003,7 +3050,7 @@
 
 				picker.innerHTML = `
 					<div class="lm-shell">
-						${lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId })}
+						${lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId, chapter2Unlocked: !!bossBest })}
 						${lmMapHtml({ variantInfos, bossInfo, currentIdx })}
 						${lmGrid4Html({ stats, globalStats, streakStatus })}
 						${lmTipHtml(stats, bossInfo)}
@@ -3144,7 +3191,7 @@
 				};
 			}
 
-			function lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId }) {
+			function lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId, chapter2Unlocked }) {
 				const heroCtaAttrs = nextActionId
 					? `data-v="${nextActionId}" title="Открыть текущий вариант" style="cursor:pointer;"`
 					: `disabled aria-disabled="true" style="opacity:.7; cursor:default;"`;
@@ -3179,6 +3226,14 @@
 									Расписание
 								</a>
 							</div>
+							${chapter2Unlocked ? `
+							<div class="lm-ch2-next" role="region" aria-label="Переход ко 2 главе">
+								<span class="lm-ch2-next__eyebrow">Следующий этап</span>
+								<div class="lm-ch2-next__row">
+									<p class="lm-ch2-next__txt">Глава 2 · демо-варианты ФИПИ — новая карта: 6 вариантов и супер-босс.</p>
+									<a href="/full-test-biology/chapter-2/" class="lm-btn-ch2-cta">Перейти в главу 2 →</a>
+								</div>
+							</div>` : ''}
 						</div>
 						<div class="lm-stat-cluster" role="group" aria-label="Прогресс">
 							<div class="lm-stat">
