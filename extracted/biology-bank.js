@@ -25,7 +25,7 @@ const _BIO_FIG_V5_19_21 =
 	'</figure>';
 const _BIO_FIG_V6_19_21 =
 	'<figure class="q-figure q-figure--wide" role="group" aria-label="Фрагмент экосистемы саванны (вариант 6)">' +
-	'<img class="q-figure__img" src="/img/biology/q119-21-ekosistema.png?v=51" alt="Саванна: растительность и животные с буквенными обозначениями (задания 19–21)" loading="lazy" decoding="async" />' +
+	'<img class="q-figure__img" src="/img/biology/q119-21-ekosistema.png?v=58" alt="Саванна: растительность и животные с буквенными обозначениями (задания 19–21)" loading="lazy" decoding="async" />' +
 	'</figure>';
 const _BIO_FIG_V7_19_21 =
 	'<figure class="q-figure q-figure--wide" role="group" aria-label="Фрагмент экосистемы тундры (демо ОГЭ-2025)">' +
