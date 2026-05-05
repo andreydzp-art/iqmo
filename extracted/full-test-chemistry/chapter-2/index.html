@@ -37,20 +37,20 @@
   .num{font-family:'JetBrains Mono',ui-monospace,monospace; font-variant-numeric: tabular-nums;}
   .shell{ max-width:1280px; margin:0 auto; padding:24px 28px 56px; }
 
-  /* nav */
-  .nav{ display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow-sm); }
-  .brand{ display:flex; align-items:center; gap:12px;}
+  /* header (matches profile / full-test pages) */
+  .header{ background:var(--surface); border-bottom:1px solid var(--line); padding:14px 0; position:sticky; top:0; z-index:20; }
+  .header__container{ max-width:1280px; margin:0 auto; padding:0 28px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .header__left{ display:flex; align-items:center; gap:12px; }
   .brand-mark{ width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--primary),var(--violet)); box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
-  .brand-name{font-weight:800; font-size:15px;}
-  .brand-sep{ color:var(--line); margin:0 14px;}
+  .brand-name{font-weight:800; font-size:15px; text-decoration:none; color:var(--ink);}
+  .brand-sep{ color:var(--line); margin:0 6px;}
   .breadcrumbs{ color:var(--muted); font-size:13.5px;}
   .breadcrumbs b{ color:var(--ink-2); font-weight:600;}
-  .nav-right{ display:flex; align-items:center; gap:8px;}
+  .header__btns{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
   .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:13.5px; height:38px; padding:0 16px; border-radius:10px; border:1.5px solid transparent; transition:transform .08s, filter .15s, border-color .15s, background .15s; white-space:nowrap; cursor:pointer; background:none; text-decoration:none; font-family:inherit; }
   .btn:active{ transform:translateY(1px); }
   .btn--ghost{ background:var(--surface); border-color:var(--line); color:var(--ink-2); }
   .btn--ghost:hover{ border-color:var(--ink-2); }
-  .avatar{ width:30px; height:30px; border-radius:999px; background:linear-gradient(135deg,#a5b4fc,#7c3aed); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px;}
 
   /* CHAPTER STEPPER */
   .chapter-stepper{
@@ -399,7 +399,7 @@
   .b-low{  background:linear-gradient(90deg,#f59e0b,#f43f5e);}
 
   .h-stack{ display:flex; align-items:center; gap:8px;}
-  .nav-right a.btn, .nav-right button.btn { font:inherit; }
+  .header__btns button.btn { font:inherit; }
   #ch2-body.ch2-denied { visibility:visible; }
   #ch2-body.ch2-denied .shell { filter:blur(6px); pointer-events:none; user-select:none; }
   .ch2-guard-loader {
@@ -435,24 +435,26 @@
 <div id="ch2-guard-loader" class="ch2-guard-loader" aria-live="polite">Загрузка…</div>
 <div id="iqmo-toast-ch2" class="iqmo-toast-ch2" role="status"></div>
 
-<div class="shell" id="ch2-shell">
-
-  <!-- NAV -->
-  <header class="nav">
-    <div class="brand">
+<!-- HEADER (same pattern as profile / full-test) -->
+<header class="header">
+  <div class="header__container">
+    <div class="header__left">
       <div class="brand-mark"></div>
-      <a href="/" class="brand-name" style="text-decoration:none;color:inherit">IQMO</a>
+      <a href="/" class="brand-name">IQMO</a>
       <span class="brand-sep">/</span>
       <div class="breadcrumbs">Химия · ОГЭ 2026 — <b>Глава 2: Демо-варианты ФИПИ</b></div>
     </div>
-    <div class="nav-right">
+    <div class="header__btns">
       <a href="/subject-chemistry/" class="btn btn--ghost">К предмету</a>
       <a href="/" class="btn btn--ghost">Главная</a>
       <a href="/login.html" class="btn btn--ghost iqmo-only-guest" id="iqmo-nav-login">Вход</a>
       <a href="/profile/" class="btn btn--ghost iqmo-only-authed" id="iqmo-nav-profile" hidden>Профиль</a>
       <button type="button" class="btn btn--ghost iqmo-only-authed" id="iqmo-nav-logout" hidden>Выйти</button>
     </div>
-  </header>
+  </div>
+</header>
+
+<div class="shell" id="ch2-shell">
 
   <!-- CHAPTER STEPPER -->
   <section class="chapter-stepper" aria-label="Главы">
