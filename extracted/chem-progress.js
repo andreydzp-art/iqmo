@@ -311,6 +311,20 @@
 		}
 	}
 
+	/** Все 7 вариантов 1-го этапа химии пройдены на ≥50% → веха chem_stage1. */
+	function maybeUnlockChemStage1() {
+		try {
+			var CHEM_STAGE1_IDS = [1, 2, 3, 4, 5, 6, 7];
+			for (var i = 0; i < CHEM_STAGE1_IDS.length; i++) {
+				var raw = localStorage.getItem('iqmo-chem-v-' + CHEM_STAGE1_IDS[i]);
+				if (!raw) return;
+				var s = JSON.parse(raw);
+				if (!s || !s.finished) return;
+			}
+			unlockBadge('chem_stage1');
+		} catch (e) {}
+	}
+
 	/** Подстановка вех и перенос старых ключей (seven_day_goal → streak7). */
 	function syncRetroBadges() {
 		migrateLegacyBadgeKeys();
@@ -336,6 +350,7 @@
 			unlockBadge('final_sprint');
 		}
 		maybeUnlockTopicStar();
+		maybeUnlockChemStage1();
 	}
 
 	function weekKey(ts) {
@@ -810,6 +825,8 @@
 				unlockBadge('perfect_run');
 			}
 		} catch (ePerf) {}
+
+		try { maybeUnlockChemStage1(); } catch (eStage) {}
 
 		try {
 			const itemsCount = Array.isArray(payload.items) ? payload.items.length : 0;
