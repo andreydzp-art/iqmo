@@ -80,3 +80,12 @@ laravel/composer
 # коммитами; саму папку держать в репо незачем.
 extracted/_rd/
 laravel/public/site/_rd/
+
+# Дизайн-снапшоты (архивы / развёрнутые): нужные части уже в extracted/
+_design-snapshots/
+
+# Временные распаковки
+extracted/_tmp-zip-*/
+
+# Проект «Знакомства» — отдельная песочница, в основной репо не входит
+extracted/znakomstva/
