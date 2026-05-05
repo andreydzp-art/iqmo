@@ -32,12 +32,9 @@ const _BIO_FIG_V7_19_21 =
 	'<img class="q-figure__img" src="/img/biology/q147-149-ekosistema-tundry.png" alt="Схема экосистемы тундры: А — растения и лишайники, Б — куропатка, В — лемминг, Г — гусь, Д — полярная сова, Е — поморник, Ж — северный олень, З — волк, И — песец, К — горностай, Л — пухоеды и клещи; стрелки показывают трофические связи" loading="lazy" decoding="async" />' +
 	'</figure>';
 const _BIO_V6_T14_TRAEHEA =
-	'<div class="q-figure-grid" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:flex-start;max-width:720px;margin:12px auto;">' +
-	'<figure style="margin:0;text-align:center;width:140px"><img class="q-figure__img" src="/img/biology/q121-t14-trahea-1.png?v=51" alt="Рисунок 1" loading="lazy" decoding="async" style="max-width:100%" /><figcaption style="font-weight:600">1</figcaption></figure>' +
-	'<figure style="margin:0;text-align:center;width:140px"><img class="q-figure__img" src="/img/biology/q121-t14-trahea-2.png?v=51" alt="Рисунок 2" loading="lazy" decoding="async" style="max-width:100%" /><figcaption style="font-weight:600">2</figcaption></figure>' +
-	'<figure style="margin:0;text-align:center;width:140px"><img class="q-figure__img" src="/img/biology/q121-t14-trahea-3.png?v=51" alt="Рисунок 3" loading="lazy" decoding="async" style="max-width:100%" /><figcaption style="font-weight:600">3</figcaption></figure>' +
-	'<figure style="margin:0;text-align:center;width:140px"><img class="q-figure__img" src="/img/biology/q121-t14-trahea-4.png?v=51" alt="Рисунок 4" loading="lazy" decoding="async" style="max-width:100%" /><figcaption style="font-weight:600">4</figcaption></figure>' +
-	'</div>';
+	'<figure class="q-figure q-figure--wide" role="group" aria-label="Четыре органа: 1) почки, 2) лёгкие с трахеей, 3) сердце, 4) печень">' +
+	'<img class="q-figure__img" src="/img/biology/q121-t14-organs.png?v=57" alt="1) почки 2) лёгкие с трахеей 3) сердце 4) печень" loading="lazy" decoding="async" />' +
+	'</figure>';
 window.BIOLOGY_QUESTIONS = [
 	{
 		id: 1,
