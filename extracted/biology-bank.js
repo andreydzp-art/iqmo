@@ -33,7 +33,7 @@ const _BIO_FIG_V7_19_21 =
 	'</figure>';
 const _BIO_V6_T14_TRAEHEA =
 	'<figure class="q-figure q-figure--wide" role="group" aria-label="Четыре органа: 1) почки, 2) лёгкие с трахеей, 3) сердце, 4) печень">' +
-	'<img class="q-figure__img" src="/img/biology/q121-t14-organs.png?v=57" alt="1) почки 2) лёгкие с трахеей 3) сердце 4) печень" loading="lazy" decoding="async" style="background:#fff;border-radius:12px" />' +
+	'<img class="q-figure__img" src="/img/biology/q121-t14-organs.png?v=57" alt="1) почки 2) лёгкие с трахеей 3) сердце 4) печень" loading="lazy" decoding="async" />' +
 	'</figure>';
 window.BIOLOGY_QUESTIONS = [
 	{
@@ -1679,7 +1679,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>Какой <b>процесс</b> изображён на рисунке? Запишите ответ одним словом в именительном падеже.</p>' +
 			'<figure class="q-figure q-figure--wide" role="group" aria-label="Иллюстрация к заданию">' +
-			'<img class="q-figure__img" src="/img/biology/q108-t1-12125.png?v=57" alt="Схема, иллюстрирующая процесс в живой природе" loading="lazy" decoding="async" style="background:#fff;border-radius:12px" />' +
+			'<img class="q-figure__img" src="/img/biology/q108-t1-12125.png?v=57" alt="Схема, иллюстрирующая процесс в живой природе" loading="lazy" decoding="async" />' +
 			'</figure>',
 		placeholder: 'слово',
 		correct: 'эволюция',
@@ -1770,7 +1770,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>На фотографии изображён спирометр. С какой целью проводят спирометрию?</p>' +
 			'<figure class="q-figure" role="group" aria-label="Спирометр">' +
-			'<img class="q-figure__img" src="/img/biology/q113-t6-1262.png?v=57" alt="Медицинский спирометр" loading="lazy" decoding="async" style="background:#fff;border-radius:12px" />' +
+			'<img class="q-figure__img" src="/img/biology/q113-t6-1262.png?v=57" alt="Медицинский спирометр" loading="lazy" decoding="async" />' +
 			'</figure>',
 		options: [
 			{ id: '1', label: 'определение жизненной ёмкости лёгких' },
@@ -1890,7 +1890,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>Классифицируйте приведённое на <b>рисунке</b> соцветие по всем пяти вариантам классификации из условия. Запишите <b>пять цифр</b> подряд в порядке А, Б, В, Г, Д.</p>' +
 			'<figure class="q-figure q-figure--wide" role="group" aria-label="Соцветие">' +
-			'<img class="q-figure__img" src="/img/biology/q120-t13-1473.png?v=57" alt="Рисунок соцветия растения" loading="lazy" decoding="async" style="background:#fff;border-radius:12px" />' +
+			'<img class="q-figure__img" src="/img/biology/q120-t13-1473.png?v=57" alt="Рисунок соцветия растения" loading="lazy" decoding="async" />' +
 			'</figure>' +
 			'<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:480px"><div><b style="color:var(--accent);margin-right:6px">А)</b> по околоцветнику: 1) простой / 2) сложный</div><div><b style="color:var(--accent);margin-right:6px">Б)</b> по ветвлению: 1) простое / 2) сложное</div><div><b style="color:var(--accent);margin-right:6px">В)</b> по цветоножке: 1) сидячие / 2) с цветоножкой</div><div><b style="color:var(--accent);margin-right:6px">Г)</b> по раскрытию: 1) ботрические / 2) цимозные</div><div><b style="color:var(--accent);margin-right:6px">Д)</b> по верхушке: 1) открытое / 2) закрытое</div></div>',
 		placeholder: '5 цифр',
