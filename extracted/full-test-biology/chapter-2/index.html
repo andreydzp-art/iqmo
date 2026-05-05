@@ -46,8 +46,10 @@
   .breadcrumbs{ color:var(--muted); font-size:13.5px;}
   .breadcrumbs b{ color:var(--ink-2); font-weight:600;}
   .nav-right{ display:flex; align-items:center; gap:8px;}
-  .pill{ height:36px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink-2); font-size:13px; font-weight:500; display:inline-flex; align-items:center; gap:8px; cursor:pointer;}
-  .pill:hover{ background:var(--bg-2);}
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:13.5px; height:38px; padding:0 16px; border-radius:10px; border:1.5px solid transparent; transition:transform .08s, filter .15s, border-color .15s, background .15s; white-space:nowrap; cursor:pointer; background:none; text-decoration:none; font-family:inherit; }
+  .btn:active{ transform:translateY(1px); }
+  .btn--ghost{ background:var(--surface); border-color:var(--line); color:var(--ink-2); }
+  .btn--ghost:hover{ border-color:var(--ink-2); }
   .avatar{ width:30px; height:30px; border-radius:999px; background:linear-gradient(135deg,#a5b4fc,#7c3aed); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px;}
 
   /* CHAPTER STEPPER */
@@ -397,7 +399,7 @@
   .b-low{  background:linear-gradient(90deg,#f59e0b,#f43f5e);}
 
   .h-stack{ display:flex; align-items:center; gap:8px;}
-  .nav-right a.pill, .nav-right button.pill { text-decoration:none; color:inherit; font:inherit; cursor:pointer; }
+  .nav-right a.btn, .nav-right button.btn { font:inherit; }
   #ch2-body.ch2-denied { visibility:visible; }
   #ch2-body.ch2-denied .shell { filter:blur(6px); pointer-events:none; user-select:none; }
   .ch2-guard-loader {
@@ -444,11 +446,11 @@
       <div class="breadcrumbs">Биология · ОГЭ 2026 — <b>Глава 2: Демо-варианты ФИПИ</b></div>
     </div>
     <div class="nav-right">
-      <a href="/subject-biology/" class="pill">К предмету</a>
-      <a href="/" class="pill">Главная</a>
-      <a href="/login.html" class="pill iqmo-only-guest" id="iqmo-nav-login">Вход</a>
-      <a href="/profile/" class="pill iqmo-only-authed" id="iqmo-nav-profile" hidden>Профиль</a>
-      <button type="button" class="pill iqmo-only-authed" id="iqmo-nav-logout" hidden>Выйти</button>
+      <a href="/subject-biology/" class="btn btn--ghost">К предмету</a>
+      <a href="/" class="btn btn--ghost">Главная</a>
+      <a href="/login.html" class="btn btn--ghost iqmo-only-guest" id="iqmo-nav-login">Вход</a>
+      <a href="/profile/" class="btn btn--ghost iqmo-only-authed" id="iqmo-nav-profile" hidden>Профиль</a>
+      <button type="button" class="btn btn--ghost iqmo-only-authed" id="iqmo-nav-logout" hidden>Выйти</button>
     </div>
   </header>
 
