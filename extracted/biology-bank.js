@@ -29,7 +29,7 @@ const _BIO_FIG_V6_19_21 =
 	'</figure>';
 const _BIO_FIG_V7_19_21 =
 	'<figure class="q-figure q-figure--wide" role="group" aria-label="Фрагмент экосистемы тундры (демо ОГЭ-2025)">' +
-	'<img class="q-figure__img" src="/img/biology/q147-149-ekosistema-tundry.png" alt="Схема экосистемы тундры: А — растения и лишайники, Б — куропатка, В — лемминг, Г — гусь, Д — полярная сова, Е — поморник, Ж — северный олень, З — волк, И — песец, К — горностай, Л — пухоеды и клещи; стрелки показывают трофические связи" loading="lazy" decoding="async" />' +
+	'<img class="q-figure__img" src="/img/biology/q147-149-ekosistema-tundry.png?v=62" alt="Схема экосистемы тундры: А — растения и лишайники, Б — куропатка, В — лемминг, Г — гусь, Д — полярная сова, Е — поморник, Ж — северный олень, З — волк, И — песец, К — горностай, Л — пухоеды и клещи; стрелки показывают трофические связи" loading="lazy" decoding="async" />' +
 	'</figure>';
 const _BIO_V6_T14_TRAEHEA =
 	'<figure class="q-figure q-figure--wide" role="group" aria-label="Четыре органа: 1) почки, 2) лёгкие с трахеей, 3) сердце, 4) печень">' +
