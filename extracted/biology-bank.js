@@ -1770,7 +1770,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>На фотографии изображён спирометр. С какой целью проводят спирометрию?</p>' +
 			'<figure class="q-figure" role="group" aria-label="Спирометр">' +
-			'<img class="q-figure__img" src="/img/biology/q113-t6-1262.png?v=57" alt="Медицинский спирометр" loading="lazy" decoding="async" />' +
+			'<img class="q-figure__img" src="/img/biology/q113-t6-1262.png?v=58" alt="Медицинский спирометр" loading="lazy" decoding="async" />' +
 			'</figure>',
 		options: [
 			{ id: '1', label: 'определение жизненной ёмкости лёгких' },
