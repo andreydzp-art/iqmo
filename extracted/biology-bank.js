@@ -1679,7 +1679,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>Какой <b>процесс</b> изображён на рисунке? Запишите ответ одним словом в именительном падеже.</p>' +
 			'<figure class="q-figure q-figure--wide" role="group" aria-label="Иллюстрация к заданию">' +
-			'<img class="q-figure__img" src="/img/biology/q108-t1-12125.png?v=57" alt="Схема, иллюстрирующая процесс в живой природе" loading="lazy" decoding="async" />' +
+			'<img class="q-figure__img" src="/img/biology/q108-t1-12125.png?v=58" alt="Схема, иллюстрирующая процесс в живой природе" loading="lazy" decoding="async" />' +
 			'</figure>',
 		placeholder: 'слово',
 		correct: 'эволюция',
