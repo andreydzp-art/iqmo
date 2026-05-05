@@ -1347,7 +1347,13 @@ window.BIOLOGY_QUESTIONS = [
 		title: 'Систематические категории (гадюка)',
 		body:
 			'<p>Расположите в правильном порядке систематические категории, <b>начиная с наименьшей</b>. В ответе запишите последовательность цифр.</p>' +
-			'<p><b>1)</b>&nbsp;Пресмыкающиеся<br><b>2)</b>&nbsp;Гадюка<br><b>3)</b>&nbsp;Хордовые<br><b>4)</b>&nbsp;Гадюка обыкновенная<br><b>5)</b>&nbsp;Чешуйчатые</p>',
+			'<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:480px">' +
+			'<div><b style="color:var(--accent);margin-right:6px">1)</b> Пресмыкающиеся</div>' +
+			'<div><b style="color:var(--accent);margin-right:6px">2)</b> Гадюка</div>' +
+			'<div><b style="color:var(--accent);margin-right:6px">3)</b> Хордовые</div>' +
+			'<div><b style="color:var(--accent);margin-right:6px">4)</b> Гадюка обыкновенная</div>' +
+			'<div><b style="color:var(--accent);margin-right:6px">5)</b> Чешуйчатые</div>' +
+			'</div>',
 		placeholder: '5 цифр',
 		correct: '42513',
 		hint: 'От меньшей таксономической единицы к большей: вид (4) → род (2) → отряд (5) → класс (1) → тип (3).',
