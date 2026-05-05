@@ -206,11 +206,15 @@
 				document.querySelectorAll('a').forEach(function (a) {
 					if (a.dataset.iqmoKeepHref === '1') return;
 					var text = (a.textContent || '').trim().toLowerCase();
-					if (text !== 'главная') return;
 					var href = (a.getAttribute('href') || '').trim();
+					if (text === 'мои предметы' && HOME_HREF_RE.test(href)) {
+						a.setAttribute('href', preferred);
+						return;
+					}
+					if (text !== 'главная') return;
 					if (!HOME_HREF_RE.test(href)) return;
 					var inCrumbs = crumbContainers.some(function (c) { return c.contains(a); });
-					if (inCrumbs) return; // breadcrumbs обрабатываются отдельным проходом
+					if (inCrumbs) return;
 					a.setAttribute('href', preferred);
 					relabelHomeTo(a, 'К занятиям');
 					a.setAttribute('aria-label', 'К занятиям');
