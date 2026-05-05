@@ -1917,6 +1917,35 @@
 				elPb.style.width = (answered / total * 100) + '%';
 			}
 
+			function formatBody(html) {
+				var S = 'display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:480px';
+				var N = 'color:var(--accent);margin-right:6px';
+				return html.replace(/<p>([^<]*?\d\)\s[^<]*?(?:,\s*\d\)\s|·\s*\d\)\s)[^<]*)<\/p>/g, function(m, inner) {
+					var items = inner.split(/(?:,\s*|\s*·\s*)(?=\d+\)\s)/);
+					if (items.length < 2) return m;
+					var prefix = '';
+					var first = items[0];
+					var numMatch = first.match(/^(.*?)\b(\d+\)\s)/);
+					if (numMatch && numMatch[1].trim()) {
+						prefix = '<p>' + numMatch[1].trim() + '</p>';
+						items[0] = numMatch[2] + first.substring(numMatch[0].length);
+					}
+					var suffix = '';
+					var last = items[items.length - 1];
+					var dashIdx = last.search(/\s\u2014\s|\s—\s/);
+					if (dashIdx > -1) {
+						suffix = '<p>' + last.substring(dashIdx).trim() + '</p>';
+						items[items.length - 1] = last.substring(0, dashIdx).trim();
+					}
+					var divs = items.map(function(it) {
+						var pm = it.match(/^(\d+)\)\s*(.*)/);
+						if (!pm) return '<div>' + it + '</div>';
+						return '<div><b style="' + N + '">' + pm[1] + ')</b> ' + pm[2].replace(/\.\s*$/, '') + '</div>';
+					}).join('');
+					return prefix + '<div style="' + S + '">' + divs + '</div>' + suffix;
+				});
+			}
+
 			function renderQuestion() {
 				try { gmCompanionPing(state.current, QCOUNT); } catch(e) {}
 				const q = QUESTIONS[state.current];
@@ -2012,7 +2041,7 @@
 							${flagged ? 'Отмечено' : 'Вернуться позже'}
 						</button>
 					</div>
-					<div class="q-body">${q.body}</div>
+					<div class="q-body">${formatBody(q.body)}</div>
 					${inputHtml}
 					<div class="q-foot">
 						<div class="q-foot__left">
@@ -2497,7 +2526,7 @@
 									<span class="review-item__title">${q.title}</span>
 									<span class="review-item__badge">${lbl[res.status]}</span>
 								</div>
-								<div class="review-item__body">${q.body}</div>
+								<div class="review-item__body">${formatBody(q.body)}</div>
 								<div class="review-answers">
 									<div class="review-answer ${yourCls}">
 										<span class="review-answer__label">Ваш ответ</span>
@@ -2611,7 +2640,7 @@
 							<span class="review-item__title"><span class="part-banner">Часть 2</span>${q.title}</span>
 							${badge}
 						</div>
-						<div class="review-item__body">${q.body}</div>
+						<div class="review-item__body">${formatBody(q.body)}</div>
 						${answerHtml}
 						<div class="sc-solution">
 							<b>Эталонное решение</b>

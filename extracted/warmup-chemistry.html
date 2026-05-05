@@ -468,6 +468,35 @@
 				return String(q.correct);
 			}
 
+			function formatBody(html) {
+				var S = 'display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:480px';
+				var N = 'color:var(--accent);margin-right:6px';
+				return html.replace(/<p>([^<]*?\d\)\s[^<]*?(?:,\s*\d\)\s|·\s*\d\)\s)[^<]*)<\/p>/g, function(m, inner) {
+					var items = inner.split(/(?:,\s*|\s*·\s*)(?=\d+\)\s)/);
+					if (items.length < 2) return m;
+					var prefix = '';
+					var first = items[0];
+					var numMatch = first.match(/^(.*?)\b(\d+\)\s)/);
+					if (numMatch && numMatch[1].trim()) {
+						prefix = '<p>' + numMatch[1].trim() + '</p>';
+						items[0] = numMatch[2] + first.substring(numMatch[0].length);
+					}
+					var suffix = '';
+					var last = items[items.length - 1];
+					var dashIdx = last.search(/\s\u2014\s|\s—\s/);
+					if (dashIdx > -1) {
+						suffix = '<p>' + last.substring(dashIdx).trim() + '</p>';
+						items[items.length - 1] = last.substring(0, dashIdx).trim();
+					}
+					var divs = items.map(function(it) {
+						var pm = it.match(/^(\d+)\)\s*(.*)/);
+						if (!pm) return '<div>' + it + '</div>';
+						return '<div><b style="' + N + '">' + pm[1] + ')</b> ' + pm[2].replace(/\.\s*$/, '') + '</div>';
+					}).join('');
+					return prefix + '<div style="' + S + '">' + divs + '</div>' + suffix;
+				});
+			}
+
 			function renderQuestion() {
 				const q = state.questions[state.current];
 				if (!q) return renderFinal();
@@ -556,7 +585,7 @@
 							<span class="q-tag">${tagText}</span>
 						</div>
 						<h1 class="q-title">${q.title}</h1>
-						<div class="q-body">${q.body}</div>
+						<div class="q-body">${formatBody(q.body)}</div>
 						${input}
 						${feedback}
 						<div class="q-foot">${actionBtn}</div>
