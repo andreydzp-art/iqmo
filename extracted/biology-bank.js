@@ -2291,7 +2291,9 @@ window.BIOLOGY_QUESTIONS = [
 		title: 'Подписи к рисунку сердца',
 		body:
 			'<p>Выберите три верно обозначенные подписи к рисунку, на котором изображены сердце и сосуды человека.</p>' +
-			'<p><i>TODO[image-source]: нужен рисунок сердца с подписями</i></p>',
+			'<figure class="q-figure q-figure--wide" role="group" aria-label="Схема сердца и кругов кровообращения">' +
+			'<img class="q-figure__img" src="/img/biology/q144-t16-heart.png?v=62" alt="Схема кровообращения: 1–6 — элементы сердца и сосудов" loading="lazy" decoding="async" />' +
+			'</figure>',
 		options: [
 			{ id: '1', label: 'сонная артерия' },
 			{ id: '2', label: 'аорта' },
