@@ -2258,7 +2258,9 @@ window.BIOLOGY_QUESTIONS = [
 		title: 'Яйцеклетка человека',
 		body:
 			'<p>На каком рисунке изображена яйцеклетка человека?</p>' +
-			'<p><i>TODO[image-source]: нужны 4 рисунка клеток</i></p>',
+			'<figure class="q-figure q-figure--wide" role="group" aria-label="Четыре типа клеток">' +
+			'<img class="q-figure__img" src="/img/biology/q142-t14-cells.png?v=62" alt="1) сперматозоид 2) яйцеклетка 3) эритроцит 4) лейкоцит" loading="lazy" decoding="async" />' +
+			'</figure>',
 		options: [
 			{ id: '1', label: '1' },
 			{ id: '2', label: '2' },
