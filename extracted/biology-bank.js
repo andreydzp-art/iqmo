@@ -1936,7 +1936,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>Выберите три верно обозначенные подписи к рисунку, на котором изображено строение <b>рефлекторной дуги</b> человека.</p>' +
 			'<figure class="q-figure q-figure--wide" role="group" aria-label="Рефлекторная дуга">' +
-			'<img class="q-figure__img" src="/img/biology/q123-t16-40785.png?v=51" alt="Схема рефлекторной дуги с нумерованными элементами" loading="lazy" decoding="async" />' +
+			'<img class="q-figure__img" src="/img/biology/q123-t16-40785.png?v=58" alt="Схема рефлекторной дуги с нумерованными элементами" loading="lazy" decoding="async" />' +
 			'</figure>',
 		options: [
 			{ id: '1', label: 'раздражитель' },
