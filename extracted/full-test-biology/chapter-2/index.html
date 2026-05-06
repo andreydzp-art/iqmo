@@ -199,77 +199,94 @@
   .legend-lock{ background:#c8cce0;}
   .legend-boss{ background:var(--violet);}
 
-  .map-wrap{ position:relative; height:320px; margin-top:18px;}
+  /* ===== Level-map nodes (same as full-test-chemistry lm-* system) ===== */
+  :root {
+    --lm-emerald: #10b981;
+    --lm-primary: #4f46e5;
+    --lm-primary-2: #6366f1;
+    --lm-shadow-glow: 0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45);
+    --lm-shadow-boss: 0 0 0 6px rgba(124,58,237,.12), 0 18px 36px -8px rgba(124,58,237,.45);
+  }
+  .map-wrap{ position:relative; height:290px; margin-top:18px;}
   .map-svg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
-  .nodes{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(7,1fr); align-items:center;}
-  .node-cell{ display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; height:100%;}
-  .node-cell .label-top{ position:absolute; top:6px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;}
-  .label-top.next{ color:var(--primary);}
-  .label-top.boss{ color:var(--violet);}
-  .label-top.new{ color:var(--teal);}
+  .lm-nodes{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(7,1fr); align-items:center;}
+  .lm-cell{ display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; height:100%;}
+  .lm-cell .lm-label-top{ position:absolute; top:6px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;}
+  .lm-label-top.is--start{ color:var(--teal);}
+  .lm-label-top.is--boss{ color:var(--violet);}
 
-  .node{
+  .lm-node{
     width:78px; height:78px; border-radius:999px;
     background:var(--surface); border:2px solid var(--line);
     display:flex; align-items:center; justify-content:center;
     font-size:24px; font-weight:800; color:var(--muted-2);
     position:relative; z-index:2;
+    cursor:pointer; padding:0;
+    transition: transform .12s;
   }
-  .node.current{
-    background:linear-gradient(180deg,var(--primary-2),var(--primary));
+  .lm-node:hover{ transform:translateY(-2px); }
+  .lm-node:disabled{ cursor:not-allowed; }
+  .lm-node:disabled:hover{ transform:none; }
+  .lm-node.is--done{
+    border-color:var(--lm-emerald); color:var(--lm-emerald); background:#fff;
+  }
+  .lm-node.is--done::after{
+    content:""; position:absolute; right:-4px; top:-4px;
+    width:26px; height:26px; border-radius:999px;
+    background:var(--lm-emerald);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+    background-repeat:no-repeat; background-position:center;
+    box-shadow:0 4px 10px -2px rgba(16,185,129,.55), 0 0 0 3px #fff;
+  }
+  .lm-node.is--current{
+    background:linear-gradient(180deg, var(--lm-primary-2), var(--lm-primary));
     border-color:transparent; color:#fff;
-    box-shadow:0 18px 36px -10px rgba(79,70,229,.55);
+    box-shadow:var(--lm-shadow-glow);
+    animation:lmPulse 2.4s ease-in-out infinite;
   }
-  /* Two emanating ring waves around available node */
-  .node.current::before,
-  .node.current::after{
-    content:""; position:absolute; inset:-4px; border-radius:50%;
-    border:2px solid rgba(79,70,229,.55);
-    pointer-events:none;
-    animation:ringWave 1.8s ease-out infinite;
+  @keyframes lmPulse{
+    0%,100%{ box-shadow:0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45);}
+    50%    { box-shadow:0 0 0 10px rgba(79,70,229,.14), 0 0 0 20px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.55);}
   }
-  .node.current::after{ animation-delay:.9s;}
-  @keyframes ringWave{
-    0%{   transform:scale(1);    opacity:.7; border-width:2px;}
-    70%{  transform:scale(1.55); opacity:0;  border-width:1px;}
-    100%{ transform:scale(1.55); opacity:0;  border-width:1px;}
+  .lm-node.is--locked{
+    background:#f3f4fb; border-color:#e3e6f0; color:var(--muted-2);
   }
-  /* tiny breathing of the node itself */
-  .node.current{ animation:nodeBreathe 2.2s ease-in-out infinite;}
-  @keyframes nodeBreathe{
-    0%,100%{ transform:scale(1);    box-shadow:0 18px 36px -10px rgba(79,70,229,.45);}
-    50%    { transform:scale(1.06); box-shadow:0 22px 44px -10px rgba(79,70,229,.65);}
-  }
-  .node.done{
-    background:#e7f6ec; border-color:#34d399; color:#059669;
-  }
-  .node.done svg{ stroke:#059669; }
-  .cap-status.done{ color:#059669; font-weight:600; display:flex; align-items:center; gap:4px; }
-  .cap-status.done svg{ stroke:#059669; width:13px; height:13px; }
-  .node.locked{ background:#f3f4fb; color:var(--muted-2);}
-  .node.locked .lock{ width:22px; height:22px;}
-
-  .node.boss{
+  .lm-node.is--locked:hover{ transform:none; }
+  .lm-node.is--locked .lm-lock{ width:22px; height:22px;}
+  .lm-node.is--boss{
     width:88px; height:88px;
-    background:linear-gradient(180deg,#8b5cf6,#6d28d9);
+    background:linear-gradient(180deg, #8b5cf6, #6d28d9);
     border-color:transparent; color:#fff;
-    box-shadow:0 0 0 6px rgba(124,58,237,.12),0 18px 36px -8px rgba(124,58,237,.45);
+    box-shadow:var(--lm-shadow-boss);
   }
-  .node.boss .boss-lock{
+  .lm-node.is--boss::before{
+    content:""; position:absolute; inset:-6px; border-radius:999px;
+    background:conic-gradient(from 0deg, rgba(167,139,250,.0), rgba(167,139,250,.55), rgba(167,139,250,.0) 60%);
+    -webkit-mask:radial-gradient(circle, transparent 60%, #000 61%);
+            mask:radial-gradient(circle, transparent 60%, #000 61%);
+    z-index:-1;
+    animation:lmSpin 8s linear infinite;
+  }
+  .lm-node.is--boss.is--locked{ opacity:.9; }
+  .lm-node.is--boss.is--locked::before{ display:none; }
+  .lm-node.is--boss.is--done{ background:linear-gradient(135deg, var(--lm-emerald), #059669); }
+  @keyframes lmSpin{ to{ transform:rotate(360deg); } }
+  .lm-node.is--boss .lm-boss-lock{
     position:absolute; right:-2px; top:-2px;
     width:24px; height:24px; border-radius:999px; background:#fff;
     color:var(--violet); display:inline-flex; align-items:center; justify-content:center;
-    box-shadow:0 4px 10px -2px rgba(124,58,237,.45),0 0 0 3px #fff;
+    box-shadow:0 4px 10px -2px rgba(124,58,237,.45), 0 0 0 3px #fff;
   }
 
-  .cap{ margin-top:14px; text-align:center; display:flex; flex-direction:column; gap:5px;}
-  .cap-name{ font-size:13.5px; font-weight:600; color:var(--ink);}
-  .cap-status{ font-size:12px; color:var(--muted); white-space:nowrap;}
-  .cap-status.now{ color:var(--primary); font-weight:600;}
-  .cap-tier{ font-size:11px; color:var(--muted-2); white-space:nowrap;}
+  .lm-cap{ margin-top:14px; text-align:center; display:flex; flex-direction:column; gap:5px;}
+  .lm-cap-name{ font-size:13.5px; font-weight:600; color:var(--ink);}
+  .lm-cap-status{ font-size:12px; color:var(--muted); white-space:nowrap; display:inline-flex; align-items:center; gap:5px;}
+  .lm-cap-status.is--done{ color:var(--lm-emerald); font-weight:600;}
+  .lm-cap-status.is--now{ color:var(--lm-primary); font-weight:600;}
+  .lm-cap-tier{ font-size:11px; color:var(--muted-2); white-space:nowrap;}
   .cap-tier b{ color:var(--ink-2);}
 
-  .start-btn{ margin-top:10px; height:34px; padding:0 14px; border-radius:10px; border:0; background:linear-gradient(180deg,var(--primary-2),var(--primary)); color:#fff; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
+  .lm-start-btn{ margin-top:10px; height:34px; padding:0 14px; border-radius:10px; border:0; background:linear-gradient(180deg,var(--primary-2),var(--primary)); color:#fff; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
 
   .boss-hint{ margin-top:10px; max-width:130px; text-align:center; font-size:11.5px; color:var(--muted); line-height:1.4;}
 
@@ -417,7 +434,7 @@
   .b-low{  background:linear-gradient(90deg,#f59e0b,#f43f5e);}
 
   .h-stack{ display:flex; align-items:center; gap:8px;}
-  .pill-btn button { font:inherit; }
+  .pill-btn { font:inherit; }
   #ch2-body.ch2-denied { visibility:visible; }
   #ch2-body.ch2-denied .shell { filter:blur(6px); pointer-events:none; user-select:none; }
   .ch2-guard-loader {
@@ -440,9 +457,9 @@
   @media (max-width: 768px) {
     .chapter-stepper{ flex-wrap:wrap; }
     .shell { padding:16px 16px 40px; }
-    .nodes{ grid-template-columns:1fr !important; height:auto !important; row-gap:18px; }
+    .lm-nodes{ grid-template-columns:repeat(2, 1fr) !important; gap:18px 8px; position:static !important; }
     .map-wrap{ height:auto !important; min-height:0 !important; padding-bottom:12px; }
-    .node-cell{ min-height:0; }
+    .lm-cell{ height:auto; padding:16px 0; }
     .map-svg{ display:none; }
     .grid-4{ grid-template-columns:1fr; }
   }
@@ -635,7 +652,7 @@
         <div class="map-sub">6 демо-вариантов · 1 супер-босс · сложность повышенная</div>
       </div>
       <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#e7f6ec;border-color:#34d399;"></span> Пройден</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#fff;border:2px solid #10b981;"></span> Пройден</span>
         <span class="legend-item"><span class="legend-dot legend-now"></span> Доступен</span>
         <span class="legend-item"><span class="legend-dot legend-lock"></span> Заблокирован</span>
         <span class="legend-item"><span class="legend-dot legend-boss"></span> Супер-босс</span>
@@ -653,7 +670,7 @@
               fill="none" stroke="url(#dashed)" stroke-width="3" stroke-linecap="round"/>
       </svg>
 
-      <div class="nodes" id="ch2-nodes"></div>
+      <div class="lm-nodes" id="ch2-nodes"></div>
     </div>
   </section>
 
@@ -772,10 +789,8 @@
     { vid: 13, tier: 'экстра' },
   ];
   var BOSS_VID = 14;
-  var lockSvg = '<svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-  var checkSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-  var smallCheckSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-  var playSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>';
+  var lockSvg = '<svg class="lm-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  var checkSmall = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   var VARIANTS = window.BIOLOGY_VARIANTS || [];
 
   function isPassed(vid) {
@@ -800,47 +815,61 @@
     var isCurrent = !done && prevDone && ready;
     var isLocked = !done && !isCurrent;
 
-    var labelTop = i === 0 ? '<div class="label-top new">\u2605 Старт главы</div>' : '';
-    var nodeClass = done ? 'node done' : isCurrent ? 'node current' : 'node locked';
-    var inner = done ? checkSvg : isCurrent ? String(sl.vid) : lockSvg;
-    var status = done ? '<div class="cap-status done">' + smallCheckSvg + ' Пройден</div>'
-               : isCurrent ? '<div class="cap-status now">Доступен сейчас</div>'
-               : '<div class="cap-status">Заблокирован</div>';
-    var btn = '';
-    if (isCurrent) {
-      btn = '<a class="start-btn" href="/full-test-biology/?v=' + sl.vid + '" style="text-decoration:none;color:#fff;">' + playSvg + ' Начать</a>';
-    } else if (done) {
-      btn = '<a class="start-btn" href="/full-test-biology/?v=' + sl.vid + '" style="text-decoration:none;color:#fff;background:#059669;">' + playSvg + ' Пройти заново</a>';
-    }
+    var labelTop = i === 0 ? '<div class="lm-label-top is--start">\u2605 Старт главы</div>' : '';
+    var cls = 'lm-node';
+    if (done) cls += ' is--done';
+    else if (isCurrent) cls += ' is--current';
+    else cls += ' is--locked';
+    var inner = done ? String(sl.vid) : isCurrent ? String(sl.vid) : lockSvg;
+    var capStatus = done
+      ? '<div class="lm-cap-status is--done">' + checkSmall + ' Пройден</div>'
+      : isCurrent
+        ? '<div class="lm-cap-status is--now">Доступен сейчас</div>'
+        : '<div class="lm-cap-status">Заблокирован</div>';
 
-    html += '<div class="node-cell">' + labelTop +
-      '<div class="' + nodeClass + '">' + inner + '</div>' +
-      '<div class="cap"><div class="cap-name">Вариант ' + sl.vid + '</div>' +
-      status +
-      '<div class="cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
-      btn + '</div></div>';
+    html += '<div class="lm-cell">' + labelTop +
+      '<button class="' + cls + '"' + (isLocked ? ' disabled' : '') +
+      ' data-v="' + sl.vid + '" data-state="' + (done ? 'done' : isCurrent ? 'current' : 'locked') + '">' +
+      inner + '</button>' +
+      '<div class="lm-cap"><div class="lm-cap-name">Вариант ' + sl.vid + '</div>' +
+      capStatus +
+      '<div class="lm-cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
+      '</div></div>';
   }
 
   var allRegularDone = CH2_SLOTS.every(function (sl) { return isPassed(sl.vid); });
   var bossDone = isPassed(BOSS_VID);
   var bossReady = variantReady(BOSS_VID);
   var bossOpen = allRegularDone && bossReady && !bossDone;
-  var bossClass = bossDone ? 'node boss done' : bossOpen ? 'node boss current' : 'node boss';
-  var bossLock = (bossDone || bossOpen) ? '' : '<div class="boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>';
-  var bossStatus = bossDone ? '<div class="cap-status done">' + smallCheckSvg + ' Босс побеждён</div>'
-                 : bossOpen ? '<div class="cap-status now">Босс открыт!</div>'
-                 : '<div class="cap-status">Заблокирован</div>';
+  var bossCls = 'lm-node is--boss';
+  if (bossDone) bossCls += ' is--done';
+  else if (bossOpen) bossCls += ' is--current';
+  else bossCls += ' is--locked';
+  var bossLock = (bossDone || bossOpen) ? '' : '<div class="lm-boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>';
+  var bossCapStatus = bossDone
+    ? '<div class="lm-cap-status is--done">' + checkSmall + ' Босс побеждён</div>'
+    : bossOpen
+      ? '<div class="lm-cap-status is--now">Босс открыт!</div>'
+      : '<div class="lm-cap-status">Заблокирован</div>';
   var bossHint = (!bossDone && !bossOpen) ? '<div class="boss-hint">Откроется после прохождения всех 6 вариантов</div>' : '';
 
-  html += '<div class="node-cell"><div class="label-top boss">\u26A1 Супер-босс</div>' +
-    '<div class="' + bossClass + '">' +
+  html += '<div class="lm-cell"><div class="lm-label-top is--boss">\u26A1 Супер-босс</div>' +
+    '<button class="' + bossCls + '"' + ((!bossDone && !bossOpen) ? ' disabled' : '') +
+    ' data-v="' + BOSS_VID + '" data-state="' + (bossDone ? 'done' : bossOpen ? 'current' : 'locked') + '">' +
     '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/></svg>' +
-    bossLock + '</div>' +
-    '<div class="cap"><div class="cap-name">Магистр биологии</div>' +
-    bossStatus + bossHint + '</div></div>';
+    bossLock + '</button>' +
+    '<div class="lm-cap"><div class="lm-cap-name">Магистр биологии</div>' +
+    bossCapStatus + bossHint + '</div></div>';
 
   var host = document.getElementById('ch2-nodes');
   if (host) host.innerHTML = html;
+
+  host.querySelectorAll('.lm-node[data-v]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.dataset.state === 'locked') return;
+      window.location.href = '/full-test-biology/?v=' + btn.dataset.v;
+    });
+  });
 
   var doneCount = CH2_SLOTS.filter(function (sl) { return isPassed(sl.vid); }).length + (bossDone ? 1 : 0);
   var statDone = document.getElementById('ch2-stat-done');
