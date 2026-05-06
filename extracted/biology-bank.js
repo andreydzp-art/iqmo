@@ -2625,7 +2625,9 @@ window.BIOLOGY_QUESTIONS = [
 		title: 'Вилочковая железа',
 		body:
 			'<p>Под каким номером изображена вилочковая железа человека?</p>' +
-			'<p><i>TODO[image-source]: нужен рисунок с пронумерованными органами иммунной системы (№&nbsp;35183)</i></p>',
+			'<figure class="q-figure q-figure--wide" role="group" aria-label="Четыре органа">' +
+			'<img class="q-figure__img" src="/img/biology/q163-t14-thymus.png?v=1" alt="1) лимфатические узлы шеи, 2) вилочковая железа (тимус) за грудиной, 3) нёбные миндалины, 4) красный костный мозг в кости" loading="lazy" decoding="async" />' +
+			'</figure>',
 		placeholder: 'номер',
 		correct: '2',
 		hint: 'Вилочковая железа (тимус) расположена за грудиной, изображена под номером <b>2</b>.',
