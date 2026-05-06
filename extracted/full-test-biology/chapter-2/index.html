@@ -278,12 +278,42 @@
     box-shadow:0 4px 10px -2px rgba(124,58,237,.45), 0 0 0 3px #fff;
   }
 
-  .lm-cap{ margin-top:14px; text-align:center; display:flex; flex-direction:column; gap:5px;}
+  .lm-cap{ margin-top:14px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:5px;}
   .lm-cap-name{ font-size:13.5px; font-weight:600; color:var(--ink);}
   .lm-cap-status{ font-size:12px; color:var(--muted); white-space:nowrap; display:inline-flex; align-items:center; gap:5px;}
   .lm-cap-status.is--done{ color:var(--lm-emerald); font-weight:600;}
   .lm-cap-status.is--now{ color:var(--lm-primary); font-weight:600;}
   .lm-cap-tier{ font-size:11px; color:var(--muted-2); white-space:nowrap;}
+  .lm-cap-stars{ margin-top:6px; display:inline-flex; gap:3px;}
+  .lm-cap-stars svg{ width:14px; height:14px;}
+  .lm-star-on{ color:#f59e0b;}
+  .lm-star-off{ color:#d9dcea;}
+  .lm-score-chip{
+    margin-top:8px;
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:11.5px; font-weight:600;
+    background:#e7faf2; color:#047857;
+    padding:3px 9px; border-radius:999px;
+    border:1px solid #c2f0d9;
+  }
+  .lm-num{ font-family:'JetBrains Mono', ui-monospace, monospace; font-variant-numeric:tabular-nums;}
+  .lm-start-btn{
+    margin-top:10px;
+    height:34px; padding:0 14px;
+    border-radius:10px; border:0;
+    background:linear-gradient(180deg, var(--lm-primary-2), var(--lm-primary));
+    color:#fff; font-weight:600; font-size:13px;
+    display:inline-flex; align-items:center; gap:6px;
+    cursor:pointer;
+    box-shadow:0 6px 14px -4px rgba(79,70,229,.55);
+    font-family:inherit;
+    text-decoration:none;
+  }
+  .lm-start-btn:hover{ filter:brightness(1.05);}
+  .boss-hint, .lm-boss-hint{
+    margin-top:10px; max-width:140px; text-align:center;
+    font-size:11.5px; color:var(--muted); line-height:1.4;
+  }
   .cap-tier b{ color:var(--ink-2);}
 
   .lm-start-btn{ margin-top:10px; height:34px; padding:0 14px; border-radius:10px; border:0; background:linear-gradient(180deg,var(--primary-2),var(--primary)); color:#fff; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
@@ -791,25 +821,95 @@
   var BOSS_VID = 14;
   var lockSvg = '<svg class="lm-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   var checkSmall = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var playSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>';
   var VARIANTS = window.BIOLOGY_VARIANTS || [];
+  var BANK = window.BIOLOGY_QUESTIONS || [];
 
-  function isPassed(vid) {
-    try {
-      var raw = localStorage.getItem('iqmo-bio-v-' + vid);
-      if (!raw) return false;
-      var s = JSON.parse(raw);
-      return !!(s && s.finished);
-    } catch (e) { return false; }
+  function findVariant(vid) {
+    return VARIANTS.find(function (v) { return v.id === vid; });
   }
 
   function variantReady(vid) {
-    return VARIANTS.some(function (v) { return v.id === vid && v.status === 'ready'; });
+    var v = findVariant(vid);
+    return !!(v && v.status === 'ready');
+  }
+
+  function normAns(s) {
+    return String(s).trim().toLowerCase()
+      .replace(/\u00A0/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\./g, ',');
+  }
+
+  function checkAns(q, given) {
+    var correct = q.correct;
+    var isEmpty = given === undefined || given === '' ||
+      (Array.isArray(given) && given.filter(function (x) { return x; }).length === 0);
+    if (isEmpty) return 'skip';
+    if (q.type === 'input') {
+      var arr = Array.isArray(correct) ? correct : [correct];
+      return arr.some(function (v) { return normAns(given) === normAns(v); }) ? 'ok' : 'wrong';
+    }
+    if (Array.isArray(correct)) {
+      if (q.type === 'match') {
+        var g = Array.isArray(given) ? given.map(function (x) { return x || ''; }).join(',') : '';
+        return g === correct.join(',') ? 'ok' : 'wrong';
+      }
+      var gArr = (Array.isArray(given) ? given.slice() : []).sort().join(',');
+      var cArr = correct.slice().sort().join(',');
+      return gArr === cArr ? 'ok' : 'wrong';
+    }
+    return normAns(given) === normAns(correct) ? 'ok' : 'wrong';
+  }
+
+  function variantBest(vid) {
+    try {
+      var raw = localStorage.getItem('iqmo-bio-v-' + vid);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (!s || !s.finished) return null;
+      var v = findVariant(vid);
+      if (!v) return null;
+      var ok = 0, total = 0;
+      (v.qids || []).forEach(function (qid) {
+        var q = BANK.find(function (b) { return b.id === qid; });
+        if (!q || q.type === 'written') return;
+        total++;
+        var given = s.answers ? s.answers[q.id] : undefined;
+        if (checkAns(q, given) === 'ok') ok++;
+      });
+      if (!total) return null;
+      return { ok: ok, total: total, percent: Math.round(100 * ok / total) };
+    } catch (e) { return null; }
+  }
+
+  function starsForPercent(p) {
+    if (p >= 90) return 3;
+    if (p >= 70) return 2;
+    if (p >= 50) return 1;
+    return 0;
+  }
+
+  function starsHtml(filled) {
+    var h = '<div class="lm-cap-stars" aria-label="Звёзды: ' + filled + ' из 3">';
+    for (var i = 1; i <= 3; i++) {
+      var cls = i <= filled ? 'lm-star-on' : 'lm-star-off';
+      h += '<svg viewBox="0 0 24 24" fill="currentColor" class="' + cls + '"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function isPassed(vid) {
+    var b = variantBest(vid);
+    return !!(b && b.percent >= 50);
   }
 
   var html = '';
   for (var i = 0; i < CH2_SLOTS.length; i++) {
     var sl = CH2_SLOTS[i];
-    var done = isPassed(sl.vid);
+    var best = variantBest(sl.vid);
+    var done = !!(best && best.percent >= 50);
     var ready = variantReady(sl.vid);
     var prevDone = i === 0 || isPassed(CH2_SLOTS[i - 1].vid);
     var isCurrent = !done && prevDone && ready;
@@ -820,25 +920,36 @@
     if (done) cls += ' is--done';
     else if (isCurrent) cls += ' is--current';
     else cls += ' is--locked';
-    var inner = done ? String(sl.vid) : isCurrent ? String(sl.vid) : lockSvg;
-    var capStatus = done
-      ? '<div class="lm-cap-status is--done">' + checkSmall + ' Пройден</div>'
-      : isCurrent
-        ? '<div class="lm-cap-status is--now">Доступен сейчас</div>'
-        : '<div class="lm-cap-status">Заблокирован</div>';
+    var inner = isLocked ? lockSvg : String(sl.vid);
+
+    var capStatusBlock;
+    if (done) {
+      var stars = best ? starsForPercent(best.percent) : 0;
+      capStatusBlock =
+        '<div class="lm-cap-status is--done">' + checkSmall + ' Пройден</div>' +
+        starsHtml(stars) +
+        (best ? '<div class="lm-score-chip"><span class="lm-num">' + best.percent + '%</span></div>' : '');
+    } else if (isCurrent) {
+      capStatusBlock =
+        '<div class="lm-cap-status is--now">Доступен сейчас</div>' +
+        '<a class="lm-start-btn" href="/full-test-biology/?v=' + sl.vid + '">' + playSvg + ' Начать</a>';
+    } else {
+      capStatusBlock = '<div class="lm-cap-status">Заблокирован</div>';
+    }
 
     html += '<div class="lm-cell">' + labelTop +
       '<button class="' + cls + '"' + (isLocked ? ' disabled' : '') +
       ' data-v="' + sl.vid + '" data-state="' + (done ? 'done' : isCurrent ? 'current' : 'locked') + '">' +
       inner + '</button>' +
       '<div class="lm-cap"><div class="lm-cap-name">Вариант ' + sl.vid + '</div>' +
-      capStatus +
       '<div class="lm-cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
+      capStatusBlock +
       '</div></div>';
   }
 
   var allRegularDone = CH2_SLOTS.every(function (sl) { return isPassed(sl.vid); });
-  var bossDone = isPassed(BOSS_VID);
+  var bossBest = variantBest(BOSS_VID);
+  var bossDone = !!(bossBest && bossBest.percent >= 50);
   var bossReady = variantReady(BOSS_VID);
   var bossOpen = allRegularDone && bossReady && !bossDone;
   var bossCls = 'lm-node is--boss';
@@ -846,12 +957,23 @@
   else if (bossOpen) bossCls += ' is--current';
   else bossCls += ' is--locked';
   var bossLock = (bossDone || bossOpen) ? '' : '<div class="lm-boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>';
-  var bossCapStatus = bossDone
-    ? '<div class="lm-cap-status is--done">' + checkSmall + ' Босс побеждён</div>'
-    : bossOpen
-      ? '<div class="lm-cap-status is--now">Босс открыт!</div>'
-      : '<div class="lm-cap-status">Заблокирован</div>';
-  var bossHint = (!bossDone && !bossOpen) ? '<div class="boss-hint">Откроется после прохождения всех 6 вариантов</div>' : '';
+
+  var bossCapBlock;
+  if (bossDone) {
+    var bossStars = bossBest ? starsForPercent(bossBest.percent) : 0;
+    bossCapBlock =
+      '<div class="lm-cap-status is--done">' + checkSmall + ' Босс побеждён</div>' +
+      starsHtml(bossStars) +
+      (bossBest ? '<div class="lm-score-chip"><span class="lm-num">' + bossBest.percent + '%</span></div>' : '');
+  } else if (bossOpen) {
+    bossCapBlock =
+      '<div class="lm-cap-status is--now">Босс открыт!</div>' +
+      '<a class="lm-start-btn" href="/full-test-biology/?v=' + BOSS_VID + '">' + playSvg + ' Сразиться</a>';
+  } else {
+    bossCapBlock =
+      '<div class="lm-cap-status">Заблокирован</div>' +
+      '<div class="lm-boss-hint">Откроется после прохождения всех 6 вариантов</div>';
+  }
 
   html += '<div class="lm-cell"><div class="lm-label-top is--boss">\u26A1 Супер-босс</div>' +
     '<button class="' + bossCls + '"' + ((!bossDone && !bossOpen) ? ' disabled' : '') +
@@ -859,7 +981,7 @@
     '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/></svg>' +
     bossLock + '</button>' +
     '<div class="lm-cap"><div class="lm-cap-name">Магистр биологии</div>' +
-    bossCapStatus + bossHint + '</div></div>';
+    bossCapBlock + '</div></div>';
 
   var host = document.getElementById('ch2-nodes');
   if (host) host.innerHTML = html;
@@ -870,10 +992,23 @@
       window.location.href = '/full-test-biology/?v=' + btn.dataset.v;
     });
   });
+  host.querySelectorAll('.lm-start-btn[data-v], .lm-start-btn').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.stopPropagation(); });
+  });
 
   var doneCount = CH2_SLOTS.filter(function (sl) { return isPassed(sl.vid); }).length + (bossDone ? 1 : 0);
   var statDone = document.getElementById('ch2-stat-done');
   if (statDone) statDone.textContent = String(doneCount);
+
+  var passedScores = CH2_SLOTS
+    .map(function (sl) { return variantBest(sl.vid); })
+    .filter(function (b) { return b && b.percent >= 50; });
+  if (bossBest && bossBest.percent >= 50) passedScores.push(bossBest);
+  var avgScore = passedScores.length
+    ? Math.round(passedScores.reduce(function (a, b) { return a + b.percent; }, 0) / passedScores.length)
+    : null;
+  var statAvg = document.getElementById('ch2-stat-avg');
+  if (statAvg) statAvg.textContent = avgScore != null ? (avgScore + '%') : '—';
 
   var ctaBtn = document.getElementById('ch2-cta-variant1');
   if (ctaBtn) {
