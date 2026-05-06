@@ -325,6 +325,20 @@
 		} catch (e) {}
 	}
 
+	/** Все 8 вариантов 1-го этапа биологии пройдены → веха bio_stage1. */
+	function maybeUnlockBioStage1() {
+		try {
+			var BIO_STAGE1_IDS = [1, 2, 3, 4, 5, 6, 7, 8];
+			for (var i = 0; i < BIO_STAGE1_IDS.length; i++) {
+				var raw = localStorage.getItem('iqmo-bio-v-' + BIO_STAGE1_IDS[i]);
+				if (!raw) return;
+				var s = JSON.parse(raw);
+				if (!s || !s.finished) return;
+			}
+			unlockBadge('bio_stage1');
+		} catch (e) {}
+	}
+
 	/** Подстановка вех и перенос старых ключей (seven_day_goal → streak7). */
 	function syncRetroBadges() {
 		migrateLegacyBadgeKeys();
@@ -351,6 +365,7 @@
 		}
 		maybeUnlockTopicStar();
 		maybeUnlockChemStage1();
+		maybeUnlockBioStage1();
 	}
 
 	function weekKey(ts) {
@@ -827,6 +842,7 @@
 		} catch (ePerf) {}
 
 		try { maybeUnlockChemStage1(); } catch (eStage) {}
+		try { maybeUnlockBioStage1(); } catch (eBioStage) {}
 
 		try {
 			const itemsCount = Array.isArray(payload.items) ? payload.items.length : 0;
