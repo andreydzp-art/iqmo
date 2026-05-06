@@ -2247,7 +2247,7 @@
 				// Геймификация: победа над боссом Главы 1 (7-й вариант первой семёрки).
 				try {
 					const allVar = window.BIOLOGY_VARIANTS || [];
-					const bossSlot = allVar.length >= 7 ? allVar[6] : null;
+					const bossSlot = allVar.length >= 8 ? allVar[7] : null;
 					const sNow = computeScoring();
 					const isBossWin =
 						bossSlot &&
@@ -2870,7 +2870,7 @@
 
 			function gmChapter1BossSlotBio() {
 				const all = window.BIOLOGY_VARIANTS || [];
-				return all.length >= 7 ? all[6] : null;
+				return all.length >= 8 ? all[7] : null;
 			}
 
 			// ============================================================
@@ -2946,19 +2946,19 @@
 
 				const allVariants = window.BIOLOGY_VARIANTS || [];
 				const ready = allVariants.filter(v => v.status === 'ready');
-				// Карта уровней = первые 6 вариантов главы + 7-й как финальный
-				// босс (как в _tmp_ft6/level-map.html — 6 узлов + 1 boss).
-				// Берём первые 7 вариантов независимо от статуса: ready=играют,
+				// Карта уровней = первые 7 вариантов главы + 8-й как финальный
+				// босс (7 узлов + 1 boss).
+				// Берём первые 8 вариантов независимо от статуса: ready=играют,
 				// coming=locked. Так карта остаётся целой даже на ранних
 				// этапах банка (биология), а в химии (29 ready) — без изменений.
-				if (allVariants.length < 7 || ready.length < 1) {
+				if (allVariants.length < 8 || ready.length < 1) {
 					_renderVariantPickerFallback(picker);
 					return;
 				}
-				const chapterReady = allVariants.slice(0, 7);
-				const bossId = chapterReady[6].id;
-				const variantSlots = chapterReady.slice(0, 6); // обычные узлы
-				const bossSlot = chapterReady[6];
+				const chapterReady = allVariants.slice(0, 8);
+				const bossId = chapterReady[7].id;
+				const variantSlots = chapterReady.slice(0, 7); // обычные узлы
+				const bossSlot = chapterReady[7];
 
 				// Для каждого узла считаем done/current/locked.
 				const attempts = loadAttempts();
@@ -3430,7 +3430,7 @@
 					`;
 				}
 				if (state === 'locked') {
-					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 6 вариантов</div>`;
+					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 7 вариантов</div>`;
 					return `<div class="lm-cap-status">Заблокирован</div>`;
 				}
 				return '';
