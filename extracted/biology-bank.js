@@ -2771,7 +2771,7 @@ window.BIOLOGY_QUESTIONS = [
 		title: 'Свойство живых организмов (рисунок)',
 		body:
 			'<p>Какое свойство живых организмов изображено на&nbsp;рисунке?</p>' +
-			'<p><i>TODO[image-source]: нужна иллюстрация (№&nbsp;12123)</i></p>',
+			'<figure class="q-figure"><img class="q-figure__img" src="/images/bio/q171-cep.png" alt="Стадии развития цыплёнка из яйца"></figure>',
 		placeholder: 'введите ответ (слово)',
 		correct: 'развитие',
 		hint: 'На рисунке показано <b>развитие</b> (онтогенез) — одно из основных свойств живых организмов.',
