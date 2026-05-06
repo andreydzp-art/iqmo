@@ -3111,19 +3111,20 @@
 					});
 				});
 
-				// Confetti / level-up
-				if (justLeveledUp) {
+				// Save seen state BEFORE showing modal to prevent re-trigger on re-render
+				seen.level = globalStats.level;
+				seen.realLevel = heroStats.level;
+				seen.lastUnlockedId = currentIdx >= 0 ? variantInfos[currentIdx].v.id : (allRegularDone ? bossSlot.id : null);
+				gmSaveSeen(seen);
+
+				// Confetti / level-up (once per page load)
+				if (justLeveledUp && !window._gmLevelUpShown) {
+					window._gmLevelUpShown = true;
 					gmShowLevelUp(heroStats.level, heroStats.title);
 					try { if (window.ym) ym(108770166, 'reachGoal', 'level_up', { level: heroStats.level }); } catch (e0) {}
 				} else if (freshUnlockId) {
 					setTimeout(() => gmFireConfetti({ origin: { y: 0.4 } }), 250);
 				}
-
-				// Save seen state
-				seen.level = globalStats.level;
-				seen.realLevel = heroStats.level;
-				seen.lastUnlockedId = currentIdx >= 0 ? variantInfos[currentIdx].v.id : (allRegularDone ? bossSlot.id : null);
-				gmSaveSeen(seen);
 
 				// Live-лидерборд: тянем top-4 по XP из /api/leaderboard.
 				try { lmLoadLeaderboard(); } catch (eLB) {}
