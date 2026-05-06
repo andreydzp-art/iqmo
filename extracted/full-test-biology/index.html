@@ -1643,8 +1643,8 @@
 		</main>
 
 		<script src="/exam-config.js"></script>
-		<script src="/biology-bank.js?v=71"></script>
-		<script src="/biology-variants.js?v=7"></script>
+		<script src="/biology-bank.js?v=72"></script>
+		<script src="/biology-variants.js?v=8"></script>
 		<script src="/iqmo-sync.js"></script>
 		<script src="/iqmo-nav.js"></script>
 		<script src="/mistakes-store.js"></script>
@@ -2247,7 +2247,7 @@
 				// Геймификация: победа над боссом Главы 1 (7-й вариант первой семёрки).
 				try {
 					const allVar = window.BIOLOGY_VARIANTS || [];
-					const bossSlot = allVar.length >= 8 ? allVar[7] : null;
+					const bossSlot = allVar.length >= 9 ? allVar[8] : null;
 					const sNow = computeScoring();
 					const isBossWin =
 						bossSlot &&
@@ -2870,7 +2870,7 @@
 
 			function gmChapter1BossSlotBio() {
 				const all = window.BIOLOGY_VARIANTS || [];
-				return all.length >= 8 ? all[7] : null;
+				return all.length >= 9 ? all[8] : null;
 			}
 
 			// ============================================================
@@ -2946,19 +2946,19 @@
 
 				const allVariants = window.BIOLOGY_VARIANTS || [];
 				const ready = allVariants.filter(v => v.status === 'ready');
-				// Карта уровней = первые 7 вариантов главы + 8-й как финальный
-				// босс (7 узлов + 1 boss).
-				// Берём первые 8 вариантов независимо от статуса: ready=играют,
+				// Карта уровней = первые 8 вариантов главы + 9-й как финальный
+				// босс (8 узлов + 1 boss).
+				// Берём первые 9 вариантов независимо от статуса: ready=играют,
 				// coming=locked. Так карта остаётся целой даже на ранних
 				// этапах банка (биология), а в химии (29 ready) — без изменений.
-				if (allVariants.length < 8 || ready.length < 1) {
+				if (allVariants.length < 9 || ready.length < 1) {
 					_renderVariantPickerFallback(picker);
 					return;
 				}
-				const chapterReady = allVariants.slice(0, 8);
-				const bossId = chapterReady[7].id;
-				const variantSlots = chapterReady.slice(0, 7); // обычные узлы
-				const bossSlot = chapterReady[7];
+				const chapterReady = allVariants.slice(0, 9);
+				const bossId = chapterReady[8].id;
+				const variantSlots = chapterReady.slice(0, 8); // обычные узлы
+				const bossSlot = chapterReady[8];
 
 				// Для каждого узла считаем done/current/locked.
 				const attempts = loadAttempts();
@@ -3430,7 +3430,7 @@
 					`;
 				}
 				if (state === 'locked') {
-					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 7 вариантов</div>`;
+					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 8 вариантов</div>`;
 					return `<div class="lm-cap-status">Заблокирован</div>`;
 				}
 				return '';
