@@ -626,60 +626,86 @@
               fill="none" stroke="url(#dashed)" stroke-width="3" stroke-linecap="round"/>
       </svg>
 
-      <div class="nodes">
-        <!-- Demo 1 — current -->
-        <div class="node-cell">
-          <div class="label-top new">★ Старт главы</div>
-          <div class="node current">1</div>
-          <div class="cap">
-            <div class="cap-name">Демо-вариант 1</div>
-            <div class="cap-status now">Доступен сейчас</div>
-            <div class="cap-tier">Сложность: <b>средняя</b></div>
-            <a class="start-btn" id="ch2-node1-start" href="/full-test-biology/?v=8" style="text-decoration:none;color:#fff;">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
-              Начать
-            </a>
-          </div>
-        </div>
+      <div class="nodes" id="ch2-nodes"></div>
+      <script>
+      (function () {
+        var CH2_SLOTS = [
+          { num: 1, vid: 8,  tier: 'средняя' },
+          { num: 2, vid: 9,  tier: 'средняя' },
+          { num: 3, vid: 10, tier: 'высокая' },
+          { num: 4, vid: 11, tier: 'высокая' },
+          { num: 5, vid: 12, tier: 'высокая' },
+          { num: 6, vid: 13, tier: 'экстра' },
+        ];
+        var BOSS_VID = 14;
+        var lockSvg = '<svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+        var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        var playSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>';
 
-        <!-- 2-5 locked -->
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 2</div><div class="cap-status">Откроется после №1</div><div class="cap-tier">Сложность: <b>средняя</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 3</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 4</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 5</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 6</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>экстра</b></div></div>
-        </div>
+        function isPassed(vid) {
+          try {
+            var raw = localStorage.getItem('iqmo-bio-v-' + vid);
+            if (!raw) return false;
+            var s = JSON.parse(raw);
+            return !!(s && s.finished);
+          } catch (e) { return false; }
+        }
 
-        <!-- Super-boss -->
-        <div class="node-cell">
-          <div class="label-top boss">⚡ Супер-босс</div>
-          <div class="node boss">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/>
-            </svg>
-            <div class="boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          </div>
-          <div class="cap">
-            <div class="cap-name">Магистр биологии</div>
-            <div class="cap-status">Заблокирован</div>
-            <div class="boss-hint">Открывает Главу 3 + бейдж «Магистр»</div>
-          </div>
-        </div>
-      </div>
+        var html = '';
+        var firstLockedIdx = -1;
+        for (var i = 0; i < CH2_SLOTS.length; i++) {
+          var sl = CH2_SLOTS[i];
+          var done = isPassed(sl.vid);
+          var variantReady = (window.BIOLOGY_VARIANTS || []).some(function (v) { return v.id === sl.vid && v.status === 'ready'; });
+          var prevDone = i === 0 || isPassed(CH2_SLOTS[i - 1].vid);
+          var isCurrent = !done && prevDone && variantReady;
+          var isLocked = !done && !isCurrent;
+
+          if (isLocked && firstLockedIdx === -1) firstLockedIdx = i;
+
+          var labelTop = i === 0 ? '<div class="label-top new">★ Старт главы</div>' : '';
+          var nodeClass = done ? 'node done' : isCurrent ? 'node current' : 'node locked';
+          var inner = done ? checkSvg : isCurrent ? String(sl.num) : lockSvg;
+          var status = done ? '<div class="cap-status done">' + checkSvg + ' Пройден</div>'
+                     : isCurrent ? '<div class="cap-status now">Доступен сейчас</div>'
+                     : '<div class="cap-status">Заблокирован</div>';
+          var btn = isCurrent
+            ? '<a class="start-btn" href="/full-test-biology/?v=' + sl.vid + '" style="text-decoration:none;color:#fff;">' + playSvg + ' Начать</a>'
+            : '';
+
+          html += '<div class="node-cell">' + labelTop +
+            '<div class="' + nodeClass + '">' + inner + '</div>' +
+            '<div class="cap"><div class="cap-name">Демо-вариант ' + sl.num + '</div>' +
+            status +
+            '<div class="cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
+            btn + '</div></div>';
+        }
+
+        var allRegularDone = CH2_SLOTS.every(function (sl) { return isPassed(sl.vid); });
+        var bossDone = isPassed(BOSS_VID);
+        var bossReady = (window.BIOLOGY_VARIANTS || []).some(function (v) { return v.id === BOSS_VID && v.status === 'ready'; });
+        var bossOpen = allRegularDone && bossReady && !bossDone;
+        var bossClass = bossDone ? 'node boss done' : bossOpen ? 'node boss current' : 'node boss';
+        var bossLock = bossDone ? '' : bossOpen ? '' : '<div class="boss-lock">' + lockSvg.replace('width="2"', 'width="2.5"').replace('class="lock"', '') + '</div>';
+        var bossStatus = bossDone ? '<div class="cap-status done">' + checkSvg + ' Босс побеждён</div>'
+                       : bossOpen ? '<div class="cap-status now">Босс открыт!</div>'
+                       : '<div class="cap-status">Заблокирован</div>';
+        var bossHint = !bossDone && !bossOpen ? '<div class="boss-hint">Откроется после прохождения всех 6 вариантов</div>' : '';
+
+        html += '<div class="node-cell"><div class="label-top boss">⚡ Супер-босс</div>' +
+          '<div class="' + bossClass + '">' +
+          '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/></svg>' +
+          bossLock + '</div>' +
+          '<div class="cap"><div class="cap-name">Магистр биологии</div>' +
+          bossStatus + bossHint + '</div></div>';
+
+        document.getElementById('ch2-nodes').innerHTML = html;
+
+        var doneCount = CH2_SLOTS.filter(function (sl) { return isPassed(sl.vid); }).length + (bossDone ? 1 : 0);
+        var statDone = document.getElementById('ch2-stat-done');
+        if (statDone) statDone.textContent = String(doneCount);
+      })();
+      </script>
     </div>
   </section>
 
@@ -785,8 +811,8 @@
 </div>
 
 <script src="/exam-config.js"></script>
-<script src="/biology-bank.js?v=72"></script>
-<script src="/biology-variants.js?v=8"></script>
+<script src="/biology-bank.js?v=73"></script>
+<script src="/biology-variants.js?v=9"></script>
 <script src="/iqmo-chapter2-access.js?v=1"></script>
 <script src="/iqmo-sync.js"></script>
 <script src="/iqmo-nav.js"></script>
