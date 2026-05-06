@@ -240,6 +240,12 @@
     0%,100%{ transform:scale(1);    box-shadow:0 18px 36px -10px rgba(79,70,229,.45);}
     50%    { transform:scale(1.06); box-shadow:0 22px 44px -10px rgba(79,70,229,.65);}
   }
+  .node.done{
+    background:#e7f6ec; border-color:#34d399; color:#059669;
+  }
+  .node.done svg{ stroke:#059669; }
+  .cap-status.done{ color:#059669; font-weight:600; display:flex; align-items:center; gap:4px; }
+  .cap-status.done svg{ stroke:#059669; width:13px; height:13px; }
   .node.locked{ background:#f3f4fb; color:var(--muted-2);}
   .node.locked .lock{ width:22px; height:22px;}
 
@@ -528,7 +534,7 @@
       <div class="cta-row">
         <a class="btn btn-primary" id="ch2-cta-variant1" href="/full-test-biology/?v=8">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
-          Начать вариант 1 главы 2
+          Начать вариант главы 2
         </a>
         <a class="btn" href="/subject-biology/">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -629,6 +635,7 @@
         <div class="map-sub">6 демо-вариантов · 1 супер-босс · сложность повышенная</div>
       </div>
       <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#e7f6ec;border-color:#34d399;"></span> Пройден</span>
         <span class="legend-item"><span class="legend-dot legend-now"></span> Доступен</span>
         <span class="legend-item"><span class="legend-dot legend-lock"></span> Заблокирован</span>
         <span class="legend-item"><span class="legend-dot legend-boss"></span> Супер-босс</span>
@@ -647,85 +654,6 @@
       </svg>
 
       <div class="nodes" id="ch2-nodes"></div>
-      <script>
-      (function () {
-        var CH2_SLOTS = [
-          { num: 1, vid: 8,  tier: 'средняя' },
-          { num: 2, vid: 9,  tier: 'средняя' },
-          { num: 3, vid: 10, tier: 'высокая' },
-          { num: 4, vid: 11, tier: 'высокая' },
-          { num: 5, vid: 12, tier: 'высокая' },
-          { num: 6, vid: 13, tier: 'экстра' },
-        ];
-        var BOSS_VID = 14;
-        var lockSvg = '<svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-        var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-        var playSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>';
-
-        function isPassed(vid) {
-          try {
-            var raw = localStorage.getItem('iqmo-bio-v-' + vid);
-            if (!raw) return false;
-            var s = JSON.parse(raw);
-            return !!(s && s.finished);
-          } catch (e) { return false; }
-        }
-
-        var html = '';
-        var firstLockedIdx = -1;
-        for (var i = 0; i < CH2_SLOTS.length; i++) {
-          var sl = CH2_SLOTS[i];
-          var done = isPassed(sl.vid);
-          var variantReady = (window.BIOLOGY_VARIANTS || []).some(function (v) { return v.id === sl.vid && v.status === 'ready'; });
-          var prevDone = i === 0 || isPassed(CH2_SLOTS[i - 1].vid);
-          var isCurrent = !done && prevDone && variantReady;
-          var isLocked = !done && !isCurrent;
-
-          if (isLocked && firstLockedIdx === -1) firstLockedIdx = i;
-
-          var labelTop = i === 0 ? '<div class="label-top new">★ Старт главы</div>' : '';
-          var nodeClass = done ? 'node done' : isCurrent ? 'node current' : 'node locked';
-          var inner = done ? checkSvg : isCurrent ? String(sl.num) : lockSvg;
-          var status = done ? '<div class="cap-status done">' + checkSvg + ' Пройден</div>'
-                     : isCurrent ? '<div class="cap-status now">Доступен сейчас</div>'
-                     : '<div class="cap-status">Заблокирован</div>';
-          var btn = isCurrent
-            ? '<a class="start-btn" href="/full-test-biology/?v=' + sl.vid + '" style="text-decoration:none;color:#fff;">' + playSvg + ' Начать</a>'
-            : '';
-
-          html += '<div class="node-cell">' + labelTop +
-            '<div class="' + nodeClass + '">' + inner + '</div>' +
-            '<div class="cap"><div class="cap-name">Демо-вариант ' + sl.num + '</div>' +
-            status +
-            '<div class="cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
-            btn + '</div></div>';
-        }
-
-        var allRegularDone = CH2_SLOTS.every(function (sl) { return isPassed(sl.vid); });
-        var bossDone = isPassed(BOSS_VID);
-        var bossReady = (window.BIOLOGY_VARIANTS || []).some(function (v) { return v.id === BOSS_VID && v.status === 'ready'; });
-        var bossOpen = allRegularDone && bossReady && !bossDone;
-        var bossClass = bossDone ? 'node boss done' : bossOpen ? 'node boss current' : 'node boss';
-        var bossLock = bossDone ? '' : bossOpen ? '' : '<div class="boss-lock">' + lockSvg.replace('width="2"', 'width="2.5"').replace('class="lock"', '') + '</div>';
-        var bossStatus = bossDone ? '<div class="cap-status done">' + checkSvg + ' Босс побеждён</div>'
-                       : bossOpen ? '<div class="cap-status now">Босс открыт!</div>'
-                       : '<div class="cap-status">Заблокирован</div>';
-        var bossHint = !bossDone && !bossOpen ? '<div class="boss-hint">Откроется после прохождения всех 6 вариантов</div>' : '';
-
-        html += '<div class="node-cell"><div class="label-top boss">⚡ Супер-босс</div>' +
-          '<div class="' + bossClass + '">' +
-          '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/></svg>' +
-          bossLock + '</div>' +
-          '<div class="cap"><div class="cap-name">Магистр биологии</div>' +
-          bossStatus + bossHint + '</div></div>';
-
-        document.getElementById('ch2-nodes').innerHTML = html;
-
-        var doneCount = CH2_SLOTS.filter(function (sl) { return isPassed(sl.vid); }).length + (bossDone ? 1 : 0);
-        var statDone = document.getElementById('ch2-stat-done');
-        if (statDone) statDone.textContent = String(doneCount);
-      })();
-      </script>
     </div>
   </section>
 
@@ -833,6 +761,107 @@
 <script src="/exam-config.js"></script>
 <script src="/biology-bank.js?v=73"></script>
 <script src="/biology-variants.js?v=9"></script>
+<script>
+(function () {
+  var CH2_SLOTS = [
+    { vid: 8,  tier: 'средняя' },
+    { vid: 9,  tier: 'средняя' },
+    { vid: 10, tier: 'высокая' },
+    { vid: 11, tier: 'высокая' },
+    { vid: 12, tier: 'высокая' },
+    { vid: 13, tier: 'экстра' },
+  ];
+  var BOSS_VID = 14;
+  var lockSvg = '<svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  var checkSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var smallCheckSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var playSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>';
+  var VARIANTS = window.BIOLOGY_VARIANTS || [];
+
+  function isPassed(vid) {
+    try {
+      var raw = localStorage.getItem('iqmo-bio-v-' + vid);
+      if (!raw) return false;
+      var s = JSON.parse(raw);
+      return !!(s && s.finished);
+    } catch (e) { return false; }
+  }
+
+  function variantReady(vid) {
+    return VARIANTS.some(function (v) { return v.id === vid && v.status === 'ready'; });
+  }
+
+  var html = '';
+  for (var i = 0; i < CH2_SLOTS.length; i++) {
+    var sl = CH2_SLOTS[i];
+    var done = isPassed(sl.vid);
+    var ready = variantReady(sl.vid);
+    var prevDone = i === 0 || isPassed(CH2_SLOTS[i - 1].vid);
+    var isCurrent = !done && prevDone && ready;
+    var isLocked = !done && !isCurrent;
+
+    var labelTop = i === 0 ? '<div class="label-top new">\u2605 Старт главы</div>' : '';
+    var nodeClass = done ? 'node done' : isCurrent ? 'node current' : 'node locked';
+    var inner = done ? checkSvg : isCurrent ? String(sl.vid) : lockSvg;
+    var status = done ? '<div class="cap-status done">' + smallCheckSvg + ' Пройден</div>'
+               : isCurrent ? '<div class="cap-status now">Доступен сейчас</div>'
+               : '<div class="cap-status">Заблокирован</div>';
+    var btn = '';
+    if (isCurrent) {
+      btn = '<a class="start-btn" href="/full-test-biology/?v=' + sl.vid + '" style="text-decoration:none;color:#fff;">' + playSvg + ' Начать</a>';
+    } else if (done) {
+      btn = '<a class="start-btn" href="/full-test-biology/?v=' + sl.vid + '" style="text-decoration:none;color:#fff;background:#059669;">' + playSvg + ' Пройти заново</a>';
+    }
+
+    html += '<div class="node-cell">' + labelTop +
+      '<div class="' + nodeClass + '">' + inner + '</div>' +
+      '<div class="cap"><div class="cap-name">Вариант ' + sl.vid + '</div>' +
+      status +
+      '<div class="cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
+      btn + '</div></div>';
+  }
+
+  var allRegularDone = CH2_SLOTS.every(function (sl) { return isPassed(sl.vid); });
+  var bossDone = isPassed(BOSS_VID);
+  var bossReady = variantReady(BOSS_VID);
+  var bossOpen = allRegularDone && bossReady && !bossDone;
+  var bossClass = bossDone ? 'node boss done' : bossOpen ? 'node boss current' : 'node boss';
+  var bossLock = (bossDone || bossOpen) ? '' : '<div class="boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>';
+  var bossStatus = bossDone ? '<div class="cap-status done">' + smallCheckSvg + ' Босс побеждён</div>'
+                 : bossOpen ? '<div class="cap-status now">Босс открыт!</div>'
+                 : '<div class="cap-status">Заблокирован</div>';
+  var bossHint = (!bossDone && !bossOpen) ? '<div class="boss-hint">Откроется после прохождения всех 6 вариантов</div>' : '';
+
+  html += '<div class="node-cell"><div class="label-top boss">\u26A1 Супер-босс</div>' +
+    '<div class="' + bossClass + '">' +
+    '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/></svg>' +
+    bossLock + '</div>' +
+    '<div class="cap"><div class="cap-name">Магистр биологии</div>' +
+    bossStatus + bossHint + '</div></div>';
+
+  var host = document.getElementById('ch2-nodes');
+  if (host) host.innerHTML = html;
+
+  var doneCount = CH2_SLOTS.filter(function (sl) { return isPassed(sl.vid); }).length + (bossDone ? 1 : 0);
+  var statDone = document.getElementById('ch2-stat-done');
+  if (statDone) statDone.textContent = String(doneCount);
+
+  var ctaBtn = document.getElementById('ch2-cta-variant1');
+  if (ctaBtn) {
+    var nextSlot = null;
+    for (var j = 0; j < CH2_SLOTS.length; j++) {
+      if (!isPassed(CH2_SLOTS[j].vid) && variantReady(CH2_SLOTS[j].vid)) { nextSlot = CH2_SLOTS[j]; break; }
+    }
+    if (nextSlot) {
+      ctaBtn.href = '/full-test-biology/?v=' + nextSlot.vid;
+      ctaBtn.lastChild.textContent = ' Начать вариант ' + nextSlot.vid;
+    } else if (doneCount === CH2_SLOTS.length) {
+      ctaBtn.href = '/full-test-biology/?v=' + BOSS_VID;
+      ctaBtn.lastChild.textContent = ' Финальный босс';
+    }
+  }
+})();
+</script>
 <script src="/iqmo-chapter2-access.js?v=1"></script>
 <script src="/iqmo-sync.js"></script>
 <script src="/iqmo-nav.js"></script>
