@@ -325,10 +325,10 @@
 		} catch (e) {}
 	}
 
-	/** Все 8 вариантов 1-го этапа биологии пройдены → веха bio_stage1. */
+	/** Все 7 вариантов 1-го этапа биологии пройдены → веха bio_stage1. */
 	function maybeUnlockBioStage1() {
 		try {
-			var BIO_STAGE1_IDS = [1, 2, 3, 4, 5, 6, 7, 8];
+			var BIO_STAGE1_IDS = [1, 2, 3, 4, 5, 6, 7];
 			for (var i = 0; i < BIO_STAGE1_IDS.length; i++) {
 				var raw = localStorage.getItem('iqmo-bio-v-' + BIO_STAGE1_IDS[i]);
 				if (!raw) return;
