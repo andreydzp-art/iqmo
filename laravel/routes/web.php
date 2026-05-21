@@ -37,6 +37,7 @@ $serveStatic = function (string $full): BinaryFileResponse {
         'webp' => 'image/webp',
         'gif' => 'image/gif',
         'ico' => 'image/x-icon',
+        'pdf' => 'application/pdf',
         default => null,
     };
     if ($mime !== null) {
@@ -72,6 +73,24 @@ Route::get('/img/{path}', function (string $path) use ($serveStatic) {
         abort(404);
     }
     $rel = 'site/img/'.$path;
+    $full = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, public_path($rel));
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+})->where('path', '.*');
+
+// Юридические документы: `extracted/docs/` → `public/site/docs/` (sync-site).
+Route::get('/docs/{path}', function (string $path) use ($serveStatic) {
+    $path = ltrim($path, '/');
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+    if (! preg_match('#^[A-Za-z0-9][A-Za-z0-9_./-]*$#', $path)) {
+        abort(404);
+    }
+    $rel = 'site/docs/'.$path;
     $full = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, public_path($rel));
     if (! is_file($full)) {
         abort(404);

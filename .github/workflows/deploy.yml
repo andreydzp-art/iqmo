@@ -335,6 +335,14 @@ jobs:
             exit 1
           fi
 
+          for doc in oferta.pdf privacy_policy.pdf; do
+            code_doc=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/docs/$doc" || true)
+            if [ "$code_doc" != "200" ]; then
+              echo "GET /docs/$doc expected 200, got $code_doc"
+              exit 1
+            fi
+          done
+
           code_me=$(curl -sS -o /tmp/smoke-me.json -w "%{http_code}" \
             -H "Accept: application/json" \
             "$BASE/api/me" || true)
