@@ -33,6 +33,22 @@
     return val === 'bio' ? '/subject-biology/' : '/subject-chemistry/';
   }
 
+  function showFormPanel() {
+    form.style.display = '';
+    form.setAttribute('aria-hidden', 'false');
+    done.style.display = 'none';
+    done.classList.remove('is-visible');
+    done.setAttribute('aria-hidden', 'true');
+  }
+
+  function showDonePanel() {
+    form.style.display = 'none';
+    form.setAttribute('aria-hidden', 'true');
+    done.style.display = 'flex';
+    done.classList.add('is-visible');
+    done.setAttribute('aria-hidden', 'false');
+  }
+
   function open(source) {
     if (source) trackCta(source);
     modal.classList.add('is-open');
@@ -40,8 +56,7 @@
     document.body.style.overflow = 'hidden';
     cur = 0;
     setStep(0);
-    form.hidden = false;
-    done.hidden = true;
+    showFormPanel();
     form.reset();
     document.querySelectorAll('[data-choice]').forEach((g) => {
       g.querySelectorAll('.choice').forEach((c) => c.classList.remove('is-on'));
@@ -127,8 +142,7 @@
       setStep(1);
       return;
     }
-    form.hidden = true;
-    done.hidden = false;
+    showDonePanel();
     const href = subjectHref();
     const link = document.getElementById('register-done-link');
     if (link) link.setAttribute('href', href);

@@ -132,16 +132,21 @@
 .modal__proof .av span:nth-child(3) { background: #26c6da; }
 .modal__proof .txt { font-size: 12.5px; color: rgba(255, 255, 255, 0.75); font-weight: 600; line-height: 1.4; }
 .modal__proof .txt b { color: #fff; font-weight: 900; }
+.modal__right {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  background: #fff;
+  min-height: 0;
+  overflow: hidden;
+}
 .modal__form {
   padding: 42px 40px 38px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  grid-column: 2;
-  grid-row: 1;
-}
-.modal__form[hidden] {
-  display: none !important;
+  height: 100%;
+  max-height: calc(100vh - 48px);
 }
 .modal__steps { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; padding-right: 44px; }
 .modal__close {
@@ -238,19 +243,20 @@
 }
 .modal__footer-note { margin-top: 14px; font-size: 12px; color: var(--muted); line-height: 1.5; text-align: center; }
 .modal__footer-note a { color: var(--primary); font-weight: 800; }
-/* [hidden] иначе перебивается display:flex ниже — «Готово!» торчит на шаге 1 */
-.modal__done[hidden] {
-  display: none !important;
-}
-.modal__done:not([hidden]) {
+.modal__done {
+  display: none;
   padding: 48px 40px;
   text-align: center;
-  display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 14px;
-  grid-column: 2;
-  grid-row: 1;
+  height: 100%;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+.modal__done.is-visible {
+  display: flex;
 }
 .modal__done .ring {
   width: 88px;
@@ -280,6 +286,7 @@
 @media (max-width: 760px) {
   .modal__card { grid-template-columns: 1fr; max-height: calc(100vh - 48px); }
   .modal__side { padding: 28px 24px; }
+  .modal__right { grid-column: 1; grid-row: 2; }
   .modal__h { font-size: 22px; }
   .modal__form { padding: 28px 24px; }
   .modal { padding: 0; align-items: flex-end; }

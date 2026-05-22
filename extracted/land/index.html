@@ -26,7 +26,7 @@ ym(108770166,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="/land/styles.css"/>
-<link rel="stylesheet" href="/land/register-modal.css"/>
+<link rel="stylesheet" href="/land/register-modal.css?v=2"/>
 <style>
   html, body, #root { height: 100%; }
   body { margin: 0; background: #f0eee9; font-family: "Inter", system-ui, sans-serif; }
@@ -62,6 +62,7 @@ ym(108770166,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',
         </div>
       </div>
     </aside>
+    <div class="modal__right">
     <form class="modal__form" id="register-form" novalidate>
       <div class="modal__steps" id="step-bar">
         <div class="modal__step-dot is-active"></div>
@@ -115,11 +116,12 @@ ym(108770166,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',
         Регистрируясь, вы соглашаетесь с <a href="/docs/oferta.pdf" target="_blank" rel="noopener">офертой</a> и <a href="/docs/privacy_policy.pdf" target="_blank" rel="noopener">политикой</a>.
       </div>
     </form>
-    <div class="modal__done" id="register-done" hidden>
+    <div class="modal__done" id="register-done" style="display:none" aria-hidden="true">
       <div class="ring">✓</div>
       <h3>Готово! Серия запущена 🔥</h3>
       <p>Мы отправили подтверждение на email. Через секунду перенесём вас на первую сессию.</p>
       <a href="/subject-chemistry/" class="modal__cta-link" id="register-done-link">Открыть курс →</a>
+    </div>
     </div>
   </div>
 </div>
@@ -127,6 +129,6 @@ ym(108770166,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',
 <script type="text/babel" src="/land/ui.jsx"></script>
 <script type="text/babel" src="/land/sections.jsx"></script>
 <script type="text/babel" src="/land/main.jsx"></script>
-<script src="/land/register-modal.js"></script>
+<script src="/land/register-modal.js?v=2"></script>
 </body>
 </html>
