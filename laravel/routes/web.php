@@ -160,6 +160,10 @@ Route::get('/quiz/{id}/{path?}', function (string $id, ?string $path = null) use
 })->where('path', '.*');
 
 // Yandex Direct landing: `public/site/land/` (synced from `extracted/land/`).
+Route::get('/land', function () {
+    return redirect('/land/', 301);
+});
+
 Route::get('/land/{path?}', function (?string $path = null) use ($serveStatic) {
     $path = $path === null ? '' : ltrim($path, '/');
     if ($path === '' || $path === 'index.html') {
