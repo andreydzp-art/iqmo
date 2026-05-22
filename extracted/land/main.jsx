@@ -14,28 +14,8 @@ const TWEAK_DEFAULTS = {
   showFloatCards: true,
 };
 
-const IQMO_METRIKA_ID = 108770166;
-
-function trackLandCta(source) {
-  const goal = source === 'sticky' ? 'cta_free_trial_sticky' : 'cta_free_trial';
-  try {
-    if (typeof ym === 'function') ym(IQMO_METRIKA_ID, 'reachGoal', goal);
-  } catch (_) {}
-  try {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: goal });
-  } catch (_) {}
-}
-
-function goRegister(source) {
-  trackLandCta(source);
-  window.location.href = '/login.html?from=land';
-}
-
 function Landing({ narrow, t }) {
   const headline = t.headline.replace(/299/g, String(t.price));
-  const onCta = () => goRegister('cta');
-  const onCtaSticky = () => goRegister('sticky');
 
   return (
     <div
@@ -48,16 +28,16 @@ function Landing({ narrow, t }) {
       data-float={t.showFloatCards ? 'on' : 'off'}
       style={{ minHeight: '100%' }}
     >
-      <Nav narrow={narrow} onCta={onCta} />
-      <Hero narrow={narrow} price={t.price} headline={headline} onCta={onCta} />
+      <Nav narrow={narrow} />
+      <Hero narrow={narrow} price={t.price} headline={headline} />
       <Problem />
       <WhyDifferent narrow={narrow} />
       <Comparison price={t.price} />
       <HowUsed />
       <Trust />
-      <Pricing price={t.price} onCta={onCta} />
-      <FinalCTA onCta={onCta} />
-      {t.stickyMobileCta && <StickyCTA price={t.price} onCta={onCtaSticky} />}
+      <Pricing price={t.price} />
+      <FinalCTA />
+      {t.stickyMobileCta && <StickyCTA price={t.price} />}
     </div>
   );
 }

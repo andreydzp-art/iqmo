@@ -5,7 +5,7 @@
 const { Ic, Mascot, Pill, ProgressBar, DashboardMock } = window.IQMO_UI;
 
 // ── Nav ───────────────────────────────────────────────────────────────
-function Nav({ narrow, onCta }) {
+function Nav({ narrow }) {
   return (
     <nav className="nav">
       <div className="wrap nav-inner">
@@ -20,12 +20,10 @@ function Nav({ narrow, onCta }) {
           <a href="#trust">Программа</a>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {!narrow && (
-            <a className="btn btn-ghost" style={{ padding: '10px 16px', fontSize: 14 }} href="/login.html">
-              Войти
-            </a>
-          )}
-          <button className="btn btn-accent" style={{ padding: '10px 16px', fontSize: 14 }} onClick={onCta}>
+          <a className="btn btn-ghost" style={{ padding: narrow ? '8px 12px' : '10px 16px', fontSize: 14 }} href="/login.html">
+            Войти
+          </a>
+          <button type="button" className="btn btn-accent" style={{ padding: '10px 16px', fontSize: 14 }} data-open-register data-cta-source="nav">
             Попробовать бесплатно
           </button>
         </div>
@@ -35,7 +33,7 @@ function Nav({ narrow, onCta }) {
 }
 
 // ── 1 · Hero ──────────────────────────────────────────────────────────
-function Hero({ narrow, price, headline, onCta }) {
+function Hero({ narrow, price, headline }) {
   return (
     <section className="section hero">
       <div className="hero-bg"/>
@@ -60,7 +58,7 @@ function Hero({ narrow, price, headline, onCta }) {
           </p>
 
           <div className="hero-cta">
-            <button type="button" className="btn btn-accent btn-lg" onClick={onCta}>
+            <button type="button" className="btn btn-accent btn-lg" data-open-register data-cta-source="hero">
               Попробовать бесплатно {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
             </button>
             <a className="btn btn-ghost btn-lg" href="/express-chemistry.html">
@@ -519,7 +517,7 @@ function Trust() {
 }
 
 // ── 7 · Pricing ───────────────────────────────────────────────────────
-function Pricing({ price, onCta }) {
+function Pricing({ price }) {
   return (
     <section className="section" id="price">
       <div className="wrap">
@@ -548,7 +546,7 @@ function Pricing({ price, onCta }) {
             </ul>
 
             <div style={{ marginTop: 26, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <button type="button" className="btn btn-accent btn-lg" style={{ background: '#fff', color: 'var(--accent)' }} onClick={onCta}>
+              <button type="button" className="btn btn-accent btn-lg" style={{ background: '#fff', color: 'var(--accent)' }} data-open-register data-cta-source="pricing">
                 Начать бесплатно {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
               </button>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,.55)', alignSelf: 'center', maxWidth: 180 }}>
@@ -601,7 +599,7 @@ function Pricing({ price, onCta }) {
 }
 
 // ── 8 · Final CTA ─────────────────────────────────────────────────────
-function FinalCTA({ onCta }) {
+function FinalCTA() {
   return (
     <section className="section">
       <div className="wrap">
@@ -615,7 +613,7 @@ function FinalCTA({ onCta }) {
             Первая неделя&nbsp;— бесплатно. Без привязки карты. Отмена в&nbsp;один клик.
           </p>
           <div className="row">
-            <button type="button" className="btn btn-accent btn-lg" onClick={onCta}>
+            <button type="button" className="btn btn-accent btn-lg" data-open-register data-cta-source="final">
               Начать бесплатно {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
             </button>
             <a className="btn btn-ghost btn-lg" href="/">
@@ -638,14 +636,14 @@ function FinalCTA({ onCta }) {
 }
 
 // ── Sticky mobile CTA ─────────────────────────────────────────────────
-function StickyCTA({ price, onCta }) {
+function StickyCTA({ price }) {
   return (
     <div className="sticky-cta">
       <div className="left">
         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{price} ₽/нед</div>
         <div className="p">первая неделя <b>0 ₽</b> · без карты</div>
       </div>
-      <button type="button" className="btn btn-accent" onClick={onCta}>Попробовать</button>
+      <button type="button" className="btn btn-accent" data-open-register data-cta-source="sticky">Попробовать</button>
     </div>
   );
 }

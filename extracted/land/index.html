@@ -26,6 +26,7 @@ ym(108770166,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="/land/styles.css"/>
+<link rel="stylesheet" href="/land/register-modal.css"/>
 <style>
   html, body, #root { height: 100%; }
   body { margin: 0; background: #f0eee9; font-family: "Inter", system-ui, sans-serif; }
@@ -36,8 +37,96 @@ ym(108770166,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',
 </head>
 <body>
 <div id="root"></div>
+
+<div class="modal" id="register-modal" role="dialog" aria-modal="true" aria-labelledby="register-title" aria-hidden="true">
+  <div class="modal__backdrop"></div>
+  <div class="modal__card">
+    <button type="button" class="modal__close" id="register-close" aria-label="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+    <aside class="modal__side">
+      <div>
+        <span class="modal__eyebrow">★ 7 дней бесплатно</span>
+        <h2 class="modal__h">Начнём за <em>2 минуты</em>.<br/>Карта не нужна.</h2>
+        <p class="modal__sub">Пробный период — полный доступ ко всем темам, заданиям и пробникам ФИПИ. Без автосписаний.</p>
+      </div>
+      <div>
+        <div class="modal__perks">
+          <div class="modal__perk"><span class="ic">✓</span><span>Доступ ко всем 10 темам химии</span></div>
+          <div class="modal__perk"><span class="ic">✓</span><span>Серия дней и XP-уровни с первого дня</span></div>
+          <div class="modal__perk"><span class="ic">✓</span><span>Прогресс синхронизируется на всех устройствах</span></div>
+        </div>
+        <div class="modal__proof">
+          <div class="av"><span>А</span><span>М</span><span>К</span></div>
+          <div class="txt"><b>2 134</b> школьника<br/>занимаются прямо сейчас</div>
+        </div>
+      </div>
+    </aside>
+    <form class="modal__form" id="register-form" novalidate>
+      <div class="modal__steps" id="step-bar">
+        <div class="modal__step-dot is-active"></div>
+        <div class="modal__step-dot"></div>
+        <div class="modal__step-num" id="step-label">Шаг 1 из 2</div>
+      </div>
+      <div class="modal__step" data-step="1">
+        <h3 class="modal__title" id="register-title">Создайте аккаунт</h3>
+        <p class="modal__desc">Email и пароль — больше ничего не нужно.</p>
+        <div class="field">
+          <label for="reg-name">Как вас зовут</label>
+          <input id="reg-name" type="text" placeholder="Алина" autocomplete="given-name"/>
+          <span class="field__err"></span>
+        </div>
+        <div class="field">
+          <label for="reg-email">Email</label>
+          <input id="reg-email" type="email" placeholder="вы@example.ru" autocomplete="email"/>
+          <span class="field__err"></span>
+        </div>
+        <div class="field">
+          <label for="reg-pass">Пароль</label>
+          <input id="reg-pass" type="password" placeholder="Минимум 6 символов" autocomplete="new-password"/>
+          <span class="field__err"></span>
+        </div>
+      </div>
+      <div class="modal__step" data-step="2" hidden>
+        <h3 class="modal__title">Что готовим к ОГЭ?</h3>
+        <p class="modal__desc">Подстроим карту тем под вас. Можно поменять позже.</p>
+        <div style="font-size:12.5px;font-weight:800;color:var(--ink-2);margin-bottom:8px">Класс</div>
+        <div class="choice-grid" data-choice="grade">
+          <button type="button" class="choice" data-val="8">8 класс</button>
+          <button type="button" class="choice is-on" data-val="9">9 класс</button>
+        </div>
+        <div style="font-size:12.5px;font-weight:800;color:var(--ink-2);margin:6px 0 8px">Предмет</div>
+        <div class="choice-grid" data-choice="subject">
+          <button type="button" class="choice is-on" data-val="chem"><span class="em">⚗️</span>Химия</button>
+          <button type="button" class="choice" data-val="bio"><span class="em">🧬</span>Биология</button>
+        </div>
+        <div style="font-size:12.5px;font-weight:800;color:var(--ink-2);margin:6px 0 8px">Цель</div>
+        <div class="choice-grid" data-choice="goal" style="grid-template-columns:1fr 1fr 1fr">
+          <button type="button" class="choice" data-val="3">На 3</button>
+          <button type="button" class="choice is-on" data-val="4">На 4</button>
+          <button type="button" class="choice" data-val="5">На 5</button>
+        </div>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="modal__back" id="step-back" hidden>← Назад</button>
+        <button type="button" class="modal__next" id="step-next">Продолжить</button>
+      </div>
+      <div class="modal__footer-note">
+        Регистрируясь, вы соглашаетесь с <a href="/docs/oferta.pdf" target="_blank" rel="noopener">офертой</a> и <a href="/docs/privacy_policy.pdf" target="_blank" rel="noopener">политикой</a>.
+      </div>
+    </form>
+    <div class="modal__done" id="register-done" hidden>
+      <div class="ring">✓</div>
+      <h3>Готово! Серия запущена 🔥</h3>
+      <p>Мы отправили подтверждение на email. Через секунду перенесём вас на первую сессию.</p>
+      <a href="/subject-chemistry/" class="modal__cta-link" id="register-done-link">Открыть курс →</a>
+    </div>
+  </div>
+</div>
+
 <script type="text/babel" src="/land/ui.jsx"></script>
 <script type="text/babel" src="/land/sections.jsx"></script>
 <script type="text/babel" src="/land/main.jsx"></script>
+<script src="/land/register-modal.js"></script>
 </body>
 </html>
