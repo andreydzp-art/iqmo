@@ -201,6 +201,46 @@ Route::get('/land/{path}', function (string $path) use ($serveStatic) {
     return $serveStatic($full);
 })->where('path', '.*');
 
+// Yandex Direct landing v2: `public/site/lander/` (synced from `extracted/lander/`).
+$serveLanderIndex = function () use ($serveStatic) {
+    $full = public_path('site/lander/index.html');
+    if (! is_file($full)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+};
+Route::get('/lander', $serveLanderIndex);
+Route::get('/lander/', $serveLanderIndex);
+
+Route::get('/lander/{path}', function (string $path) use ($serveStatic) {
+    $path = ltrim($path, '/');
+    if ($path === 'index.html') {
+        $full = public_path('site/lander/index.html');
+        if (! is_file($full)) {
+            abort(404);
+        }
+
+        return $serveStatic($full);
+    }
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+    if (! preg_match('#^[A-Za-z0-9][A-Za-z0-9_./-]*$#', $path)) {
+        abort(404);
+    }
+    $full = public_path('site/lander/'.$path);
+    if (! is_file($full)) {
+        abort(404);
+    }
+    $ext = strtolower(pathinfo($full, PATHINFO_EXTENSION));
+    if (! in_array($ext, ['css', 'js', 'jsx', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'md'], true)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
+})->where('path', '.*');
+
 // Canonical homepage is served at `/` (without exposing the file name in the URL).
 // Keep `/index-standalone-design.html` for backward compatibility, but redirect to `/`.
 Route::get('/index-standalone-design.html', function () {
