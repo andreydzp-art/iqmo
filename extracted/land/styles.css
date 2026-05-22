@@ -1,0 +1,727 @@
+/* ───────────────────────────────────────────────
+   IQMO School — landing tokens & sections
+   Mobile-first. 3 directions via [data-direction].
+   ─────────────────────────────────────────────── */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+:root {
+  /* base — overridden per direction */
+  --bg:        #ffffff;
+  --bg-soft:   #f6f5f2;
+  --bg-card:   #ffffff;
+  --ink:       #0e0e12;
+  --ink-2:     #2a2a33;
+  --ink-3:     #5e5e6b;
+  --ink-4:     #9a9aa6;
+  --hairline:  rgba(14,14,18,0.08);
+  --hairline-2:rgba(14,14,18,0.12);
+
+  --accent:    #6E56F7;   /* primary violet */
+  --accent-2:  #22D3EE;   /* cyan */
+  --accent-3:  #F472B6;   /* magenta */
+  --success:   #10B981;
+  --warn:      #F59E0B;
+  --danger:    #EF4444;
+  --gold:      #F4B731;
+
+  --shadow-sm: 0 1px 2px rgba(15,15,30,.04), 0 1px 1px rgba(15,15,30,.03);
+  --shadow-md: 0 10px 30px rgba(40,30,90,.07), 0 2px 6px rgba(40,30,90,.04);
+  --shadow-lg: 0 24px 60px rgba(50,40,110,.12), 0 4px 14px rgba(40,30,90,.06);
+  --glow:      0 0 0 1px rgba(110,86,247,.18), 0 18px 50px -10px rgba(110,86,247,.35);
+
+  --radius-sm: 10px;
+  --radius:    16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl:36px;
+
+  --font-display: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-text:    "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --font-mono:    ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+}
+
+/* ── Direction A · Premium (Notion+Apple) ── */
+.iqmo[data-direction="premium"] {
+  --accent:   #4F46E5;
+  --accent-2: #10B981;
+  --accent-3: #0EA5E9;
+  --bg:       #fbfaf7;
+  --bg-soft:  #f1efe9;
+  --bg-card:  #ffffff;
+  --ink:      #0a0a0f;
+}
+
+/* ── Direction B · Playful (Duolingo) ── */
+.iqmo[data-direction="playful"] {
+  --accent:   #7C3AED;
+  --accent-2: #22C55E;
+  --accent-3: #F59E0B;
+  --bg:       #fffdf7;
+  --bg-soft:  #fff3df;
+  --bg-card:  #ffffff;
+  --ink:      #1a1730;
+}
+
+/* ── Direction C · Gaming (Linear + neon) ── */
+.iqmo[data-direction="gaming"] {
+  --accent:   #8B5CF6;
+  --accent-2: #22D3EE;
+  --accent-3: #F472B6;
+  --bg:       #f7f6ff;
+  --bg-soft:  #efedff;
+  --bg-card:  #ffffff;
+  --ink:      #0a0420;
+}
+
+/* dark mode (tweak) */
+.iqmo[data-theme="dark"] {
+  --bg:       #0b0a14;
+  --bg-soft:  #14132a;
+  --bg-card:  #161532;
+  --ink:      #f4f1ff;
+  --ink-2:    #d6d0ec;
+  --ink-3:    #9a93b8;
+  --ink-4:    #6c6388;
+  --hairline: rgba(255,255,255,0.08);
+  --hairline-2: rgba(255,255,255,0.14);
+  --shadow-md: 0 10px 30px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.3);
+  --shadow-lg: 0 30px 80px rgba(0,0,0,.55), 0 6px 18px rgba(0,0,0,.35);
+}
+
+/* ── Reset / base ── */
+.iqmo {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.iqmo h1, .iqmo h2, .iqmo h3, .iqmo h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.iqmo p { margin: 0; text-wrap: pretty; }
+.iqmo a { color: inherit; text-decoration: none; }
+.iqmo button { font: inherit; cursor: pointer; }
+
+/* ── Layout shell ── */
+.iqmo .wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.iqmo .section { padding: 64px 0; position: relative; }
+.iqmo .section-soft { background: var(--bg-soft); }
+
+/* ── Type scale ── */
+.iqmo .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.iqmo .eyebrow::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 25%, transparent);
+}
+.iqmo h1.display {
+  font-size: clamp(36px, 7vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+.iqmo h2.title {
+  font-size: clamp(28px, 4.2vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+.iqmo h3.sub {
+  font-size: clamp(20px, 2.4vw, 28px);
+  line-height: 1.2;
+  font-weight: 700;
+}
+.iqmo .lead {
+  font-size: clamp(16px, 1.8vw, 19px);
+  line-height: 1.5;
+  color: var(--ink-3);
+  max-width: 62ch;
+}
+
+/* highlight token in headlines */
+.iqmo .hl {
+  display: inline-block;
+  background: linear-gradient(120deg, var(--accent) 0%, var(--accent-3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+}
+.iqmo .hl-underline {
+  position: relative;
+  white-space: nowrap;
+}
+.iqmo .hl-underline::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0.04em;
+  height: 0.32em;
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
+  border-radius: 4px;
+  z-index: -1;
+}
+
+/* ── Buttons ── */
+.iqmo .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: 0;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  white-space: nowrap;
+}
+.iqmo .btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-md);
+}
+.iqmo .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.iqmo .btn-accent {
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 70%, var(--accent-3)) 100%);
+  color: #fff;
+  box-shadow: var(--glow);
+}
+.iqmo .btn-accent:hover { transform: translateY(-1px); }
+.iqmo .btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--hairline-2);
+}
+.iqmo .btn-ghost:hover { background: var(--bg-soft); }
+.iqmo .btn-lg { padding: 18px 30px; font-size: 17px; }
+
+/* ── Navbar ── */
+.iqmo .nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--hairline);
+}
+.iqmo .nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+}
+.iqmo .nav-links {
+  display: none;
+  gap: 28px;
+  font-size: 14px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.iqmo .nav-links a { transition: color .15s; }
+.iqmo .nav-links a:hover { color: var(--accent); }
+@media (min-width: 880px) {
+  .iqmo .nav-links { display: flex; }
+}
+
+.iqmo .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+}
+.iqmo .logo-mark {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-3));
+  display: grid; place-items: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  box-shadow: var(--glow);
+  position: relative;
+  overflow: hidden;
+}
+.iqmo .logo-mark::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.5), transparent 50%);
+}
+
+/* ── Generic cards ── */
+.iqmo .card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Hero ── */
+.iqmo .hero {
+  padding: 32px 0 64px;
+  position: relative;
+  overflow: hidden;
+}
+.iqmo .hero-grid {
+  display: grid;
+  gap: 36px;
+  align-items: center;
+}
+@media (min-width: 980px) {
+  .iqmo .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 64px; padding: 40px 0 80px; }
+}
+.iqmo .hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 40% at 100% 0%, color-mix(in oklab, var(--accent-2) 20%, transparent), transparent 60%),
+    radial-gradient(50% 50% at -10% 50%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 60%),
+    radial-gradient(40% 40% at 80% 100%, color-mix(in oklab, var(--accent-3) 15%, transparent), transparent 60%);
+}
+.iqmo .hero-content { position: relative; z-index: 1; }
+.iqmo .hero h1 { margin-top: 14px; }
+.iqmo .hero .lead { margin-top: 20px; }
+.iqmo .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.iqmo .hero-meta {
+  display: flex; flex-wrap: wrap; gap: 22px;
+  margin-top: 28px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.iqmo .hero-meta-item { display: inline-flex; align-items: center; gap: 8px; }
+.iqmo .hero-meta-item strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Hero pricing pill — bold price hero element */
+.iqmo .price-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--hairline-2);
+  border-radius: 999px;
+  padding: 8px 8px 8px 16px;
+  font-size: 13px;
+  color: var(--ink-3);
+  box-shadow: var(--shadow-sm);
+}
+.iqmo .price-pill b { color: var(--ink); font-weight: 700; }
+.iqmo .price-pill .strike { text-decoration: line-through; color: var(--ink-4); }
+.iqmo .price-pill .chip {
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ── Hero device mock ── */
+.iqmo .hero-visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Sections / utility ── */
+.iqmo .section-head {
+  display: flex; flex-direction: column; gap: 14px;
+  margin-bottom: 40px;
+  max-width: 760px;
+}
+.iqmo .section-head.center { margin-left: auto; margin-right: auto; text-align: center; align-items: center; }
+.iqmo .section-head .lead { max-width: 60ch; }
+
+/* ── Problem cards ── */
+.iqmo .problem-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 700px)  { .iqmo .problem-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .iqmo .problem-grid { grid-template-columns: repeat(4, 1fr); } }
+.iqmo .problem-card {
+  padding: 26px 22px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+  position: relative;
+  overflow: hidden;
+}
+.iqmo .problem-card .glyph {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  display: grid; place-items: center;
+  background: color-mix(in oklab, var(--accent) 12%, var(--bg-soft));
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.iqmo .problem-card h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.iqmo .problem-card p { font-size: 14px; color: var(--ink-3); line-height: 1.55; }
+
+/* ── Why-different feature grid ── */
+.iqmo .feature-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 700px)  { .iqmo .feature-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .iqmo .feature-grid { grid-template-columns: repeat(3, 1fr); } }
+.iqmo .feature-card {
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+  position: relative;
+  overflow: hidden;
+}
+.iqmo .feature-card.tall { grid-row: span 2; }
+.iqmo .feature-card .badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 12%, var(--bg-soft));
+  color: var(--accent);
+}
+.iqmo .feature-card h3 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin-top: 14px;
+  margin-bottom: 8px;
+  letter-spacing: -0.025em;
+}
+.iqmo .feature-card p { font-size: 14px; color: var(--ink-3); }
+
+/* ── Comparison table ── */
+.iqmo .compare {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 800px) { .iqmo .compare { grid-template-columns: 1fr 1fr; align-items: stretch; } }
+.iqmo .compare-col {
+  position: relative;
+  padding: 28px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+}
+.iqmo .compare-col.us {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 5%, var(--bg-card)) 0%, var(--bg-card) 70%);
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  box-shadow: var(--shadow-lg);
+}
+.iqmo .compare-col.us::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-3));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.iqmo .compare-col h3 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  display: flex; align-items: baseline; gap: 8px;
+  margin-bottom: 4px;
+}
+.iqmo .compare-col .price-line {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+  display: flex; align-items: baseline; gap: 8px;
+  margin: 6px 0 18px;
+}
+.iqmo .compare-col .price-line .unit { font-size: 14px; font-weight: 500; color: var(--ink-3); }
+.iqmo .compare-col.us .price-line { color: var(--accent); }
+.iqmo .compare-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.iqmo .compare-col li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 15px; color: var(--ink-2);
+}
+.iqmo .compare-col li .ic {
+  flex: 0 0 auto;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  margin-top: 1px;
+}
+.iqmo .compare-col.tutor li .ic { background: color-mix(in oklab, var(--danger) 14%, transparent); color: var(--danger); }
+.iqmo .compare-col.us    li .ic { background: color-mix(in oklab, var(--success) 18%, transparent); color: var(--success); }
+.iqmo .compare-col .tag {
+  position: absolute; top: 18px; right: 18px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 10px; border-radius: 999px;
+  background: var(--ink); color: var(--bg);
+}
+.iqmo .compare-col.us .tag { background: linear-gradient(135deg, var(--accent), var(--accent-3)); color: #fff; }
+
+/* ── Scenarios (How children use it) ── */
+.iqmo .scenarios {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 980px) { .iqmo .scenarios { grid-template-columns: 1.1fr 1fr; } }
+.iqmo .scenario-card {
+  padding: 28px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+}
+.iqmo .scenario-card.dark {
+  background: linear-gradient(160deg, #0a0a1a 0%, #1a1238 100%);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.iqmo .scenario-card.dark h3 { color: #fff; }
+.iqmo .scenario-card.dark p { color: rgba(255,255,255,0.7); }
+.iqmo .scenario-card .quote {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 28px);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+.iqmo .scenario-card .meta { font-size: 13px; color: var(--ink-3); }
+.iqmo .scenario-card.dark .meta { color: rgba(255,255,255,0.55); }
+
+/* ── Trust / stats strip ── */
+.iqmo .stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+}
+@media (min-width: 740px) { .iqmo .stats { grid-template-columns: repeat(4, 1fr); } }
+.iqmo .stat { padding: 14px 16px; }
+.iqmo .stat .num {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(120deg, var(--accent), var(--accent-3));
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+.iqmo .stat .lbl { display: block; font-size: 13px; color: var(--ink-3); margin-top: 4px; }
+
+/* ── Pricing block ── */
+.iqmo .price-card {
+  border-radius: var(--radius-2xl);
+  padding: 36px 28px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(150deg, #100c2c 0%, #1f1450 70%, #2a1a8a 100%);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  isolation: isolate;
+}
+.iqmo .price-card::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(40% 40% at 100% 0%, color-mix(in oklab, var(--accent-2) 40%, transparent), transparent 60%),
+    radial-gradient(40% 40% at 0% 100%, color-mix(in oklab, var(--accent-3) 35%, transparent), transparent 60%);
+  z-index: -1;
+}
+.iqmo .price-card .number {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 12vw, 140px);
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: linear-gradient(180deg, #fff 0%, color-mix(in oklab, var(--accent-2) 60%, #fff) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+.iqmo .price-card .ruble { font-size: 0.5em; font-weight: 700; vertical-align: super; margin-left: 0.05em; }
+.iqmo .price-card .per { font-size: 16px; color: rgba(255,255,255,0.7); margin-top: 6px; }
+.iqmo .price-card .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.iqmo .price-card ul { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
+.iqmo .price-card li { font-size: 15px; color: rgba(255,255,255,0.85); display: flex; gap: 10px; align-items: flex-start; }
+.iqmo .price-card li::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--accent-2) 35%, transparent);
+  border: 1.5px solid var(--accent-2);
+  margin-top: 2px;
+  background-image: linear-gradient(180deg, transparent 0 0);
+}
+.iqmo .price-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 980px) { .iqmo .price-grid { grid-template-columns: 1.15fr 1fr; align-items: stretch; } }
+.iqmo .vs-card {
+  padding: 28px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--hairline);
+}
+.iqmo .vs-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0;
+  border-top: 1px solid var(--hairline);
+}
+.iqmo .vs-row:first-child { border-top: none; padding-top: 0; }
+.iqmo .vs-row .what { color: var(--ink-3); font-size: 15px; }
+.iqmo .vs-row .amt { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+/* ── Final CTA ── */
+.iqmo .final {
+  text-align: center;
+  padding: 80px 24px;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(150deg, var(--bg-soft) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--hairline);
+  position: relative;
+  overflow: hidden;
+}
+.iqmo .final::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(50% 50% at 50% 0%, color-mix(in oklab, var(--accent) 15%, transparent), transparent 70%),
+    radial-gradient(40% 40% at 90% 100%, color-mix(in oklab, var(--accent-3) 10%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.iqmo .final h2 { position: relative; }
+.iqmo .final .lead { margin: 14px auto 0; position: relative; }
+.iqmo .final .row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 26px; position: relative; }
+
+/* ── Footer ── */
+.iqmo footer {
+  padding: 40px 0 56px;
+  font-size: 13px;
+  color: var(--ink-4);
+  border-top: 1px solid var(--hairline);
+  display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between;
+}
+
+/* ── Sticky mobile CTA ── */
+.iqmo .sticky-cta {
+  display: none;
+  position: sticky;
+  bottom: 12px;
+  z-index: 40;
+  margin: 0 12px;
+  padding: 10px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--bg-card) 92%, transparent);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--hairline-2);
+  box-shadow: var(--shadow-lg);
+  align-items: center;
+  gap: 10px;
+}
+.iqmo[data-narrow="true"] .sticky-cta { display: flex; }
+.iqmo .sticky-cta .left { padding-left: 8px; }
+.iqmo .sticky-cta .left .p { font-size: 11px; color: var(--ink-3); line-height: 1.1; }
+.iqmo .sticky-cta .left .p b { color: var(--ink); font-weight: 700; }
+.iqmo .sticky-cta .btn { margin-left: auto; padding: 12px 18px; font-size: 14px; }
+
+/* ── Narrow override: when iqmo is rendered inside a 390-wide artboard ── */
+.iqmo[data-narrow="true"] .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+.iqmo[data-narrow="true"] .hero { padding: 24px 0 40px; }
+.iqmo[data-narrow="true"] .section { padding: 48px 0; }
+.iqmo[data-narrow="true"] .problem-grid { grid-template-columns: 1fr 1fr; }
+.iqmo[data-narrow="true"] .feature-grid { grid-template-columns: 1fr; }
+.iqmo[data-narrow="true"] .scenarios { grid-template-columns: 1fr; }
+.iqmo[data-narrow="true"] .compare { grid-template-columns: 1fr; }
+.iqmo[data-narrow="true"] .stats { grid-template-columns: 1fr 1fr; }
+.iqmo[data-narrow="true"] .price-grid { grid-template-columns: 1fr; }
+.iqmo[data-narrow="true"] .nav-links { display: none; }
+.iqmo[data-narrow="true"] h1.display { font-size: 38px; line-height: 1.05; }
+.iqmo[data-narrow="true"] h2.title { font-size: 30px; }
+.iqmo[data-narrow="true"] .price-card .number { font-size: 96px; }
+.iqmo[data-narrow="true"] .wrap { padding: 0 16px; }
+
+/* ── Tweak: hero centered layout ── */
+.iqmo[data-hero-layout="centered"] .hero-grid {
+  grid-template-columns: 1fr !important;
+  text-align: center;
+  justify-items: center;
+  max-width: 880px;
+  margin: 0 auto;
+}
+.iqmo[data-hero-layout="centered"] .hero-content { max-width: 720px; }
+.iqmo[data-hero-layout="centered"] .hero-cta,
+.iqmo[data-hero-layout="centered"] .hero-meta { justify-content: center; }
+.iqmo[data-hero-layout="centered"] .lead { margin-left: auto; margin-right: auto; }
+.iqmo[data-hero-layout="centered"] .hero-visual { margin-top: 24px; }
+
+/* ── Tweak: mascot off ── */
+.iqmo[data-mascot="off"] .iqmo-mascot { display: none; }
+
+/* ── Tweak: floating cards off ── */
+.iqmo[data-float="off"] .device-wrap .float-card { display: none; }
+
+/* ── Subtle SVG noise on hero (very subtle) ── */
+.iqmo .grain { position: absolute; inset: 0; pointer-events: none; opacity: .35; mix-blend-mode: multiply; }
+.iqmo[data-theme="dark"] .grain { mix-blend-mode: overlay; opacity: .25; }
