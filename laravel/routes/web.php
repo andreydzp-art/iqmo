@@ -25,7 +25,7 @@ $serveStatic = function (string $full): BinaryFileResponse {
     $ext = strtolower(pathinfo($full, PATHINFO_EXTENSION));
     $mime = match ($ext) {
         'css' => 'text/css; charset=UTF-8',
-        'js', 'mjs' => 'application/javascript; charset=UTF-8',
+        'js', 'mjs', 'jsx' => 'application/javascript; charset=UTF-8',
         'json', 'map' => 'application/json; charset=UTF-8',
         'webmanifest' => 'application/manifest+json; charset=UTF-8',
         'html', 'htm' => 'text/html; charset=UTF-8',
@@ -157,6 +157,35 @@ Route::get('/quiz/{id}/{path?}', function (string $id, ?string $path = null) use
 
     // For now quiz is a single-file landing; disallow arbitrary file serving under /quiz.
     abort(404);
+})->where('path', '.*');
+
+// Yandex Direct landing: `public/site/land/` (synced from `extracted/land/`).
+Route::get('/land/{path?}', function (?string $path = null) use ($serveStatic) {
+    $path = $path === null ? '' : ltrim($path, '/');
+    if ($path === '' || $path === 'index.html') {
+        $full = public_path('site/land/index.html');
+        if (! is_file($full)) {
+            abort(404);
+        }
+
+        return $serveStatic($full);
+    }
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+    if (! preg_match('#^[A-Za-z0-9][A-Za-z0-9_./-]*$#', $path)) {
+        abort(404);
+    }
+    $full = public_path('site/land/'.$path);
+    if (! is_file($full)) {
+        abort(404);
+    }
+    $ext = strtolower(pathinfo($full, PATHINFO_EXTENSION));
+    if (! in_array($ext, ['css', 'js', 'jsx', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'], true)) {
+        abort(404);
+    }
+
+    return $serveStatic($full);
 })->where('path', '.*');
 
 // Canonical homepage is served at `/` (without exposing the file name in the URL).
