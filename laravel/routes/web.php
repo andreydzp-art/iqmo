@@ -160,13 +160,22 @@ Route::get('/quiz/{id}/{path?}', function (string $id, ?string $path = null) use
 })->where('path', '.*');
 
 // Yandex Direct landing: `public/site/land/` (synced from `extracted/land/`).
-Route::get('/land', function () {
-    return redirect('/land/', 301);
-});
+// Отдаём index и по `/land`, и по `/land/` — без 301 между ними (nginx иначе
+// зацикливает слэш). Ассеты в HTML — только абсолютные `/land/...`.
+$serveLandIndex = function () use ($serveStatic) {
+    $full = public_path('site/land/index.html');
+    if (! is_file($full)) {
+        abort(404);
+    }
 
-Route::get('/land/{path?}', function (?string $path = null) use ($serveStatic) {
-    $path = $path === null ? '' : ltrim($path, '/');
-    if ($path === '' || $path === 'index.html') {
+    return $serveStatic($full);
+};
+Route::get('/land', $serveLandIndex);
+Route::get('/land/', $serveLandIndex);
+
+Route::get('/land/{path}', function (string $path) use ($serveStatic) {
+    $path = ltrim($path, '/');
+    if ($path === 'index.html') {
         $full = public_path('site/land/index.html');
         if (! is_file($full)) {
             abort(404);
