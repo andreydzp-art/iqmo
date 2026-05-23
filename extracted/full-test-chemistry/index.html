@@ -35,6 +35,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="/iqmo-base.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
+		<link rel="stylesheet" href="/chemistry-level-map.css?v=1" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
 		<style>
 			html.is--hub #test-root { display: none !important; }
@@ -1648,6 +1649,7 @@
 		<script src="/iqmo-nav.js"></script>
 		<script src="/mistakes-store.js"></script>
 		<script src="/chem-progress.js?v=5"></script>
+		<script src="/chemistry-level-map-render.js?v=1"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from chemistry-bank.js)
@@ -3104,30 +3106,37 @@
 				picker.innerHTML = `
 					<div class="lm-shell">
 						${lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId, chapter2Unlocked: !!bossBest })}
-						${lmMapHtml({ variantInfos, bossInfo, currentIdx })}
+						<div id="chem-map-host"></div>
 						${lmGrid4Html({ stats, globalStats, streakStatus })}
 						${lmTipHtml(stats, bossInfo)}
 					</div>
 				`;
 
-				// Wire clicks
-				picker.querySelectorAll('.lm-node[data-v]').forEach(btn => {
-					btn.addEventListener('click', () => {
-						const st = btn.dataset.state;
-						const v = btn.dataset.v;
-						if (st === 'locked') {
-							alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
-							return;
+				const mapHost = document.getElementById('chem-map-host');
+				if (mapHost && window.IqmoChemLevelMap) {
+					const mapSub = variantInfos.length + ' ' + (variantInfos.length === 1 ? 'этап' : variantInfos.length < 5 ? 'этапа' : 'этапов') + ' · 1 финальный босс';
+					IqmoChemLevelMap.render(mapHost, {
+						chapterEyebrow: 'Глава 1 · Химия',
+						chapterSubInProgress: mapSub,
+						bossName: bossSlot.title || 'Магистр химии',
+						completeRecapPrefix: 'Глава 1 (химия) завершена',
+						completeCtaHref: bossBest ? '/full-test-chemistry/chapter-2/' : '/subject-chemistry/',
+						completeCtaLabel: bossBest ? 'К Главе 2 →' : 'К предмету →',
+						variantInfos: variantInfos,
+						bossInfo: bossInfo,
+						currentIdx: currentIdx,
+						stats: stats,
+						starsForPercent: gmStarsForPercent,
+						xpForVariant: gmXpForVariant,
+						onGo: function (v, st) {
+							if (st === 'locked') {
+								alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
+								return;
+							}
+							window.location.search = '?v=' + v;
 						}
-						window.location.search = '?v=' + v;
 					});
-				});
-				picker.querySelectorAll('.lm-start-btn[data-v]').forEach(btn => {
-					btn.addEventListener('click', e => {
-						e.stopPropagation();
-						window.location.search = '?v=' + btn.dataset.v;
-					});
-				});
+				}
 				// CTA в hero «Начните серию / Серия N дней» → текущий вариант
 				picker.querySelectorAll('.lm-btn-streak[data-v]').forEach(btn => {
 					btn.addEventListener('click', e => {
@@ -3330,150 +3339,6 @@
 				`;
 			}
 
-			function lmMapHtml({ variantInfos, bossInfo, currentIdx }) {
-				const allInfos = [...variantInfos, bossInfo];
-				const cells = allInfos.map((vi, i) => lmCellHtml(vi, i, currentIdx)).join('');
-				const passedCount = allInfos.filter(vi => vi.state === 'done').length;
-				return `
-					<section class="lm-map-card">
-						<div class="lm-map-head">
-							<div>
-								<div class="lm-map-title">Карта уровней</div>
-								<div class="lm-map-sub">${variantInfos.length} ${_lmPlural(variantInfos.length, ['этап', 'этапа', 'этапов'])} · 1 финальный босс</div>
-							</div>
-							<div class="lm-legend">
-								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-done"></span> Пройден</span>
-								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-now"></span> Доступен</span>
-								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-lock"></span> Заблокирован</span>
-								<span class="lm-legend-item"><span class="lm-legend-dot lm-legend-boss"></span> Босс</span>
-							</div>
-						</div>
-						<div class="lm-map-wrap">
-							<svg class="lm-map-svg" viewBox="0 0 1220 290" preserveAspectRatio="none" aria-hidden="true">
-								<defs>
-									<linearGradient id="lmDoneGrad" x1="0" x2="1">
-										<stop offset="0" stop-color="#10b981"/>
-										<stop offset="1" stop-color="#4f46e5"/>
-									</linearGradient>
-									<pattern id="lmDashed" x="0" y="0" width="14" height="2" patternUnits="userSpaceOnUse">
-										<rect x="0" y="0" width="8" height="2" fill="#cdd2e6"/>
-									</pattern>
-								</defs>
-								<path d="M 60 145 C 220 100, 360 190, 520 145 S 800 100, 940 145 S 1120 190, 1180 145"
-									fill="none" stroke="url(#lmDashed)" stroke-width="3" stroke-linecap="round"/>
-								${_lmDoneCurve(passedCount, allInfos.length)}
-							</svg>
-							<div class="lm-nodes">
-								${cells}
-							</div>
-						</div>
-					</section>
-				`;
-			}
-
-			// progress curve from start to last passed node (rough approximation)
-			function _lmDoneCurve(passedCount, total) {
-				if (passedCount <= 0 || total <= 1) return '';
-				const xStart = 60;
-				const xEnd = 1180;
-				const xCurrent = xStart + (xEnd - xStart) * (passedCount / total);
-				return `<path d="M ${xStart} 145 C ${xStart + 80} 120, ${xStart + 140} 110, ${xCurrent} 130"
-					fill="none" stroke="url(#lmDoneGrad)" stroke-width="4" stroke-linecap="round"/>`;
-			}
-
-			function lmCellHtml(vi, idx, currentIdx) {
-				const v = vi.v;
-				const isBoss = vi.isBoss;
-				const state = vi.state; // 'done' | 'current' | 'locked'
-				const isNext = (state === 'current' && !isBoss);
-				const labelTop = isNext
-					? '<div class="lm-label-top is--next">› Следующий</div>'
-					: (isBoss
-						? '<div class="lm-label-top is--boss">★ Финальный босс</div>'
-						: '');
-				let nodeInner = '';
-				if (state === 'done' && !isBoss) {
-					nodeInner = String(v.id);
-				} else if (state === 'locked' && !isBoss) {
-					nodeInner = `<svg class="lm-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
-				} else if (isBoss) {
-					nodeInner = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M6 9H4a2 2 0 0 1-2-2V5h4"/>
-						<path d="M18 9h2a2 2 0 0 0 2-2V5h-4"/>
-						<path d="M6 4h12v6a6 6 0 0 1-12 0V4z"/>
-						<line x1="12" y1="15" x2="12" y2="19"/>
-						<path d="M8 21h8"/>
-					</svg>`;
-					if (state === 'locked') {
-						nodeInner += `<div class="lm-boss-lock" aria-hidden="true">
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-						</div>`;
-					}
-				} else {
-					// current normal
-					nodeInner = String(v.id);
-				}
-				const cls = ['lm-node'];
-				if (state === 'done') cls.push('is--done');
-				if (state === 'current') cls.push('is--current');
-				if (state === 'locked') cls.push('is--locked');
-				if (isBoss) cls.push('is--boss');
-				const disabled = (state === 'locked');
-				const cap = isBoss ? 'Сложный вариант' : (v.title || ('Вариант ' + v.id));
-				const capStatusHtml = lmCapStatusHtml(vi, state, isBoss);
-
-				return `
-					<div class="lm-cell">
-						${labelTop}
-						<button type="button" class="${cls.join(' ')}" data-v="${v.id}" data-state="${state}" ${disabled ? 'disabled' : ''} aria-label="${cap} — ${state}">
-							${nodeInner}
-						</button>
-						<div class="lm-cap">
-							<div class="lm-cap-name">${cap}</div>
-							${capStatusHtml}
-						</div>
-					</div>
-				`;
-			}
-
-			function lmCapStatusHtml(vi, state, isBoss) {
-				if (state === 'done') {
-					const stars = vi.best ? gmStarsForPercent(vi.best.percent) : 0;
-					return `
-						<div class="lm-cap-status is--done">
-							<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-							${isBoss ? 'Босс побеждён' : 'Пройден'}
-						</div>
-						${lmStarsHtml(stars)}
-						${vi.best ? `<div class="lm-score-chip"><span class="lm-num">${vi.best.percent}%</span></div>` : ''}
-					`;
-				}
-				if (state === 'current') {
-					return `
-						<div class="lm-cap-status is--now">${isBoss ? 'Босс открыт' : 'Доступен сейчас'}</div>
-						<button type="button" class="lm-start-btn" data-v="${vi.v.id}">
-							<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
-							${isBoss ? 'Сразиться' : 'Начать'}
-						</button>
-					`;
-				}
-				if (state === 'locked') {
-					if (isBoss) return `<div class="lm-cap-status">Заблокирован</div><div class="lm-boss-hint">Откроется после прохождения всех 6 вариантов</div>`;
-					return `<div class="lm-cap-status">Заблокирован</div>`;
-				}
-				return '';
-			}
-
-			function lmStarsHtml(filled) {
-				let html = '<div class="lm-cap-stars" aria-label="Звёзды: ' + filled + ' из 3">';
-				for (let i = 1; i <= 3; i++) {
-					const cls = i <= filled ? 'lm-star-on' : 'lm-star-off';
-					html += `<svg viewBox="0 0 24 24" fill="currentColor" class="${cls}"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>`;
-				}
-				html += '</div>';
-				return html;
-			}
-
 			function lmGrid4Html({ stats, globalStats, streakStatus }) {
 				const ringPct = stats.totalNodes ? Math.round(100 * stats.passed / stats.totalNodes) : 0;
 				const dashOffset = Math.max(0, Math.round(226 * (1 - ringPct / 100)));
@@ -3634,13 +3499,6 @@
 						<div>${text}</div>
 					</div>
 				`;
-			}
-
-			function _lmPlural(n, forms) {
-				const m10 = n % 10, m100 = n % 100;
-				if (m10 === 1 && m100 !== 11) return forms[0];
-				if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return forms[1];
-				return forms[2];
 			}
 
 			function renderGmNode(vi, idx, attempts, dangerVid, freshUnlockId) {

@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
+<link rel="stylesheet" href="/chemistry-level-map.css?v=1" />
 <style>
   :root{
     --bg:#f6f7fb; --bg-2:#eef0f7; --surface:#fff;
@@ -155,7 +156,9 @@
   }
   .archive-btn:hover{ background:#f0fdf4;}
 
-  /* MAP */
+  #ch2-map-host .map-card.pd-card{ margin-top:20px; }
+
+  /* MAP (legacy — kept for reference; map rendered via chemistry-level-map) */
   .map-card{
     margin-top:20px; background:var(--surface); border:1px solid var(--line);
     border-radius:28px; padding:26px 28px 30px; box-shadow:var(--shadow);
@@ -644,37 +647,7 @@
   </section>
 
   <!-- MAP OF CHAPTER 2 -->
-  <section class="map-card">
-    <div class="map-head">
-      <div>
-        <div class="map-title">
-          Карта уровней
-          <span class="ch-badge">Глава 2</span>
-        </div>
-        <div class="map-sub">6 демо-вариантов · 1 супер-босс · сложность повышенная</div>
-      </div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#fff;border:2px solid #10b981;"></span> Пройден</span>
-        <span class="legend-item"><span class="legend-dot legend-now"></span> Доступен</span>
-        <span class="legend-item"><span class="legend-dot legend-lock"></span> Заблокирован</span>
-        <span class="legend-item"><span class="legend-dot legend-boss"></span> Супер-босс</span>
-      </div>
-    </div>
-
-    <div class="map-wrap">
-      <svg class="map-svg" viewBox="0 0 1220 280" preserveAspectRatio="none">
-        <defs>
-          <pattern id="dashed" x="0" y="0" width="14" height="2" patternUnits="userSpaceOnUse">
-            <rect x="0" y="0" width="8" height="2" fill="#cdd2e6"/>
-          </pattern>
-        </defs>
-        <path d="M 87 140 C 220 90, 320 190, 435 140 S 600 90, 700 140 S 870 190, 960 140 S 1100 90, 1180 140"
-              fill="none" stroke="url(#dashed)" stroke-width="3" stroke-linecap="round"/>
-      </svg>
-
-      <div class="lm-nodes" id="ch2-nodes"></div>
-    </div>
-  </section>
+  <div id="ch2-map-host"></div>
 
   <!-- SECONDARY CARDS — как на проде -->
   <section class="grid-4">
@@ -781,6 +754,7 @@
 <script src="/chemistry-bank.js?v=11"></script>
 <script src="/chemistry-banks-bundle.js?v=9"></script>
 <script src="/chemistry-variants.js?v=10"></script>
+<script src="/chemistry-level-map-render.js?v=1"></script>
 <script>
 (function () {
   var CH2_SLOTS = [
@@ -793,9 +767,6 @@
   ];
   var BOSS_VID = 14;
   var BASE = '/full-test-chemistry';
-  var lockSvg = '<svg class="lm-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-  var checkSmall = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-  var playSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>';
   var VARIANTS = window.CHEMISTRY_VARIANTS || [];
   var BANK = window.CHEMISTRY_QUESTIONS || [];
 
@@ -864,14 +835,12 @@
     return 0;
   }
 
-  function starsHtml(filled) {
-    var h = '<div class="lm-cap-stars" aria-label="Звёзды: ' + filled + ' из 3">';
-    for (var i = 1; i <= 3; i++) {
-      var cls = i <= filled ? 'lm-star-on' : 'lm-star-off';
-      h += '<svg viewBox="0 0 24 24" fill="currentColor" class="' + cls + '"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>';
-    }
-    h += '</div>';
-    return h;
+  function xpForVariant(p) {
+    if (p < 50) return 0;
+    var xp = 100;
+    if (p >= 80) xp += 50;
+    if (p >= 90) xp += 50;
+    return xp;
   }
 
   function isPassed(vid) {
@@ -879,7 +848,8 @@
     return !!(b && b.percent >= 50);
   }
 
-  var html = '';
+  var variantInfos = [];
+  var currentIdx = -1;
   for (var i = 0; i < CH2_SLOTS.length; i++) {
     var sl = CH2_SLOTS[i];
     var best = variantBest(sl.vid);
@@ -887,38 +857,10 @@
     var ready = variantReady(sl.vid);
     var prevDone = i === 0 || isPassed(CH2_SLOTS[i - 1].vid);
     var isCurrent = !done && prevDone && ready;
-    var isLocked = !done && !isCurrent;
-
-    var labelTop = i === 0 ? '<div class="lm-label-top is--start">\u2605 Старт главы</div>' : '';
-    var cls = 'lm-node';
-    if (done) cls += ' is--done';
-    else if (isCurrent) cls += ' is--current';
-    else cls += ' is--locked';
-    var inner = isLocked ? lockSvg : String(sl.vid);
-
-    var capStatusBlock;
-    if (done) {
-      var stars = best ? starsForPercent(best.percent) : 0;
-      capStatusBlock =
-        '<div class="lm-cap-status is--done">' + checkSmall + ' Пройден</div>' +
-        starsHtml(stars) +
-        (best ? '<div class="lm-score-chip"><span class="lm-num">' + best.percent + '%</span></div>' : '');
-    } else if (isCurrent) {
-      capStatusBlock =
-        '<div class="lm-cap-status is--now">Доступен сейчас</div>' +
-        '<a class="lm-start-btn" href="' + BASE + '/?v=' + sl.vid + '">' + playSvg + ' Начать</a>';
-    } else {
-      capStatusBlock = '<div class="lm-cap-status">Заблокирован</div>';
-    }
-
-    html += '<div class="lm-cell">' + labelTop +
-      '<button class="' + cls + '"' + (isLocked ? ' disabled' : '') +
-      ' data-v="' + sl.vid + '" data-state="' + (done ? 'done' : isCurrent ? 'current' : 'locked') + '">' +
-      inner + '</button>' +
-      '<div class="lm-cap"><div class="lm-cap-name">Вариант ' + sl.vid + '</div>' +
-      '<div class="lm-cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
-      capStatusBlock +
-      '</div></div>';
+    var state = done ? 'done' : (isCurrent ? 'current' : 'locked');
+    if (isCurrent && currentIdx < 0) currentIdx = i;
+    var v = findVariant(sl.vid) || { id: sl.vid, title: 'Вариант ' + sl.vid };
+    variantInfos.push({ v: v, best: done ? best : null, state: state, tier: sl.tier });
   }
 
   var allRegularDone = CH2_SLOTS.every(function (sl) { return isPassed(sl.vid); });
@@ -926,49 +868,44 @@
   var bossDone = !!(bossBest && bossBest.percent >= 50);
   var bossReady = variantReady(BOSS_VID);
   var bossOpen = allRegularDone && bossReady && !bossDone;
-  var bossCls = 'lm-node is--boss';
-  if (bossDone) bossCls += ' is--done';
-  else if (bossOpen) bossCls += ' is--current';
-  else bossCls += ' is--locked';
-  var bossLock = (bossDone || bossOpen) ? '' : '<div class="lm-boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>';
+  var bossV = findVariant(BOSS_VID) || { id: BOSS_VID, title: 'Вариант ' + BOSS_VID };
+  var bossInfo = {
+    v: bossV,
+    isBoss: true,
+    best: bossDone ? bossBest : null,
+    state: bossDone ? 'done' : (bossOpen ? 'current' : 'locked')
+  };
 
-  var bossCapBlock;
-  if (bossDone) {
-    var bossStars = bossBest ? starsForPercent(bossBest.percent) : 0;
-    bossCapBlock =
-      '<div class="lm-cap-status is--done">' + checkSmall + ' Босс побеждён</div>' +
-      starsHtml(bossStars) +
-      (bossBest ? '<div class="lm-score-chip"><span class="lm-num">' + bossBest.percent + '%</span></div>' : '');
-  } else if (bossOpen) {
-    bossCapBlock =
-      '<div class="lm-cap-status is--now">Босс открыт!</div>' +
-      '<a class="lm-start-btn" href="' + BASE + '/?v=' + BOSS_VID + '">' + playSvg + ' Сразиться</a>';
-  } else {
-    bossCapBlock =
-      '<div class="lm-cap-status">Заблокирован</div>' +
-      '<div class="lm-boss-hint">Откроется после прохождения всех 6 вариантов</div>';
-  }
+  var allInfos = variantInfos.concat([bossInfo]);
+  var stats = { totalNodes: allInfos.length, maxStars: allInfos.length * 3, passed: 0, totalStars: 0, totalXp: 0, avgScore: 0 };
+  var totalScore = 0, scoredCount = 0;
+  allInfos.forEach(function (vi) {
+    if (vi.best && vi.best.percent >= 50) {
+      stats.passed++;
+      totalScore += vi.best.percent;
+      scoredCount++;
+      stats.totalStars += starsForPercent(vi.best.percent);
+      stats.totalXp += xpForVariant(vi.best.percent);
+    }
+  });
+  stats.avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
 
-  html += '<div class="lm-cell"><div class="lm-label-top is--boss">\u26A1 Супер-босс</div>' +
-    '<button class="' + bossCls + '"' + ((!bossDone && !bossOpen) ? ' disabled' : '') +
-    ' data-v="' + BOSS_VID + '" data-state="' + (bossDone ? 'done' : bossOpen ? 'current' : 'locked') + '">' +
-    '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/></svg>' +
-    bossLock + '</button>' +
-    '<div class="lm-cap"><div class="lm-cap-name">Магистр химии</div>' +
-    bossCapBlock + '</div></div>';
-
-  var host = document.getElementById('ch2-nodes');
-  if (host) host.innerHTML = html;
-
-  if (host) {
-    host.querySelectorAll('.lm-node[data-v]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (btn.dataset.state === 'locked') return;
-        window.location.href = BASE + '/?v=' + btn.dataset.v;
-      });
-    });
-    host.querySelectorAll('.lm-start-btn').forEach(function (a) {
-      a.addEventListener('click', function (e) { e.stopPropagation(); });
+  var mapHost = document.getElementById('ch2-map-host');
+  if (mapHost && window.IqmoChemLevelMap) {
+    IqmoChemLevelMap.render(mapHost, {
+      chapterEyebrow: 'Глава 2 · Химия',
+      chapterSubInProgress: '6 демо-вариантов · 1 супер-босс · сложность <b>повышенная</b>',
+      bossName: 'Магистр химии',
+      completeRecapPrefix: 'Глава 2 завершена',
+      completeCtaHref: '/subject-chemistry/',
+      completeCtaLabel: 'К предмету →',
+      variantInfos: variantInfos,
+      bossInfo: bossInfo,
+      currentIdx: currentIdx,
+      stats: stats,
+      starsForPercent: starsForPercent,
+      xpForVariant: xpForVariant,
+      baseUrl: BASE + '/?v='
     });
   }
 
@@ -986,12 +923,10 @@
   var statAvg = document.getElementById('ch2-stat-avg');
   if (statAvg) statAvg.textContent = avgScore != null ? (avgScore + '%') : '—';
 
-  var totalStars = 0;
-  CH2_SLOTS.forEach(function (sl) {
-    var b = variantBest(sl.vid);
-    if (b && b.percent >= 50) totalStars += starsForPercent(b.percent);
-  });
-  if (bossBest && bossBest.percent >= 50) totalStars += starsForPercent(bossBest.percent);
+  var statXp = document.getElementById('ch2-stat-xp');
+  if (statXp) statXp.textContent = String(stats.totalXp);
+
+  var totalStars = stats.totalStars;
   var stepperSub = document.querySelector('.ch-pill.active .ch-sub');
   if (stepperSub) stepperSub.textContent = '6 вариантов + супер-босс · ' + totalStars + '/18 ★';
 
