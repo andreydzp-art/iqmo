@@ -843,6 +843,12 @@
 
 
 .map-card{position:relative;border-radius:24px}
+
+/* Hub layout hooks (отступ после lm-ch2-promo — как на biology) */
+.lm .map-card.pd-card { margin-top: 22px; }
+.lm .pd-node[role="button"] { cursor: pointer; }
+.lm .pd-node[role="button"]:focus-visible { outline: 2px solid #7c66ff; outline-offset: 3px; border-radius: 12px; }
+
 .pd-circle .num{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion: reduce){
   .pd-node.active .pd-circle::before,
