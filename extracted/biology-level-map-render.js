@@ -254,7 +254,7 @@
 	function pdBossNodeHtml(cfg, bossInfo, chapterComplete) {
 		const v = bossInfo.v;
 		const state = bossInfo.state;
-		const bossName = cfg.bossName || 'Сложный вариант';
+		const bossName = cfg.bossName || bossInfo.v.title || ('Вариант ' + bossInfo.v.id);
 		if (chapterComplete && bossInfo.best) {
 			const stars = _mapCfg.starsForPercent(bossInfo.best.percent);
 			const bossXp = global.IqmoLevelMapXp

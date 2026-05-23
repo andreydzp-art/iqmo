@@ -3487,7 +3487,7 @@
 			function pdBossNodeHtml(bossInfo, chapterComplete) {
 				const v = bossInfo.v;
 				const state = bossInfo.state;
-				const bossName = 'Сложный вариант';
+				const bossName = bossInfo.v.title || ('Вариант ' + bossInfo.v.id);
 				if (chapterComplete && bossInfo.best) {
 					const stars = gmStarsForPercent(bossInfo.best.percent);
 					const xp = IqmoLevelMapXp
