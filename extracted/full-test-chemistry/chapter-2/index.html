@@ -187,73 +187,122 @@
   .legend-lock{ background:#c8cce0;}
   .legend-boss{ background:var(--violet);}
 
-  .map-wrap{ position:relative; height:320px; margin-top:18px;}
+  /* ===== Level-map nodes (lm-* — same as full-test-biology/chapter-2) ===== */
+  :root {
+    --lm-emerald: #10b981;
+    --lm-primary: #4f46e5;
+    --lm-primary-2: #6366f1;
+    --lm-shadow-glow: 0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45);
+    --lm-shadow-boss: 0 0 0 6px rgba(124,58,237,.12), 0 18px 36px -8px rgba(124,58,237,.45);
+  }
+  .map-wrap{ position:relative; height:290px; margin-top:18px;}
   .map-svg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
-  .nodes{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(7,1fr); align-items:center;}
-  .node-cell{ display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; height:100%;}
-  .node-cell .label-top{ position:absolute; top:6px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;}
-  .label-top.next{ color:var(--primary);}
-  .label-top.boss{ color:var(--violet);}
-  .label-top.new{ color:var(--teal);}
+  .lm-nodes{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(7,1fr); align-items:center;}
+  .lm-cell{ display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; height:100%;}
+  .lm-cell .lm-label-top{ position:absolute; top:6px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;}
+  .lm-label-top.is--start{ color:var(--teal);}
+  .lm-label-top.is--boss{ color:var(--violet);}
 
-  .node{
+  .lm-node{
     width:78px; height:78px; border-radius:999px;
     background:var(--surface); border:2px solid var(--line);
     display:flex; align-items:center; justify-content:center;
     font-size:24px; font-weight:800; color:var(--muted-2);
     position:relative; z-index:2;
+    cursor:pointer; padding:0;
+    transition: transform .12s;
   }
-  .node.current{
-    background:linear-gradient(180deg,var(--primary-2),var(--primary));
+  .lm-node:hover{ transform:translateY(-2px); }
+  .lm-node:disabled{ cursor:not-allowed; }
+  .lm-node:disabled:hover{ transform:none; }
+  .lm-node.is--done{
+    border-color:var(--lm-emerald); color:var(--lm-emerald); background:#fff;
+  }
+  .lm-node.is--done::after{
+    content:""; position:absolute; right:-4px; top:-4px;
+    width:26px; height:26px; border-radius:999px;
+    background:var(--lm-emerald);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+    background-repeat:no-repeat; background-position:center;
+    box-shadow:0 4px 10px -2px rgba(16,185,129,.55), 0 0 0 3px #fff;
+  }
+  .lm-node.is--current{
+    background:linear-gradient(180deg, var(--lm-primary-2), var(--lm-primary));
     border-color:transparent; color:#fff;
-    box-shadow:0 18px 36px -10px rgba(79,70,229,.55);
+    box-shadow:var(--lm-shadow-glow);
+    animation:lmPulse 2.4s ease-in-out infinite;
   }
-  /* Two emanating ring waves around available node */
-  .node.current::before,
-  .node.current::after{
-    content:""; position:absolute; inset:-4px; border-radius:50%;
-    border:2px solid rgba(79,70,229,.55);
-    pointer-events:none;
-    animation:ringWave 1.8s ease-out infinite;
+  @keyframes lmPulse{
+    0%,100%{ box-shadow:0 0 0 6px rgba(79,70,229,.10), 0 0 0 14px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.45);}
+    50%    { box-shadow:0 0 0 10px rgba(79,70,229,.14), 0 0 0 20px rgba(79,70,229,.06), 0 18px 36px -10px rgba(79,70,229,.55);}
   }
-  .node.current::after{ animation-delay:.9s;}
-  @keyframes ringWave{
-    0%{   transform:scale(1);    opacity:.7; border-width:2px;}
-    70%{  transform:scale(1.55); opacity:0;  border-width:1px;}
-    100%{ transform:scale(1.55); opacity:0;  border-width:1px;}
+  .lm-node.is--locked{
+    background:#f3f4fb; border-color:#e3e6f0; color:var(--muted-2);
   }
-  /* tiny breathing of the node itself */
-  .node.current{ animation:nodeBreathe 2.2s ease-in-out infinite;}
-  @keyframes nodeBreathe{
-    0%,100%{ transform:scale(1);    box-shadow:0 18px 36px -10px rgba(79,70,229,.45);}
-    50%    { transform:scale(1.06); box-shadow:0 22px 44px -10px rgba(79,70,229,.65);}
-  }
-  .node.locked{ background:#f3f4fb; color:var(--muted-2);}
-  .node.locked .lock{ width:22px; height:22px;}
-
-  .node.boss{
+  .lm-node.is--locked:hover{ transform:none; }
+  .lm-node.is--locked .lm-lock{ width:22px; height:22px;}
+  .lm-node.is--boss{
     width:88px; height:88px;
-    background:linear-gradient(180deg,#8b5cf6,#6d28d9);
+    background:linear-gradient(180deg, #8b5cf6, #6d28d9);
     border-color:transparent; color:#fff;
-    box-shadow:0 0 0 6px rgba(124,58,237,.12),0 18px 36px -8px rgba(124,58,237,.45);
+    box-shadow:var(--lm-shadow-boss);
   }
-  .node.boss .boss-lock{
+  .lm-node.is--boss::before{
+    content:""; position:absolute; inset:-6px; border-radius:999px;
+    background:conic-gradient(from 0deg, rgba(167,139,250,.0), rgba(167,139,250,.55), rgba(167,139,250,.0) 60%);
+    -webkit-mask:radial-gradient(circle, transparent 60%, #000 61%);
+            mask:radial-gradient(circle, transparent 60%, #000 61%);
+    z-index:-1;
+    animation:lmSpin 8s linear infinite;
+  }
+  .lm-node.is--boss.is--locked{ opacity:.9; }
+  .lm-node.is--boss.is--locked::before{ display:none; }
+  .lm-node.is--boss.is--done{ background:linear-gradient(135deg, var(--lm-emerald), #059669); }
+  @keyframes lmSpin{ to{ transform:rotate(360deg); } }
+  .lm-node.is--boss .lm-boss-lock{
     position:absolute; right:-2px; top:-2px;
     width:24px; height:24px; border-radius:999px; background:#fff;
     color:var(--violet); display:inline-flex; align-items:center; justify-content:center;
-    box-shadow:0 4px 10px -2px rgba(124,58,237,.45),0 0 0 3px #fff;
+    box-shadow:0 4px 10px -2px rgba(124,58,237,.45), 0 0 0 3px #fff;
   }
 
-  .cap{ margin-top:14px; text-align:center; display:flex; flex-direction:column; gap:5px;}
-  .cap-name{ font-size:13.5px; font-weight:600; color:var(--ink);}
-  .cap-status{ font-size:12px; color:var(--muted); white-space:nowrap;}
-  .cap-status.now{ color:var(--primary); font-weight:600;}
-  .cap-tier{ font-size:11px; color:var(--muted-2); white-space:nowrap;}
+  .lm-cap{ margin-top:14px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:5px;}
+  .lm-cap-name{ font-size:13.5px; font-weight:600; color:var(--ink);}
+  .lm-cap-status{ font-size:12px; color:var(--muted); white-space:nowrap; display:inline-flex; align-items:center; gap:5px;}
+  .lm-cap-status.is--done{ color:var(--lm-emerald); font-weight:600;}
+  .lm-cap-status.is--now{ color:var(--lm-primary); font-weight:600;}
+  .lm-cap-tier{ font-size:11px; color:var(--muted-2); white-space:nowrap;}
+  .lm-cap-stars{ margin-top:6px; display:inline-flex; gap:3px;}
+  .lm-cap-stars svg{ width:14px; height:14px;}
+  .lm-star-on{ color:#f59e0b;}
+  .lm-star-off{ color:#d9dcea;}
+  .lm-score-chip{
+    margin-top:8px;
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:11.5px; font-weight:600;
+    background:#e7faf2; color:#047857;
+    padding:3px 9px; border-radius:999px;
+    border:1px solid #c2f0d9;
+  }
+  .lm-num{ font-family:'JetBrains Mono', ui-monospace, monospace; font-variant-numeric:tabular-nums;}
+  .lm-start-btn{
+    margin-top:10px;
+    height:34px; padding:0 14px;
+    border-radius:10px; border:0;
+    background:linear-gradient(180deg, var(--lm-primary-2), var(--lm-primary));
+    color:#fff; font-weight:600; font-size:13px;
+    display:inline-flex; align-items:center; gap:6px;
+    cursor:pointer;
+    box-shadow:0 6px 14px -4px rgba(79,70,229,.55);
+    font-family:inherit;
+    text-decoration:none;
+  }
+  .lm-start-btn:hover{ filter:brightness(1.05);}
+  .boss-hint, .lm-boss-hint{
+    margin-top:10px; max-width:140px; text-align:center;
+    font-size:11.5px; color:var(--muted); line-height:1.4;
+  }
   .cap-tier b{ color:var(--ink-2);}
-
-  .start-btn{ margin-top:10px; height:34px; padding:0 14px; border-radius:10px; border:0; background:linear-gradient(180deg,var(--primary-2),var(--primary)); color:#fff; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 6px 14px -4px rgba(79,70,229,.55);}
-
-  .boss-hint{ margin-top:10px; max-width:130px; text-align:center; font-size:11.5px; color:var(--muted); line-height:1.4;}
 
   /* split: adaptive + daily */
   .grid-2{ margin-top:22px; display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
@@ -422,9 +471,9 @@
   @media (max-width: 768px) {
     .chapter-stepper{ flex-wrap:wrap; }
     .shell { padding:16px 16px 40px; }
-    .nodes{ grid-template-columns:1fr !important; height:auto !important; row-gap:18px; }
+    .lm-nodes{ grid-template-columns:repeat(2, 1fr) !important; gap:18px 8px; position:static !important; }
     .map-wrap{ height:auto !important; min-height:0 !important; padding-bottom:12px; }
-    .node-cell{ min-height:0; }
+    .lm-cell{ height:auto; padding:16px 0; }
     .map-svg{ display:none; }
     .grid-4{ grid-template-columns:1fr; }
   }
@@ -508,7 +557,7 @@
       <div class="cta-row">
         <a class="btn btn-primary" id="ch2-cta-variant1" href="/full-test-chemistry/?v=8">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
-          Начать вариант 1 главы 2
+          Начать вариант главы 2
         </a>
         <a class="btn" href="/subject-chemistry/">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -609,6 +658,7 @@
         <div class="map-sub">6 демо-вариантов · 1 супер-босс · сложность повышенная</div>
       </div>
       <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#fff;border:2px solid #10b981;"></span> Пройден</span>
         <span class="legend-item"><span class="legend-dot legend-now"></span> Доступен</span>
         <span class="legend-item"><span class="legend-dot legend-lock"></span> Заблокирован</span>
         <span class="legend-item"><span class="legend-dot legend-boss"></span> Супер-босс</span>
@@ -626,60 +676,7 @@
               fill="none" stroke="url(#dashed)" stroke-width="3" stroke-linecap="round"/>
       </svg>
 
-      <div class="nodes">
-        <!-- Demo 1 — current -->
-        <div class="node-cell">
-          <div class="label-top new">★ Старт главы</div>
-          <div class="node current">1</div>
-          <div class="cap">
-            <div class="cap-name">Демо-вариант 1</div>
-            <div class="cap-status now">Доступен сейчас</div>
-            <div class="cap-tier">Сложность: <b>средняя</b></div>
-            <a class="start-btn" id="ch2-node1-start" href="/full-test-chemistry/?v=8" style="text-decoration:none;color:#fff;">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
-              Начать
-            </a>
-          </div>
-        </div>
-
-        <!-- 2-5 locked -->
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 2</div><div class="cap-status">Откроется после №1</div><div class="cap-tier">Сложность: <b>средняя</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 3</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 4</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 5</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>высокая</b></div></div>
-        </div>
-        <div class="node-cell">
-          <div class="node locked"><svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          <div class="cap"><div class="cap-name">Демо-вариант 6</div><div class="cap-status">Заблокирован</div><div class="cap-tier">Сложность: <b>экстра</b></div></div>
-        </div>
-
-        <!-- Super-boss -->
-        <div class="node-cell">
-          <div class="label-top boss">⚡ Супер-босс</div>
-          <div class="node boss">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/>
-            </svg>
-            <div class="boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
-          </div>
-          <div class="cap">
-            <div class="cap-name">Магистр химии</div>
-            <div class="cap-status">Заблокирован</div>
-            <div class="boss-hint">Открывает Главу 3 + бейдж «Магистр»</div>
-          </div>
-        </div>
-      </div>
+      <div class="lm-nodes" id="ch2-nodes"></div>
     </div>
   </section>
 
@@ -788,6 +785,236 @@
 <script src="/chemistry-bank.js?v=11"></script>
 <script src="/chemistry-banks-bundle.js?v=9"></script>
 <script src="/chemistry-variants.js?v=10"></script>
+<script>
+(function () {
+  var CH2_SLOTS = [
+    { vid: 8,  tier: 'средняя' },
+    { vid: 9,  tier: 'средняя' },
+    { vid: 10, tier: 'высокая' },
+    { vid: 11, tier: 'высокая' },
+    { vid: 12, tier: 'высокая' },
+    { vid: 13, tier: 'экстра' },
+  ];
+  var BOSS_VID = 14;
+  var BASE = '/full-test-chemistry';
+  var lockSvg = '<svg class="lm-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  var checkSmall = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var playSvg = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>';
+  var VARIANTS = window.CHEMISTRY_VARIANTS || [];
+  var BANK = window.CHEMISTRY_QUESTIONS || [];
+
+  function findVariant(vid) {
+    return VARIANTS.find(function (v) { return v.id === vid; });
+  }
+
+  function variantReady(vid) {
+    var v = findVariant(vid);
+    return !!(v && v.status === 'ready');
+  }
+
+  function normAns(s) {
+    return String(s).trim().toLowerCase()
+      .replace(/\u00A0/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\./g, ',');
+  }
+
+  function checkAns(q, given) {
+    var correct = q.correct;
+    var isEmpty = given === undefined || given === '' ||
+      (Array.isArray(given) && given.filter(function (x) { return x; }).length === 0);
+    if (isEmpty) return 'skip';
+    if (q.type === 'input') {
+      var arr = Array.isArray(correct) ? correct : [correct];
+      return arr.some(function (v) { return normAns(given) === normAns(v); }) ? 'ok' : 'wrong';
+    }
+    if (Array.isArray(correct)) {
+      if (q.type === 'match') {
+        var g = Array.isArray(given) ? given.map(function (x) { return x || ''; }).join(',') : '';
+        return g === correct.join(',') ? 'ok' : 'wrong';
+      }
+      var gArr = (Array.isArray(given) ? given.slice() : []).sort().join(',');
+      var cArr = correct.slice().sort().join(',');
+      return gArr === cArr ? 'ok' : 'wrong';
+    }
+    return normAns(given) === normAns(correct) ? 'ok' : 'wrong';
+  }
+
+  function variantBest(vid) {
+    try {
+      var raw = localStorage.getItem('iqmo-chem-v-' + vid);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (!s || !s.finished) return null;
+      var v = findVariant(vid);
+      if (!v) return null;
+      var ok = 0, total = 0;
+      (v.qids || []).forEach(function (qid) {
+        var q = BANK.find(function (b) { return b.id === qid; });
+        if (!q || q.type === 'written') return;
+        total++;
+        var given = s.answers ? s.answers[q.id] : undefined;
+        if (checkAns(q, given) === 'ok') ok++;
+      });
+      if (!total) return null;
+      return { ok: ok, total: total, percent: Math.round(100 * ok / total) };
+    } catch (e) { return null; }
+  }
+
+  function starsForPercent(p) {
+    if (p >= 90) return 3;
+    if (p >= 70) return 2;
+    if (p >= 50) return 1;
+    return 0;
+  }
+
+  function starsHtml(filled) {
+    var h = '<div class="lm-cap-stars" aria-label="Звёзды: ' + filled + ' из 3">';
+    for (var i = 1; i <= 3; i++) {
+      var cls = i <= filled ? 'lm-star-on' : 'lm-star-off';
+      h += '<svg viewBox="0 0 24 24" fill="currentColor" class="' + cls + '"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function isPassed(vid) {
+    var b = variantBest(vid);
+    return !!(b && b.percent >= 50);
+  }
+
+  var html = '';
+  for (var i = 0; i < CH2_SLOTS.length; i++) {
+    var sl = CH2_SLOTS[i];
+    var best = variantBest(sl.vid);
+    var done = !!(best && best.percent >= 50);
+    var ready = variantReady(sl.vid);
+    var prevDone = i === 0 || isPassed(CH2_SLOTS[i - 1].vid);
+    var isCurrent = !done && prevDone && ready;
+    var isLocked = !done && !isCurrent;
+
+    var labelTop = i === 0 ? '<div class="lm-label-top is--start">\u2605 Старт главы</div>' : '';
+    var cls = 'lm-node';
+    if (done) cls += ' is--done';
+    else if (isCurrent) cls += ' is--current';
+    else cls += ' is--locked';
+    var inner = isLocked ? lockSvg : String(sl.vid);
+
+    var capStatusBlock;
+    if (done) {
+      var stars = best ? starsForPercent(best.percent) : 0;
+      capStatusBlock =
+        '<div class="lm-cap-status is--done">' + checkSmall + ' Пройден</div>' +
+        starsHtml(stars) +
+        (best ? '<div class="lm-score-chip"><span class="lm-num">' + best.percent + '%</span></div>' : '');
+    } else if (isCurrent) {
+      capStatusBlock =
+        '<div class="lm-cap-status is--now">Доступен сейчас</div>' +
+        '<a class="lm-start-btn" href="' + BASE + '/?v=' + sl.vid + '">' + playSvg + ' Начать</a>';
+    } else {
+      capStatusBlock = '<div class="lm-cap-status">Заблокирован</div>';
+    }
+
+    html += '<div class="lm-cell">' + labelTop +
+      '<button class="' + cls + '"' + (isLocked ? ' disabled' : '') +
+      ' data-v="' + sl.vid + '" data-state="' + (done ? 'done' : isCurrent ? 'current' : 'locked') + '">' +
+      inner + '</button>' +
+      '<div class="lm-cap"><div class="lm-cap-name">Вариант ' + sl.vid + '</div>' +
+      '<div class="lm-cap-tier">Сложность: <b>' + sl.tier + '</b></div>' +
+      capStatusBlock +
+      '</div></div>';
+  }
+
+  var allRegularDone = CH2_SLOTS.every(function (sl) { return isPassed(sl.vid); });
+  var bossBest = variantBest(BOSS_VID);
+  var bossDone = !!(bossBest && bossBest.percent >= 50);
+  var bossReady = variantReady(BOSS_VID);
+  var bossOpen = allRegularDone && bossReady && !bossDone;
+  var bossCls = 'lm-node is--boss';
+  if (bossDone) bossCls += ' is--done';
+  else if (bossOpen) bossCls += ' is--current';
+  else bossCls += ' is--locked';
+  var bossLock = (bossDone || bossOpen) ? '' : '<div class="lm-boss-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>';
+
+  var bossCapBlock;
+  if (bossDone) {
+    var bossStars = bossBest ? starsForPercent(bossBest.percent) : 0;
+    bossCapBlock =
+      '<div class="lm-cap-status is--done">' + checkSmall + ' Босс побеждён</div>' +
+      starsHtml(bossStars) +
+      (bossBest ? '<div class="lm-score-chip"><span class="lm-num">' + bossBest.percent + '%</span></div>' : '');
+  } else if (bossOpen) {
+    bossCapBlock =
+      '<div class="lm-cap-status is--now">Босс открыт!</div>' +
+      '<a class="lm-start-btn" href="' + BASE + '/?v=' + BOSS_VID + '">' + playSvg + ' Сразиться</a>';
+  } else {
+    bossCapBlock =
+      '<div class="lm-cap-status">Заблокирован</div>' +
+      '<div class="lm-boss-hint">Откроется после прохождения всех 6 вариантов</div>';
+  }
+
+  html += '<div class="lm-cell"><div class="lm-label-top is--boss">\u26A1 Супер-босс</div>' +
+    '<button class="' + bossCls + '"' + ((!bossDone && !bossOpen) ? ' disabled' : '') +
+    ' data-v="' + BOSS_VID + '" data-state="' + (bossDone ? 'done' : bossOpen ? 'current' : 'locked') + '">' +
+    '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h4l-2 8 7-9h-4l1-6z"/></svg>' +
+    bossLock + '</button>' +
+    '<div class="lm-cap"><div class="lm-cap-name">Магистр химии</div>' +
+    bossCapBlock + '</div></div>';
+
+  var host = document.getElementById('ch2-nodes');
+  if (host) host.innerHTML = html;
+
+  if (host) {
+    host.querySelectorAll('.lm-node[data-v]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.dataset.state === 'locked') return;
+        window.location.href = BASE + '/?v=' + btn.dataset.v;
+      });
+    });
+    host.querySelectorAll('.lm-start-btn').forEach(function (a) {
+      a.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+  }
+
+  var doneCount = CH2_SLOTS.filter(function (sl) { return isPassed(sl.vid); }).length + (bossDone ? 1 : 0);
+  var statDone = document.getElementById('ch2-stat-done');
+  if (statDone) statDone.textContent = String(doneCount);
+
+  var passedScores = CH2_SLOTS
+    .map(function (sl) { return variantBest(sl.vid); })
+    .filter(function (b) { return b && b.percent >= 50; });
+  if (bossBest && bossBest.percent >= 50) passedScores.push(bossBest);
+  var avgScore = passedScores.length
+    ? Math.round(passedScores.reduce(function (a, b) { return a + b.percent; }, 0) / passedScores.length)
+    : null;
+  var statAvg = document.getElementById('ch2-stat-avg');
+  if (statAvg) statAvg.textContent = avgScore != null ? (avgScore + '%') : '—';
+
+  var totalStars = 0;
+  CH2_SLOTS.forEach(function (sl) {
+    var b = variantBest(sl.vid);
+    if (b && b.percent >= 50) totalStars += starsForPercent(b.percent);
+  });
+  if (bossBest && bossBest.percent >= 50) totalStars += starsForPercent(bossBest.percent);
+  var stepperSub = document.querySelector('.ch-pill.active .ch-sub');
+  if (stepperSub) stepperSub.textContent = '6 вариантов + супер-босс · ' + totalStars + '/18 ★';
+
+  var ctaBtn = document.getElementById('ch2-cta-variant1');
+  if (ctaBtn) {
+    var nextSlot = null;
+    for (var j = 0; j < CH2_SLOTS.length; j++) {
+      if (!isPassed(CH2_SLOTS[j].vid) && variantReady(CH2_SLOTS[j].vid)) { nextSlot = CH2_SLOTS[j]; break; }
+    }
+    if (nextSlot) {
+      ctaBtn.href = BASE + '/?v=' + nextSlot.vid;
+      ctaBtn.lastChild.textContent = ' Начать вариант ' + nextSlot.vid;
+    } else if (doneCount === CH2_SLOTS.length) {
+      ctaBtn.href = BASE + '/?v=' + BOSS_VID;
+      ctaBtn.lastChild.textContent = ' Финальный босс';
+    }
+  }
+})();
+</script>
 <script src="/iqmo-chapter2-access.js?v=1"></script>
 <script src="/iqmo-sync.js"></script>
 <script src="/iqmo-nav.js"></script>
@@ -856,13 +1083,6 @@
 			ring.setAttribute('stroke-dashoffset', String(c));
 		}
 		setText('ch2-prog-pct', '100%');
-	}
-
-	function fillCh2StatsPlaceholder() {
-		setText('ch2-stat-nodes', '7');
-		setText('ch2-stat-done', '0');
-		setText('ch2-stat-avg', '—');
-		setText('ch2-stat-xp', '0');
 	}
 
 	function fillLeaderboard() {
@@ -960,7 +1180,6 @@
 			var arch = IqmoChapter2Access.chapter1ArchiveSummary(SUBJ);
 			fillArchive(arch);
 			fillProgressCards(arch);
-			fillCh2StatsPlaceholder();
 			fillHeroGamification();
 			fillLeaderboard();
 			try {
