@@ -88,8 +88,10 @@ const Comparison = () => {
                 ))}
               </div>
 
-              <div className="cmp-card__cta-spacer" aria-hidden="true">
-                <span>Попробовать бесплатно</span>
+              <div className="cmp-card__cta">
+                <button type="button" className="cmp-card__cta-btn cmp-card__cta-btn--mirror" tabIndex={-1} aria-hidden="true" disabled>
+                  Попробовать бесплатно <IconArrow size={16} stroke={2.5}/>
+                </button>
               </div>
             </div>
           </div>
@@ -213,25 +215,25 @@ const Comparison = () => {
 
       <style>{`
         .cmp-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
+          display: flex;
           align-items: stretch;
+          gap: 20px;
         }
         .cmp-card {
+          flex: 1 1 0;
+          min-width: 0;
           padding: 28px;
           border-radius: 28px;
           position: relative;
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          height: 100%;
         }
         .cmp-card__body {
           display: flex;
           flex-direction: column;
-          flex: 1;
-          height: 100%;
+          flex: 1 1 auto;
+          min-height: 100%;
         }
         .cmp-card__cta {
           margin-top: auto;
@@ -254,24 +256,9 @@ const Comparison = () => {
           cursor: pointer;
           transition: transform .15s ease;
         }
-        .cmp-card__cta-spacer {
-          margin-top: auto;
-          padding-top: 24px;
+        .cmp-card__cta-btn--mirror {
           visibility: hidden;
           pointer-events: none;
-          user-select: none;
-        }
-        .cmp-card__cta-spacer span {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          width: 100%;
-          padding: 16px 22px;
-          border-radius: 999px;
-          font-weight: 700;
-          font-size: 15px;
-          line-height: 1.2;
         }
         .cmp-tutor {
           background: white;
@@ -283,8 +270,8 @@ const Comparison = () => {
           box-shadow: 0 40px 80px -30px rgba(99,102,241,.55), 0 20px 40px -20px rgba(124,58,237,.4);
         }
         @media (max-width: 900px) {
-          .cmp-grid { grid-template-columns: 1fr; gap: 16px; }
-          .cmp-card__cta-spacer { display: none; }
+          .cmp-grid { flex-direction: column; gap: 16px; }
+          .cmp-card__cta-btn--mirror { display: none; }
         }
       `}</style>
     </section>
