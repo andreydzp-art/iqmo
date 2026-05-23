@@ -34,12 +34,13 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="/iqmo-base.css?v=2" />
-		<link rel="stylesheet" href="/iqmo-topnav.css?v=1" />
+		<link rel="stylesheet" href="/iqmo-topnav.css?v=2" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
 		<style>
 			html.is--hub #test-root { display: none !important; }
 			html.is--hub #exam-subbar { display: none !important; }
-			.ft-site-nav { max-width: 1280px; margin: 0 auto; padding: 24px 28px 0; }
+			html.is--hub .page__main { padding-top: 0; }
+			.shell { max-width: 1280px; margin: 0 auto; padding: 24px 28px 56px; }
 
 
 			/* ---- top bar ---- (стиль навбара из референса _tmp_ft6/level-map.html) */
@@ -1549,8 +1550,7 @@
 	</head>
 
 	<body data-exam-subject="chemistry">
-		<!-- Unified site nav (карта вариантов — как subject-chemistry) -->
-		<div class="ft-site-nav" id="ft-site-nav">
+		<div class="shell" id="hub-shell">
 			<nav class="topnav">
 				<a class="brand" href="/" aria-label="IQMO — главная">
 					<div class="brand-mark">IQ</div>
@@ -1572,9 +1572,10 @@
 					<div class="avatar" id="nav-avatar"></div>
 				</div>
 			</nav>
-			<div class="crumbs" id="ft-crumbs">
+			<div class="crumbs breadcrumbs" id="ft-crumbs">
 				<a href="/">Главная</a><span class="sep">/</span><a href="/subject-chemistry/">Химия</a><span class="sep">/</span><b>Полный вариант ОГЭ</b>
 			</div>
+			<div id="variant-picker" style="display:none;"></div>
 		</div>
 
 		<!-- Полоска экзамена: только во время ?v=N (таймер + прервать) -->
@@ -1604,9 +1605,6 @@
 		</header>
 
 		<main class="page__main" id="page-main">
-			<!-- variant picker (shown by JS when no ?v=N) -->
-			<div class="container" id="variant-picker" style="display:none;"></div>
-
 			<div class="container" id="test-root">
 				<div class="grid">
 					<!-- aside -->
