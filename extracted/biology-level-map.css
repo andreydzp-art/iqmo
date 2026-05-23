@@ -1,0 +1,628 @@
+/** Biology level map — visual ref level-map-biology (variants D/E) */
+/* ============================================================
+     VARIANT D — Refined / Polished EdTech
+     ============================================================ */
+  .pd-card{
+    position:relative;
+    background:
+      radial-gradient(110% 80% at 0% 0%,   #ecfdf5 0%, transparent 55%),
+      radial-gradient(120% 90% at 100% 100%, #efeaff 0%, transparent 55%),
+      #fbfaff;
+    border:1px solid #ece8f5;
+    border-radius:24px;
+    box-shadow:
+      0 30px 70px -38px rgba(60, 40, 130, .25),
+      0 1px 0 rgba(255,255,255,.6) inset;
+    padding:30px 36px 34px;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .pd-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(124,102,255,.06) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  .pd-deco{position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden}
+  .pd-deco svg{position:absolute}
+  .pd-d1{top:-20px;  left:40%; width:160px; opacity:.05}
+  .pd-d2{bottom:-30px; left:6%;  width:150px; opacity:.05}
+  .pd-d3{top:48%; right:30%; width:140px; opacity:.04; transform:translateY(-50%)}
+  .pd-d4{top:20px; right:6%;  width:110px; opacity:.05}
+
+  /* ---- header ---- */
+  .pd-head{
+    position:relative; z-index:2;
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:24px; flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .pd-eyebrow{
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:11px; letter-spacing:.16em; font-weight:700;
+    color:#5b4ca8; text-transform:uppercase;
+  }
+  .pd-eyebrow::before{
+    content:""; width:6px; height:6px; border-radius:50%;
+    background:linear-gradient(135deg,#10b981,#7c66ff);
+  }
+  .pd-title{
+    font-size:26px; font-weight:800; letter-spacing:-.015em;
+    color:#1b1733; margin:6px 0 0;
+  }
+  .pd-sub{font-size:13.5px; color:#5a557a; margin-top:6px}
+  .pd-sub b{color:#1b1733; font-weight:700}
+
+  .pd-head-right{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .pd-statpill{
+    display:inline-flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,.65);
+    backdrop-filter: blur(6px);
+    border:1px solid #eae5f3;
+    border-radius:14px;
+    padding:10px 14px;
+    box-shadow: 0 2px 6px rgba(40,30,90,.04);
+  }
+  .pd-statpill .pd-ring{
+    position:relative; width:36px; height:36px;
+    display:grid; place-items:center;
+  }
+  .pd-statpill .pd-ring svg{position:absolute; inset:0; width:100%; height:100%}
+  .pd-statpill .pd-ring b{font-size:11px; font-weight:800; color:#1b1733; line-height:1}
+  .pd-statpill .pd-stat-meta{display:flex; flex-direction:column; line-height:1.15}
+  .pd-statpill .pd-stat-meta small{font-size:10.5px; color:#8a86a3; letter-spacing:.06em; text-transform:uppercase; font-weight:700}
+  .pd-statpill .pd-stat-meta b{font-size:13.5px; color:#1b1733; font-weight:700; margin-top:1px}
+
+  .pd-legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; color:#5a557a}
+  .pd-legend i{width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:6px; vertical-align:-1px}
+  .pd-legend i.p{background:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+  .pd-legend i.a{background:linear-gradient(135deg,#7c66ff,#5b21b6); box-shadow:0 0 0 3px rgba(124,102,255,.15)}
+  .pd-legend i.l{background:#cbc6dc; box-shadow:0 0 0 3px rgba(203,198,220,.25)}
+  .pd-legend i.b{background:linear-gradient(135deg,#a78bfa,#5b21b6); box-shadow:0 0 0 3px rgba(167,139,250,.18)}
+
+  /* ---- map ---- */
+  .pd-map{position:relative; z-index:1; padding: 12px 0 4px}
+  .pd-svg{
+    position:absolute; left:0; right:0; top: 78px; height: 130px;
+    width:100%; pointer-events:none; z-index:0;
+  }
+  .pd-nodes{
+    position:relative; z-index:1;
+    display:grid; grid-template-columns: repeat(7, minmax(0,1fr));
+    gap:6px; align-items:start;
+    padding:10px 4px 4px;
+  }
+  .pd-node{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding:6px 4px 8px;
+  }
+
+  /* top kicker line */
+  .pd-kicker{
+    height:18px; margin-bottom:8px;
+    display:flex; align-items:center; gap:6px; justify-content:center;
+    font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; font-weight:800;
+    color:transparent;
+  }
+  .pd-kicker.start{color:#0f9c5d}
+  .pd-kicker.now  {color:#5b21b6}
+  .pd-kicker.boss {color:#7c3aed}
+  .pd-kicker svg{width:12px;height:12px}
+
+  /* circles */
+  .pd-circle{
+    position:relative;
+    width:80px; height:80px; border-radius:50%;
+    display:grid; place-items:center;
+    font-weight:800;
+  }
+  .pd-circle .num{font-size:28px; line-height:1; letter-spacing:-.01em}
+
+  /* passed */
+  .pd-node.passed .pd-circle{
+    background:#fff; color:#0f9c5d;
+    border:3px solid #10b981;
+    box-shadow:
+      0 0 0 6px rgba(16,185,129,.08),
+      0 14px 26px -14px rgba(15,156,93,.5),
+      inset 0 -2px 0 rgba(16,185,129,.05);
+  }
+  .pd-node.passed .pd-check{
+    position:absolute; right:-4px; top:-4px;
+    width:28px; height:28px; border-radius:50%;
+    background:linear-gradient(135deg,#34d399,#059669);
+    display:grid; place-items:center;
+    border:3px solid #fff;
+    box-shadow: 0 6px 12px -4px rgba(5,150,105,.5);
+  }
+  .pd-node.passed .pd-check svg{width:13px;height:13px;fill:#fff}
+
+  /* active — STRONGER focus */
+  .pd-node.active{padding-bottom:0}
+  .pd-node.active .pd-kicker{margin-bottom:4px}
+  .pd-node.active .pd-circle{
+    width:116px; height:116px;
+    background:
+      radial-gradient(120% 100% at 28% 22%, #c4b6ff 0%, transparent 55%),
+      linear-gradient(160deg, #8b7aff 0%, #5b21b6 100%);
+    color:#fff; border:none;
+    box-shadow:
+      0 0 0 6px rgba(124,102,255,.12),
+      0 0 0 16px rgba(124,102,255,.06),
+      0 24px 44px -16px rgba(91,33,182,.55),
+      inset 0 -4px 12px rgba(0,0,0,.18),
+      inset 0 2px 0 rgba(255,255,255,.35);
+  }
+  .pd-node.active .pd-circle .num{font-size:46px; text-shadow:0 2px 4px rgba(0,0,0,.18)}
+  .pd-node.active .pd-circle::before{
+    content:""; position:absolute; inset:-22px; border-radius:50%;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(124,102,255,.22) 0%, transparent 65%);
+    pointer-events:none; z-index:-1;
+    animation: pdBreathe 3.2s ease-in-out infinite;
+  }
+  .pd-node.active .pd-circle::after{
+    content:""; position:absolute; inset:-9px; border-radius:50%;
+    border:1.5px solid rgba(124,102,255,.45);
+    animation: pdPulse 2.4s ease-out infinite;
+    pointer-events:none;
+  }
+  @keyframes pdBreathe{
+    0%,100%{opacity:.7; transform:scale(1)}
+    50%{opacity:1; transform:scale(1.06)}
+  }
+  @keyframes pdPulse{
+    0%{transform:scale(.96); opacity:.85}
+    70%{transform:scale(1.18); opacity:0}
+    100%{transform:scale(1.18); opacity:0}
+  }
+
+  /* locked — refined, not flat gray */
+  .pd-node.locked .pd-circle{
+    width:70px; height:70px;
+    background:
+      radial-gradient(120% 100% at 30% 22%, #fafaff 0%, #f0edf8 70%);
+    color:#8682a3;
+    border:1.5px solid #e3deef;
+    box-shadow:
+      0 8px 18px -12px rgba(60,40,120,.18),
+      inset 0 -1.5px 0 rgba(60,40,120,.04);
+  }
+  .pd-node.locked .pd-circle svg{width:22px; height:22px; fill:#8682a3}
+
+  /* labels & states */
+  .pd-label{margin-top:14px; font-weight:700; font-size:15px; color:#1b1733; letter-spacing:-.005em}
+  .pd-node.locked .pd-label{color:#6e6985}
+  .pd-meta{font-size:12px; color:#8a86a3; margin-top:3px}
+  .pd-meta b{color:#5a557a; font-weight:600}
+
+  .pd-state{
+    margin-top:7px;
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:700; letter-spacing:.02em;
+  }
+  .pd-state.passed{color:#0f9c5d}
+  .pd-state.passed svg{width:13px;height:13px;fill:#0f9c5d}
+  .pd-state.locked{color:#8a86a3; font-weight:600}
+
+  .pd-xp{
+    margin-top:6px;
+    display:inline-flex; align-items:center; gap:4px;
+    background:rgba(16,185,129,.1);
+    border:1px solid rgba(16,185,129,.22);
+    color:#0f9c5d; font-weight:800; font-size:11.5px;
+    padding:3px 9px; border-radius:999px;
+  }
+  .pd-stars{margin-top:7px; display:inline-flex; gap:3px}
+  .pd-stars svg{width:13px;height:13px;fill:#f5a623; filter:drop-shadow(0 1px 0 rgba(245,166,35,.25))}
+
+  /* active state chip */
+  .pd-now{
+    margin-top:8px;
+    display:inline-flex; align-items:center; gap:7px;
+    background:linear-gradient(135deg,#ede9ff,#dde6ff);
+    color:#4a32c4;
+    border:1px solid #ddd3ff;
+    padding:5px 11px; border-radius:999px;
+    font-size:11.5px; font-weight:800; letter-spacing:.02em;
+  }
+  .pd-now i{
+    width:6px; height:6px; border-radius:50%;
+    background:#7c66ff;
+    box-shadow:0 0 0 3px rgba(124,102,255,.25);
+    animation: pdDot 1.4s ease-in-out infinite;
+  }
+  @keyframes pdDot{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* prominent CTA */
+  .pd-cta{
+    margin-top:14px;
+    display:inline-flex; align-items:center; gap:9px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 50%),
+      linear-gradient(135deg,#8b7aff 0%, #5b21b6 100%);
+    color:#fff; border:none; cursor:pointer;
+    padding:13px 22px; border-radius:14px;
+    font-weight:800; font-size:14px; letter-spacing:.01em;
+    box-shadow:
+      0 14px 28px -10px rgba(91,33,182,.55),
+      0 1px 0 rgba(255,255,255,.25) inset,
+      0 -2px 0 rgba(0,0,0,.10) inset;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .pd-cta:hover{transform:translateY(-1px); box-shadow:0 18px 32px -10px rgba(91,33,182,.65), 0 1px 0 rgba(255,255,255,.25) inset, 0 -2px 0 rgba(0,0,0,.10) inset}
+  .pd-cta:active{transform:translateY(1px)}
+  .pd-cta svg{width:14px; height:14px; fill:#fff}
+  .pd-cta .pd-arrow{
+    transition: transform .2s ease;
+  }
+  .pd-cta:hover .pd-arrow{transform: translateX(2px)}
+
+  /* boss — final challenge */
+  .pd-node.boss{
+    grid-column: span 1;
+    align-self: stretch;
+  }
+  .pd-bossCard{
+    position:relative;
+    width:100%;
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,.20), transparent 60%),
+      linear-gradient(160deg, #8b5cf6 0%, #6d28d9 55%, #4c1d95 100%);
+    border-radius:20px;
+    padding:14px 16px 18px;
+    color:#fff;
+    box-shadow:
+      0 22px 44px -18px rgba(91,33,182,.55),
+      inset 0 1px 0 rgba(255,255,255,.28),
+      inset 0 -3px 0 rgba(0,0,0,.10);
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .pd-bossCard::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 80% 18%, rgba(255,255,255,.22) 0 2px, transparent 3px),
+      radial-gradient(circle at 18% 70%, rgba(255,255,255,.18) 0 2px, transparent 3px),
+      radial-gradient(circle at 62% 88%, rgba(255,255,255,.14) 0 1.5px, transparent 2.5px);
+    pointer-events:none;
+  }
+  .pd-bossTop{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:10px; letter-spacing:.18em; font-weight:800; text-transform:uppercase;
+    opacity:.92;
+  }
+  .pd-bossTop .pd-finale{
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .pd-bossTop .pd-finale svg{width:12px; height:12px; fill:#fde68a}
+  .pd-bossTop .pd-lockMini{
+    width:22px; height:22px; border-radius:50%;
+    background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.25);
+    display:grid; place-items:center;
+  }
+  .pd-bossTop .pd-lockMini svg{width:10px; height:10px; fill:#fff}
+
+  .pd-bossCircle{
+    width:100px; height:100px; margin: 12px auto 10px;
+    border-radius:50%;
+    display:grid; place-items:center;
+    background:
+      radial-gradient(120% 100% at 30% 22%, #f0d8ff 0%, #c084fc 45%, #6d28d9 100%);
+    border:4px solid rgba(255,255,255,.85);
+    box-shadow:
+      0 14px 28px -10px rgba(0,0,0,.4),
+      inset 0 -6px 12px rgba(0,0,0,.20);
+    position:relative;
+  }
+  .pd-bossCircle::after{
+    content:""; position:absolute; inset:-12px; border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.18);
+  }
+  .pd-bossCircle svg{width:40px; height:40px; fill:#fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+
+  .pd-bossName{text-align:center; font-size:16px; font-weight:800; letter-spacing:-.005em}
+  .pd-bossState{text-align:center; font-size:11.5px; opacity:.85; margin-top:2px; letter-spacing:.04em}
+  .pd-bossRewards{
+    display:flex; gap:6px; justify-content:center; flex-wrap:wrap;
+    margin-top:10px; padding-top:10px;
+    border-top:1px dashed rgba(255,255,255,.28);
+  }
+  .pd-bossRewards .pd-reward{
+    font-size:10.5px; font-weight:800; letter-spacing:.04em;
+    background: rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.22);
+    padding:4px 8px; border-radius:999px;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .pd-bossRewards .pd-reward svg{width:11px; height:11px; fill:#fde68a}
+  .pd-bossDesc{
+    margin-top:8px; font-size:11.5px; line-height:1.45; text-align:center; opacity:.9;
+  }
+
+  /* ---- footer hint ---- */
+  .pd-foot{
+    position:relative; z-index:2;
+    margin-top:22px; padding-top:18px;
+    border-top:1px dashed #e3deef;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
+  }
+  .pd-foot .pd-bar{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size:12.5px; color:#5a557a;
+  }
+  .pd-foot .pd-bar .pd-meter{
+    position:relative; width:160px; height:5px; border-radius:999px;
+    background:#ece8f5; overflow:hidden;
+  }
+  .pd-foot .pd-bar .pd-meter i{
+    position:absolute; inset:0; width:16.7%;
+    background: linear-gradient(90deg, #10b981, #7c66ff 65%, #6d28d9);
+    border-radius:999px;
+  }
+  .pd-foot .pd-bar b{color:#1b1733; font-weight:700}
+  .pd-foot .pd-next{font-size:13px; color:#5a557a}
+  .pd-foot .pd-next b{color:#1b1733; font-weight:700}
+
+  /* ---- responsive ---- */
+  @media (max-width: 1100px){
+    .pd-nodes{grid-template-columns: repeat(2,1fr); gap:24px 14px}
+    .pd-svg{display:none}
+    .pd-node.boss{grid-column: 1 / -1}
+    .pd-bossCard{max-width:520px; margin:0 auto}
+  }
+  @media (max-width: 640px){
+    .pd-card{padding:22px 18px 26px}
+    .pd-nodes{grid-template-columns:1fr; gap:22px}
+    .pd-head-right{flex-direction:row; align-items:flex-start}
+  }
+
+
+  /* ============================================================
+     VARIANT E — Continuation of D · Chapter completed
+     ============================================================ */
+  .pe-card{
+    background:
+      radial-gradient(110% 80% at 0% 0%,   #e9fbf2 0%, transparent 55%),
+      radial-gradient(110% 80% at 100% 0%, #fff5d8 0%, transparent 55%),
+      radial-gradient(110% 80% at 100% 100%, #efeaff 0%, transparent 55%),
+      #fbfaff;
+  }
+  .pe-card::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 12% 22%, rgba(251,191,36,.18) 0 2.5px, transparent 4px),
+      radial-gradient(circle at 88% 14%, rgba(16,185,129,.18) 0 2.5px, transparent 4px),
+      radial-gradient(circle at 78% 86%, rgba(124,102,255,.18) 0 2.5px, transparent 4px),
+      radial-gradient(circle at 22% 78%, rgba(251,191,36,.14) 0 2px, transparent 3px),
+      radial-gradient(circle at 50% 8%, rgba(16,185,129,.14) 0 2px, transparent 3px);
+    pointer-events:none; z-index:0;
+  }
+  .pe-card .pd-eyebrow{color:#0f9c5d}
+  .pe-card .pd-eyebrow::before{background:linear-gradient(135deg,#fbbf24,#10b981)}
+
+  .pe-completed-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-left:10px;
+    background:linear-gradient(135deg,#ecfdf5,#fef3c7);
+    color:#065f46;
+    border:1px solid #bbf7d0;
+    padding:5px 11px; border-radius:999px;
+    font-size:11px; letter-spacing:.08em; font-weight:800; text-transform:uppercase;
+    vertical-align:2px;
+  }
+  .pe-completed-chip svg{width:12px;height:12px;fill:#10b981}
+
+  /* head-right meta stats for completion */
+  .pe-meta-row{display:flex; gap:8px; flex-wrap:wrap}
+  .pe-meta{
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.7);
+    backdrop-filter: blur(6px);
+    border:1px solid #eae5f3;
+    border-radius:12px;
+    padding:9px 12px;
+    box-shadow:0 2px 6px rgba(40,30,90,.04);
+  }
+  .pe-meta svg{width:16px; height:16px}
+  .pe-meta small{font-size:10.5px; color:#8a86a3; letter-spacing:.06em; text-transform:uppercase; font-weight:700; display:block; line-height:1}
+  .pe-meta b{font-size:13px; color:#1b1733; font-weight:700; line-height:1; display:block; margin-top:2px; letter-spacing:-.005em}
+  .pe-meta .pe-meta-text{display:flex; flex-direction:column}
+
+  /* full-completion ring */
+  .pe-card .pd-statpill{
+    background:linear-gradient(135deg, rgba(236,253,245,.85), rgba(255,247,237,.85));
+    border-color:#bbf7d0;
+  }
+  .pe-card .pd-statpill .pd-ring b{color:#0f9c5d}
+
+  /* the spark/path stays — but tinted toward gold at the end */
+
+  /* All nodes are passed — the trail just shows progression */
+  .pe-card .pd-node.passed .pd-circle{
+    box-shadow:
+      0 0 0 6px rgba(16,185,129,.08),
+      0 14px 26px -14px rgba(15,156,93,.4);
+  }
+
+  /* Boss in completed state */
+  .pe-card .pd-bossCard{
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,.22), transparent 60%),
+      linear-gradient(160deg, #34d399 0%, #0d9b6c 50%, #065f46 100%);
+    box-shadow:
+      0 22px 44px -18px rgba(5,95,70,.55),
+      inset 0 1px 0 rgba(255,255,255,.32),
+      inset 0 -3px 0 rgba(0,0,0,.10);
+  }
+  .pe-card .pd-bossCard::before{
+    background-image:
+      radial-gradient(circle at 80% 18%, rgba(255,235,150,.30) 0 2px, transparent 3px),
+      radial-gradient(circle at 18% 70%, rgba(255,255,255,.24) 0 2px, transparent 3px),
+      radial-gradient(circle at 62% 88%, rgba(255,235,150,.20) 0 1.5px, transparent 2.5px),
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,.16) 0 1.5px, transparent 2.5px),
+      radial-gradient(circle at 90% 50%, rgba(255,235,150,.18) 0 1.5px, transparent 2.5px);
+  }
+  .pe-card .pd-bossTop .pd-finale svg{fill:#fde68a}
+  .pe-card .pd-bossTop .pd-lockMini{
+    background:rgba(255,255,255,.25);
+    border:1px solid rgba(255,255,255,.4);
+  }
+  .pe-card .pd-bossTop .pd-lockMini svg{fill:#fff}
+  .pe-card .pd-bossCircle{
+    background:
+      radial-gradient(120% 100% at 30% 22%, #fff8d6 0%, #fcd34d 45%, #b45309 100%);
+    border-color: rgba(255,255,255,.92);
+    box-shadow:
+      0 14px 28px -10px rgba(0,0,0,.35),
+      0 0 0 4px rgba(255,255,255,.18),
+      inset 0 -6px 12px rgba(0,0,0,.18);
+  }
+  .pe-card .pd-bossCircle::after{
+    border-color: rgba(255,255,255,.28);
+  }
+  .pe-card .pd-bossCircle svg{filter: drop-shadow(0 2px 4px rgba(120,60,5,.35))}
+  .pe-card .pe-victory-check{
+    position:absolute; right:-4px; top:-4px;
+    width:32px; height:32px; border-radius:50%;
+    background:#fff; display:grid; place-items:center;
+    border:3px solid #ecfdf5;
+    box-shadow:0 5px 12px rgba(0,0,0,.22);
+  }
+  .pe-card .pe-victory-check svg{width:16px; height:16px; fill:#059669}
+  .pe-card .pd-bossRewards{
+    border-top-color: rgba(255,255,255,.32);
+  }
+  .pe-card .pd-bossRewards .pd-reward{
+    background:rgba(255,255,255,.20);
+    border:1px solid rgba(255,255,255,.34);
+  }
+  .pe-card .pd-bossRewards .pd-reward.got{
+    background:#fff;
+    color:#065f46;
+    border:1px solid #fff;
+  }
+  .pe-card .pd-bossRewards .pd-reward.got svg{fill:#059669}
+
+  /* Footer hint becomes a celebratory recap */
+  .pe-card .pd-foot{
+    border-top: 1px dashed #bbf7d0;
+  }
+  .pe-card .pd-foot .pd-bar .pd-meter i{
+    width:100% !important;
+    background: linear-gradient(90deg, #10b981 0%, #fbbf24 60%, #10b981 100%);
+    box-shadow: 0 0 12px rgba(251,191,36,.4);
+  }
+  .pe-recap{
+    display:inline-flex; align-items:center; gap:9px;
+    font-size:13px; color:#0f9c5d; font-weight:700;
+  }
+  .pe-recap svg{width:14px; height:14px; fill:#fbbf24}
+  .pe-recap b{color:#065f46; font-weight:800}
+  .pe-cta-replay{
+    background:#fff; color:#065f46;
+    border:1px solid #bbf7d0;
+    padding:9px 14px; border-radius:10px;
+    font-size:13px; font-weight:700; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px;
+    transition: background .15s ease;
+  }
+  .pe-cta-replay:hover{background:#ecfdf5}
+  .pe-cta-replay svg{width:12px; height:12px; fill:#065f46}
+
+  /* ----- Premium achievement treatment for completed boss ----- */
+  .pe-card .pd-bossCard{
+    border: 1px solid rgba(212,169,81,.30);
+    box-shadow:
+      0 22px 50px -18px rgba(5,95,70,.55),
+      0 0 0 1px rgba(244,212,140,.16),
+      0 0 56px -10px rgba(251,191,36,.22),
+      inset 0 1px 0 rgba(255,255,255,.32),
+      inset 0 -3px 0 rgba(0,0,0,.10);
+  }
+  /* Gold halo around the trophy */
+  .pe-card .pd-bossCircle{
+    box-shadow:
+      0 14px 28px -10px rgba(0,0,0,.40),
+      0 0 0 4px rgba(255,255,255,.22),
+      0 0 0 7px rgba(212,169,81,.20),
+      0 0 32px rgba(251,191,36,.28),
+      inset 0 -6px 12px rgba(0,0,0,.20);
+  }
+  .pe-card .pd-bossCircle::after{
+    inset:-13px;
+    border:1px solid rgba(212,169,81,.28);
+  }
+
+  /* Tiny static sparkles around the trophy */
+  .pe-sparkles{
+    position:absolute; inset:0; pointer-events:none; z-index:2;
+  }
+  .pe-sparkles .sp{
+    position:absolute;
+    width:4px; height:4px; border-radius:50%;
+    background:#fde68a;
+    box-shadow:0 0 6px 1.5px rgba(253,230,138,.55);
+    opacity:0;
+    animation: peSparkle 5.5s ease-in-out infinite;
+  }
+  .pe-sparkles .sp:nth-child(1){top:30%; left:16%; animation-delay:0s}
+  .pe-sparkles .sp:nth-child(2){top:22%; right:16%; width:3px; height:3px; animation-delay:1.8s}
+  .pe-sparkles .sp:nth-child(3){top:46%; right:8%;  width:2.5px; height:2.5px; animation-delay:3.2s}
+  .pe-sparkles .sp:nth-child(4){top:60%; left:8%;   width:2.5px; height:2.5px; animation-delay:4.2s}
+
+  @keyframes peSparkle{
+    0%, 100%{opacity:0; transform:scale(.6)}
+    50%     {opacity:.75; transform:scale(1)}
+  }
+
+  /* Slow, infrequent diagonal shimmer */
+  .pe-shimmer{
+    position:absolute; inset:0;
+    pointer-events:none; z-index:2;
+    border-radius:inherit;
+    overflow:hidden;
+  }
+  .pe-shimmer::before{
+    content:"";
+    position:absolute; top:-20%; bottom:-20%;
+    width:55%;
+    left:-80%;
+    background: linear-gradient(115deg,
+      transparent 0%,
+      rgba(255,244,200,0) 38%,
+      rgba(255,244,200,.16) 50%,
+      rgba(255,244,200,0) 62%,
+      transparent 100%
+    );
+    transform: skewX(-12deg);
+    opacity:0;
+    animation: peShine 5s ease-in-out infinite;
+  }
+  @keyframes peShine{
+    0%, 60%   { left:-80%; opacity:0 }
+    64%       { opacity:1 }
+    82%       { left:130%; opacity:.85 }
+    86%, 100% { opacity:0 }
+  }
+
+
+@media (prefers-reduced-motion: reduce){
+  .pd-node.active .pd-circle::before,
+  .pd-node.active .pd-circle::after,
+  .pd-now i,
+  .pe-shimmer::before,
+  .pe-sparkles .sp { animation: none !important; }
+}
+
+/* Hub layout hooks */
+.lm .map-card.pd-card { margin-top: 22px; }
+.lm .pd-node[role="button"] { cursor: pointer; }
+.lm .pd-node[role="button"]:focus-visible { outline: 2px solid #7c66ff; outline-offset: 3px; border-radius: 12px; }
