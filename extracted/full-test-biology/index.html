@@ -1530,6 +1530,7 @@
 		<script src="/iqmo-nav.js"></script>
 		<script src="/mistakes-store.js"></script>
 		<script src="/chem-progress.js?v=5"></script>
+		<script src="/level-map-state.js?v=1"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from biology-bank.js)
@@ -2893,6 +2894,14 @@
 					v: bossSlot, i: variantInfos.length, isBoss: true, best: bossBest,
 					state: bossBest ? 'done' : (allRegularDone && bossReady ? 'current' : 'locked'),
 				};
+				if (window.IqmoLevelMapState) {
+					currentIdx = IqmoLevelMapState.normalize(
+						variantInfos,
+						bossInfo,
+						function (v) { return gmVariantBest(v); },
+						function (v) { return v && v.status === 'ready'; }
+					);
+				}
 
 				// Метрики карты уровней: XP, звёзды, ср. балл.
 				const stats = lmComputeChapterStats([...variantInfos, bossInfo]);

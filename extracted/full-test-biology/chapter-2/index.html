@@ -611,6 +611,7 @@
 <script src="/exam-config.js"></script>
 <script src="/biology-bank.js?v=79"></script>
 <script src="/biology-variants.js?v=9"></script>
+<script src="/level-map-state.js?v=1"></script>
 <script src="/biology-level-map-render.js?v=1"></script>
 <script>
 (function () {
@@ -731,6 +732,14 @@
     best: bossDone ? bossBest : null,
     state: bossDone ? 'done' : (bossOpen ? 'current' : 'locked')
   };
+
+  if (window.IqmoLevelMapState) {
+    currentIdx = IqmoLevelMapState.normalize(
+      variantInfos,
+      bossInfo,
+      function (v) { return variantBest(v.id); }
+    );
+  }
 
   var allInfos = variantInfos.concat([bossInfo]);
   var stats = { totalNodes: allInfos.length, maxStars: allInfos.length * 3, passed: 0, totalStars: 0, totalXp: 0, avgScore: 0 };
