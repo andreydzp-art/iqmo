@@ -2898,14 +2898,13 @@
 						pdGoVariant(btn.dataset.v, 'current');
 					});
 				});
-				// CTA в hero → текущий вариант
-				picker.querySelectorAll('.lm-btn-primary[data-v]').forEach(btn => {
-					btn.addEventListener('click', e => {
-						e.preventDefault();
-						const v = btn.dataset.v;
+				// Метрика по клику на primary CTA в hero
+				picker.querySelectorAll('.lm-btn-primary[href*="?v="]').forEach(link => {
+					link.addEventListener('click', () => {
+						const m = link.getAttribute('href').match(/[?&]v=(\d+)/);
+						const v = m ? m[1] : '';
 						if (!v) return;
-						try { if (window.ym) ym(108770166, 'reachGoal', 'bio_full_hero_cta', { v }); } catch(e0) {}
-						window.location.search = '?v=' + v;
+						try { if (window.ym) ym(108770166, 'reachGoal', 'bio_full_hero_cta', { v }); } catch (e0) {}
 					});
 				});
 
@@ -3048,8 +3047,8 @@
 
 			function lmHeroHtml({ heroEyebrow, heroLead, heroCtaLabel, stats, heroStats, streakStatus, nextActionId }) {
 				const heroCtaAttrs = nextActionId
-					? `data-v="${nextActionId}" title="Открыть текущий вариант" style="cursor:pointer;"`
-					: `disabled aria-disabled="true" style="opacity:.7; cursor:default;"`;
+					? `href="?v=${nextActionId}" title="Открыть текущий вариант"`
+					: `href="#" aria-disabled="true" style="opacity:.7; pointer-events:none;"`;
 				const hs = heroStats || {
 					totalPoints: 0,
 					level: 1,
@@ -3072,10 +3071,10 @@
 							<h1>Полный вариант ОГЭ <span class="lm-dot">·</span> Биология</h1>
 							<p class="lm-lead">${heroLead}</p>
 							<div class="lm-cta-row">
-								<button class="lm-btn lm-btn-primary" type="button" ${heroCtaAttrs}>
+								<a class="lm-btn lm-btn-primary" ${heroCtaAttrs}>
 									<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
 									${heroCtaLabel}
-								</button>
+								</a>
 								<a href="/subject-biology/" class="lm-btn">
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
 									Расписание

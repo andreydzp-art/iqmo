@@ -56,7 +56,7 @@ a {
 	text-decoration: none;
 }
 
-button:not(.pill-btn) {
+button:not(.pill-btn):not(.lm-btn) {
 	font-family: inherit;
 	cursor: pointer;
 	border: 0;
