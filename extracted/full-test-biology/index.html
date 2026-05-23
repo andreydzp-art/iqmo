@@ -35,6 +35,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="/iqmo-base.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
+		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=3" />
 		<link rel="stylesheet" href="/biology-level-map.css?v=2" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
 		<style>
@@ -1197,144 +1198,6 @@
 			}
 			.lm .lm-num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
-			/* HERO */
-			.lm-hero {
-				background: var(--lm-surface);
-				border: 1px solid var(--lm-line);
-				border-radius: 28px;
-				padding: 28px 32px;
-				box-shadow: var(--lm-shadow);
-				display: grid;
-				grid-template-columns: minmax(0, 1fr) auto;
-				gap: 28px;
-				align-items: center;
-				position: relative;
-				overflow: hidden;
-			}
-			.lm-hero::before {
-				content: ""; position: absolute; inset: auto -10% -60% auto;
-				width: 520px; height: 520px;
-				background: radial-gradient(closest-side, rgba(124,58,237,.10), transparent 70%);
-				pointer-events: none;
-			}
-			.lm-back {
-				color: var(--lm-muted); font-size: 12.5px;
-				display: inline-flex; align-items: center; gap: 6px;
-				text-decoration: none;
-			}
-			.lm-back:hover { color: var(--lm-ink-2); }
-			.lm-hero h1 {
-				margin: 10px 0 8px; font-size: 32px; line-height: 1.1;
-				letter-spacing: -0.02em; font-weight: 800; color: var(--lm-ink);
-			}
-			.lm-hero h1 .lm-dot { color: var(--lm-muted-2); margin: 0 6px; font-weight: 400; }
-			.lm-hero p.lm-lead {
-				margin: 0 0 18px; color: var(--lm-muted);
-				font-size: 14.5px; line-height: 1.55; max-width: 56ch;
-			}
-			.lm-cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
-			.lm-ch2-next {
-				margin-top: 16px;
-				padding: 14px 16px;
-				border-radius: 14px;
-				border: 1px solid #c7d2fe;
-				background: linear-gradient(180deg, #eef0ff 0%, #e0e7ff 100%);
-				box-shadow: 0 4px 14px -6px rgba(79, 70, 229, 0.35);
-			}
-			.lm-ch2-next__eyebrow {
-				display: block;
-				font-size: 11px;
-				font-weight: 700;
-				letter-spacing: 0.06em;
-				text-transform: uppercase;
-				color: #4f46e5;
-				margin-bottom: 6px;
-			}
-			.lm-ch2-next__row {
-				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				justify-content: space-between;
-				gap: 12px;
-			}
-			.lm-ch2-next__txt {
-				flex: 1 1 220px;
-				font-size: 14px;
-				line-height: 1.45;
-				color: var(--ink);
-				margin: 0;
-			}
-			a.lm-btn-ch2-cta {
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				gap: 6px;
-				padding: 10px 18px;
-				border-radius: 999px;
-				font-weight: 700;
-				font-size: 14px;
-				text-decoration: none;
-				white-space: nowrap;
-				background: linear-gradient(180deg, #6366f1, #4f46e5);
-				color: #fff;
-				box-shadow: 0 6px 18px -8px rgba(79, 70, 229, 0.65);
-			}
-			a.lm-btn-ch2-cta:hover { filter: brightness(1.05); }
-			.lm-btn {
-				height: 42px; padding: 0 16px; border-radius: 12px;
-				border: 1px solid var(--lm-line); background: var(--lm-surface);
-				font-weight: 600; font-size: 13.5px; color: var(--lm-ink-2);
-				display: inline-flex; align-items: center; gap: 8px;
-				cursor: pointer; transition: background .15s, border-color .15s;
-			}
-			.lm-btn:hover { background: var(--lm-bg-2); }
-			.lm-btn-streak {
-				background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
-				border-color: #fed7aa; color: #9a3412;
-			}
-			.lm-btn-streak:hover { background: linear-gradient(180deg, #ffedd5 0%, #fed7aa 100%); }
-
-			.lm-stat-cluster {
-				display: grid; grid-template-columns: repeat(4, auto);
-				border: 1px solid var(--lm-line);
-				border-radius: 18px;
-				background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
-				overflow: hidden;
-				min-width: 540px;
-			}
-			.lm-stat {
-				padding: 16px 22px;
-				display: flex; align-items: center; gap: 12px;
-				border-right: 1px solid var(--lm-line-2);
-				white-space: nowrap;
-			}
-			.lm-stat:last-child { border-right: none; }
-			.lm-stat-ico {
-				width: 38px; height: 38px; border-radius: 10px;
-				display: inline-flex; align-items: center; justify-content: center;
-				flex-shrink: 0;
-			}
-			.lm-ico-star { background: #fff7d6; color: #b45309; }
-			.lm-ico-fire { background: #ffe4e1; color: #dc2626; }
-			.lm-ico-xp   { background: var(--lm-violet-50); color: var(--lm-violet); }
-			.lm-ico-lvl  { background: var(--lm-primary-50); color: var(--lm-primary); }
-			.lm-stat-val {
-				font-size: 19px; font-weight: 800; letter-spacing: -.01em;
-				line-height: 1; color: var(--lm-ink);
-			}
-			.lm-stat-lbl {
-				font-size: 11.5px; color: var(--lm-muted); margin-top: 4px;
-				letter-spacing: .02em;
-			}
-			.lm-stat .lm-num { font-weight: 800; }
-			.lm-stat-lvl-num {
-				font-size: 26px; font-weight: 800;
-				background: linear-gradient(180deg, var(--lm-primary) 0%, var(--lm-violet) 100%);
-				-webkit-background-clip: text; background-clip: text;
-				-webkit-text-fill-color: transparent;
-				line-height: 1;
-			}
-
 			/* BOTTOM CARDS */
 			.lm-grid4 {
 				margin-top: 22px;
@@ -1423,15 +1286,10 @@
 			.lm-tip b { font-weight: 700; }
 
 			@media (max-width: 980px) {
-				.lm-hero { grid-template-columns: 1fr; }
-				.lm-stat-cluster { min-width: 0; grid-template-columns: repeat(2, 1fr); }
-				.lm-stat:nth-child(2n) { border-right: none; }
 				.lm-grid4 { grid-template-columns: repeat(2, 1fr); }
 			}
 			@media (max-width: 640px) {
 				.lm-grid4 { grid-template-columns: 1fr; }
-				.lm-hero { padding: 22px; }
-				.lm-hero h1 { font-size: 26px; }
 			}
 		</style>
 	</head>
@@ -2968,13 +2826,33 @@
 				const ringPct = stats.totalNodes ? Math.round(100 * stats.passed / stats.totalNodes) : 0;
 				const dashOffset = Math.max(0, Math.round(226 * (1 - ringPct / 100)));
 
+				const heroEyebrow = bossBest
+					? 'Глава 1 · Завершена'
+					: (allRegularDone && !bossBest)
+						? 'Финальный босс · Открыт'
+						: 'Глава 1 · Полный вариант ОГЭ';
 				const heroLead = (allRegularDone && !bossBest)
-					? 'Все варианты пройдены. Открыт финальный босс — победите его, чтобы получить мастер-уровень.'
+					? 'Все шесть вариантов пройдены. Победите супер-босса, чтобы открыть главу 2.'
 					: (bossBest)
-						? 'Глава 1 завершена. Доступна глава 2 — демо-варианты ФИПИ (кнопка ниже). Здесь можно перерешивать варианты, чтобы поднять звёзды.'
-						: 'Проходите варианты по порядку. Следующий открывается, когда вы набираете не менее 50 % правильных ответов в части 1 текущего варианта.';
+						? 'Шесть вариантов и супер-босс пройдены. Перерешивайте варианты, чтобы поднять звёзды.'
+						: 'Проходите варианты по порядку. Следующий откроется при результате ≥ 50 % в части 1.';
 
 				const seen = gmLoadSeen();
+
+				// Куда ведёт primary CTA в hero.
+				let nextActionId = null;
+				if (currentIdx >= 0) nextActionId = variantInfos[currentIdx].v.id;
+				else if (allRegularDone && !bossBest) nextActionId = bossSlot.id;
+				else if (variantInfos.length) nextActionId = variantInfos[0].v.id;
+
+				let heroCtaLabel = 'Начать вариант 1';
+				if (nextActionId === bossSlot.id) heroCtaLabel = 'К супер-боссу';
+				else if (bossBest) heroCtaLabel = 'Перерешать варианты';
+				else if (currentIdx >= 0) heroCtaLabel = 'Продолжить вариант ' + (currentIdx + 1);
+				else if (nextActionId) {
+					const ni = variantInfos.findIndex(vi => vi.v.id === nextActionId);
+					if (ni >= 0) heroCtaLabel = 'Начать вариант ' + (ni + 1);
+				}
 				// «realLevel» — отдельное поле, чтобы новая (реальная) шкала уровней
 				// не давала ложных level-up на пользователях, у которых seen.level
 				// был сохранён по старой формуле gmComputedStats.
@@ -2984,17 +2862,12 @@
 					: (currentIdx >= 0 && variantInfos[currentIdx].v.id !== seen.lastUnlockedId
 						? variantInfos[currentIdx].v.id : null);
 
-				// Куда ведёт CTA «Начните серию» в hero: первый недопройденный
-				// обычный вариант → босс, если все 6 пройдены → первый вариант
 				// для перепрохождения, если пройдено всё, включая босса.
-				let nextActionId = null;
-				if (currentIdx >= 0) nextActionId = variantInfos[currentIdx].v.id;
-				else if (allRegularDone && !bossBest) nextActionId = bossSlot.id;
-				else if (variantInfos.length) nextActionId = variantInfos[0].v.id;
 
 				picker.innerHTML = `
-					<div class="lm-shell">
-						${lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId, chapter2Unlocked: !!bossBest })}
+					<div class="lm lm-shell">
+						${lmHeroHtml({ heroEyebrow, heroLead, heroCtaLabel, stats, heroStats, streakStatus, nextActionId })}
+						${bossBest ? lmCh2PromoHtml() : ''}
 						${lmMapHtml({ variantInfos, bossInfo, currentIdx, stats })}
 						${lmGrid4Html({ stats, globalStats, streakStatus })}
 						${lmTipHtml(stats, bossInfo)}
@@ -3025,8 +2898,8 @@
 						pdGoVariant(btn.dataset.v, 'current');
 					});
 				});
-				// CTA в hero «Начните серию / Серия N дней» → текущий вариант
-				picker.querySelectorAll('.lm-btn-streak[data-v]').forEach(btn => {
+				// CTA в hero → текущий вариант
+				picker.querySelectorAll('.lm-btn-primary[data-v]').forEach(btn => {
 					btn.addEventListener('click', e => {
 						e.preventDefault();
 						const v = btn.dataset.v;
@@ -3161,19 +3034,27 @@
 				};
 			}
 
-			function lmHeroHtml({ heroLead, stats, globalStats, heroStats, streakStatus, nextActionId, chapter2Unlocked }) {
+			function lmCh2PromoHtml() {
+				return `
+					<section class="lm-ch2-promo" role="region" aria-label="Переход ко 2 главе">
+						<span class="lm-ch2-promo__eyebrow">Следующий этап</span>
+						<div class="lm-ch2-promo__row">
+							<p class="lm-ch2-promo__txt">Глава 2 · демо-варианты ФИПИ — новая карта: 6 вариантов и супер-босс.</p>
+							<a href="/full-test-biology/chapter-2/" class="lm-btn-ch2-cta">Перейти в главу 2 →</a>
+						</div>
+					</section>
+				`;
+			}
+
+			function lmHeroHtml({ heroEyebrow, heroLead, heroCtaLabel, stats, heroStats, streakStatus, nextActionId }) {
 				const heroCtaAttrs = nextActionId
 					? `data-v="${nextActionId}" title="Открыть текущий вариант" style="cursor:pointer;"`
 					: `disabled aria-disabled="true" style="opacity:.7; cursor:default;"`;
-				const heroCtaLabel = streakStatus.days > 0
-					? 'Серия ' + streakStatus.days + ' ' + (streakStatus.days === 1 ? 'день' : 'дн.') + (streakStatus.todayDone ? ' · сегодня ✓ — продолжить' : ' — продолжить')
-					: 'Начните серию — пройдите вариант сегодня';
-				// Реальные XP/уровень — приоритет, иначе fallback на устаревшую формулу.
 				const hs = heroStats || {
-					totalPoints: globalStats.totalXp,
-					level: globalStats.level,
-					title: globalStats.title,
-					xpToNext: 100 - (globalStats.totalXp % 100),
+					totalPoints: 0,
+					level: 1,
+					title: '—',
+					xpToNext: 100,
 					isMax: false
 				};
 				const xpToNextLabel = hs.isMax ? 'Максимальный уровень' : ('Уровень · ' + hs.xpToNext + ' XP до след.');
@@ -3184,11 +3065,15 @@
 								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
 								К предмету
 							</a>
+							<div class="lm-eyebrow">
+								<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18.2 22 12 18l-6.2 4 1.7-7.2L2 10l7.1-1.1z"/></svg>
+								${heroEyebrow}
+							</div>
 							<h1>Полный вариант ОГЭ <span class="lm-dot">·</span> Биология</h1>
 							<p class="lm-lead">${heroLead}</p>
 							<div class="lm-cta-row">
-								<button class="lm-btn lm-btn-streak" type="button" ${heroCtaAttrs}>
-									<svg width="14" height="14" viewBox="0 0 24 24" fill="#ea580c"><path d="M13.5 0c.7 4.6-1.7 6.6-3.6 8.4-1.7 1.6-3.4 3.3-3.4 6.4 0 4.4 3.5 8 7.9 8s7.9-3.6 7.9-8c0-2.7-1.4-5.6-3.5-8.1-2.5-3-4.5-5-5.3-6.7zM12 19.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+								<button class="lm-btn lm-btn-primary" type="button" ${heroCtaAttrs}>
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
 									${heroCtaLabel}
 								</button>
 								<a href="/subject-biology/" class="lm-btn">
@@ -3196,14 +3081,6 @@
 									Расписание
 								</a>
 							</div>
-							${chapter2Unlocked ? `
-							<div class="lm-ch2-next" role="region" aria-label="Переход ко 2 главе">
-								<span class="lm-ch2-next__eyebrow">Следующий этап</span>
-								<div class="lm-ch2-next__row">
-									<p class="lm-ch2-next__txt">Глава 2 · демо-варианты ФИПИ — новая карта: 6 вариантов и супер-босс.</p>
-									<a href="/full-test-biology/chapter-2/" class="lm-btn-ch2-cta">Перейти в главу 2 →</a>
-								</div>
-							</div>` : ''}
 						</div>
 						<div class="lm-stat-cluster" role="group" aria-label="Прогресс">
 							<div class="lm-stat">
