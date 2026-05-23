@@ -497,19 +497,11 @@
     box-shadow:0 5px 12px rgba(0,0,0,.22);
   }
   .pe-card .pe-victory-check svg{width:16px; height:16px; fill:#059669}
-  .pe-card .pd-bossRewards{
-    border-top-color: rgba(255,255,255,.32);
-  }
-  .pe-card .pd-bossRewards .pd-reward{
-    background:rgba(255,255,255,.20);
-    border:1px solid rgba(255,255,255,.34);
-  }
-  .pe-card .pd-bossRewards .pd-reward.got{
-    background:#fff;
-    color:#065f46;
-    border:1px solid #fff;
-  }
-  .pe-card .pd-bossRewards .pd-reward.got svg{fill:#059669}
+  /* Completed chapter: hide boss reward chips (same as chemistry pg-card) */
+  .pe-card .pd-bossRewards{display:none}
+  .pe-card .pe-sparkles{display:none}
+  .pe-card .pd-bossName{font-size:17px; margin-top:4px}
+  .pe-card .pd-bossState{font-size:12px; margin-top:4px; opacity:.92}
 
   /* Footer hint becomes a celebratory recap */
   .pe-card .pd-foot{
