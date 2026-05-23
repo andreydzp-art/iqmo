@@ -165,3 +165,16 @@
 	color: var(--ink-2, #2a2e4a);
 	font-weight: 700;
 }
+
+@media (max-width: 768px) {
+	:root {
+		--site-gutter: 16px;
+	}
+	.shell {
+		padding-top: 16px;
+		padding-bottom: 40px;
+	}
+	.topnav .nav-mid {
+		display: none;
+	}
+}

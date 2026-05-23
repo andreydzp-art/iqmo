@@ -22,7 +22,7 @@
 
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=1320" />
 		<title>IQMO — Профиль</title>
 		<meta name="description" content="Прогресс по химии ОГЭ: темы, попытки, вехи и банк ошибок." />
 		<link rel="canonical" href="https://www.iqmoschool.ru/profile/" />
@@ -37,7 +37,7 @@
 		     перекрыт правилом body { font-family: 'Inter', ... } ниже. -->
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="/iqmo-base.css?v=3" />
-		<link rel="stylesheet" href="/iqmo-topnav.css?v=3" />
+		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
 		<style>
 			/* === IQMO · Профиль · редизайн v6 (handoff-profile from designer)
 			   Структура HTML и все JS-хуки (id="prof-..." и .prof-badge-*)
@@ -86,10 +86,9 @@
 				margin: 0; padding: 0;
 			}
 			h1, h2, h3, p { margin: 0; }
-			.container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 28px; }
-
 			/* Shell-обёртка (аналог subject-biology) */
-			.shell { min-height:100vh; display:flex; flex-direction:column; }
+			/* Ширина — общий .shell (1280px), как на subject-chemistry */
+			.shell { min-height: 100vh; display: flex; flex-direction: column; }
 
 			/* ----- Кнопки ----- */
 			.btn {
@@ -113,7 +112,7 @@
 			.btn--danger:hover { background: #fef2f2; border-color: #dc2626; }
 
 			/* ----- Layout ----- */
-			.page__main { flex: 1 0 auto; padding: 8px 0 56px; }
+			.page__main { flex: 1 0 auto; padding: 0 0 56px; }
 			/* .crumbs — стили берутся из /iqmo-base.css */
 
 			.page-title {
@@ -226,7 +225,6 @@
 				gap: 14px; margin-top: 14px;
 			}
 			@media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-			@media (max-width: 768px)  { .nav-mid { display: none; } }
 			@media (max-width: 640px)  { .grid { grid-template-columns: 1fr; } }
 
 			/* ----- Чек-листы тем ----- */
@@ -307,14 +305,19 @@
 			/* ----- Footer ----- */
 			.footer {
 				background: var(--surface);
-				border-top: 1px solid var(--line);
-				margin-top: auto;
-				font-size: 13px; color: var(--muted);
+				border: 1px solid var(--line);
+				border-radius: 22px;
+				margin-top: 32px;
+				font-size: 13px;
+				color: var(--muted);
+				box-shadow: var(--shadow-sm);
 			}
 			.footer__inner {
-				padding: 24px;
-				display: flex; justify-content: space-between;
-				gap: 16px; flex-wrap: wrap;
+				padding: 24px 28px;
+				display: flex;
+				justify-content: space-between;
+				gap: 16px;
+				flex-wrap: wrap;
 			}
 			.footer a:hover { color: var(--primary); }
 		</style>
@@ -344,7 +347,6 @@
 		</nav>
 
 		<main class="page__main">
-			<div class="container">
 				<h1 class="page-title">Профиль</h1>
 				<p class="page-lead iqmo-only-guest">
 					Здесь собран прогресс по химии ОГЭ. Сейчас он хранится только в этом браузере — при очистке данных или на другом устройстве его не будет.
@@ -492,11 +494,10 @@
 						Счётчик «баллы за неделю» и лига — это накопление XP за календарную неделю для сравнения с вашими прошлыми неделями. Без входа данные только в этом браузере; после входа на серверной версии сайта они подгружаются с облака.
 					</p>
 				</div>
-			</div>
 		</main>
 
 		<footer class="footer">
-			<div class="container footer__inner">
+			<div class="footer__inner">
 				<span>© IQMO · 2026 · ООО «Контент Айти» · ИНН 7810985013</span>
 				<span><a href="/">На главную</a> · <a href="/docs/privacy_policy.pdf" target="_blank" rel="noopener">Политика</a> · <a href="/docs/oferta.pdf" target="_blank" rel="noopener">Оферта</a></span>
 			</div>
