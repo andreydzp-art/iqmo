@@ -1,10 +1,10 @@
-/* Register modal — same UX as main site (index-standalone-design.html) */
+/* Register modal — цвета как на главной (index-standalone-design.html) */
 .modal {
-  --primary: #4f46e5;
+  --primary: #5b3df5;
   --primary-soft: #ece8ff;
-  --mint: #10b981;
+  --mint: #23d3a4;
   --mint-soft: #daf6ec;
-  --coral: #ef4444;
+  --coral: #ff6b6b;
   --sun: #ffd23a;
   --ink: #0e0e12;
   --ink-2: #3b3d49;
@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Manrope", system-ui, sans-serif;
 }
 .modal.is-open { display: flex; }
 .modal__backdrop {
