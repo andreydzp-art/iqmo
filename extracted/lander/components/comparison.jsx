@@ -43,48 +43,54 @@ const Comparison = () => {
         <div className="cmp-grid">
           {/* Tutor card */}
           <div className="cmp-card cmp-tutor">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 12,
-                  background: "var(--ink-100)", color: "var(--ink-500)",
-                  display: "grid", placeItems: "center",
-                }}><IconUsers size={22} stroke={2}/></div>
-                <div>
-                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 22, color: "var(--ink-700)", letterSpacing: "-.02em" }}>Репетитор</div>
-                  <div style={{ fontSize: 12, color: "var(--ink-500)", fontWeight: 600, marginTop: 2 }}>классический формат</div>
-                </div>
-              </div>
-              <div style={{
-                padding: "5px 10px", borderRadius: 999,
-                background: "var(--ink-50)", color: "var(--ink-500)",
-                fontSize: 10, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase",
-                border: "1px solid var(--border-strong)",
-              }}>Дорого</div>
-            </div>
-
-            <div style={{
-              padding: "18px 20px", borderRadius: 18,
-              background: "var(--ink-50)",
-              border: "1px solid var(--border)",
-              marginBottom: 20,
-            }}>
-              <div style={{ fontSize: 11, color: "var(--ink-500)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>стоимость</div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 38, color: "var(--ink-700)", letterSpacing: "-.03em", textDecoration: "line-through", textDecorationColor: "rgba(244,63,94,.5)", textDecorationThickness: 3 }}>2 000 – 4 000 ₽</span>
-              </div>
-              <div style={{ fontSize: 13, color: "var(--ink-500)", fontWeight: 600, marginTop: 2 }}>за&nbsp;один час занятия</div>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {tutor.map((r, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--ink-100)", color: "var(--ink-500)", display: "grid", placeItems: "center", flexShrink: 0 }}>
-                    <r.i size={12} stroke={2.5}/>
+            <div className="cmp-card__body">
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: "var(--ink-100)", color: "var(--ink-500)",
+                    display: "grid", placeItems: "center",
+                  }}><IconUsers size={22} stroke={2}/></div>
+                  <div>
+                    <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 22, color: "var(--ink-700)", letterSpacing: "-.02em" }}>Репетитор</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-500)", fontWeight: 600, marginTop: 2 }}>классический формат</div>
                   </div>
-                  <span style={{ fontSize: 14, color: "var(--ink-600)", fontWeight: 500 }} dangerouslySetInnerHTML={{ __html: r.t }}/>
                 </div>
-              ))}
+                <div style={{
+                  padding: "5px 10px", borderRadius: 999,
+                  background: "var(--ink-50)", color: "var(--ink-500)",
+                  fontSize: 10, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase",
+                  border: "1px solid var(--border-strong)",
+                }}>Дорого</div>
+              </div>
+
+              <div style={{
+                padding: "18px 20px", borderRadius: 18,
+                background: "var(--ink-50)",
+                border: "1px solid var(--border)",
+                marginBottom: 20,
+              }}>
+                <div style={{ fontSize: 11, color: "var(--ink-500)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>стоимость</div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 38, color: "var(--ink-700)", letterSpacing: "-.03em", textDecoration: "line-through", textDecorationColor: "rgba(244,63,94,.5)", textDecorationThickness: 3 }}>2 000 – 4 000 ₽</span>
+                </div>
+                <div style={{ fontSize: 13, color: "var(--ink-500)", fontWeight: 600, marginTop: 2 }}>за&nbsp;один час занятия</div>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {tutor.map((r, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--ink-100)", color: "var(--ink-500)", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                      <r.i size={12} stroke={2.5}/>
+                    </div>
+                    <span style={{ fontSize: 14, color: "var(--ink-600)", fontWeight: 500 }} dangerouslySetInnerHTML={{ __html: r.t }}/>
+                  </div>
+                ))}
+              </div>
+
+              <div className="cmp-card__cta-spacer" aria-hidden="true">
+                <span>Попробовать бесплатно</span>
+              </div>
             </div>
           </div>
 
@@ -109,7 +115,7 @@ const Comparison = () => {
               WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
             }}/>
 
-            <div style={{ position: "relative", zIndex: 1, color: "white" }}>
+            <div className="cmp-card__body" style={{ position: "relative", zIndex: 1, color: "white" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <div style={{
@@ -167,16 +173,8 @@ const Comparison = () => {
                 ))}
               </div>
 
-              <div style={{ marginTop: 24 }}>
-                <button type="button" data-open-register data-cta-source="comparison" style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  padding: "16px 22px", borderRadius: 999,
-                  background: "white", color: "var(--indigo-700)",
-                  fontWeight: 700, fontSize: 15,
-                  boxShadow: "0 14px 30px -10px rgba(0,0,0,.3)",
-                  transition: "transform .15s ease",
-                  border: 0, cursor: "pointer", width: "100%",
-                }}>
+              <div className="cmp-card__cta">
+                <button type="button" data-open-register data-cta-source="comparison" className="cmp-card__cta-btn">
                   Попробовать бесплатно <IconArrow size={16} stroke={2.5}/>
                 </button>
               </div>
@@ -216,7 +214,7 @@ const Comparison = () => {
       <style>{`
         .cmp-grid {
           display: grid;
-          grid-template-columns: 1fr 1.1fr;
+          grid-template-columns: 1fr 1fr;
           gap: 20px;
           align-items: stretch;
         }
@@ -225,6 +223,55 @@ const Comparison = () => {
           border-radius: 28px;
           position: relative;
           overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        .cmp-card__body {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          height: 100%;
+        }
+        .cmp-card__cta {
+          margin-top: auto;
+          padding-top: 24px;
+        }
+        .cmp-card__cta-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          padding: 16px 22px;
+          border-radius: 999px;
+          background: white;
+          color: var(--indigo-700);
+          font-weight: 700;
+          font-size: 15px;
+          box-shadow: 0 14px 30px -10px rgba(0,0,0,.3);
+          border: 0;
+          cursor: pointer;
+          transition: transform .15s ease;
+        }
+        .cmp-card__cta-spacer {
+          margin-top: auto;
+          padding-top: 24px;
+          visibility: hidden;
+          pointer-events: none;
+          user-select: none;
+        }
+        .cmp-card__cta-spacer span {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          padding: 16px 22px;
+          border-radius: 999px;
+          font-weight: 700;
+          font-size: 15px;
+          line-height: 1.2;
         }
         .cmp-tutor {
           background: white;
@@ -234,11 +281,10 @@ const Comparison = () => {
         .cmp-iqmo {
           border-radius: 28px;
           box-shadow: 0 40px 80px -30px rgba(99,102,241,.55), 0 20px 40px -20px rgba(124,58,237,.4);
-          transform: translateY(-12px) scale(1.02);
         }
         @media (max-width: 900px) {
           .cmp-grid { grid-template-columns: 1fr; gap: 16px; }
-          .cmp-iqmo { transform: none; }
+          .cmp-card__cta-spacer { display: none; }
         }
       `}</style>
     </section>
