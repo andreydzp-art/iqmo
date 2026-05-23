@@ -1650,7 +1650,8 @@
 		<script src="/mistakes-store.js"></script>
 		<script src="/chem-progress.js?v=5"></script>
 		<script src="/level-map-state.js?v=1"></script>
-		<script src="/chemistry-level-map-render.js?v=1"></script>
+		<script src="/level-map-xp.js?v=1"></script>
+		<script src="/chemistry-level-map-render.js?v=2"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from chemistry-bank.js)
@@ -2281,7 +2282,7 @@
 				const selfNeedsReview = hasSelf && s.selfReviewed < s.selfTotal;
 				// Геймификация: звёзды и XP за этот вариант (по части 1).
 				const gmStarsThis = gmStarsForPercent(s.part1Percent);
-				const gmXpThis = gmXpForVariant(s.part1Percent);
+				const gmXpThis = gmXpForVariant(s.part1Percent, activeVariant && activeVariant.id);
 				const gmGotPass = s.part1Percent >= 50;
 				try {
 					if (gmStarsThis === 3 && window.ym) ym(108770166, 'reachGoal', 'stars_3', { variant: activeVariant && activeVariant.id });
@@ -2327,7 +2328,7 @@
 								const best = gmVariantBest(v);
 								if (best && best.percent >= 50) {
 									ch1Stars += gmStarsForPercent(best.percent);
-									ch1XpSum += gmXpForVariant(best.percent);
+									ch1XpSum += gmXpForVariant(best.percent, v.id);
 									pctSum += best.percent;
 									pctN++;
 								}
@@ -2812,12 +2813,12 @@
 					return { ok, total, percent: Math.round(100 * ok / total) };
 				} catch (e) { return null; }
 			}
-			function gmXpForVariant(percent) {
-				if (percent < 50) return 0;          // не зачёт — XP не идёт (cooldown логика)
-				let xp = 100;                         // base за прохождение
-				if (percent >= 80) xp += 50;
-				if (percent >= 90) xp += 50;          // 100 + 50 + 50 = 200 за 3★
-				return xp;
+			function gmXpForVariant(percent, variantId) {
+				if (window.IqmoLevelMapXp && variantId != null) {
+					return IqmoLevelMapXp.xpForVariantId('chemistry', variantId, percent);
+				}
+				if (percent < 50) return 0;
+				return 100;
 			}
 			function gmComputedStats(variants) {
 				let totalXp = 0, totalStars = 0, passed = 0;
@@ -2828,7 +2829,7 @@
 					const stars = gmStarsForPercent(best.percent);
 					totalStars += stars;
 					if (stars >= 1) passed++;
-					totalXp += gmXpForVariant(best.percent);
+					totalXp += gmXpForVariant(best.percent, v.id);
 				});
 				// XP за серию (бонус)
 				try {
@@ -3138,7 +3139,6 @@
 						currentIdx: currentIdx,
 						stats: stats,
 						starsForPercent: gmStarsForPercent,
-						xpForVariant: gmXpForVariant,
 						onGo: function (v, st) {
 							if (st === 'locked') {
 								alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
@@ -3252,6 +3252,25 @@
 			// ── helpers (lm-*) ────────────────────────────────────────────
 
 			function lmComputeChapterStats(allInfos) {
+				if (window.IqmoLevelMapXp) {
+					let totalScore = 0, scoredCount = 0, passed = 0, totalStars = 0;
+					allInfos.forEach(vi => {
+						if (vi.best && vi.best.percent >= 50) {
+							passed++;
+							totalScore += vi.best.percent;
+							scoredCount++;
+							totalStars += gmStarsForPercent(vi.best.percent);
+						}
+					});
+					return {
+						totalNodes: allInfos.length,
+						maxStars: allInfos.length * 3,
+						passed,
+						totalStars,
+						totalXp: IqmoLevelMapXp.sumChapterXp(allInfos),
+						avgScore: scoredCount ? Math.round(totalScore / scoredCount) : 0,
+					};
+				}
 				let totalScore = 0, scoredCount = 0, passed = 0, totalStars = 0, totalXp = 0;
 				allInfos.forEach(vi => {
 					if (vi.best) {
@@ -3260,7 +3279,7 @@
 						scoredCount++;
 						const stars = gmStarsForPercent(vi.best.percent);
 						totalStars += stars;
-						totalXp += gmXpForVariant(vi.best.percent);
+						totalXp += gmXpForVariant(vi.best.percent, vi.v && vi.v.id);
 					}
 				});
 				const avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;

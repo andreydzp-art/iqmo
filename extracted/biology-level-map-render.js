@@ -220,7 +220,9 @@
 		let body = '';
 		if (pdState === 'passed' && vi.best) {
 			const stars = _mapCfg.starsForPercent(vi.best.percent);
-			const xp = _mapCfg.xpForVariant(vi.best.percent);
+			const xp = global.IqmoLevelMapXp
+				? IqmoLevelMapXp.xpForPassedNode(idx, false, vi.best.percent)
+				: (_mapCfg.xpForVariant ? _mapCfg.xpForVariant(vi.best.percent) : 0);
 			body = `
 		<div class="pd-state passed">${PD_CHECK_SVG} Пройден · ${vi.best.percent}%</div>
 		${pdStarsHtml(stars)}
@@ -255,7 +257,9 @@
 		const bossName = cfg.bossName || 'Сложный вариант';
 		if (chapterComplete && bossInfo.best) {
 			const stars = _mapCfg.starsForPercent(bossInfo.best.percent);
-			const xp = _mapCfg.xpForVariant(bossInfo.best.percent);
+			const bossXp = global.IqmoLevelMapXp
+				? IqmoLevelMapXp.xpForPassedNode(0, true, bossInfo.best.percent)
+				: (_mapCfg.xpForVariant ? _mapCfg.xpForVariant(bossInfo.best.percent) : 550);
 			return `
 		<div class="pd-node boss passed" data-v="${v.id}" data-state="done" role="button" tabindex="0">
 			<div class="pd-kicker boss" style="color:#0f9c5d">${PD_CHECK_SVG} Глава завершена</div>
@@ -273,7 +277,7 @@
 				<div class="pd-bossName">${bossName}</div>
 				<div class="pd-bossState">Побеждён · ${bossInfo.best.percent}%</div>
 				<div class="pd-bossRewards">
-			<span class="pd-reward got">${PD_CHECK_SVG} +${xp || 500} XP</span>
+			<span class="pd-reward got">${PD_CHECK_SVG} +${bossXp} XP</span>
 			<span class="pd-reward got">${PD_CHECK_SVG} Бейдж</span>
 			<span class="pd-reward got">${PD_CHECK_SVG} ${stars}★</span>
 				</div>
@@ -297,6 +301,7 @@
 			</button>` : '';
 		const dataAttrs = !locked ? ` data-v="${v.id}" data-state="${state}"` : ` data-v="${v.id}" data-state="locked"`;
 		const kicker = '<div class="pd-kicker boss"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg> Финал главы</div>';
+		const previewBossXp = global.IqmoLevelMapXp ? IqmoLevelMapXp.bossPreviewXp() : 550;
 		return `
 			<div class="pd-node boss${locked ? ' locked' : (current ? ' active' : ' passed')}"${dataAttrs}${!locked ? ' role="button" tabindex="0"' : ''}>
 		${kicker}
@@ -311,7 +316,7 @@
 			<div class="pd-bossName">${bossName}</div>
 			<div class="pd-bossState">${bossStateTxt}</div>
 			<div class="pd-bossRewards">
-				<span class="pd-reward"><svg viewBox="0 0 24 24"><path d="${PD_STAR_PATH}"/></svg> +500 XP</span>
+				<span class="pd-reward"><svg viewBox="0 0 24 24"><path d="${PD_STAR_PATH}"/></svg> +${previewBossXp} XP</span>
 				<span class="pd-reward">${PD_TROPHY_SVG} Бейдж</span>
 			</div>
 			${bossDesc ? '<div class="pd-bossDesc">' + bossDesc + '</div>' : ''}

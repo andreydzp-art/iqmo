@@ -612,7 +612,8 @@
 <script src="/biology-bank.js?v=79"></script>
 <script src="/biology-variants.js?v=9"></script>
 <script src="/level-map-state.js?v=1"></script>
-<script src="/biology-level-map-render.js?v=1"></script>
+<script src="/level-map-xp.js?v=1"></script>
+<script src="/biology-level-map-render.js?v=2"></script>
 <script>
 (function () {
   var CH2_SLOTS = [
@@ -692,12 +693,10 @@
     return 0;
   }
 
-  function xpForVariant(p) {
+  function xpForVariant(p, nodeIndex, isBoss) {
+    if (window.IqmoLevelMapXp) return IqmoLevelMapXp.xpForPassedNode(nodeIndex, isBoss, p);
     if (p < 50) return 0;
-    var xp = 100;
-    if (p >= 80) xp += 50;
-    if (p >= 90) xp += 50;
-    return xp;
+    return 50 * (nodeIndex + 1);
   }
 
   function isPassed(vid) {
@@ -744,13 +743,13 @@
   var allInfos = variantInfos.concat([bossInfo]);
   var stats = { totalNodes: allInfos.length, maxStars: allInfos.length * 3, passed: 0, totalStars: 0, totalXp: 0, avgScore: 0 };
   var totalScore = 0, scoredCount = 0;
-  allInfos.forEach(function (vi) {
+  allInfos.forEach(function (vi, idx) {
     if (vi.best && vi.best.percent >= 50) {
       stats.passed++;
       totalScore += vi.best.percent;
       scoredCount++;
       stats.totalStars += starsForPercent(vi.best.percent);
-      stats.totalXp += xpForVariant(vi.best.percent);
+      stats.totalXp += xpForVariant(vi.best.percent, vi.isBoss ? 5 : idx, !!vi.isBoss);
     }
   });
   stats.avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
@@ -768,7 +767,6 @@
       currentIdx: currentIdx,
       stats: stats,
       starsForPercent: starsForPercent,
-      xpForVariant: xpForVariant,
       baseUrl: '/full-test-biology/?v='
     });
   }
@@ -806,7 +804,7 @@
   }
 })();
 </script>
-<script src="/iqmo-chapter2-access.js?v=2"></script>
+<script src="/iqmo-chapter2-access.js?v=3"></script>
 <script src="/iqmo-sync.js"></script>
 <script src="/iqmo-nav.js"></script>
 <script src="/iqmo-companion.js"></script>

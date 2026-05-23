@@ -1531,6 +1531,7 @@
 		<script src="/mistakes-store.js"></script>
 		<script src="/chem-progress.js?v=5"></script>
 		<script src="/level-map-state.js?v=1"></script>
+		<script src="/level-map-xp.js?v=1"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from biology-bank.js)
@@ -2160,7 +2161,7 @@
 				const selfNeedsReview = hasSelf && s.selfReviewed < s.selfTotal;
 				// Геймификация: звёзды и XP за этот вариант (по части 1).
 				const gmStarsThis = gmStarsForPercent(s.part1Percent);
-				const gmXpThis = gmXpForVariant(s.part1Percent);
+				const gmXpThis = gmXpForVariant(s.part1Percent, activeVariant && activeVariant.id);
 				const gmGotPass = s.part1Percent >= 50;
 				try {
 					if (gmStarsThis === 3 && window.ym) ym(108770166, 'reachGoal', 'stars_3', { variant: activeVariant && activeVariant.id });
@@ -2675,12 +2676,12 @@
 					return { ok, total, percent: Math.round(100 * ok / total) };
 				} catch (e) { return null; }
 			}
-			function gmXpForVariant(percent) {
-				if (percent < 50) return 0;          // не зачёт — XP не идёт (cooldown логика)
-				let xp = 100;                         // base за прохождение
-				if (percent >= 80) xp += 50;
-				if (percent >= 90) xp += 50;          // 100 + 50 + 50 = 200 за 3★
-				return xp;
+			function gmXpForVariant(percent, variantId) {
+				if (window.IqmoLevelMapXp && variantId != null) {
+					return IqmoLevelMapXp.xpForVariantId('biology', variantId, percent);
+				}
+				if (percent < 50) return 0;
+				return 100;
 			}
 			function gmComputedStats(variants) {
 				let totalXp = 0, totalStars = 0, passed = 0;
@@ -2691,7 +2692,7 @@
 					const stars = gmStarsForPercent(best.percent);
 					totalStars += stars;
 					if (stars >= 1) passed++;
-					totalXp += gmXpForVariant(best.percent);
+					totalXp += gmXpForVariant(best.percent, v.id);
 				});
 				// XP за серию (бонус)
 				try {
@@ -3115,6 +3116,25 @@
 			// ── helpers (lm-*) ────────────────────────────────────────────
 
 			function lmComputeChapterStats(allInfos) {
+				if (window.IqmoLevelMapXp) {
+					let totalScore = 0, scoredCount = 0, passed = 0, totalStars = 0;
+					allInfos.forEach(vi => {
+						if (vi.best && vi.best.percent >= 50) {
+							passed++;
+							totalScore += vi.best.percent;
+							scoredCount++;
+							totalStars += gmStarsForPercent(vi.best.percent);
+						}
+					});
+					return {
+						totalNodes: allInfos.length,
+						maxStars: allInfos.length * 3,
+						passed,
+						totalStars,
+						totalXp: IqmoLevelMapXp.sumChapterXp(allInfos),
+						avgScore: scoredCount ? Math.round(totalScore / scoredCount) : 0,
+					};
+				}
 				let totalScore = 0, scoredCount = 0, passed = 0, totalStars = 0, totalXp = 0;
 				allInfos.forEach(vi => {
 					if (vi.best) {
@@ -3123,7 +3143,7 @@
 						scoredCount++;
 						const stars = gmStarsForPercent(vi.best.percent);
 						totalStars += stars;
-						totalXp += gmXpForVariant(vi.best.percent);
+						totalXp += gmXpForVariant(vi.best.percent, vi.v && vi.v.id);
 					}
 				});
 				const avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
@@ -3433,7 +3453,9 @@
 				let body = '';
 				if (pdState === 'passed' && vi.best) {
 					const stars = gmStarsForPercent(vi.best.percent);
-					const xp = gmXpForVariant(vi.best.percent);
+					const xp = IqmoLevelMapXp
+						? IqmoLevelMapXp.xpForPassedNode(idx, false, vi.best.percent)
+						: gmXpForVariant(vi.best.percent, vi.v.id);
 					body = `
 						<div class="pd-state passed">${PD_CHECK_SVG} Пройден · ${vi.best.percent}%</div>
 						${pdStarsHtml(stars)}
@@ -3468,7 +3490,9 @@
 				const bossName = 'Сложный вариант';
 				if (chapterComplete && bossInfo.best) {
 					const stars = gmStarsForPercent(bossInfo.best.percent);
-					const xp = gmXpForVariant(bossInfo.best.percent);
+					const xp = IqmoLevelMapXp
+						? IqmoLevelMapXp.xpForPassedNode(0, true, bossInfo.best.percent)
+						: gmXpForVariant(bossInfo.best.percent, v.id);
 					return `
 						<div class="pd-node boss passed" data-v="${v.id}" data-state="done" role="button" tabindex="0">
 							<div class="pd-kicker boss" style="color:#0f9c5d">${PD_CHECK_SVG} Глава завершена</div>
@@ -3486,7 +3510,7 @@
 								<div class="pd-bossName">${bossName}</div>
 								<div class="pd-bossState">Побеждён · ${bossInfo.best.percent}%</div>
 								<div class="pd-bossRewards">
-									<span class="pd-reward got">${PD_CHECK_SVG} +${xp || 500} XP</span>
+									<span class="pd-reward got">${PD_CHECK_SVG} +${xp} XP</span>
 									<span class="pd-reward got">${PD_CHECK_SVG} Бейдж</span>
 									<span class="pd-reward got">${PD_CHECK_SVG} ${stars}★</span>
 								</div>
@@ -3510,6 +3534,7 @@
 					</button>` : '';
 				const dataAttrs = !locked ? ` data-v="${v.id}" data-state="${state}"` : ` data-v="${v.id}" data-state="locked"`;
 				const kicker = '<div class="pd-kicker boss"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg> Финал главы</div>';
+				const previewBossXp = IqmoLevelMapXp ? IqmoLevelMapXp.bossPreviewXp() : 550;
 				return `
 					<div class="pd-node boss${locked ? ' locked' : (current ? ' active' : ' passed')}"${dataAttrs}${!locked ? ' role="button" tabindex="0"' : ''}>
 						${kicker}
@@ -3524,7 +3549,7 @@
 							<div class="pd-bossName">${bossName}</div>
 							<div class="pd-bossState">${bossStateTxt}</div>
 							<div class="pd-bossRewards">
-								<span class="pd-reward"><svg viewBox="0 0 24 24"><path d="${PD_STAR_PATH}"/></svg> +500 XP</span>
+								<span class="pd-reward"><svg viewBox="0 0 24 24"><path d="${PD_STAR_PATH}"/></svg> +${previewBossXp} XP</span>
 								<span class="pd-reward">${PD_TROPHY_SVG} Бейдж</span>
 							</div>
 							${bossDesc ? '<div class="pd-bossDesc">' + bossDesc + '</div>' : ''}

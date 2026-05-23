@@ -81,12 +81,18 @@
 		return 0;
 	}
 
+	function gmXpForMapNode(nodeIndex, isBoss, percent) {
+		if (global.IqmoLevelMapXp) {
+			return IqmoLevelMapXp.xpForPassedNode(nodeIndex, isBoss, percent);
+		}
+		if (percent == null || percent < 50) return 0;
+		if (isBoss) return 50 * 7 + 200;
+		return 50 * (nodeIndex + 1);
+	}
+
 	function gmXpForVariant(percent) {
-		if (percent < 50) return 0;
-		var xp = 100;
-		if (percent >= 80) xp += 50;
-		if (percent >= 90) xp += 50;
-		return xp;
+		if (percent == null || percent < 50) return 0;
+		return 100;
 	}
 
 	function getChapterSliceChemistry() {
@@ -118,6 +124,8 @@
 			attemptsKey: 'iqmo-chem-attempts',
 		};
 	}
+
+	var REGULAR_COUNT = 6;
 
 	function slotPassedForAccess(bp, slots, boss, idx) {
 		if (passAtLeast50(bp.bank, bp.ls, slots[idx])) return true;
@@ -163,14 +171,14 @@
 		var scoreSum = 0;
 		var scored = 0;
 		var passed = 0;
-		slice.forEach(function (v) {
+		slice.forEach(function (v, i) {
 			if (subject === 'biology' && v.status !== 'ready') return;
 			var p = passAtLeast50(bp.bank, bp.ls, v);
 			if (!p) return;
 			var st = gmStarsForPercent(p.percent);
 			totalStars += st;
 			maxStars += 3;
-			totalXp += gmXpForVariant(p.percent);
+			totalXp += gmXpForMapNode(i < REGULAR_COUNT ? i : 0, i >= REGULAR_COUNT, p.percent);
 			scoreSum += p.percent;
 			scored++;
 			if (st >= 1) passed++;
@@ -212,5 +220,6 @@
 		chapter1BossPassedAt: chapter1BossPassedAt,
 		gmStarsForPercent: gmStarsForPercent,
 		gmXpForVariant: gmXpForVariant,
+		gmXpForMapNode: gmXpForMapNode,
 	};
 })(typeof window !== 'undefined' ? window : this);
