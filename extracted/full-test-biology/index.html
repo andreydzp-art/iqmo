@@ -33,8 +33,13 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-		<link rel="stylesheet" href="/iqmo-base.css?v=1" />
+		<link rel="stylesheet" href="/iqmo-base.css?v=2" />
+		<link rel="stylesheet" href="/iqmo-topnav.css?v=1" />
+		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
 		<style>
+			html.is--hub #test-root { display: none !important; }
+			html.is--hub #exam-subbar { display: none !important; }
+			.ft-site-nav { max-width: 1280px; margin: 0 auto; padding: 24px 28px 0; }
 
 
 			/* ---- top bar ---- (стиль навбара из референса _tmp_ft6/level-map.html) */
@@ -1575,16 +1580,44 @@
 	</head>
 
 	<body data-exam-subject="biology">
-		<!-- Top -->
-		<header class="topbar">
+		<!-- Unified site nav (карта вариантов — как subject-biology) -->
+		<div class="ft-site-nav" id="ft-site-nav">
+			<nav class="topnav">
+				<a class="brand" href="/" aria-label="IQMO — главная">
+					<div class="brand-mark">IQ</div>
+					<div class="brand-name">IQMO</div>
+				</a>
+				<div class="nav-mid">
+					<a href="/">Мои предметы</a>
+					<span class="is--disabled" title="Раздел «Расписание» появится позже" aria-disabled="true">Расписание</span>
+					<span class="is--disabled" title="Раздел «Достижения» появится позже" aria-disabled="true">Достижения</span>
+					<span class="is--disabled" title="Раздел «Рейтинг» появится позже" aria-disabled="true">Рейтинг</span>
+				</div>
+				<div class="nav-right">
+					<a href="/profile/" class="pill-btn" id="iqmo-nav-profile">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+						Профиль
+					</a>
+					<a href="/login.html" class="pill-btn primary" id="iqmo-nav-login">Войти</a>
+					<button type="button" class="pill-btn" id="iqmo-nav-logout" hidden data-iqmo-after-logout="/">Выйти</button>
+					<div class="avatar" id="nav-avatar"></div>
+				</div>
+			</nav>
+			<div class="crumbs" id="ft-crumbs">
+				<a href="/">Главная</a><span class="sep">/</span><a href="/subject-biology/">Биология</a><span class="sep">/</span><b>Полный вариант ОГЭ</b>
+			</div>
+		</div>
+
+		<!-- Полоска экзамена: только во время ?v=N (таймер + прервать) -->
+		<header class="topbar" id="exam-subbar">
 			<div class="topbar__head">
 				<div class="container topbar__row">
 					<div class="topbar__left">
 						<div class="brand">
 							<div class="brand-mark" aria-hidden="true"></div>
-							<a href="/" class="brand-name" style="text-decoration:none; color:inherit;">IQMO</a>
+							<a href="/full-test-biology/" class="brand-name" style="text-decoration:none; color:inherit;">IQMO</a>
 							<span class="brand-sep">/</span>
-							<div class="breadcrumbs">Биология · ОГЭ 2026 — <b>Полный вариант</b></div>
+							<div class="breadcrumbs" id="exam-breadcrumb">Биология · ОГЭ 2026 — <b>Полный вариант</b></div>
 						</div>
 					</div>
 					<div class="topbar__center">
@@ -1594,13 +1627,7 @@
 						</div>
 					</div>
 					<div class="topbar__right">
-						<div class="header__btns" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-							<a href="/" class="btn btn--ghost">Главная</a>
-							<a href="/login.html" class="btn btn--ghost" id="iqmo-nav-login">Вход</a>
-							<a href="/profile/" class="btn btn--ghost" id="iqmo-nav-profile" hidden>Профиль</a>
-							<button type="button" class="btn btn--ghost" id="iqmo-nav-logout" hidden>Выйти</button>
-						</div>
-						<button type="button" class="btn btn--ghost" id="btn-quit-exam" style="margin-left:8px;">Прервать</button>
+						<button type="button" class="btn btn--ghost" id="btn-quit-exam">Прервать</button>
 					</div>
 				</div>
 			</div>
@@ -1698,6 +1725,7 @@
 				}
 				window.addEventListener('iqmo-sync', rerender);
 				window.addEventListener('iqmo-sync-ready', rerender);
+				window.addEventListener('iqmo-sync-ready', fillHubNavAvatar);
 			})();
 
 			(function runApp() {
@@ -1705,6 +1733,10 @@
 				renderVariantPicker();
 				return; // stop here, picker only
 			}
+
+			setHubLayout(false);
+			const pb = document.getElementById('pb-fill');
+			if (pb && pb.parentElement) pb.parentElement.style.display = '';
 
 			// Resolve variant
 			let activeVariant = null;
@@ -1722,7 +1754,7 @@
 
 			// Update subject label with variant
 			try {
-				const subj = document.querySelector('.breadcrumbs') || document.querySelector('.topbar__subject');
+				const subj = document.getElementById('exam-breadcrumb');
 				if (subj) subj.innerHTML = `Биология · ОГЭ 2026 — <b>${activeVariant.title}</b>`;
 			} catch(e) {}
 
@@ -2929,16 +2961,29 @@
 			// больше не используется и оставлен мёртвым кодом, чтобы не
 			// рисковать при минорных будущих фиксах.
 			// ============================================================
+			function fillHubNavAvatar() {
+				try {
+					if (!window.ChemProgress) return;
+					var snap = ChemProgress.getGamificationSnapshot();
+					if (!snap || !snap.level) return;
+					var nav = document.getElementById('nav-avatar');
+					if (nav && snap.level.current != null) nav.textContent = String(snap.level.current);
+				} catch (e) {}
+			}
+
+			function setHubLayout(isHub) {
+				var examSub = document.getElementById('exam-subbar');
+				if (examSub) examSub.style.display = isHub ? 'none' : '';
+				fillHubNavAvatar();
+			}
+
 			function _renderVariantPickerImpl() {
 				const picker = document.getElementById('variant-picker');
 				const testRoot = document.getElementById('test-root');
 				if (testRoot) testRoot.style.display = 'none';
-				const timerEl = document.getElementById('timer');
-				if (timerEl) timerEl.style.display = 'none';
-				const quitBtn = document.getElementById('btn-quit-exam');
-				if (quitBtn) quitBtn.style.display = 'none';
+				setHubLayout(true);
 				const pb = document.getElementById('pb-fill');
-				if (pb) pb.parentElement.style.display = 'none';
+				if (pb && pb.parentElement) pb.parentElement.style.display = 'none';
 				if (!picker) return;
 				picker.style.display = 'block';
 				picker.classList.add('lm');
