@@ -2,11 +2,25 @@
  * Единая шапка IQMO — эталон subject-biology / subject-chemistry.
  * Подключать после Google Fonts, до page-specific <style>.
  */
+:root {
+	--site-max: 1280px;
+	--site-gutter: 28px;
+}
+
+.shell {
+	width: 100%;
+	max-width: var(--site-max);
+	margin: 0 auto;
+	padding: 24px var(--site-gutter) 56px;
+	box-sizing: border-box;
+}
+
 .topnav {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
+	align-self: stretch;
 	box-sizing: border-box;
 	padding: 10px 14px;
 	background: var(--surface, #fff);
