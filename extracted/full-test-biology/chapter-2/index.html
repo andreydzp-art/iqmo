@@ -806,7 +806,7 @@
   }
 })();
 </script>
-<script src="/iqmo-chapter2-access.js?v=1"></script>
+<script src="/iqmo-chapter2-access.js?v=2"></script>
 <script src="/iqmo-sync.js"></script>
 <script src="/iqmo-nav.js"></script>
 <script src="/iqmo-companion.js"></script>
@@ -850,6 +850,7 @@
 	function denyLocked() {
 		try {
 			sessionStorage.setItem('iqmo_ch2_denied_toast', '1');
+			sessionStorage.setItem('iqmo_ch2_denied_reason', 'locked');
 		} catch (e) {}
 		location.replace(BASE + '/');
 	}

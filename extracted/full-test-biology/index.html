@@ -2800,8 +2800,11 @@
 						t.setAttribute('role', 'status');
 						document.body.appendChild(t);
 					}
-					t.textContent =
-						'Глава 2 откроется после победы над финальным боссом главы 1 и входа в аккаунт.';
+					var reason = sessionStorage.getItem('iqmo_ch2_denied_reason');
+					try { sessionStorage.removeItem('iqmo_ch2_denied_reason'); } catch (eR0) {}
+					t.textContent = reason === 'guest'
+						? 'Войдите в аккаунт, чтобы открыть главу 2.'
+						: 'Победите финального босса главы 1 (≥ 50% в части 1), чтобы открыть главу 2.';
 					setTimeout(function () {
 						try {
 							t.remove();

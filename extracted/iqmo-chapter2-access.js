@@ -119,6 +119,17 @@
 		};
 	}
 
+	function slotPassedForAccess(bp, slots, boss, idx) {
+		if (passAtLeast50(bp.bank, bp.ls, slots[idx])) return true;
+		// Цепочка: если пройден более поздний узел или босс — ранние тоже зачтены
+		// (localStorage раннего варианта мог пропасть при обновлении банка).
+		var j;
+		for (j = idx + 1; j < slots.length; j++) {
+			if (passAtLeast50(bp.bank, bp.ls, slots[j])) return true;
+		}
+		return !!passAtLeast50(bp.bank, bp.ls, boss);
+	}
+
 	function isChapter1Complete(subject) {
 		var slice =
 			subject === 'biology' ? getChapterSliceBiology() : getChapterSliceChemistry();
@@ -133,10 +144,12 @@
 			}
 			if (boss.status !== 'ready') return false;
 		}
+		// Совпадает с hub: победа над боссом = глава 1 завершена.
+		if (passAtLeast50(bp.bank, bp.ls, boss)) return true;
 		for (i = 0; i < slots.length; i++) {
-			if (!passAtLeast50(bp.bank, bp.ls, slots[i])) return false;
+			if (!slotPassedForAccess(bp, slots, boss, i)) return false;
 		}
-		return !!passAtLeast50(bp.bank, bp.ls, boss);
+		return false;
 	}
 
 	function chapter1ArchiveSummary(subject) {
