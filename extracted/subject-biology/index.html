@@ -22,17 +22,17 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=1320" />
 <title>IQMO — Биология · ОГЭ</title>
-<meta name="description" content="Подготовка к ОГЭ по биологии: 10 разделов курса, полный вариант №1 уже доступен (21 задание), банк заданий пополняется. Тренажёр IQMO." />
+<meta name="description" content="Подготовка к ОГЭ по биологии: 10 разделов курса, 9 полных вариантов ОГЭ, карта уровней и банк заданий. Тренажёр IQMO." />
 <link rel="canonical" href="https://www.iqmoschool.ru/subject-biology/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="IQMO" />
 <meta property="og:locale" content="ru_RU" />
 <meta property="og:url" content="https://www.iqmoschool.ru/subject-biology/" />
 <meta property="og:title" content="IQMO — Биология · ОГЭ 2026" />
-<meta property="og:description" content="Онлайн-тренажёр: курс по биологии для ОГЭ — полный вариант №1, темы и категории по мере наполнения банка." />
+<meta property="og:description" content="Онлайн-тренажёр: 9 полных вариантов ОГЭ по биологии, карта уровней, банк заданий ФИПИ 2026." />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="IQMO — Биология · ОГЭ 2026" />
-<meta name="twitter:description" content="Полный вариант №1, разделы курса и работа над ошибками — подготовка к ОГЭ по биологии в IQMO." />
+<meta name="twitter:description" content="9 полных вариантов ОГЭ, карта уровней и банк заданий — подготовка к ОГЭ по биологии в IQMO." />
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
@@ -570,7 +570,7 @@
       <section class="hero-current">
         <div class="hc-inner">
           <div class="hc-title">Подготовься к&nbsp;ОГЭ <em>на&nbsp;5</em><br>в&nbsp;своём темпе</div>
-          <div class="hc-sub" id="hc-sub">Уже доступен <b>полный вариант №1</b> (21 задание с автопроверкой). Разминка, быстрый тест и темы по разделам — по мере наполнения банка.</div>
+          <div class="hc-sub" id="hc-sub">9 полных вариантов ОГЭ с автопроверкой и картой уровней. Разминка, быстрый тест и темы по разделам — по мере наполнения банка.</div>
         </div>
 
         <div class="hc-illu" aria-hidden="true">
@@ -619,10 +619,10 @@
               <span class="fmt__icon ico-full"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
               <div>
                 <div class="fmt__title">Полный вариант ОГЭ</div>
-                <div class="fmt__meta"><span>21 задание (вариант №1)</span><span>· таймер</span><span>· с оценкой</span></div>
+                <div class="fmt__meta" id="fmt-full-meta"><span>9 вариантов</span><span>· 21 задание</span><span>· таймер</span><span>· с оценкой</span></div>
               </div>
             </div>
-            <p class="fmt__desc">Вариант №1 собран. Остальные варианты появятся по мере наполнения банка. Таймер, итоговая оценка и автопроверка — как на экзамене.</p>
+            <p class="fmt__desc" id="fmt-full-desc">9 полных вариантов ОГЭ: карта уровней с 6 шагами и супер-боссом, глава 2 с демо-вариантами ФИПИ. Таймер, итоговая оценка и автопроверка — как на экзамене.</p>
             <div class="fmt__foot"><span class="fmt__start">К вариантам <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span></div>
           </div>
 
@@ -1033,7 +1033,7 @@
         var when = ChemProgress.formatRelativeTime(la.finishedAt);
         heroInner.innerHTML = 'Последний результат (био): <b>' + la.correct + ' / ' + la.total + '</b> (' + la.percent + '%) · ' + when;
       } else if (la && la.subject === 'chemistry') {
-        heroInner.textContent = 'Тестов по биологии пока нет — пройдите вариант №1, и здесь появится ваш результат.';
+        heroInner.textContent = 'Тестов по биологии пока нет — пройдите полный вариант, и здесь появится ваш результат.';
       } else {
         heroInner.textContent = 'Здесь появится результат после прохождения теста.';
       }
@@ -1041,16 +1041,44 @@
   }
   paintHeroLastResult();
 
-  // Hero stat — questions count
+  // Hero stat — questions + variant count
   (function applyQuestionsCount() {
     var elQ1 = document.getElementById('hc-stat-questions');
     var elQ2 = document.getElementById('head-questions');
+    var elSub = document.getElementById('hc-sub');
+    var elMeta = document.getElementById('fmt-full-meta');
+    var elDesc = document.getElementById('fmt-full-desc');
     try {
+      var topics = document.querySelectorAll('#topics-course-grid a.topic, #topics-course-grid .topic').length || 10;
       var qsAll = Array.isArray(window.BIOLOGY_QUESTIONS) ? window.BIOLOGY_QUESTIONS : [];
       var qs = qsAll.filter(function (q) { return q && q.type !== 'open' && q.type !== 'todo'; });
-      var qCount = qs.length || 21;
+      var qCount = qs.length || 191;
+      var variants = Array.isArray(window.BIOLOGY_VARIANTS) ? window.BIOLOGY_VARIANTS : [];
+      var ready = variants.filter(function (v) { return v && v.status === 'ready'; });
+      var vCount = ready.length;
       if (elQ1) elQ1.textContent = fmtPts(qCount);
       if (elQ2) elQ2.textContent = fmtPts(qCount);
+      if (elSub && vCount) {
+        var parts = [];
+        if (topics) parts.push(topics + ' ' + pluralize(topics, 'тема', 'темы', 'тем') + ' курса');
+        if (qCount) parts.push(qCount + ' ' + pluralize(qCount, 'задание', 'задания', 'заданий') + ' в банке');
+        parts.push(vCount + ' ' + pluralize(vCount, 'полный вариант', 'полных варианта', 'полных вариантов') + ' ОГЭ');
+        parts.push('карта уровней');
+        elSub.textContent = parts.join(', ') + '. Выбирай формат и начинай тренировку.';
+      }
+      if (elMeta && vCount) {
+        elMeta.innerHTML = '<span>' + vCount + ' ' + pluralize(vCount, 'вариант', 'варианта', 'вариантов') + '</span><span>· 21 задание</span><span>· таймер</span><span>· с оценкой</span>';
+      }
+      if (elDesc && vCount) {
+        var coming = variants.filter(function (v) { return v && v.status === 'coming'; }).length;
+        var tail = coming
+          ? ' Ещё ' + coming + ' ' + pluralize(coming, 'вариант', 'варианта', 'вариантов') + ' — в подготовке.'
+          : '';
+        elDesc.textContent =
+          vCount + ' ' + pluralize(vCount, 'полный вариант', 'полных варианта', 'полных вариантов') +
+          ' ОГЭ: карта уровней (6 шагов + супер-босс), глава 2 с демо-вариантами ФИПИ.' +
+          tail + ' Таймер, итоговая оценка и автопроверка — как на экзамене.';
+      }
     } catch (e) {}
   })();
 
@@ -1058,7 +1086,7 @@
   (function renderWeakBio() {
     var root = document.getElementById('weak-spots-root');
     if (!root) return;
-    root.innerHTML = '<p class="weak__empty">Пока нет данных по пробелам: пройдите вариант №1 по биологии — здесь отобразятся темы для повторения.</p>';
+    root.innerHTML = '<p class="weak__empty">Пока нет данных по пробелам: пройдите полный вариант по биологии — здесь отобразятся темы для повторения.</p>';
   })();
 
   (function pulseFullTest(){
