@@ -85,7 +85,7 @@ final class IqmoPublicProfileBuilder
     private static function buildPayload(int $userId, string $email, int $createdAtMs, array $keys): array
     {
         $profileId = IqmoGamificationMath::formatProfileId($userId);
-        $name = IqmoGamificationMath::displayNameFromEmail($email);
+        $name = self::resolveDisplayName($keys, $email);
         $totalPts = (int) self::keyVal($keys, 'iqmo-chem-progress-points-v1', 0);
         $level = IqmoGamificationMath::computeLevelDetail($totalPts);
         $levelTitle = IqmoGamificationMath::levelTitleRu($level['current']);
@@ -177,6 +177,22 @@ final class IqmoPublicProfileBuilder
                 ? 'Прогресс по биологии может храниться только на устройстве ученика и не отображаться здесь.'
                 : null,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $keys
+     */
+    private static function resolveDisplayName(array $keys, string $email): string
+    {
+        $raw = self::keyVal($keys, 'iqmo-chem-display-name-v1', null);
+        if (is_string($raw)) {
+            $trimmed = trim(preg_replace('/\s+/u', ' ', $raw) ?? '');
+            if ($trimmed !== '' && mb_strlen($trimmed) >= 2 && mb_strlen($trimmed) <= 32) {
+                return $trimmed;
+            }
+        }
+
+        return IqmoGamificationMath::displayNameFromEmail($email);
     }
 
     /**

@@ -108,6 +108,20 @@ final class IqmoPublicProfileTest extends TestCase
         $this->getJson('/api/profile/IQ-9999')->assertNotFound();
     }
 
+    public function test_public_profile_uses_custom_display_name_from_state(): void
+    {
+        DB::connection('iqmo')->table('profile_state')->where('user_id', self::USER_ID)->update([
+            'keys_json' => json_encode([
+                'iqmo-chem-progress-points-v1' => 120,
+                'iqmo-chem-display-name-v1' => 'Катя ОГЭ',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        $this->getJson('/api/profile/IQ-0868')
+            ->assertOk()
+            ->assertJsonPath('profileData.name', 'Катя ОГЭ');
+    }
+
     public function test_invalid_profile_id_route_returns_404(): void
     {
         $this->getJson('/api/profile/not-a-profile')->assertNotFound();

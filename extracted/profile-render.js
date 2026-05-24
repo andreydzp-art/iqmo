@@ -38,6 +38,32 @@
 		return 'с ' + fmtDate(ts * 1000) + ' · ' + days + ' ' + (days === 1 ? 'день' : days < 5 ? 'дня' : 'дней') + ' в IQMO';
 	}
 
+	function displayNameFromEmailPlaceholder(d) {
+		if (d.email && global.IqmoProfileData && IqmoProfileData.displayNameFromEmail) {
+			return IqmoProfileData.displayNameFromEmail({ email: d.email });
+		}
+		return 'Ученик IQMO';
+	}
+
+	function renderXpGuide() {
+		return (
+			'<section class="prof-xp-guide">' +
+			'<details class="prof-xp-guide__panel">' +
+			'<summary><span class="prof-xp-guide__title">Как качается XP</span>' +
+			'<span class="prof-xp-guide__hint">уровни · серии · карта вариантов</span></summary>' +
+			'<div class="prof-xp-guide__body">' +
+			'<ul class="prof-xp-guide__list">' +
+			'<li><b>Задания в тестах</b> — XP за верные ответы. Полный вариант даёт больше, чем разминка или быстрый тест.</li>' +
+			'<li><b>Карта глав</b> — разовый бонус за узел при ≥50% в части&nbsp;1 (от +50 XP за шаг до +550 за босса).</li>' +
+			'<li><b>Серия дней</b> — чем дольше закрываете дневную цель подряд, тем выше множитель к XP (до&nbsp;+18%).</li>' +
+			'<li><b>Визит и активность</b> — +10 XP за первый заход в день и небольшие порции за время в тренажёре.</li>' +
+			'<li><b>50 уровней</b> — пороги растут нелинейно; XP копится суммарно и не сгорает.</li>' +
+			'</ul>' +
+			'<p class="prof-xp-guide__note">XP — мотивация, а не оценка на экзамене. Главный результат — освоение тем и уверенность на ОГЭ.</p>' +
+			'</div></details></section>'
+		);
+	}
+
 	function renderHero(p) {
 		var d = p.profileData;
 		var sig = p.socialSignals || [];
@@ -239,7 +265,15 @@
 		);
 	}
 
-	function renderSettingsAccount(profileId) {
+	function renderSettingsAccount(profileId, profileData) {
+		var d = profileData || {};
+		var storedName = global.IqmoProfileData && IqmoProfileData.readStoredDisplayName
+			? IqmoProfileData.readStoredDisplayName()
+			: null;
+		var nameInputVal = storedName || '';
+		var nameHint = storedName
+			? 'Сохранено в этом браузере' + (d.isAuthed ? ' и синхронизируется после входа' : '')
+			: (d.isAuthed ? 'По умолчанию — из e-mail. Можно задать своё.' : 'По умолчанию — «Ученик IQMO». Можно задать своё.');
 		var pubLink = profileId
 			? '<div class="prof-settings__box iqmo-only-authed"><h3 style="margin:0 0 8px;font-size:14px">Публичная ссылка</h3>' +
 			  '<p style="font-size:12px;color:var(--muted);margin:0 0 10px">Можно отправить друзьям — e-mail и настройки не показываются.</p>' +
@@ -252,6 +286,16 @@
 			'<h2>Аккаунт и данные</h2>' +
 			'<p>Управление сессией и локальным прогрессом. Сброс затрагивает только данные по химии в этом браузере.</p>' +
 			'<div class="prof-settings__grid">' +
+			'<div class="prof-settings__box prof-settings__box--wide">' +
+			'<h3 style="margin:0 0 8px;font-size:14px">Имя в профиле</h3>' +
+			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">' + esc(nameHint) + '</p>' +
+			'<form class="prof-name-form" id="prof-name-form">' +
+			'<input type="text" class="prof-name-input" id="prof-display-name" maxlength="32" ' +
+			'placeholder="' + esc(d.isAuthed ? displayNameFromEmailPlaceholder(d) : 'Ученик IQMO') + '" ' +
+			'value="' + esc(nameInputVal) + '" autocomplete="nickname" />' +
+			'<button type="submit" class="btn btn--ghost" id="prof-save-name">Сохранить</button>' +
+			'</form>' +
+			'<p id="prof-name-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
 			'<div class="prof-settings__box"><h3 style="margin:0 0 8px;font-size:14px">Сброс прогресса</h3>' +
 			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Очистить iqmo-chem-* (и на сервере, если вы вошли).</p>' +
 			'<button type="button" class="btn btn--danger" id="prof-reset">Сбросить данные химии</button></div>' +
@@ -297,11 +341,12 @@
 		if (!root || !data) return;
 		var isPublic = !!data.isPublic;
 		var profileId = data.profileData && data.profileData.profileId;
-		var settingsBlock = isPublic ? '' : renderSettingsGuest() + renderSettingsAccount(profileId);
+		var settingsBlock = isPublic ? '' : renderSettingsGuest() + renderSettingsAccount(profileId, data.profileData);
 		root.innerHTML =
 			(isPublic ? renderPublicBanner(data) : '') +
 			renderHero(data) +
 			renderGoals(data.nextGoalsData) +
+			(isPublic ? '' : renderXpGuide()) +
 			settingsBlock +
 			renderAchievements(data.achievementsData) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +

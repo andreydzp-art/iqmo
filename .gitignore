@@ -84,8 +84,16 @@ laravel/public/site/_rd/
 # Дизайн-снапшоты (архивы / развёрнутые): нужные части уже в extracted/
 _design-snapshots/
 
-# Временные распаковки
+# Временные распаковки и дизайн-снапшоты (не коммитить)
 extracted/_tmp-zip-*/
+extracted/_tmp-*/
+extracted/_profile-design-*/
+extracted/_pdf-pages/
+extracted/dating-platform.tar.gz
+extracted/scripts/
+
+# Маркетинговые/рекламные песочницы вне основного сайта
+yandex-direct-ab/
 
 # Проект «Знакомства» — отдельная песочница, в основной репо не входит
 extracted/znakomstva/

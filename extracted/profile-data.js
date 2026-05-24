@@ -63,7 +63,42 @@
 		return 'IQ-0000';
 	}
 
-	function displayNameFromMe(me) {
+	const KEY_DISPLAY_NAME = 'iqmo-chem-display-name-v1';
+
+	function normalizeDisplayName(raw) {
+		if (raw == null) return '';
+		var s = String(raw).replace(/\s+/g, ' ').trim();
+		if (!s) return '';
+		if (s.length < 2 || s.length > 32) return null;
+		if (!/^[a-zA-Z\u0400-\u04FF\u0500-\u052F0-9][a-zA-Z\u0400-\u04FF\u0500-\u052F0-9 \-]*$/.test(s)) return null;
+		return s;
+	}
+
+	function readStoredDisplayName() {
+		try {
+			var raw = localStorage.getItem(KEY_DISPLAY_NAME);
+			if (raw == null || raw === '') return null;
+			return normalizeDisplayName(raw);
+		} catch (e) {
+			return null;
+		}
+	}
+
+	function saveDisplayName(raw) {
+		var normalized = normalizeDisplayName(raw);
+		if (raw != null && String(raw).trim() && normalized === null) {
+			return { ok: false, error: 'invalid' };
+		}
+		try {
+			if (!normalized) localStorage.removeItem(KEY_DISPLAY_NAME);
+			else localStorage.setItem(KEY_DISPLAY_NAME, normalized);
+		} catch (e) {
+			return { ok: false, error: 'storage' };
+		}
+		return { ok: true, name: normalized || null };
+	}
+
+	function displayNameFromEmail(me) {
 		if (!me || !me.email) return 'Ученик IQMO';
 		var local = String(me.email).split('@')[0] || 'Ученик';
 		local = local.replace(/[._-]+/g, ' ').trim();
@@ -71,6 +106,12 @@
 		return local.split(/\s+/).map(function (w) {
 			return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
 		}).join(' ');
+	}
+
+	function displayNameFromMe(me) {
+		var stored = readStoredDisplayName();
+		if (stored) return stored;
+		return displayNameFromEmail(me);
 	}
 
 	function starsForPercent(p) {
@@ -510,6 +551,9 @@
 	global.IqmoProfileData = {
 		build: build,
 		ACHIEVEMENT_CATALOG: ACHIEVEMENT_CATALOG,
-		fmtPts: fmtPts
+		fmtPts: fmtPts,
+		readStoredDisplayName: readStoredDisplayName,
+		saveDisplayName: saveDisplayName,
+		displayNameFromEmail: displayNameFromEmail
 	};
 })(typeof window !== 'undefined' ? window : global);

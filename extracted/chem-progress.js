@@ -668,8 +668,15 @@
 	}
 
 	function persistLevel(totalPoints) {
+		var prev = lsGet(KEY_LEVEL, null);
+		var prevLevel = prev && prev.level != null ? Number(prev.level) : 1;
 		const d = computeLevelDetail(totalPoints);
 		lsSet(KEY_LEVEL, { level: d.current, updatedAt: Date.now() });
+		if (d.current > prevLevel) {
+			try {
+				queueProfileCelebration('level_up');
+			} catch (eLv) {}
+		}
 		if (d.current >= MAX_LEVEL) {
 			unlockBadge('final_sprint');
 		}
