@@ -1540,7 +1540,7 @@
 		<script src="/level-map-xp.js?v=2"></script>
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/chem-progress.js?v=6"></script>
-		<script src="/chemistry-level-map-render.js?v=3"></script>
+		<script src="/chemistry-level-map-render.js?v=4"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from chemistry-bank.js)
@@ -2985,12 +2985,12 @@
 				const heroEyebrow = bossBest
 					? 'Глава 1 · Завершена'
 					: (allRegularDone && !bossBest)
-						? 'Финальный босс · Открыт'
+						? 'Вариант 7 · Доступен'
 						: 'Глава 1 · Полный вариант ОГЭ';
 				const heroLead = (allRegularDone && !bossBest)
-					? 'Все шесть вариантов пройдены. Победите супер-босса, чтобы открыть главу 2.'
+					? 'Пройдено 6 из 7. Пройдите финальный вариант, чтобы открыть главу 2.'
 					: (bossBest)
-						? 'Шесть вариантов и супер-босс пройдены. Перерешивайте варианты, чтобы поднять звёзды.'
+						? 'Все 7 вариантов пройдены. Перерешивайте варианты, чтобы поднять звёзды.'
 						: 'Проходите варианты по порядку. Следующий откроется при результате ≥ 50 % в части 1.';
 
 				const seen = gmLoadSeen();
@@ -3001,7 +3001,7 @@
 				else if (variantInfos.length) nextActionId = variantInfos[0].v.id;
 
 				let heroCtaLabel = 'Начать вариант 1';
-				if (nextActionId === bossSlot.id) heroCtaLabel = 'К супер-боссу';
+				if (nextActionId === bossSlot.id) heroCtaLabel = 'Продолжить вариант 7';
 				else if (bossBest) heroCtaLabel = 'Перерешать варианты';
 				else if (currentIdx >= 0) heroCtaLabel = 'Продолжить вариант ' + (currentIdx + 1);
 				else if (nextActionId) {
@@ -3200,7 +3200,7 @@
 					<section class="lm-ch2-promo" role="region" aria-label="Переход ко 2 главе">
 						<span class="lm-ch2-promo__eyebrow">Следующий этап</span>
 						<div class="lm-ch2-promo__row">
-							<p class="lm-ch2-promo__txt">Глава 2 · демо-варианты ФИПИ — новая карта: 6 вариантов и супер-босс.</p>
+							<p class="lm-ch2-promo__txt">Глава 2 · демо-варианты ФИПИ — новая карта из 7 вариантов.</p>
 							<a href="/full-test-chemistry/chapter-2/" class="lm-btn-ch2-cta">Перейти в главу 2 →</a>
 						</div>
 					</section>

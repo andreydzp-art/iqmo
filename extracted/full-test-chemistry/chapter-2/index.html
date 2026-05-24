@@ -468,7 +468,7 @@
       <div class="ch-meta">
         <div class="ch-label">Глава 1</div>
         <div class="ch-title">Полный вариант ОГЭ</div>
-        <div class="ch-sub">7 вариантов + босс · 21/21 ★</div>
+        <div class="ch-sub">7 вариантов · 21/21 ★</div>
       </div>
       <div class="ch-tag">Завершено</div>
     </a>
@@ -478,7 +478,7 @@
       <div class="ch-meta">
         <div class="ch-label">Глава 2 · Текущая</div>
         <div class="ch-title">Демо-варианты ФИПИ 2026</div>
-        <div class="ch-sub">6 вариантов + супер-босс · 0/18 ★</div>
+        <div class="ch-sub" id="ch2-stepper-sub">7 вариантов · 0/21 ★</div>
       </div>
       <div class="ch-tag">Сейчас</div>
     </div>
@@ -507,7 +507,7 @@
         Новая глава · Уровень сложности +1
       </div>
       <h1>Демо-варианты ФИПИ <span class="lm-dot">·</span> 2026</h1>
-      <p class="lm-lead">Свежие официальные демо-версии ОГЭ. Сложнее предыдущей главы: больше задач на расчёты и реакции. За победу над супер-боссом — бейдж «Магистр химии» и доступ к Главе 3.</p>
+      <p class="lm-lead">Свежие официальные демо-версии ОГЭ. Сложнее предыдущей главы: больше задач на расчёты и реакции. За прохождение всех 7 вариантов — бейдж «Магистр химии» и доступ к Главе 3.</p>
       <div class="lm-cta-row">
         <a class="lm-btn lm-btn-primary" id="ch2-cta-variant1" href="/full-test-chemistry/?v=8">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg>
@@ -634,8 +634,8 @@
       <h3>Статистика <small style="font-weight:600;color:var(--muted);font-size:11px;">(Глава 2)</small></h3>
       <ul class="stat-list">
         <li><span class="lab">Всего узлов</span><span class="val" id="ch2-stat-nodes">7</span></li>
-        <li class="dot-em"><span class="lab">Пройдено</span><span class="val" id="ch2-stat-done">0</span></li>
-        <li class="dot-am"><span class="lab">В процессе</span><span class="val">0</span></li>
+        <li class="dot-em"><span class="lab">Пройдено</span><span class="val" id="ch2-stat-done">0 / 7</span></li>
+        <li class="dot-am"><span class="lab">В процессе</span><span class="val" id="ch2-stat-progress">0</span></li>
         <li class="dot-em"><span class="lab">Средний балл</span><span class="val" style="color:var(--muted)" id="ch2-stat-avg">—</span></li>
         <li><span class="lab">Заработано XP</span><span class="val" id="ch2-stat-xp">0</span></li>
       </ul>
@@ -711,7 +711,7 @@
 <script src="/chemistry-variants.js?v=10"></script>
 <script src="/level-map-state.js?v=1"></script>
 <script src="/level-map-xp.js?v=1"></script>
-<script src="/chemistry-level-map-render.js?v=2"></script>
+<script src="/chemistry-level-map-render.js?v=4"></script>
 <script>
 (function () {
   var CH2_SLOTS = [
@@ -843,13 +843,14 @@
   var stats = { totalNodes: allInfos.length, maxStars: allInfos.length * 3, passed: 0, totalStars: 0, totalXp: 0, avgScore: 0 };
   var totalScore = 0, scoredCount = 0;
   allInfos.forEach(function (vi, idx) {
-    if (vi.best && vi.best.percent >= 50) {
-      stats.passed++;
-      totalScore += vi.best.percent;
-      scoredCount++;
-      stats.totalStars += starsForPercent(vi.best.percent);
-      stats.totalXp += xpForVariant(vi.best.percent, vi.isBoss ? 5 : idx, !!vi.isBoss);
-    }
+    var passedNode = vi.state === 'done' || (vi.best && vi.best.percent >= 50);
+    if (!passedNode) return;
+    var pct = vi.best && vi.best.percent != null ? vi.best.percent : 50;
+    stats.passed++;
+    totalScore += pct;
+    scoredCount++;
+    stats.totalStars += starsForPercent(pct);
+    stats.totalXp += xpForVariant(pct, vi.isBoss ? 5 : idx, !!vi.isBoss);
   });
   stats.avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
 
@@ -857,7 +858,7 @@
   if (mapHost && window.IqmoChemLevelMap) {
     IqmoChemLevelMap.render(mapHost, {
       chapterEyebrow: 'Глава 2 · Химия',
-      chapterSubInProgress: '6 демо-вариантов · 1 супер-босс · сложность <b>повышенная</b>',
+      chapterSubInProgress: '7 вариантов · сложность <b>повышенная</b>',
       bossName: 'Магистр химии',
       completeRecapPrefix: 'Глава 2 завершена',
       completeCtaHref: '/subject-chemistry/',
@@ -871,9 +872,11 @@
     });
   }
 
-  var doneCount = CH2_SLOTS.filter(function (sl) { return isPassed(sl.vid); }).length + (bossDone ? 1 : 0);
+  var doneCount = stats.passed;
   var statDone = document.getElementById('ch2-stat-done');
-  if (statDone) statDone.textContent = String(doneCount);
+  if (statDone) statDone.textContent = doneCount + ' / ' + stats.totalNodes;
+  var statProgress = document.getElementById('ch2-stat-progress');
+  if (statProgress) statProgress.textContent = String(currentIdx >= 0 && !bossDone ? 1 : 0);
 
   var passedScores = CH2_SLOTS
     .map(function (sl) { return variantBest(sl.vid); })
@@ -889,8 +892,8 @@
   if (statXp) statXp.textContent = String(stats.totalXp);
 
   var totalStars = stats.totalStars;
-  var stepperSub = document.querySelector('.ch-pill.active .ch-sub');
-  if (stepperSub) stepperSub.textContent = '6 вариантов + супер-босс · ' + totalStars + '/18 ★';
+  var stepperSub = document.getElementById('ch2-stepper-sub');
+  if (stepperSub) stepperSub.textContent = doneCount + '/7 вариантов · ' + totalStars + '/21 ★';
 
   var ctaBtn = document.getElementById('ch2-cta-variant1');
   if (ctaBtn) {

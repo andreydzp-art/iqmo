@@ -65,16 +65,23 @@
 			</div>`;
 	}
 
-	function pdHeadHtml(cfg, stats, chapterComplete, regularPassed, regularTotal, ringPct, ringOffset) {
+	function chapterNodeCounts(variantInfos, bossInfo) {
+		var passed = 0;
+		(variantInfos || []).forEach(function (vi) {
+			if (vi && vi.state === 'done') passed++;
+		});
+		if (bossInfo && bossInfo.state === 'done') passed++;
+		return { passed: passed, total: (variantInfos || []).length + 1 };
+	}
+
+	function pdHeadHtml(cfg, stats, chapterComplete, chapterPassed, chapterTotal, ringPct, ringOffset) {
 		const completedChip = chapterComplete
 			? `<span class="pe-completed-chip">${PD_CHECK_SVG} Завершена</span>`
 			: '';
 		const subDone = chapterComplete
-			? `Все <b>6 вариантов пройдены</b> · супер-босс <b>побеждён</b> · средний балл <b>${stats.avgScore}%</b>`
-			: `6 демо-вариантов · 1 супер-босс · сложность <b>повышенная</b>`;
-		const mapPassed = chapterComplete ? stats.totalNodes : regularPassed;
-		const mapTotal = chapterComplete ? stats.totalNodes : regularTotal;
-		const progressLabel = `${mapPassed} / ${mapTotal} пройдено`;
+			? (cfg.chapterSubComplete || ('Все <b>' + chapterTotal + ' вариантов пройдены</b> · средний балл <b>' + stats.avgScore + '%</b>'))
+			: (cfg.chapterSubInProgress || (chapterTotal + ' вариантов · сложность <b>повышенная</b>'));
+		const progressLabel = chapterPassed + ' / ' + chapterTotal + ' пройдено';
 		const ringGrad = chapterComplete ? 'peRingGrad' : 'pdRingGrad';
 		const ringStroke = chapterComplete ? '#dcfae6' : '#ece8f5';
 		const metaRow = chapterComplete ? `
@@ -291,7 +298,7 @@
 			: '';
 		const bossStateTxt = locked ? 'Заблокирован' : (current ? 'Босс открыт' : 'Побеждён');
 		const bossDesc = locked
-			? 'Откроется после прохождения<br/>всех 6 вариантов'
+			? 'Откроется после прохождения<br/>предыдущих вариантов'
 			: '';
 		const cta = current ? `
 			<button type="button" class="pd-cta" data-v="${v.id}" style="margin-top:12px;width:100%;justify-content:center">
@@ -325,9 +332,9 @@
 			</div>`;
 	}
 
-	function pdFootHtml(cfg, variantInfos, bossInfo, currentIdx, stats, chapterComplete, regularPassed, regularTotal, meterPct) {
-		const barCount = chapterComplete ? stats.totalNodes : regularPassed;
-		const barTotal = chapterComplete ? stats.totalNodes : regularTotal;
+	function pdFootHtml(cfg, variantInfos, bossInfo, currentIdx, stats, chapterComplete, chapterPassed, chapterTotal, meterPct) {
+		const barCount = chapterPassed;
+		const barTotal = chapterTotal;
 		let nextHtml = '';
 		if (chapterComplete) {
 			nextHtml = `
@@ -349,10 +356,11 @@
 			const nxtLabel = nxt.v.title || ('Вариант ' + nxt.v.id);
 			nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + nxtLabel + '</b>';
 		} else {
-			nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>супер-босса</b>';
+			const bossLabel = (cfg.bossName || bossInfo.v.title || ('Вариант ' + bossInfo.v.id));
+			nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + bossLabel + '</b>';
 		}
 			}
-			const stepsLeft = regularTotal - regularPassed;
+			const stepsLeft = chapterTotal - chapterPassed;
 			nextHtml = '<div class="pd-next">Следующая цель: ' + nextGoal + ' · до финала <b>' + stepsLeft + ' ' + plural(stepsLeft, ['шаг', 'шага', 'шагов']) + '</b></div>';
 		}
 		return `
@@ -373,16 +381,15 @@
 	function buildMapHtml(cfg) {
 		const { variantInfos, bossInfo, currentIdx, stats } = cfg;
 		const chapterComplete = bossInfo.state === 'done';
-		const regularPassed = variantInfos.filter(vi => vi.state === 'done').length;
-		const regularTotal = variantInfos.length;
-		const ringPct = chapterComplete ? 100 : (regularTotal ? Math.round(100 * regularPassed / regularTotal) : 0);
+		const ch = chapterNodeCounts(variantInfos, bossInfo);
+		const ringPct = ch.total ? Math.round(100 * ch.passed / ch.total) : 0;
 		const ringOffset = (94.25 * (1 - ringPct / 100)).toFixed(1);
-		const meterPct = chapterComplete ? 100 : (regularTotal ? (100 * regularPassed / regularTotal) : 0);
+		const meterPct = ch.total ? (100 * ch.passed / ch.total) : 0;
 		const cardCls = chapterComplete ? 'map-card pd-card pe-card' : 'map-card pd-card';
 		return `
 			<section class="${cardCls}" aria-label="Карта уровней">
 		${pdDecoHtml(chapterComplete)}
-		${pdHeadHtml(cfg, stats, chapterComplete, regularPassed, regularTotal, ringPct, ringOffset)}
+		${pdHeadHtml(cfg, stats, chapterComplete, ch.passed, ch.total, ringPct, ringOffset)}
 		<div class="pd-map">
 			${pdSvgHtml(chapterComplete)}
 			<div class="pd-nodes">
@@ -390,7 +397,7 @@
 				${pdBossNodeHtml(cfg, bossInfo, chapterComplete)}
 			</div>
 		</div>
-		${pdFootHtml(cfg, variantInfos, bossInfo, currentIdx, stats, chapterComplete, regularPassed, regularTotal, meterPct)}
+		${pdFootHtml(cfg, variantInfos, bossInfo, currentIdx, stats, chapterComplete, ch.passed, ch.total, meterPct)}
 			</section>`;
 	}
 

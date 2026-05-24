@@ -2834,9 +2834,9 @@
 						? 'Финальный босс · Открыт'
 						: 'Глава 1 · Полный вариант ОГЭ';
 				const heroLead = (allRegularDone && !bossBest)
-					? 'Все шесть вариантов пройдены. Победите супер-босса, чтобы открыть главу 2.'
+					? 'Пройдено 6 из 7. Пройдите финальный вариант, чтобы открыть главу 2.'
 					: (bossBest)
-						? 'Шесть вариантов и супер-босс пройдены. Перерешивайте варианты, чтобы поднять звёзды.'
+						? 'Все 7 вариантов пройдены. Перерешивайте варианты, чтобы поднять звёзды.'
 						: 'Проходите варианты по порядку. Следующий откроется при результате ≥ 50 % в части 1.';
 
 				const seen = gmLoadSeen();
@@ -2848,7 +2848,7 @@
 				else if (variantInfos.length) nextActionId = variantInfos[0].v.id;
 
 				let heroCtaLabel = 'Начать вариант 1';
-				if (nextActionId === bossSlot.id) heroCtaLabel = 'К супер-боссу';
+				if (nextActionId === bossSlot.id) heroCtaLabel = 'Продолжить вариант 7';
 				else if (bossBest) heroCtaLabel = 'Перерешать варианты';
 				else if (currentIdx >= 0) heroCtaLabel = 'Продолжить вариант ' + (currentIdx + 1);
 				else if (nextActionId) {
@@ -3044,7 +3044,7 @@
 					<section class="lm-ch2-promo" role="region" aria-label="Переход ко 2 главе">
 						<span class="lm-ch2-promo__eyebrow">Следующий этап</span>
 						<div class="lm-ch2-promo__row">
-							<p class="lm-ch2-promo__txt">Глава 2 · демо-варианты ФИПИ — новая карта: 6 вариантов и супер-босс.</p>
+							<p class="lm-ch2-promo__txt">Глава 2 · демо-варианты ФИПИ — новая карта из 7 вариантов.</p>
 							<a href="/full-test-biology/chapter-2/" class="lm-btn-ch2-cta">Перейти в главу 2 →</a>
 						</div>
 					</section>
@@ -3182,16 +3182,21 @@
 					</div>`;
 			}
 
-			function pdHeadHtml({ stats, chapterComplete, regularPassed, regularTotal, ringPct, ringOffset }) {
+			function chapterNodeCounts(variantInfos, bossInfo) {
+				let passed = 0;
+				variantInfos.forEach(vi => { if (vi.state === 'done') passed++; });
+				if (bossInfo && bossInfo.state === 'done') passed++;
+				return { passed, total: variantInfos.length + 1 };
+			}
+
+			function pdHeadHtml({ stats, chapterComplete, chapterPassed, chapterTotal, ringPct, ringOffset }) {
 				const completedChip = chapterComplete
 					? `<span class="pe-completed-chip">${PD_CHECK_SVG} Завершена</span>`
 					: '';
 				const subDone = chapterComplete
-					? `Все <b>6 вариантов пройдены</b> · супер-босс <b>побеждён</b> · средний балл <b>${stats.avgScore}%</b>`
-					: `6 демо-вариантов · 1 супер-босс · сложность <b>повышенная</b>`;
-				const mapPassed = chapterComplete ? stats.totalNodes : regularPassed;
-				const mapTotal = chapterComplete ? stats.totalNodes : regularTotal;
-				const progressLabel = `${mapPassed} / ${mapTotal} пройдено`;
+					? `Все <b>${chapterTotal} вариантов пройдены</b> · средний балл <b>${stats.avgScore}%</b>`
+					: `${chapterTotal} вариантов · сложность <b>повышенная</b>`;
+				const progressLabel = `${chapterPassed} / ${chapterTotal} пройдено`;
 				const ringGrad = chapterComplete ? 'peRingGrad' : 'pdRingGrad';
 				const ringStroke = chapterComplete ? '#dcfae6' : '#ece8f5';
 				const metaRow = chapterComplete ? `
@@ -3408,7 +3413,7 @@
 					: '';
 				const bossStateTxt = locked ? 'Заблокирован' : (current ? 'Босс открыт' : 'Побеждён');
 				const bossDesc = locked
-					? 'Откроется после прохождения<br/>всех 6 вариантов'
+					? 'Откроется после прохождения<br/>предыдущих вариантов'
 					: '';
 				const cta = current ? `
 					<button type="button" class="pd-cta" data-v="${v.id}" style="margin-top:12px;width:100%;justify-content:center">
@@ -3442,9 +3447,9 @@
 					</div>`;
 			}
 
-			function pdFootHtml({ variantInfos, bossInfo, currentIdx, stats, chapterComplete, regularPassed, regularTotal, meterPct }) {
-				const barCount = chapterComplete ? stats.totalNodes : regularPassed;
-				const barTotal = chapterComplete ? stats.totalNodes : regularTotal;
+			function pdFootHtml({ variantInfos, bossInfo, currentIdx, stats, chapterComplete, chapterPassed, chapterTotal, meterPct }) {
+				const barCount = chapterPassed;
+				const barTotal = chapterTotal;
 				let nextHtml = '';
 				if (chapterComplete) {
 					nextHtml = `
@@ -3466,10 +3471,11 @@
 							const nxtLabel = nxt.v.title || ('Вариант ' + nxt.v.id);
 							nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + nxtLabel + '</b>';
 						} else {
-							nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>супер-босса</b>';
+							const bossLabel = bossInfo.v.title || ('Вариант ' + bossInfo.v.id);
+							nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + bossLabel + '</b>';
 						}
 					}
-					const stepsLeft = regularTotal - regularPassed;
+					const stepsLeft = chapterTotal - chapterPassed;
 					nextHtml = '<div class="pd-next">Следующая цель: ' + nextGoal + ' · до финала <b>' + stepsLeft + ' ' + _lmPlural(stepsLeft, ['шаг', 'шага', 'шагов']) + '</b></div>';
 				}
 				return `
@@ -3489,16 +3495,15 @@
 
 			function lmMapHtml({ variantInfos, bossInfo, currentIdx, stats }) {
 				const chapterComplete = bossInfo.state === 'done';
-				const regularPassed = variantInfos.filter(vi => vi.state === 'done').length;
-				const regularTotal = variantInfos.length;
-				const ringPct = chapterComplete ? 100 : (regularTotal ? Math.round(100 * regularPassed / regularTotal) : 0);
+				const ch = chapterNodeCounts(variantInfos, bossInfo);
+				const ringPct = ch.total ? Math.round(100 * ch.passed / ch.total) : 0;
 				const ringOffset = (94.25 * (1 - ringPct / 100)).toFixed(1);
-				const meterPct = chapterComplete ? 100 : (regularTotal ? (100 * regularPassed / regularTotal) : 0);
+				const meterPct = ch.total ? (100 * ch.passed / ch.total) : 0;
 				const cardCls = chapterComplete ? 'map-card pd-card pe-card' : 'map-card pd-card';
 				return `
 					<section class="${cardCls}" aria-label="Карта уровней">
 						${pdDecoHtml(chapterComplete)}
-						${pdHeadHtml({ stats, chapterComplete, regularPassed, regularTotal, ringPct, ringOffset })}
+						${pdHeadHtml({ stats, chapterComplete, chapterPassed: ch.passed, chapterTotal: ch.total, ringPct, ringOffset })}
 						<div class="pd-map">
 							${pdSvgHtml(chapterComplete)}
 							<div class="pd-nodes">
@@ -3506,7 +3511,7 @@
 								${pdBossNodeHtml(bossInfo, chapterComplete)}
 							</div>
 						</div>
-						${pdFootHtml({ variantInfos, bossInfo, currentIdx, stats, chapterComplete, regularPassed, regularTotal, meterPct })}
+						${pdFootHtml({ variantInfos, bossInfo, currentIdx, stats, chapterComplete, chapterPassed: ch.passed, chapterTotal: ch.total, meterPct })}
 					</section>`;
 			}
 
