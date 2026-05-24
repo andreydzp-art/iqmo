@@ -67,9 +67,15 @@
 
 	function sumChapterXp(infos) {
 		var total = 0;
+		var nodePassed = global.IqmoLevelMapState && global.IqmoLevelMapState.nodePassed
+			? global.IqmoLevelMapState.nodePassed
+			: function (vi) {
+				return vi && (vi.state === 'done' || (vi.best && vi.best.percent >= 50));
+			};
 		(infos || []).forEach(function (vi, idx) {
-			if (!vi || !vi.best || vi.best.percent < 50) return;
-			total += xpForPassedNode(idx, !!vi.isBoss, vi.best.percent);
+			if (!nodePassed(vi)) return;
+			var pct = vi.best && vi.best.percent != null ? vi.best.percent : 50;
+			total += xpForPassedNode(idx, !!vi.isBoss, pct);
 		});
 		return total;
 	}

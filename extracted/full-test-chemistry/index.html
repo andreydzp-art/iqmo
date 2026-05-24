@@ -1538,9 +1538,9 @@
 		<script src="/iqmo-nav.js"></script>
 		<script src="/mistakes-store.js"></script>
 		<script src="/chem-progress.js?v=5"></script>
-		<script src="/level-map-state.js?v=1"></script>
-		<script src="/level-map-xp.js?v=1"></script>
-		<script src="/chemistry-level-map-render.js?v=2"></script>
+		<script src="/level-map-state.js?v=2"></script>
+		<script src="/level-map-xp.js?v=2"></script>
+		<script src="/chemistry-level-map-render.js?v=3"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from chemistry-bank.js)
@@ -3151,15 +3151,19 @@
 			// ── helpers (lm-*) ────────────────────────────────────────────
 
 			function lmComputeChapterStats(allInfos) {
+				const nodePassed = window.IqmoLevelMapState && IqmoLevelMapState.nodePassed
+					? vi => IqmoLevelMapState.nodePassed(vi)
+					: vi => vi.state === 'done' || !!(vi.best && vi.best.percent >= 50);
+				const nodePercent = vi => (vi.best && vi.best.percent != null ? vi.best.percent : (vi.state === 'done' ? 50 : 0));
 				if (window.IqmoLevelMapXp) {
 					let totalScore = 0, scoredCount = 0, passed = 0, totalStars = 0;
 					allInfos.forEach(vi => {
-						if (vi.best && vi.best.percent >= 50) {
-							passed++;
-							totalScore += vi.best.percent;
-							scoredCount++;
-							totalStars += gmStarsForPercent(vi.best.percent);
-						}
+						if (!nodePassed(vi)) return;
+						const pct = nodePercent(vi);
+						passed++;
+						totalScore += pct;
+						scoredCount++;
+						totalStars += gmStarsForPercent(pct);
 					});
 					return {
 						totalNodes: allInfos.length,
@@ -3172,14 +3176,14 @@
 				}
 				let totalScore = 0, scoredCount = 0, passed = 0, totalStars = 0, totalXp = 0;
 				allInfos.forEach(vi => {
-					if (vi.best) {
-						passed++;
-						totalScore += vi.best.percent;
-						scoredCount++;
-						const stars = gmStarsForPercent(vi.best.percent);
-						totalStars += stars;
-						totalXp += gmXpForVariant(vi.best.percent, vi.v && vi.v.id);
-					}
+					if (!nodePassed(vi)) return;
+					const pct = nodePercent(vi);
+					passed++;
+					totalScore += pct;
+					scoredCount++;
+					const stars = gmStarsForPercent(pct);
+					totalStars += stars;
+					totalXp += gmXpForVariant(pct, vi.v && vi.v.id);
 				});
 				const avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
 				return {

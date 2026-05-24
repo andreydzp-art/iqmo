@@ -72,9 +72,9 @@
 		const subDone = chapterComplete
 			? `Все <b>6 вариантов пройдены</b> · супер-босс <b>побеждён</b> · средний балл <b>${stats.avgScore}%</b>`
 			: `6 демо-вариантов · 1 супер-босс · сложность <b>повышенная</b>`;
-		const progressLabel = chapterComplete
-			? `${stats.passed} / ${stats.totalNodes} пройдено`
-			: `${regularPassed} / ${regularTotal} пройдено`;
+		const mapPassed = chapterComplete ? stats.totalNodes : regularPassed;
+		const mapTotal = chapterComplete ? stats.totalNodes : regularTotal;
+		const progressLabel = `${mapPassed} / ${mapTotal} пройдено`;
 		const ringGrad = chapterComplete ? 'peRingGrad' : 'pdRingGrad';
 		const ringStroke = chapterComplete ? '#dcfae6' : '#ece8f5';
 		const metaRow = chapterComplete ? `
@@ -326,7 +326,7 @@
 	}
 
 	function pdFootHtml(cfg, variantInfos, bossInfo, currentIdx, stats, chapterComplete, regularPassed, regularTotal, meterPct) {
-		const barCount = chapterComplete ? stats.passed : regularPassed;
+		const barCount = chapterComplete ? stats.totalNodes : regularPassed;
 		const barTotal = chapterComplete ? stats.totalNodes : regularTotal;
 		let nextHtml = '';
 		if (chapterComplete) {

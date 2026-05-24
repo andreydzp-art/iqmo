@@ -34,5 +34,19 @@
 		return -1;
 	}
 
-	global.IqmoLevelMapState = { normalize: normalize };
+	function nodePassed(vi) {
+		if (!vi) return false;
+		if (vi.state === 'done') return true;
+		return !!(vi.best && vi.best.percent >= 50);
+	}
+
+	function countPassed(infos) {
+		var n = 0;
+		(infos || []).forEach(function (vi) {
+			if (nodePassed(vi)) n++;
+		});
+		return n;
+	}
+
+	global.IqmoLevelMapState = { normalize: normalize, nodePassed: nodePassed, countPassed: countPassed };
 })(typeof window !== 'undefined' ? window : global);

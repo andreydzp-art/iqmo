@@ -566,9 +566,9 @@
 <script src="/exam-config.js"></script>
 <script src="/biology-bank.js?v=79"></script>
 <script src="/biology-variants.js?v=9"></script>
-<script src="/level-map-state.js?v=1"></script>
-<script src="/level-map-xp.js?v=1"></script>
-<script src="/biology-level-map-render.js?v=2"></script>
+<script src="/level-map-state.js?v=2"></script>
+<script src="/level-map-xp.js?v=2"></script>
+<script src="/biology-level-map-render.js?v=3"></script>
 <script>
 (function () {
   var CH2_SLOTS = [
@@ -699,13 +699,14 @@
   var stats = { totalNodes: allInfos.length, maxStars: allInfos.length * 3, passed: 0, totalStars: 0, totalXp: 0, avgScore: 0 };
   var totalScore = 0, scoredCount = 0;
   allInfos.forEach(function (vi, idx) {
-    if (vi.best && vi.best.percent >= 50) {
-      stats.passed++;
-      totalScore += vi.best.percent;
-      scoredCount++;
-      stats.totalStars += starsForPercent(vi.best.percent);
-      stats.totalXp += xpForVariant(vi.best.percent, vi.isBoss ? 5 : idx, !!vi.isBoss);
-    }
+    var passedNode = vi.state === 'done' || (vi.best && vi.best.percent >= 50);
+    if (!passedNode) return;
+    var pct = vi.best && vi.best.percent != null ? vi.best.percent : 50;
+    stats.passed++;
+    totalScore += pct;
+    scoredCount++;
+    stats.totalStars += starsForPercent(pct);
+    stats.totalXp += xpForVariant(pct, vi.isBoss ? 5 : idx, !!vi.isBoss);
   });
   stats.avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
 
