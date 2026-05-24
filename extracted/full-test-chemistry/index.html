@@ -2694,6 +2694,8 @@
 					if (!raw) return null;
 					const s = JSON.parse(raw);
 					if (!s || !s.finished) return null;
+					const storedPct = s.part1Percent != null ? Number(s.part1Percent)
+						: (s.percent != null ? Number(s.percent) : null);
 					const bank = window.CHEMISTRY_QUESTIONS || [];
 					let ok = 0, total = 0;
 					(v.qids || []).forEach(qid => {
@@ -2703,8 +2705,15 @@
 						const given = s.answers ? s.answers[q.id] : undefined;
 						if (checkAnswerStatic(q, given) === 'ok') ok++;
 					});
-					if (!total) return null;
-					return { ok, total, percent: Math.round(100 * ok / total) };
+					if (!total) {
+						if (storedPct == null || !Number.isFinite(storedPct)) return null;
+						return { ok: Math.round(storedPct), total: 100, percent: storedPct };
+					}
+					const computed = Math.round(100 * ok / total);
+					const percent = (computed > 0 || storedPct == null || !Number.isFinite(storedPct))
+						? computed
+						: storedPct;
+					return { ok, total, percent: percent };
 				} catch (e) { return null; }
 			}
 			function gmXpForVariant(percent, variantId) {
