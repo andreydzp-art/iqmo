@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 final class IqmoProfileController extends Controller
 {
+    /** @var list<string> */
+    private const SYNC_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
+
     public function stateGet(Request $request)
     {
         $userId = (int) $request->attributes->get('iqmo_user_id');
@@ -88,16 +91,16 @@ final class IqmoProfileController extends Controller
             ], 409);
         }
 
-        $sanitized = [];
-        foreach ($incomingKeys as $k => $v) {
-            if (!is_string($k) || !str_starts_with($k, 'iqmo-chem-')) {
-                continue;
-            }
-            if ($v === null) {
-                continue;
-            }
-            $sanitized[$k] = (string) $v;
+        $existing = $row->keys_json;
+        if (is_string($existing)) {
+            $decoded = json_decode($existing, true);
+            $existing = is_array($decoded) ? $decoded : [];
         }
+        if (!is_array($existing)) {
+            $existing = [];
+        }
+
+        $sanitized = self::mergeSyncKeys($existing, $incomingKeys);
 
         $keysJson = json_encode($sanitized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $newRev = $serverRev + 1;
@@ -106,10 +109,13 @@ final class IqmoProfileController extends Controller
         $prevJson = is_string($row->keys_json) ? $row->keys_json : json_encode($row->keys_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $this->snapshotHistory($userId, $prevJson, (int) $row->revision);
 
-        DB::connection('iqmo')->update(
-            'UPDATE profile_state SET keys_json = CAST(? AS JSON), revision = ?, updated_at = ? WHERE user_id = ?',
-            [$keysJson, $newRev, $now, $userId]
-        );
+        DB::connection('iqmo')->table('profile_state')
+            ->where('user_id', $userId)
+            ->update([
+                'keys_json' => $keysJson,
+                'revision' => $newRev,
+                'updated_at' => $now,
+            ]);
 
         return response()->json(['ok' => true, 'revision' => $newRev, 'updatedAt' => $now]);
     }
@@ -199,5 +205,67 @@ final class IqmoProfileController extends Controller
                 [$userId, $toDelete]
             );
         }
+    }
+
+    /**
+     * Слияние snapshot'ов sync-ключей. Если клиент прислал хотя бы один ключ
+     * с префиксом — для этого префикса принимается полный снимок из push
+     * (старые ключи префикса на сервере заменяются). Если префикса в push нет
+     * (старый клиент без bio-sync) — серверные ключи этого префикса сохраняются.
+     *
+     * @param  array<string, mixed>  $existing
+     * @param  array<string, mixed>  $incoming
+     * @return array<string, string>
+     */
+    private static function mergeSyncKeys(array $existing, array $incoming): array
+    {
+        $out = [];
+        foreach ($existing as $k => $v) {
+            if (!is_string($k) || self::isSyncKey($k)) {
+                continue;
+            }
+            $out[$k] = is_string($v) ? $v : (string) json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
+        foreach (self::SYNC_PREFIXES as $prefix) {
+            $incomingHasPrefix = false;
+            foreach ($incoming as $k => $v) {
+                if (is_string($k) && str_starts_with($k, $prefix)) {
+                    $incomingHasPrefix = true;
+                    break;
+                }
+            }
+
+            if ($incomingHasPrefix) {
+                foreach ($incoming as $k => $v) {
+                    if (!is_string($k) || !str_starts_with($k, $prefix) || $v === null) {
+                        continue;
+                    }
+                    $out[$k] = (string) $v;
+                }
+
+                continue;
+            }
+
+            foreach ($existing as $k => $v) {
+                if (!is_string($k) || !str_starts_with($k, $prefix)) {
+                    continue;
+                }
+                $out[$k] = is_string($v) ? $v : (string) json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+        }
+
+        return $out;
+    }
+
+    private static function isSyncKey(string $key): bool
+    {
+        foreach (self::SYNC_PREFIXES as $prefix) {
+            if (str_starts_with($key, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

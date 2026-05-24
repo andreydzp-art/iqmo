@@ -1,9 +1,17 @@
-// Синхронизация ключей localStorage с префиксом iqmo-chem-* на сервер (после входа).
+// Синхронизация ключей localStorage iqmo-chem-* и iqmo-bio-* на сервер (после входа).
 // Требует, чтобы сайт открывался с того же хоста, что и API (см. server/index.js), не file://
 (function () {
 	'use strict';
 
-	const PREFIX = 'iqmo-chem-';
+	const SYNC_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
+
+	function hasSyncPrefix(key) {
+		if (typeof key !== 'string') return false;
+		for (let i = 0; i < SYNC_PREFIXES.length; i++) {
+			if (key.indexOf(SYNC_PREFIXES[i]) === 0) return true;
+		}
+		return false;
+	}
 	// Маркер «последний залогиненный пользователь» в этом браузере. Нужен для
 	// изоляции прогресса между аккаунтами: без него localStorage остаётся от
 	// предыдущего юзера, и при первом заходе нового аккаунта (state на сервере
@@ -50,11 +58,11 @@
 		const origClear = ls.clear.bind(ls);
 		ls.setItem = function (key, val) {
 			origSet(key, val);
-			if (typeof key === 'string' && key.indexOf(PREFIX) === 0) markDirty();
+			if (hasSyncPrefix(key)) markDirty();
 		};
 		ls.removeItem = function (key) {
 			origRemove(key);
-			if (typeof key === 'string' && key.indexOf(PREFIX) === 0) markDirty();
+			if (hasSyncPrefix(key)) markDirty();
 		};
 		ls.clear = function () {
 			origClear();
@@ -67,7 +75,7 @@
 		try {
 			for (let i = 0; i < localStorage.length; i++) {
 				const k = localStorage.key(i);
-				if (k && k.indexOf(PREFIX) === 0) out[k] = localStorage.getItem(k);
+				if (k && hasSyncPrefix(k)) out[k] = localStorage.getItem(k);
 			}
 		} catch (e) {}
 		return out;
@@ -88,7 +96,7 @@
 	// iqmo-nav.js (logout) и в delete-обработчике в extracted/profile/index.html.
 	// Префиксы покрывают:
 	//   iqmo-chem-*           — прогресс химии (синкается на сервер)
-	//   iqmo-bio-*            — прогресс биологии (только локально, серверный sync ещё не реализован)
+	//   iqmo-bio-*            — прогресс биологии (синкается на сервер)
 	//   iqmo:chem:*           — двоеточная схема (warmup-chemistry, iqmo:chem:catWrong:<id>)
 	//   iqmo_purchase_*       — commerce-dedup (uploads/thank.html: iqmo_purchase_done_<date>, _id)
 	//   iqmo_express_start_*  — easy-test express stage (uploads/easy-test.html)
@@ -156,7 +164,7 @@
 		try {
 			for (let i = 0; i < localStorage.length; i++) {
 				const k = localStorage.key(i);
-				if (k && k.indexOf(PREFIX) === 0) toRemove.push(k);
+				if (k && hasSyncPrefix(k)) toRemove.push(k);
 			}
 		} catch (e) {}
 		for (let j = 0; j < toRemove.length; j++) {
@@ -168,7 +176,7 @@
 		}
 		for (let n = 0; n < incoming.length; n++) {
 			const k = incoming[n];
-			if (k.indexOf(PREFIX) !== 0) continue;
+			if (!hasSyncPrefix(k)) continue;
 			try {
 				const v = obj[k];
 				if (v == null) localStorage.removeItem(k);
@@ -261,9 +269,9 @@
 			if (!authed) return;
 
 			// Кто сейчас залогинен и кто был залогинен в прошлый раз на этом
-			// устройстве. Если это разные аккаунты — локальные iqmo-chem-* нельзя
-			// доверять (это прогресс ушедшего юзера), и нельзя пушить их на сервер
-			// нового аккаунта. Сценарий, который этот блок предотвращает: админ
+			// устройстве. Если это разные аккаунты — локальные iqmo-chem-* /
+			// iqmo-bio-* нельзя доверять (это прогресс ушедшего юзера), и нельзя
+			// пушить их на сервер нового аккаунта. Сценарий, который этот блок предотвращает: админ
 			// разлогинился, регистрируется новый андроид@…; до фикса его профиль
 			// сразу показывал XP/уровни/серию админа, потому что серверный state
 			// был пуст, а локальный — нет, и init() заливал старое на новый аккаунт.

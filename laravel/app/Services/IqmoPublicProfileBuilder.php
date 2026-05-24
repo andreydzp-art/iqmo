@@ -173,7 +173,7 @@ final class IqmoPublicProfileBuilder
             'statsData' => self::stats($totalTasks, $attemptTotal, $totalActiveMs, $streakDays, $accuracyAvg, $lastAttempt, $weekPts),
             'subjectsProgressData' => $subjects,
             'collectiblesData' => [],
-            'publicNotice' => $bioV['passed'] === 0
+            'publicNotice' => ! self::hasBioKeys($keys) && $bioV['passed'] === 0
                 ? 'Прогресс по биологии может храниться только на устройстве ученика и не отображаться здесь.'
                 : null,
         ];
@@ -193,6 +193,20 @@ final class IqmoPublicProfileBuilder
         }
 
         return IqmoGamificationMath::displayNameFromEmail($email);
+    }
+
+    /**
+     * @param  array<string, mixed>  $keys
+     */
+    private static function hasBioKeys(array $keys): bool
+    {
+        foreach (array_keys($keys) as $k) {
+            if (is_string($k) && str_starts_with($k, 'iqmo-bio-')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
