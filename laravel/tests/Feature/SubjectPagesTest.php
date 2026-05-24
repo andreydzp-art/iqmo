@@ -158,4 +158,17 @@ final class SubjectPagesTest extends TestCase
         $response->assertStatus(301);
         $response->assertRedirect('/profile/');
     }
+
+    public function test_public_profile_url_serves_same_spa(): void
+    {
+        $response = $this->get('/profile/IQ-0868/');
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+    }
+
+    public function test_public_profile_url_without_trailing_slash_also_works(): void
+    {
+        $this->get('/profile/IQ-0042')->assertStatus(200);
+    }
 }

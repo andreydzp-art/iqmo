@@ -1,10 +1,21 @@
 /**
- * IQMO profile — инициализация, аккаунт, sync.
+ * IQMO profile — инициализация, аккаунт, sync, публичный режим.
  */
 (function (global) {
 	'use strict';
 
 	var meUser = null;
+	var publicProfileId = null;
+
+	function parsePublicProfileId() {
+		try {
+			var m = global.location.pathname.match(/^\/profile\/IQ-(\d+)\/?$/i);
+			if (!m) return null;
+			return 'IQ-' + String(parseInt(m[1], 10)).padStart(4, '0');
+		} catch (e) {
+			return null;
+		}
+	}
 
 	function refresh() {
 		if (!global.IqmoProfileData || !global.IqmoProfileRender) return;
@@ -70,6 +81,22 @@
 		bindAccountHandlers._bound = true;
 
 		document.addEventListener('click', async function (e) {
+			var copyBtn = e.target.closest('#prof-copy-link');
+			if (copyBtn) {
+				var href = copyBtn.getAttribute('data-copy-href') || '';
+				var url = href ? (global.location.origin + href) : '';
+				try {
+					if (navigator.clipboard && navigator.clipboard.writeText) {
+						await navigator.clipboard.writeText(url);
+					} else {
+						prompt('Скопируйте ссылку:', url);
+					}
+					copyBtn.textContent = 'Скопировано';
+					setTimeout(function () { copyBtn.textContent = 'Копировать ссылку'; }, 1800);
+				} catch (errCopy) {}
+				return;
+			}
+
 			var resetBtn = e.target.closest('#prof-reset');
 			if (resetBtn) {
 				if (!confirm('Удалить все данные IQMO по химии в этом браузере (и на сервере, если вы вошли)?')) return;
@@ -203,20 +230,49 @@
 		}
 	}
 
+	async function loadPublicProfile(profileId) {
+		var root = document.getElementById('prof-root');
+		try {
+			var r = await fetch('/api/profile/' + encodeURIComponent(profileId), { cache: 'no-store' });
+			if (!r.ok) {
+				if (root && global.IqmoProfileRender && IqmoProfileRender.renderError) {
+					root.innerHTML = IqmoProfileRender.renderError(r.status === 404 ? 'Профиль не найден' : 'Не удалось загрузить профиль');
+				}
+				return;
+			}
+			var data = await r.json();
+			data.viewerMe = meUser;
+			if (global.IqmoProfileRender) IqmoProfileRender.render(data);
+			document.title = 'IQMO — Профиль ' + profileId;
+		} catch (eLoad) {
+			if (root && global.IqmoProfileRender && IqmoProfileRender.renderError) {
+				root.innerHTML = IqmoProfileRender.renderError('Сеть недоступна');
+			}
+		}
+	}
+
 	async function init() {
 		if (global.IqmoProfileRender && IqmoProfileRender.bindCollectibles) {
 			IqmoProfileRender.bindCollectibles();
 		}
+		publicProfileId = parsePublicProfileId();
 		meUser = await fetchMe();
-		refresh();
 		bindAccountHandlers();
+
+		if (publicProfileId) {
+			await loadPublicProfile(publicProfileId);
+			return;
+		}
+
+		refresh();
 		global.addEventListener('iqmo-sync', refresh);
 		global.addEventListener('iqmo-sync-ready', refresh);
 	}
 
 	global.IqmoProfileApp = {
 		init: init,
-		refresh: refresh
+		refresh: refresh,
+		parsePublicProfileId: parsePublicProfileId
 	};
 
 	if (document.readyState === 'loading') {

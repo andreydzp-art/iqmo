@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AdminOverviewController;
 use App\Http\Controllers\Api\AdminQuizzesController;
 use App\Http\Controllers\Api\AdminUsersController;
 use App\Http\Controllers\Api\AnalyticsIngestController;
+use App\Http\Controllers\Api\IqmoPublicProfileController;
 use App\Http\Controllers\Api\IqmoAuthController;
 use App\Http\Controllers\Api\IqmoLeaderboardController;
 use App\Http\Controllers\Api\IqmoProfileController;
@@ -25,6 +26,10 @@ Route::prefix('api')->group(function (): void {
     Route::get('/me', [IqmoAuthController::class, 'me']);
 
     Route::get('/leaderboard', [IqmoLeaderboardController::class, 'index']);
+
+    // Публичный профиль по Profile ID (IQ-0868). Без auth; без e-mail.
+    Route::get('/profile/{profileId}', [IqmoPublicProfileController::class, 'show'])
+        ->where('profileId', 'IQ-[0-9]+');
 
     Route::middleware(['iqmo.jwt'])->group(function (): void {
         Route::get('/profile/state', [IqmoProfileController::class, 'stateGet']);

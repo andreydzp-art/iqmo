@@ -239,7 +239,14 @@
 		);
 	}
 
-	function renderSettingsAccount() {
+	function renderSettingsAccount(profileId) {
+		var pubLink = profileId
+			? '<div class="prof-settings__box iqmo-only-authed"><h3 style="margin:0 0 8px;font-size:14px">Публичная ссылка</h3>' +
+			  '<p style="font-size:12px;color:var(--muted);margin:0 0 10px">Можно отправить друзьям — e-mail и настройки не показываются.</p>' +
+			  '<p style="margin:0 0 10px;font-family:\'JetBrains Mono\',monospace;font-size:12px">' +
+			  '<a href="/profile/' + esc(profileId) + '" id="prof-public-link">/profile/' + esc(profileId) + '</a></p>' +
+			  '<button type="button" class="btn btn--ghost" id="prof-copy-link" data-copy-href="/profile/' + esc(profileId) + '">Копировать ссылку</button></div>'
+			: '';
 		return (
 			'<section class="prof-settings" id="prof-account">' +
 			'<h2>Аккаунт и данные</h2>' +
@@ -256,22 +263,50 @@
 			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Безвозвратно: e-mail, пароль и прогресс на сервере.</p>' +
 			'<button type="button" class="btn btn--danger" id="prof-delete-account">Удалить аккаунт</button>' +
 			'<p id="prof-delete-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
+			pubLink +
 			'</div></section>'
+		);
+	}
+
+	function renderPublicBanner(data) {
+		var pid = data.profileId || (data.profileData && data.profileData.profileId) || '';
+		var viewer = data.viewerMe;
+		var ownId = viewer && viewer.id != null
+			? 'IQ-' + String(viewer.id).padStart(4, '0')
+			: null;
+		var isOwn = ownId && ownId === pid;
+		return (
+			'<div class="prof-public-banner">' +
+			'<div><strong>Публичный профиль</strong> <span class="prof-public-id">' + esc(pid) + '</span></div>' +
+			(isOwn ? '<a class="sec-link" href="/profile/">Мой кабинет →</a>' : '<a class="sec-link" href="/profile/">Мой профиль</a>') +
+			(data.publicNotice ? '<p class="prof-public-note">' + esc(data.publicNotice) + '</p>' : '') +
+			'</div>'
+		);
+	}
+
+	function renderError(message) {
+		return (
+			'<div class="prof-error">' +
+			'<h1 style="margin:0 0 8px;font-size:22px">' + esc(message) + '</h1>' +
+			'<p style="margin:0;color:var(--muted)"><a href="/profile/">Вернуться в свой профиль</a></p></div>'
 		);
 	}
 
 	function render(data) {
 		var root = document.getElementById('prof-root');
 		if (!root || !data) return;
+		var isPublic = !!data.isPublic;
+		var profileId = data.profileData && data.profileData.profileId;
+		var settingsBlock = isPublic ? '' : renderSettingsGuest() + renderSettingsAccount(profileId);
 		root.innerHTML =
+			(isPublic ? renderPublicBanner(data) : '') +
 			renderHero(data) +
 			renderGoals(data.nextGoalsData) +
-			renderSettingsGuest() +
-			renderSettingsAccount() +
+			settingsBlock +
 			renderAchievements(data.achievementsData) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +
 			renderSubjects(data.subjectsProgressData) +
-			renderCollectibles(data.collectiblesData) +
+			(isPublic ? '' : renderCollectibles(data.collectiblesData || [])) +
 			'<p class="footnote">Уровни, рамки и значки — дополнительная мотивация, а не учебный результат. Главная цель — освоение тем и подготовка к экзамену.</p>';
 
 		var navAv = document.getElementById('nav-avatar');
@@ -298,6 +333,7 @@
 
 	global.IqmoProfileRender = {
 		render: render,
+		renderError: renderError,
 		bindCollectibles: bindCollectibles
 	};
 })(typeof window !== 'undefined' ? window : global);

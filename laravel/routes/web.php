@@ -270,8 +270,10 @@ Route::get('/profile.html', function () {
 $serveProfileIndex = function () use ($serveStatic) {
     return $serveStatic(public_path('site/profile/index.html'));
 };
-// `/profile` и `/profile/` — оба отдают index.html; Laravel нормализует
-// trailing slash при роутинге, одной записи достаточно.
+// Публичный профиль: /profile/IQ-0868/ — тот же SPA, режим определяется по URL.
+Route::get('/profile/IQ-{uid}', $serveProfileIndex)->where('uid', '[0-9]+');
+Route::get('/profile/IQ-{uid}/', $serveProfileIndex)->where('uid', '[0-9]+');
+// `/profile` и `/profile/` — личный профиль (свой прогресс из localStorage + /api/me).
 Route::get('/profile', $serveProfileIndex)->name('iqmo.profile');
 
 Route::get('/login', function () {
