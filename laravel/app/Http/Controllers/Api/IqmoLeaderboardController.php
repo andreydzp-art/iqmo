@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\IqmoGamificationMath;
 use App\Services\IqmoJwt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +62,7 @@ final class IqmoLeaderboardController extends Controller
             $items[] = [
                 'rank' => $i + 1,
                 'uid' => $uid,
+                'profileId' => IqmoGamificationMath::formatProfileId($uid),
                 'display' => $this->maskEmail((string) $r->email),
                 'initials' => $this->initialsFromEmail((string) $r->email),
                 'xp' => $xp,
@@ -89,6 +91,7 @@ final class IqmoLeaderboardController extends Controller
                 );
                 $me = [
                     'uid' => $meId,
+                    'profileId' => IqmoGamificationMath::formatProfileId($meId),
                     'rank' => ((int) ($rankRow->c ?? 0)) + 1,
                     'xp' => $myXp,
                     'level' => $this->levelFromXp($myXp),

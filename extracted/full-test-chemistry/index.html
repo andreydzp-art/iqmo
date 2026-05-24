@@ -1540,6 +1540,7 @@
 		<script src="/level-map-xp.js?v=3"></script>
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/chem-progress.js?v=7"></script>
+		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/chemistry-level-map-render.js?v=4"></script>
 		<script>
 			// ============================================================
@@ -3124,19 +3125,16 @@
 				function rowHtml(it, isTopRow) {
 					var rank = Number(it.rank) || 0;
 					var rankCls = ['', 'lm-lb-1', 'lm-lb-2', 'lm-lb-3'][rank] || '';
-					var nameRaw = it.is_me ? 'Вы' : (it.display || 'user');
-					var name = String(nameRaw).replace(/[<>&"']/g, function (c) {
-						return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' })[c];
-					});
 					var meStyle = it.is_me ? ' style="background: var(--lm-primary-50); padding: 6px 10px; margin: 0 -10px; border-radius: 10px;"' : '';
-					var nameStyle = it.is_me ? ' style="color: var(--lm-primary)"' : '';
+					var nameStyle = it.is_me ? 'color: var(--lm-primary)' : '';
 					var scoreStyle = it.is_me ? ' style="color: var(--lm-primary)"' : '';
 					var rankNode = isTopRow && rankCls
 						? '<div class="lm-lb-rank ' + rankCls + '">' + rank + '</div>'
 						: '<div class="lm-lb-mini"' + (it.is_me ? ' style="background: var(--lm-primary); color: #fff;"' : '') + '>' + rank + '</div>';
+					var nameNode = IqmoLeaderboardUi.profileNameHtml(it, { tag: 'div', className: 'lm-lb-name', style: nameStyle });
 					return '<div class="lm-lb-row"' + meStyle + '>' +
 						rankNode +
-						'<div class="lm-lb-name"' + nameStyle + '>' + name + '</div>' +
+						nameNode +
 						'<div class="lm-lb-score lm-num"' + scoreStyle + '>' + fmtPts(it.xp) + ' XP</div>' +
 					'</div>';
 				}
@@ -3157,7 +3155,14 @@
 						var meIdx = items.findIndex(function (x) { return x && x.is_me; });
 						if (meIdx < 0 && data && data.me && data.me.uid) {
 							html += '<div style="border-top:1px dashed var(--lm-line, var(--line)); margin-top:6px; padding-top:8px;">' +
-								rowHtml({ rank: data.me.rank, xp: data.me.xp, is_me: true, display: 'Вы' }, false) +
+								rowHtml({
+									rank: data.me.rank,
+									xp: data.me.xp,
+									is_me: true,
+									display: 'Вы',
+									uid: data.me.uid,
+									profileId: data.me.profileId
+								}, false) +
 								'</div>';
 						}
 						host.innerHTML = html;

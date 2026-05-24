@@ -836,6 +836,7 @@
 <script src="/iqmo-sync.js"></script>
 <script src="/iqmo-nav.js"></script>
 <script src="/iqmo-companion.js"></script>
+<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 <script>
 (function () {
   function pluralize(n, one, few, many) {
@@ -992,11 +993,11 @@
           var seed = String(it.uid || it.display || idx);
           var bg = avatarBg(seed, it.is_me);
           var ini = (it.initials || '?').slice(0, 2);
-          var name = it.is_me ? 'Вы' : (it.display || 'user');
+          var nameCell = IqmoLeaderboardUi.profileNameHtml(it, { tag: 'span', className: 'pf__name' });
           return '<div class="pf ' + rankCls + meCls + '">' +
             '<span class="pf__rank">' + it.rank + '</span>' +
             '<span class="pf__avatar" style="background:' + bg + '">' + ini + '</span>' +
-            '<span class="pf__name">' + name + '</span>' +
+            nameCell +
             '<span class="pf__score">' + fmtPts(it.xp) + '</span>' +
             '</div>';
         }).join('');
@@ -1008,7 +1009,7 @@
             '<div class="pf pf--me" style="border-top:1px dashed var(--line); margin-top:6px; padding-top:8px;">' +
             '<span class="pf__rank">#' + me.rank + '</span>' +
             '<span class="pf__avatar" style="background:' + bg + '">' + ini + '</span>' +
-            '<span class="pf__name">Вы</span>' +
+            IqmoLeaderboardUi.profileNameHtml({ is_me: true, display: 'Вы', uid: me.uid, profileId: me.profileId }, { tag: 'span', className: 'pf__name' }) +
             '<span class="pf__score">' + fmtPts(me.xp) + '</span>' +
             '</div>'
           );

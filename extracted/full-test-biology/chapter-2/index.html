@@ -805,6 +805,7 @@
 <script src="/iqmo-nav.js"></script>
 <script src="/iqmo-companion.js"></script>
 <script src="/chem-progress.js?v=7"></script>
+<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 <script>
 (function () {
 	var SUBJ = 'biology';
@@ -892,19 +893,19 @@
 					host.removeAttribute('data-loading');
 					return;
 				}
-				function row(it, isMe) {
+				function row(it) {
 					var xp = it.xp != null ? it.xp : 0;
 					var rank = it.rank != null ? it.rank : '—';
-					var name = it.display || it.email || '—';
-					var cls = isMe || it.is_me ? 'lead-row me' : 'lead-row';
+					var cls = it.is_me ? 'lead-row me' : 'lead-row';
+					var nameCell = IqmoLeaderboardUi.profileNameHtml(it, { tag: 'div', className: 'lead-name' });
 					return (
 						'<div class="' +
 						cls +
 						'"><div class="lead-rank">' +
 						rank +
-						'</div><div class="lead-name">' +
-						String(name).replace(/</g, '&lt;') +
-						'</div><div class="lead-xp">' +
+						'</div>' +
+						nameCell +
+						'<div class="lead-xp">' +
 						fmtNum(xp) +
 						' <small>XP</small></div></div>'
 					);
@@ -915,7 +916,14 @@
 				if (data && data.me && data.me.uid && items.every(function (x) { return !x.is_me; })) {
 					html +=
 						'<div style="border-top:1px dashed var(--line);margin-top:6px;padding-top:8px;">' +
-						row({ rank: data.me.rank, xp: data.me.xp, display: 'Вы', is_me: true }, true) +
+						row({
+							rank: data.me.rank,
+							xp: data.me.xp,
+							display: 'Вы',
+							is_me: true,
+							uid: data.me.uid,
+							profileId: data.me.profileId
+						}) +
 						'</div>';
 				}
 				host.innerHTML = html;
