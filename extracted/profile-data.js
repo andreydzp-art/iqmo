@@ -155,23 +155,6 @@
 		}
 	}
 
-	function countFinishedVariants(prefix, ids) {
-		var passed = 0;
-		var finished = 0;
-		for (var i = 0; i < ids.length; i++) {
-			var raw = localStorage.getItem(prefix + ids[i]);
-			if (!raw) continue;
-			try {
-				var s = JSON.parse(raw);
-				if (s && s.finished) {
-					finished++;
-					passed++;
-				}
-			} catch (e2) {}
-		}
-		return { passed: passed, finished: finished, total: ids.length };
-	}
-
 	function chemTopicsSummary() {
 		var sum = 0;
 		var count = 0;
