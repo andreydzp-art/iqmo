@@ -1937,6 +1937,12 @@
 			function finishTest() {
 				state.finished = true;
 				if (!state.selfScores) state.selfScores = {};
+				try {
+					const sFinish = computeScoring();
+					state.part1Percent = sFinish.part1Percent;
+					state.percent = sFinish.percent;
+					state.finishedAt = Date.now();
+				} catch (eFinish) {}
 				saveState();
 				// Записываем в банк личных ошибок (только автопроверяемые)
 				try {

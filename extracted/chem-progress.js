@@ -19,6 +19,8 @@
 	const KEY_ATTEMPT_STATS = 'iqmo-chem-attempt-stats-v1';
 	const KEY_TOTAL_TASKS = 'iqmo-chem-total-tasks-v1';
 	const KEY_BADGES = 'iqmo-chem-badges-v1';
+	/** Скользящее среднее процента по завершённым попыткам (для профиля). */
+	const KEY_ACCURACY_STATS = 'iqmo-chem-accuracy-stats-v1';
 	/** Очередь «покажи салют в профиле» после первого открытия награды. */
 	const KEY_BADGE_CELEBRATE = 'iqmo-badge-celebrate-queue-v1';
 	/** Уже начисленный step-XP карты уровней: { biology: { "1": 50 }, chemistry: { … } }. */
@@ -732,6 +734,33 @@
 		awardXp(DAILY_VISIT_XP, 'daily_visit', 0);
 	}
 
+	function bumpAccuracyStats(percent) {
+		const p = Math.round(Number(percent));
+		if (!Number.isFinite(p)) return;
+		const st = lsGet(KEY_ACCURACY_STATS, { sum: 0, count: 0 }) || { sum: 0, count: 0 };
+		st.sum = (Number(st.sum) || 0) + p;
+		st.count = (Number(st.count) || 0) + 1;
+		lsSet(KEY_ACCURACY_STATS, st);
+	}
+
+	function getAccuracyAverage() {
+		const st = lsGet(KEY_ACCURACY_STATS, { sum: 0, count: 0 }) || { sum: 0, count: 0 };
+		const count = Number(st.count) || 0;
+		if (!count) return null;
+		return Math.round((Number(st.sum) || 0) / count);
+	}
+
+	function migrateAccuracyFromLast() {
+		const st = lsGet(KEY_ACCURACY_STATS, { sum: 0, count: 0 }) || { sum: 0, count: 0 };
+		if ((Number(st.count) || 0) > 0) return;
+		try {
+			const raw = localStorage.getItem(KEY_LAST);
+			if (!raw) return;
+			const o = JSON.parse(raw);
+			if (o && o.percent != null) bumpAccuracyStats(o.percent);
+		} catch (e) {}
+	}
+
 	function loadAttemptStatsRaw() {
 		const st = lsGet(KEY_ATTEMPT_STATS, null);
 		const byMode = { warmup: 0, trial: 0, full: 0, quick: 0, other: 0 };
@@ -840,6 +869,7 @@
 
 	function getGamificationSnapshot() {
 		syncRetroBadges();
+		migrateAccuracyFromLast();
 		const goal = ensureDailyGoal();
 		const today = dayKey(Date.now());
 		const daily = lsGet(KEY_DAILY, null);
@@ -887,7 +917,8 @@
 				prevThreshold: level.minXpThisLevel,
 				nextThreshold: level.nextThreshold != null ? level.nextThreshold : level.minXpThisLevel
 			},
-			league: { rank, size, gapToPrev: gap }
+			league: { rank, size, gapToPrev: gap },
+			accuracyAverage: getAccuracyAverage()
 		};
 	}
 
@@ -951,6 +982,12 @@
 		try {
 			bumpAttemptStats(payload.mode);
 		} catch (e0) {}
+
+		try {
+			if (total > 0 || payload.percent != null) {
+				bumpAccuracyStats(percent);
+			}
+		} catch (eAcc) {}
 
 		try {
 			const astAfter = loadAttemptStatsRaw();

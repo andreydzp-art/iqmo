@@ -18,23 +18,25 @@
 		{ key: 'iqmo-chem-topic10-subtopics', n: 7, label: '10 · Экология' }
 	];
 
+	var CH1_VARIANT_IDS = [1, 2, 3, 4, 5, 6, 7];
+
 	var ACHIEVEMENT_CATALOG = [
-		{ id: 'welcome', title: 'Старт', desc: 'Первый визит в IQMO.', rarity: 'common', pctEarned: 94, icon: 'star' },
-		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', pctEarned: 41, icon: 'book' },
-		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', pctEarned: 8.2, icon: 'flame' },
-		{ id: 'chem_stage1', title: 'Этап 1 · Химия', desc: 'Все 7 вариантов главы 1 по химии.', rarity: 'epic', pctEarned: 5.1, icon: 'trophy' },
-		{ id: 'bio_stage1', title: 'Этап 1 · Биология', desc: 'Все 7 вариантов главы 1 по биологии.', rarity: 'epic', pctEarned: 4.6, icon: 'trophy' },
-		{ id: 'ten_tests', title: 'Десятка', desc: '10 завершённых попыток.', rarity: 'rare', pctEarned: 12, icon: 'medal' },
-		{ id: 'perfect_run', title: 'Без ошибок', desc: '100% при ≥5 вопросах в зачёте.', rarity: 'rare', pctEarned: 6.4, icon: 'target' },
-		{ id: 'topic_star', title: 'Мастер темы', desc: 'Полностью освоена хотя бы одна тема.', rarity: 'rare', pctEarned: 11, icon: 'spark' },
-		{ id: 'final_sprint', title: 'Финишный рывок', desc: 'Максимальный уровень (50).', rarity: 'legend', pctEarned: 0.9, icon: 'crown' }
+		{ id: 'welcome', title: 'Старт', desc: 'Первый визит в IQMO.', rarity: 'common', icon: 'star' },
+		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', icon: 'book' },
+		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame' },
+		{ id: 'chem_stage1', title: 'Этап 1 · Химия', desc: 'Все 7 вариантов главы 1 по химии.', rarity: 'epic', icon: 'trophy' },
+		{ id: 'bio_stage1', title: 'Этап 1 · Биология', desc: 'Все 7 вариантов главы 1 по биологии.', rarity: 'epic', icon: 'trophy' },
+		{ id: 'ten_tests', title: 'Десятка', desc: '10 завершённых попыток.', rarity: 'rare', icon: 'medal' },
+		{ id: 'perfect_run', title: 'Без ошибок', desc: '100% при ≥5 вопросах в зачёте.', rarity: 'rare', icon: 'target' },
+		{ id: 'topic_star', title: 'Мастер темы', desc: 'Полностью освоена хотя бы одна тема.', rarity: 'rare', icon: 'spark' },
+		{ id: 'final_sprint', title: 'Финишный рывок', desc: 'Максимальный уровень (50).', rarity: 'legend', icon: 'crown' }
 	];
 
 	var COLLECTIBLES_CATALOG = [
-		{ id: 'gold-crown', name: 'Золотая корона', desc: 'За победу в недельной лиге IQMO.', rarity: 'legend', pctOwned: 1.3, locked: true, progress: null },
-		{ id: 'violet-aura', name: 'Фиолетовая аура', desc: 'За прохождение главы по двум предметам.', rarity: 'epic', pctOwned: 6.8, locked: true, progress: null },
-		{ id: 'blue-ring', name: 'Синий контур', desc: 'За серию 7 дней без перерыва.', rarity: 'rare', pctOwned: 18, locked: false, progress: null },
-		{ id: 'may-storm', name: 'Майская гроза', desc: 'Сезонная награда — закройте 7 целей за неделю.', rarity: 'epic', pctOwned: null, locked: true, progress: { current: 0, total: 7, label: 'прогресс' } }
+		{ id: 'gold-crown', name: 'Золотая корона', desc: 'За лучшую неделю в личной лиге.', rarity: 'legend', locked: true, progress: null },
+		{ id: 'violet-aura', name: 'Фиолетовая аура', desc: 'За прохождение этапа 1 по двум предметам.', rarity: 'epic', locked: true, progress: null },
+		{ id: 'blue-ring', name: 'Синий контур', desc: 'За серию 7 дней без перерыва.', rarity: 'rare', locked: false, progress: null },
+		{ id: 'may-storm', name: 'Майская гроза', desc: 'Сезонная награда — 7 дней подряд с закрытой дневной целью.', rarity: 'epic', locked: true, progress: { current: 0, total: 7, label: 'серия' } }
 	];
 
 	function lsGet(key, fallback) {
@@ -66,7 +68,64 @@
 		var local = String(me.email).split('@')[0] || 'Ученик';
 		local = local.replace(/[._-]+/g, ' ').trim();
 		if (!local) return 'Ученик IQMO';
-		return local.charAt(0).toUpperCase() + local.slice(1);
+		return local.split(/\s+/).map(function (w) {
+			return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+		}).join(' ');
+	}
+
+	function starsForPercent(p) {
+		var n = Number(p);
+		if (!Number.isFinite(n)) return 0;
+		if (n >= 90) return 3;
+		if (n >= 70) return 2;
+		if (n >= 50) return 1;
+		return 0;
+	}
+
+	function readVariantBest(prefix, id) {
+		try {
+			var raw = localStorage.getItem(prefix + id);
+			if (!raw) return null;
+			var s = JSON.parse(raw);
+			if (!s || !s.finished) return null;
+			var part1 = s.part1Percent != null ? Number(s.part1Percent) : null;
+			var pct = part1 != null ? part1 : (s.percent != null ? Number(s.percent) : null);
+			if (pct == null) pct = 50;
+			return {
+				finished: true,
+				part1Percent: pct,
+				passed: pct >= 50,
+				stars: starsForPercent(pct)
+			};
+		} catch (e) {
+			return null;
+		}
+	}
+
+	function summarizeVariants(prefix, ids) {
+		var passed = 0;
+		var finished = 0;
+		var totalStars = 0;
+		var maxStars = ids.length * 3;
+		var pctSum = 0;
+		var pctCount = 0;
+		for (var i = 0; i < ids.length; i++) {
+			var b = readVariantBest(prefix, ids[i]);
+			if (!b) continue;
+			finished++;
+			if (b.passed) passed++;
+			totalStars += b.stars;
+			pctSum += b.part1Percent;
+			pctCount++;
+		}
+		return {
+			passed: passed,
+			finished: finished,
+			total: ids.length,
+			stars: totalStars,
+			maxStars: maxStars,
+			avgPart1: pctCount ? Math.round(pctSum / pctCount) : 0
+		};
 	}
 
 	function initials(name) {
@@ -207,7 +266,7 @@
 				desc: cat.desc,
 				rarity: cat.rarity,
 				icon: cat.icon,
-				pctEarned: cat.pctEarned,
+				pctEarned: unlocked ? null : null,
 				unlocked: unlocked,
 				earnedAt: unlocked ? ts : null,
 				locked: !unlocked
@@ -224,10 +283,22 @@
 		try {
 			streakDays = (lsGet('iqmo-chem-streak', {}) || {}).days || 0;
 		} catch (e2) {}
+		var badges = (snap && snap.badges) || {};
+		var league = snap && snap.league ? snap.league : { rank: 1 };
+		var weekPts = snap && snap.week ? snap.week.points : 0;
 		return COLLECTIBLES_CATALOG.map(function (c) {
 			var item = Object.assign({}, c);
-			if (c.id === 'blue-ring') item.locked = streakDays < 7;
+			if (c.id === 'blue-ring') {
+				item.locked = streakDays < 7;
+			}
+			if (c.id === 'gold-crown') {
+				item.locked = !(league.rank <= 1 && weekPts > 0);
+			}
+			if (c.id === 'violet-aura') {
+				item.locked = !(badges.chem_stage1 && badges.bio_stage1);
+			}
 			if (c.id === 'may-storm' && c.progress) {
+				item.locked = streakDays < 7;
 				item.progress = {
 					current: Math.min(streakDays, c.progress.total),
 					total: c.progress.total,
@@ -240,28 +311,31 @@
 	}
 
 	function buildSubjectsProgress(snap, lv) {
-		var ch1 = [1, 2, 3, 4, 5, 6, 7];
-		var bioV = countFinishedVariants('iqmo-bio-v-', ch1);
-		var chemV = countFinishedVariants('iqmo-chem-v-', ch1);
+		var bioV = summarizeVariants('iqmo-bio-v-', CH1_VARIANT_IDS);
+		var chemV = summarizeVariants('iqmo-chem-v-', CH1_VARIANT_IDS);
 		var chemTopics = chemTopicsSummary();
-		var bioPct = ch1.length ? Math.round((bioV.passed / ch1.length) * 100) : 0;
-		var chemPct = Math.max(
-			ch1.length ? Math.round((chemV.passed / ch1.length) * 100) : 0,
-			chemTopics.avgPct
-		);
+		var bioPct = CH1_VARIANT_IDS.length
+			? Math.round((bioV.passed / CH1_VARIANT_IDS.length) * 100)
+			: 0;
+		var chemMapPct = CH1_VARIANT_IDS.length
+			? Math.round((chemV.passed / CH1_VARIANT_IDS.length) * 100)
+			: 0;
+		var chemPct = Math.max(chemMapPct, chemTopics.avgPct);
 		return [
 			{
 				slug: 'biology',
 				name: 'Биология',
-				sub: 'ОГЭ · 10 тем',
+				sub: 'ОГЭ · карта уровней · глава 1',
 				level: lv.current,
 				pct: bioPct,
 				status: bioPct >= 100 ? 'done' : bioPct > 0 ? 'progress' : 'new',
 				meta: [
-					{ label: 'вариантов', value: bioV.passed + ' / ' + ch1.length },
-					{ label: 'звёзды', value: '—' }
+					{ label: 'вариантов', value: bioV.passed + ' / ' + CH1_VARIANT_IDS.length },
+					{ label: 'звёзды', value: bioV.stars + ' / ' + bioV.maxStars }
 				],
-				topSignal: bioPct >= 50 ? null : { mock: true, text: 'начато' },
+				topSignal: bioV.passed > 0
+					? { text: 'ср. ' + bioV.avgPart1 + '% по части 1' }
+					: null,
 				href: '/full-test-biology/'
 			},
 			{
@@ -273,9 +347,12 @@
 				status: chemPct >= 100 ? 'done' : chemPct > 0 ? 'progress' : 'new',
 				meta: [
 					{ label: 'тем', value: chemTopics.doneTopics + ' / ' + chemTopics.totalTopics },
-					{ label: 'вариантов', value: chemV.passed + ' / ' + ch1.length }
+					{ label: 'вариантов', value: chemV.passed + ' / ' + CH1_VARIANT_IDS.length },
+					{ label: 'звёзды', value: chemV.stars + ' / ' + chemV.maxStars }
 				],
-				topSignal: null,
+				topSignal: chemV.passed > 0
+					? { text: 'ср. ' + chemV.avgPart1 + '% по части 1' }
+					: null,
 				href: '/subject-chemistry/'
 			}
 		];
@@ -335,14 +412,19 @@
 		var mins = Math.round((ms % 3600000) / 60000);
 		var streak = lsGet('iqmo-chem-streak', { days: 0 }) || { days: 0 };
 		var la = global.ChemProgress && ChemProgress.getLastAttempt ? ChemProgress.getLastAttempt() : null;
-		var avg = la && la.percent != null ? la.percent : null;
+		var avg = snap.accuracyAverage != null
+			? snap.accuracyAverage
+			: (la && la.percent != null ? la.percent : null);
+		var avgLabel = snap.accuracyAverage != null
+			? 'среднее по ' + (ast.total || 0) + ' попыткам'
+			: 'последняя попытка';
 		return [
-			{ kind: 'solved', top: null, value: String(tasks || ast.total || 0), unit: '', label: 'Решено задач', delta: snap.week ? 'за неделю +' + (snap.week.points || 0) : '' },
-			{ kind: 'score', top: null, value: avg != null ? String(avg) : '—', unit: avg != null ? '%' : '', label: 'Средний результат', delta: 'последняя попытка' },
+			{ kind: 'solved', top: null, value: String(tasks || ast.total || 0), unit: '', label: 'Решено задач', delta: snap.week ? 'за неделю +' + (snap.week.points || 0) + ' XP' : '' },
+			{ kind: 'score', top: null, value: avg != null ? String(avg) : '—', unit: avg != null ? '%' : '', label: 'Средний результат', delta: avgLabel },
 			{ kind: 'hours', top: null, value: String(hours), unit: hours ? 'ч' : 'мин', label: 'Часов учёбы', delta: hours ? '+' + mins + 'м' : String(mins) + ' мин всего' },
 			{ kind: 'best', top: null, value: String(streak.days || 0), unit: 'дн', label: 'Текущая серия', delta: 'лучшая серия' },
 			{ kind: 'subject', top: null, value: la && la.subject === 'biology' ? 'Био' : 'Хим', unit: '', label: 'Последний предмет', delta: la ? modeRu(la.mode) : '—' },
-			{ kind: 'accuracy', top: null, value: avg != null ? String(avg) : '—', unit: avg != null ? '%' : '', label: 'Точность ответа', delta: 'по последнему тесту' }
+			{ kind: 'accuracy', top: null, value: avg != null ? String(avg) : '—', unit: avg != null ? '%' : '', label: 'Точность ответа', delta: avgLabel }
 		];
 	}
 
@@ -352,13 +434,17 @@
 			signals.push({ kind: 'rank', text: 'Ранг «' + (snap.levelTitle || 'Старт') + '»' });
 		}
 		var bio = subjects.find(function (s) { return s.slug === 'biology'; });
-		if (bio && bio.pct >= 50) {
-			signals.push({ kind: 'top', text: 'Прогресс по биологии ' + bio.pct + '%', mock: true });
+		if (bio && bio.pct > 0) {
+			var bioMeta = bio.meta && bio.meta[0] ? bio.meta[0].value : '';
+			signals.push({ kind: 'top', text: 'Биология · ' + bioMeta });
+		}
+		var chem = subjects.find(function (s) { return s.slug === 'chemistry'; });
+		if (chem && chem.pct > 0) {
+			signals.push({ kind: 'ahead', text: 'Химия · ' + Math.round(chem.pct) + '% курса' });
 		}
 		signals.push({
 			kind: 'ahead',
-			text: 'Место в лиге ' + (snap.league ? snap.league.rank : 1) + ' / ' + (snap.league ? snap.league.size : 1),
-			mock: false
+			text: 'Лига ' + (snap.league ? snap.league.rank : 1) + ' / ' + (snap.league ? snap.league.size : 1)
 		});
 		return signals;
 	}
@@ -393,6 +479,12 @@
 		var minXp = lv.minXpThisLevel || 0;
 		var maxXp = lv.nextThreshold != null ? lv.nextThreshold : minXp + 200;
 		var curXp = snap.totalPoints || 0;
+		var accuracyPct = snap.accuracyAverage != null
+			? snap.accuracyAverage
+			: (function () {
+				var la = global.ChemProgress && ChemProgress.getLastAttempt ? ChemProgress.getLastAttempt() : null;
+				return la && la.percent != null ? la.percent : null;
+			})();
 
 		return {
 			profileData: {
@@ -416,7 +508,7 @@
 				leagueSize: snap.league ? snap.league.size : 1,
 				leagueDelta: snap.league && snap.league.rank > 1 ? 1 : 0,
 				coursePct: coursePct,
-				accuracyPct: null,
+				accuracyPct: accuracyPct,
 				equippedFrame: equippedFrame,
 				memberSince: meUser && meUser.created_at ? meUser.created_at : null,
 				avatarUrl: null
