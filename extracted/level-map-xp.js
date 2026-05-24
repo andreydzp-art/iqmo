@@ -23,7 +23,13 @@
 		return xpForNodeIndex(0, true);
 	}
 
+	function normalizeMapSubject(subject) {
+		var s = subject == null ? '' : String(subject).toLowerCase();
+		return s === 'biology' || s === 'bio' ? 'biology' : 'chemistry';
+	}
+
 	function getChapter1Slice(subject) {
+		subject = normalizeMapSubject(subject);
 		if (subject === 'biology') {
 			var all = global.BIOLOGY_VARIANTS || [];
 			return all.length >= 7 ? all.slice(0, 7) : null;
@@ -38,6 +44,7 @@
 	var CH2_BOSS = 14;
 
 	function findMapSlot(subject, variantId) {
+		subject = normalizeMapSubject(subject);
 		var id = Number(variantId);
 		if (!id) return null;
 		var ch1 = getChapter1Slice(subject);
@@ -84,6 +91,7 @@
 		STEP_XP: STEP_XP,
 		BOSS_EXTRA: BOSS_EXTRA,
 		REGULAR_COUNT: REGULAR_COUNT,
+		normalizeMapSubject: normalizeMapSubject,
 		xpForNodeIndex: xpForNodeIndex,
 		xpForPassedNode: xpForPassedNode,
 		bossPreviewXp: bossPreviewXp,

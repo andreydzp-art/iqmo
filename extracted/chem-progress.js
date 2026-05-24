@@ -22,7 +22,8 @@
 	/** Очередь «покажи салют в профиле» после первого открытия награды. */
 	const KEY_BADGE_CELEBRATE = 'iqmo-badge-celebrate-queue-v1';
 	/** Уже начисленный step-XP карты уровней: { biology: { "1": 50 }, chemistry: { … } }. */
-	const KEY_MAP_XP_CLAIMED = 'iqmo-map-xp-claimed-v1';
+	const KEY_MAP_XP_CLAIMED = 'iqmo-chem-map-xp-claimed-v1';
+	const KEY_MAP_XP_CLAIMED_LEGACY = 'iqmo-map-xp-claimed-v1';
 
 	/** Чеклисты тем (все подтемы = 2 → веха «Мастер темы»). */
 	const TOPIC_CHECKLIST = [
@@ -454,6 +455,23 @@
 		return def;
 	}
 
+	function migrateMapXpClaimedKey() {
+		try {
+			if (lsGet(KEY_MAP_XP_CLAIMED, null)) return;
+			var legacy = lsGet(KEY_MAP_XP_CLAIMED_LEGACY, null);
+			if (legacy) {
+				lsSet(KEY_MAP_XP_CLAIMED, legacy);
+				localStorage.removeItem(KEY_MAP_XP_CLAIMED_LEGACY);
+			}
+		} catch (e) {}
+	}
+
+	/** biology | bio → biology, всё остальное → chemistry (единый стандарт карты). */
+	function normalizeMapSubject(subject) {
+		var s = subject == null ? '' : String(subject).toLowerCase();
+		return s === 'biology' || s === 'bio' ? 'biology' : 'chemistry';
+	}
+
 	function streakMultiplier() {
 		try {
 			const st = lsGet(KEY_STREAK, null) || { days: 0 };
@@ -497,18 +515,19 @@
 	}
 
 	/**
-	 * Step-XP карты уровней (+50 за шаг 1, …, босс 550) — один раз за узел при ≥50% в части 1.
-	 * @returns {number} XP к начислению (0 — узел не на карте, провал или уже получено).
+	 * Step-XP карты (+50 за шаг 1, …, босс 550) — один раз за узел при ≥50% в части 1.
+	 * @returns {number} XP к начислению (0 — не на карте, провал или уже получено).
 	 */
-	function tryMapStepXp(payload) {
+	function computeMapStepAward(payload) {
 		try {
-			if (payload.mode !== 'full' || !payload.passedPart1) return 0;
+			migrateMapXpClaimedKey();
+			if (payload.mode !== 'full') return 0;
 			if (typeof window.IqmoLevelMapXp === 'undefined') return 0;
-			var subject = payload.subject === 'biology' ? 'biology' : 'chemistry';
+			var subject = normalizeMapSubject(payload.subject);
 			var vid = payload.variantId;
 			if (vid == null) return 0;
 			var pct = Number.isFinite(payload.part1Percent)
-				? Number(payload.part1Percent)
+				? Math.round(Number(payload.part1Percent))
 				: payload.passedPart1
 					? 50
 					: 0;
@@ -525,6 +544,79 @@
 		} catch (e) {
 			return 0;
 		}
+	}
+
+	function tryMapStepXp(payload) {
+		if (payload.mode !== 'full') return 0;
+		var pct = Number.isFinite(payload.part1Percent)
+			? Math.round(Number(payload.part1Percent))
+			: payload.passedPart1
+				? 50
+				: 0;
+		if (pct < 50) return 0;
+		return computeMapStepAward(
+			Object.assign({}, payload, { part1Percent: pct, passedPart1: true })
+		);
+	}
+
+	/**
+	 * Единая запись полного варианта (биология / химия / будущие предметы).
+	 * @param {object} data
+	 * @param {string} data.subject
+	 * @param {number} data.variantId
+	 * @param {object} data.scoring — результат computeScoring()
+	 * @param {Array|null} [data.items]
+	 */
+	function recordFullVariantAttempt(data) {
+		var scoring = data.scoring || {};
+		var part1Percent = Number.isFinite(scoring.part1Percent)
+			? Math.round(Number(scoring.part1Percent))
+			: scoring.autoTotal > 0
+				? Math.round((100 * scoring.autoPoints) / scoring.autoTotal)
+				: 0;
+		var passedPart1 = part1Percent >= 50;
+		return recordAttempt({
+			mode: 'full',
+			subject: normalizeMapSubject(data.subject),
+			variantId: data.variantId,
+			variantTitle: data.variantTitle || '',
+			label: data.label || ('Полный вариант · ' + (data.variantTitle || '')),
+			correct: scoring.totalPoints != null ? scoring.totalPoints : 0,
+			total: scoring.totalMax != null ? scoring.totalMax : 0,
+			percent: scoring.percent,
+			part1Percent: part1Percent,
+			passedPart1: passedPart1,
+			items: Array.isArray(data.items) ? data.items : null,
+			attemptId: data.attemptId
+		});
+	}
+
+	/**
+	 * Доначислить step-XP за уже пройденные варианты (если раньше subject не передавался).
+	 * @param {Array<{subject:string, variantId:number, part1Percent:number}>} entries
+	 * @returns {number} суммарно начислено XP
+	 */
+	function syncPassedVariantsMapXp(entries) {
+		if (!Array.isArray(entries) || !entries.length) return 0;
+		var total = 0;
+		for (var i = 0; i < entries.length; i++) {
+			var e = entries[i];
+			if (!e || e.variantId == null) continue;
+			var pct = Number(e.part1Percent);
+			if (!Number.isFinite(pct) || pct < 50) continue;
+			var xp = computeMapStepAward({
+				mode: 'full',
+				subject: e.subject,
+				variantId: e.variantId,
+				part1Percent: pct,
+				passedPart1: true
+			});
+			if (xp) {
+				awardXp(xp, 'map_step', 0);
+				total += xp;
+			}
+		}
+		return total;
 	}
 
 	function updateDailyAndStreak(deltaTasks, deltaPoints) {
@@ -800,6 +892,7 @@
 	}
 
 	function ensureAnonId() {
+		migrateMapXpClaimedKey();
 		let id = null;
 		try {
 			id = localStorage.getItem(KEY_ANON);
@@ -837,7 +930,7 @@
 		const attemptId = data.attemptId != null ? String(data.attemptId) : iqmoCurrentAttemptId;
 		const payload = {
 			schemaVersion: SCHEMA_VERSION,
-			subject: data.subject || 'chemistry',
+			subject: normalizeMapSubject(data.subject || 'chemistry'),
 			mode: data.mode,
 			variantId: data.variantId != null ? data.variantId : null,
 			variantTitle: data.variantTitle || '',
@@ -997,6 +1090,9 @@
 		ensureAnonId,
 		beginAttempt,
 		recordAttempt,
+		recordFullVariantAttempt,
+		syncPassedVariantsMapXp,
+		normalizeMapSubject,
 		getLastAttempt,
 		formatRelativeTime,
 		formatActiveDurationRu,

@@ -1387,9 +1387,9 @@
 		<script src="/iqmo-sync.js"></script>
 		<script src="/iqmo-nav.js"></script>
 		<script src="/mistakes-store.js"></script>
-		<script src="/level-map-xp.js?v=2"></script>
+		<script src="/level-map-xp.js?v=3"></script>
 		<script src="/level-map-state.js?v=2"></script>
-		<script src="/chem-progress.js?v=6"></script>
+		<script src="/chem-progress.js?v=7"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from biology-bank.js)
@@ -1415,6 +1415,7 @@
 			// ============================================================
 			const urlParams = new URLSearchParams(window.location.search);
 			const variantParam = urlParams.get('v');
+			const MAP_SUBJECT = (document.body && document.body.dataset.examSubject) || 'biology';
 
 			// ---- DEV flag (hoisted to top of script) ----
 			var DEV_UNLOCK_ALL = false;
@@ -1434,6 +1435,7 @@
 					scheduled = true;
 					requestAnimationFrame(function () {
 						scheduled = false;
+						try { syncHubMapXpFromLocal(); } catch (e0) {}
 						try { renderVariantPicker(); } catch (e) {}
 					});
 				}
@@ -1978,20 +1980,14 @@
 					}
 				} catch(e) { console.error('progress update failed', e); }
 				try {
-					if (window.ChemProgress && typeof activeVariant !== 'undefined' && activeVariant) {
+					if (window.ChemProgress && typeof ChemProgress.recordFullVariantAttempt === 'function' && activeVariant) {
 						const s = computeScoring();
-						const part1Ratio = s.autoTotal > 0 ? s.autoPoints / s.autoTotal : 0;
-						ChemProgress.recordAttempt({
-							mode: 'full',
-							subject: 'biology',
+						ChemProgress.recordFullVariantAttempt({
+							subject: EXAM_SUBJECT,
 							variantId: activeVariant.id,
 							variantTitle: activeVariant.title,
 							label: 'Полный вариант · ' + activeVariant.title,
-							correct: s.totalPoints,
-							total: s.totalMax,
-							percent: s.percent,
-							part1Percent: s.part1Percent,
-							passedPart1: part1Ratio >= 0.5,
+							scoring: s,
 							items: QUESTIONS.filter(function (q) { return q.type !== 'written'; }).map(function (q) {
 								return { qid: q.id, ok: checkAnswer(q).status === 'ok' };
 							})
@@ -2544,11 +2540,31 @@
 				} catch (e) { return null; }
 			}
 			function gmXpForVariant(percent, variantId) {
+				var sub = window.IqmoLevelMapXp && IqmoLevelMapXp.normalizeMapSubject
+					? IqmoLevelMapXp.normalizeMapSubject(MAP_SUBJECT)
+					: 'biology';
 				if (window.IqmoLevelMapXp && variantId != null) {
-					return IqmoLevelMapXp.xpForVariantId('biology', variantId, percent);
+					return IqmoLevelMapXp.xpForVariantId(sub, variantId, percent);
 				}
 				if (percent < 50) return 0;
 				return 100;
+			}
+			function syncHubMapXpFromLocal() {
+				try {
+					if (!window.ChemProgress || typeof ChemProgress.syncPassedVariantsMapXp !== 'function') return;
+					var sub = ChemProgress.normalizeMapSubject
+						? ChemProgress.normalizeMapSubject(MAP_SUBJECT)
+						: 'biology';
+					var entries = [];
+					(window.BIOLOGY_VARIANTS || []).forEach(function (v) {
+						if (v.status !== 'ready') return;
+						var best = gmVariantBest(v);
+						if (best && best.percent >= 50) {
+							entries.push({ subject: sub, variantId: v.id, part1Percent: best.percent });
+						}
+					});
+					ChemProgress.syncPassedVariantsMapXp(entries);
+				} catch (e) {}
 			}
 			function gmComputedStats(variants) {
 				let totalXp = 0, totalStars = 0, passed = 0;
@@ -2713,6 +2729,7 @@
 				if (!picker) return;
 				picker.style.display = 'block';
 				picker.classList.add('lm');
+				try { syncHubMapXpFromLocal(); } catch (eSync) {}
 				iqmoShowCh2DeniedToastBio();
 
 				const allVariants = window.BIOLOGY_VARIANTS || [];
