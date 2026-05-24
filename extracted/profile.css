@@ -45,6 +45,17 @@
     display:flex; flex-direction:column; gap:24px;
   }
 
+  /* Секции v5 рендерятся в #prof-root, не напрямую в .shell — gap нужен здесь */
+  #prof-root{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+    min-width:0;
+  }
+  #prof-root > section{
+    min-width:0;
+  }
+
   /* ───── TOP NAV ───── */
   .top{
     display:flex; align-items:center; justify-content:space-between;
@@ -198,7 +209,14 @@
     color:var(--ink);
     line-height:1.05;
   }
-  .h-handle{font-size:14px; color:var(--muted); font-family:'JetBrains Mono',monospace;}
+  .h-handle{
+    font-size:14px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    padding:4px 10px;
+    border-radius:8px;
+    background:var(--primary-50);
+    border:1px solid rgba(99,102,241,.18);
+  }
   .h-pro{
     display:inline-flex; align-items:center; gap:5px;
     padding:4px 10px; border-radius:999px;
@@ -432,7 +450,8 @@
   .sec-head{
     display:flex; align-items:end; justify-content:space-between;
     padding:0 4px;
-    margin-bottom:12px;
+    margin-top:4px;
+    margin-bottom:14px;
   }
   .sec-eye{
     font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
@@ -1103,7 +1122,7 @@
 
 /* ── Settings / account (preserved from legacy profile) ── */
 .prof-settings{
-  margin-top:8px;
+  scroll-margin-top:24px;
   border-radius:20px;
   border:1px solid var(--line);
   background:#fff;

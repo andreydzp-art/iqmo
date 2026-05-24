@@ -10,7 +10,19 @@
 		if (!global.IqmoProfileData || !global.IqmoProfileRender) return;
 		var data = IqmoProfileData.build(meUser);
 		IqmoProfileRender.render(data);
+		syncProfAuthVisibility(!!(meUser && meUser.id != null));
 		tryCelebrate(data);
+	}
+
+	function syncProfAuthVisibility(loggedIn) {
+		document.querySelectorAll('#prof-root .iqmo-only-authed').forEach(function (el) {
+			if (loggedIn) el.removeAttribute('hidden');
+			else el.setAttribute('hidden', '');
+		});
+		document.querySelectorAll('#prof-root .iqmo-only-guest').forEach(function (el) {
+			if (loggedIn) el.setAttribute('hidden', '');
+			else el.removeAttribute('hidden');
+		});
 	}
 
 	function tryCelebrate(data) {
