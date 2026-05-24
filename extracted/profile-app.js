@@ -309,8 +309,10 @@
 		}
 
 		refresh();
+		if (global.__IQMO_SYNC__) {
+			global.addEventListener('iqmo-sync-ready', refresh, { once: true });
+		}
 		global.addEventListener('iqmo-sync', refresh);
-		global.addEventListener('iqmo-sync-ready', refresh);
 	}
 
 	global.IqmoProfileApp = {

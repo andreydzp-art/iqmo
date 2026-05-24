@@ -159,29 +159,45 @@
 
 	function applyKeys(obj) {
 		if (!obj || typeof obj !== 'object') return;
-		const incoming = Object.keys(obj);
-		const toRemove = [];
-		try {
-			for (let i = 0; i < localStorage.length; i++) {
-				const k = localStorage.key(i);
-				if (k && hasSyncPrefix(k)) toRemove.push(k);
+
+		for (let pi = 0; pi < SYNC_PREFIXES.length; pi++) {
+			var prefix = SYNC_PREFIXES[pi];
+			var serverHasPrefix = false;
+			var incoming = Object.keys(obj);
+			for (let i = 0; i < incoming.length; i++) {
+				if (incoming[i].indexOf(prefix) === 0) {
+					serverHasPrefix = true;
+					break;
+				}
 			}
-		} catch (e) {}
-		for (let j = 0; j < toRemove.length; j++) {
-			if (!Object.prototype.hasOwnProperty.call(obj, toRemove[j])) {
-				try {
-					localStorage.removeItem(toRemove[j]);
-				} catch (e) {}
-			}
-		}
-		for (let n = 0; n < incoming.length; n++) {
-			const k = incoming[n];
-			if (!hasSyncPrefix(k)) continue;
+
+			// Сервер не прислал ни одного ключа префикса (bio раньше не синкалась) —
+			// локальный прогресс по этому предмету не трогаем.
+			if (!serverHasPrefix) continue;
+
+			var toRemove = [];
 			try {
-				const v = obj[k];
-				if (v == null) localStorage.removeItem(k);
-				else localStorage.setItem(k, String(v));
+				for (let j = 0; j < localStorage.length; j++) {
+					var k = localStorage.key(j);
+					if (k && k.indexOf(prefix) === 0 && !Object.prototype.hasOwnProperty.call(obj, k)) {
+						toRemove.push(k);
+					}
+				}
 			} catch (e) {}
+			for (let r = 0; r < toRemove.length; r++) {
+				try {
+					localStorage.removeItem(toRemove[r]);
+				} catch (e2) {}
+			}
+			for (let n = 0; n < incoming.length; n++) {
+				var key = incoming[n];
+				if (key.indexOf(prefix) !== 0) continue;
+				try {
+					var v = obj[key];
+					if (v == null) localStorage.removeItem(key);
+					else localStorage.setItem(key, String(v));
+				} catch (e3) {}
+			}
 		}
 	}
 
