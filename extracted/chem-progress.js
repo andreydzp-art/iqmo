@@ -21,6 +21,8 @@
 	const KEY_BADGES = 'iqmo-chem-badges-v1';
 	/** Очередь «покажи салют в профиле» после первого открытия награды. */
 	const KEY_BADGE_CELEBRATE = 'iqmo-badge-celebrate-queue-v1';
+	/** Уже начисленный step-XP карты уровней: { biology: { "1": 50 }, chemistry: { … } }. */
+	const KEY_MAP_XP_CLAIMED = 'iqmo-map-xp-claimed-v1';
 
 	/** Чеклисты тем (все подтемы = 2 → веха «Мастер темы»). */
 	const TOPIC_CHECKLIST = [
@@ -494,6 +496,37 @@
 		return Math.max(0, Math.round(pts * streakMultiplier()));
 	}
 
+	/**
+	 * Step-XP карты уровней (+50 за шаг 1, …, босс 550) — один раз за узел при ≥50% в части 1.
+	 * @returns {number} XP к начислению (0 — узел не на карте, провал или уже получено).
+	 */
+	function tryMapStepXp(payload) {
+		try {
+			if (payload.mode !== 'full' || !payload.passedPart1) return 0;
+			if (typeof window.IqmoLevelMapXp === 'undefined') return 0;
+			var subject = payload.subject === 'biology' ? 'biology' : 'chemistry';
+			var vid = payload.variantId;
+			if (vid == null) return 0;
+			var pct = Number.isFinite(payload.part1Percent)
+				? Number(payload.part1Percent)
+				: payload.passedPart1
+					? 50
+					: 0;
+			if (pct < 50) return 0;
+			var slotXp = IqmoLevelMapXp.xpForVariantId(subject, vid, pct);
+			if (!slotXp) return 0;
+			var claimed = lsGet(KEY_MAP_XP_CLAIMED, {});
+			var sub = claimed[subject] || {};
+			if (sub[String(vid)]) return 0;
+			sub[String(vid)] = { xp: slotXp, at: Date.now() };
+			claimed[subject] = sub;
+			lsSet(KEY_MAP_XP_CLAIMED, claimed);
+			return slotXp;
+		} catch (e) {
+			return 0;
+		}
+	}
+
 	function updateDailyAndStreak(deltaTasks, deltaPoints) {
 		const goal = ensureDailyGoal();
 		const today = dayKey(Date.now());
@@ -813,6 +846,7 @@
 			total,
 			percent,
 			passedPart1: !!data.passedPart1,
+			part1Percent: data.part1Percent != null ? Math.round(Number(data.part1Percent)) : null,
 			finishedAt: finishedAt,
 			items: Array.isArray(data.items) ? data.items : null,
 			attemptId: attemptId || null
@@ -846,14 +880,15 @@
 
 		try {
 			const itemsCount = Array.isArray(payload.items) ? payload.items.length : 0;
-			const pts = addPoints(payload.mode, {
+			const mapPts = tryMapStepXp(payload);
+			const pts = mapPts || addPoints(payload.mode, {
 				correct: payload.correct,
 				total: payload.total,
 				percent: payload.percent,
 				passedPart1: payload.passedPart1,
 				itemsCount
 			});
-			awardXp(pts, 'test_' + payload.mode, itemsCount);
+			awardXp(pts, mapPts ? 'map_step' : ('test_' + payload.mode), itemsCount);
 		} catch (e2) {}
 
 		try {

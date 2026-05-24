@@ -1387,9 +1387,9 @@
 		<script src="/iqmo-sync.js"></script>
 		<script src="/iqmo-nav.js"></script>
 		<script src="/mistakes-store.js"></script>
-		<script src="/chem-progress.js?v=5"></script>
-		<script src="/level-map-state.js?v=2"></script>
 		<script src="/level-map-xp.js?v=2"></script>
+		<script src="/level-map-state.js?v=2"></script>
+		<script src="/chem-progress.js?v=6"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from biology-bank.js)
@@ -1983,12 +1983,14 @@
 						const part1Ratio = s.autoTotal > 0 ? s.autoPoints / s.autoTotal : 0;
 						ChemProgress.recordAttempt({
 							mode: 'full',
+							subject: 'biology',
 							variantId: activeVariant.id,
 							variantTitle: activeVariant.title,
 							label: 'Полный вариант · ' + activeVariant.title,
 							correct: s.totalPoints,
 							total: s.totalMax,
 							percent: s.percent,
+							part1Percent: s.part1Percent,
 							passedPart1: part1Ratio >= 0.5,
 							items: QUESTIONS.filter(function (q) { return q.type !== 'written'; }).map(function (q) {
 								return { qid: q.id, ok: checkAnswer(q).status === 'ok' };
@@ -2136,7 +2138,7 @@
 										<span>${gmStarsThis} из 3 звёзд</span>
 									</span>
 									${gmGotPass ? `
-									<span class="gm-xp-pill" title="XP за этот вариант (бонус +50 за ≥80%, ещё +50 за ≥90%)">
+									<span class="gm-xp-pill" title="XP за шаг карты уровней (вариант 1 → +50 XP, каждый следующий +50, босс +550)">
 										💎 +<span class="gm-combo-pill__num">${gmXpThis}</span> XP
 									</span>` : `
 									<span class="gm-combo-pill" style="background:#fdecd6;border-color:#f3d592;color:#8a5a1c;">
