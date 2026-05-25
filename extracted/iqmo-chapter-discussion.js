@@ -77,7 +77,7 @@
 			+ '<header class="soc-head">'
 			+ '<div class="soc-titlewrap">'
 			+ '<h2 class="soc-title"><span class="em" aria-hidden="true">💬</span> Обсуждение главы</h2>'
-			+ '<span class="soc-count"><span class="soc-livedot" aria-hidden="true"></span> 14 учеников обсуждают</span>'
+			+ '<span class="soc-count"><span class="soc-livedot" aria-hidden="true"></span> 847 человек обсуждают</span>'
 			+ '</div>'
 			+ '<div class="soc-sort" role="tablist" aria-label="Сортировка">'
 			+ '<button type="button" class="is-active" data-sort="top">Популярные</button>'
