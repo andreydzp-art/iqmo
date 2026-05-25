@@ -157,11 +157,6 @@
 			return '<button class="soc-react' + mine + '" type="button"><span class="em">' + r[0] + '</span> ' + r[1] + '</button>';
 		}).join('');
 		if (!opts.user) reactHtml += '<button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>';
-		var repliesHtml = '';
-		if (replies) {
-			var word = replies === 1 ? 'ответ' : (replies >= 2 && replies <= 4 ? 'ответа' : 'ответов');
-			repliesHtml = '<button class="soc-replies" type="button"><span class="em">💬</span> ' + replies + ' ' + word + '</button>';
-		}
 		return ''
 			+ '<article class="' + cls + '"' + (opts.id ? ' data-soc-id="' + esc(opts.id) + '"' : '') + '>'
 			+ '<div class="' + avCls + '" aria-hidden="true"><img src="' + esc(avSrc) + '" alt="" /></div>'
@@ -170,7 +165,7 @@
 			+ '<span class="soc-dot" aria-hidden="true"></span>'
 			+ '<span class="soc-time">' + esc(time) + '</span></div>'
 			+ '<p class="soc-text">' + esc(text) + '</p>'
-			+ '<div class="soc-actions">' + reactHtml + repliesHtml + '</div>'
+			+ '<div class="soc-actions">' + reactHtml + '</div>'
 			+ '</div>'
 			+ '</article>';
 	}
