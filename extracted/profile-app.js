@@ -245,7 +245,7 @@
 
 	function wipeLocalUserData() {
 		var WIPE_PREFIXES = ['iqmo-chem-', 'iqmo-bio-', 'iqmo:chem:', 'iqmo_purchase_', 'iqmo_express_start_'];
-		var WIPE_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at', 'iqmo-last-uid', 'iqmo_auth_hint', 'iqmo-avatar-v1'];
+		var WIPE_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at', 'iqmo-last-uid', 'iqmo_auth_hint', 'iqmo-avatar-v1', 'iqmo-avatar-customized-v1'];
 		try {
 			for (var i = localStorage.length - 1; i >= 0; i--) {
 				var k = localStorage.key(i);

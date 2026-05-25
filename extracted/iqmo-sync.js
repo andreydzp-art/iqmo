@@ -108,7 +108,7 @@
 		'iqmo_purchase_',
 		'iqmo_express_start_'
 	];
-	const USER_SCOPED_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at', 'iqmo-avatar-v1'];
+	const USER_SCOPED_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at', 'iqmo-avatar-v1', 'iqmo-avatar-customized-v1'];
 
 	function isUserScopedKey(k) {
 		if (typeof k !== 'string') return false;

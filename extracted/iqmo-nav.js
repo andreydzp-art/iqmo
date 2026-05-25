@@ -127,7 +127,8 @@
 						'iqmo-regnudge-dismissed-at',
 						'iqmo-last-uid',
 						'iqmo_auth_hint',
-						'iqmo-avatar-v1'
+						'iqmo-avatar-v1',
+						'iqmo-avatar-customized-v1'
 					];
 					var toWipe = [];
 					for (var i = 0; i < localStorage.length; i++) {

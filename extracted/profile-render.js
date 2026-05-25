@@ -100,9 +100,18 @@
 			var cls = 'cap';
 			if (i <= d) cls += ' on';
 			if (d > 0 && d < 7 && i === d) cls += ' now';
-			html += '<span class="' + cls + '"></span>';
+			html += '<span class="' + cls + '" style="--cap-i:' + i + '"></span>';
 		}
 		return html;
+	}
+
+	function streakCardClass(days) {
+		var d = Math.min(7, Math.max(0, parseInt(days, 10) || 0));
+		var cls = 'streak';
+		if (d > 0) cls += ' is-active';
+		if (d >= 6 && d < 7) cls += ' is-near-reward';
+		if (d >= 7) cls += ' is-complete';
+		return cls;
 	}
 
 	function metaRankLine(signals, d) {
@@ -117,15 +126,39 @@
 		return esc(d.coursePct) + '% курса';
 	}
 
+	var CAM_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-1V7a3 3 0 0 0-3-3H9zm0 2h6a1 1 0 0 1 1 1v1H8V7a1 1 0 0 1 1-1zm-2 5h10l-4.5 5.4L11 13l-2 2.4L7 13z"/></svg>';
+
 	function renderHero(p) {
 		var d = p.profileData;
+		var isPublic = !!p.isPublic;
 		var sig = p.socialSignals || [];
 		var streakDays = d.streakDays || 0;
 		var xpPct = d.xpPct || 0;
 		var gid = String(d.profileId || 'user').replace(/[^a-zA-Z0-9_-]/g, '');
-		var avatarInner = d.avatarUrl
-			? '<img src="' + esc(d.avatarUrl) + '" alt="" />'
+		var avUrl = d.avatarUrl || (global.IqmoAvatar ? IqmoAvatar.getUrl() : '');
+		var avatarInner = avUrl
+			? '<img src="' + esc(avUrl) + '" alt="" data-avatar-hero-img decoding="async" />'
 			: '<div class="av-initials" aria-hidden="true">' + esc(d.initials) + '</div>';
+		var canEdit = !isPublic && global.IqmoAvatar;
+		var hintCls = canEdit && IqmoAvatar.isPristine() ? ' is-hint' : '';
+		var avPctChip =
+			'<div class="av-pct">' + xpPct + '%</div>' +
+			'<div class="av-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>LVL ' + d.level + '</div>';
+		var avBlock = canEdit
+			? (
+				'<div class="av av--editable">' +
+				'<div class="av-ring" style="' + avRingStyle(xpPct) + '"></div>' +
+				'<button type="button" class="av-hit" data-avatar-trigger aria-label="Сменить аватар">' +
+				'<div class="av-img">' + avatarInner + '</div>' +
+				'<span class="av-hover" aria-hidden="true"><span class="av-hover-txt">Сменить аватар</span></span>' +
+				'<span class="av-cam-badge' + hintCls + '" aria-hidden="true">' + CAM_SVG + '</span>' +
+				'</button>' + avPctChip + '</div>'
+			)
+			: (
+				'<div class="av" aria-label="Уровень ' + d.level + '">' +
+				'<div class="av-ring" style="' + avRingStyle(xpPct) + '"></div>' +
+				'<div class="av-img">' + avatarInner + '</div>' + avPctChip + '</div>'
+			);
 		var xpMax = d.nextLevel ? d.xpLevelMax : d.xpCurrent;
 		var xpRange = IqmoProfileData.fmtPts(d.xpCurrent) + ' / ' + IqmoProfileData.fmtPts(xpMax) + ' XP';
 		var lvlNow = d.nextLevel
@@ -160,12 +193,7 @@
 			'<section class="iqmo-hero">' +
 			'<div class="hero-deco"><span class="pp a"></span><span class="pp b"></span><span class="pp c"></span></div>' +
 			'<div class="hero-inner">' +
-			'<div class="av" aria-label="Уровень ' + d.level + '">' +
-			'<div class="av-ring" style="' + avRingStyle(xpPct) + '"></div>' +
-			'<div class="av-img">' + avatarInner + '</div>' +
-			'<div class="av-pct">' + xpPct + '%</div>' +
-			'<div class="av-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>LVL ' + d.level + '</div>' +
-			'</div>' +
+			avBlock +
 			'<div class="h-id">' +
 			'<div class="h-name-row">' +
 			'<h1 class="h-name">' + esc(d.name) + '</h1>' +
@@ -184,7 +212,7 @@
 			'<div class="xp-dot" style="left:' + xpPct + '%"></div></div>' +
 			'<div class="xp-foot"><span>' + xpFootLeft + '</span><span class="week">за неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b></span></div>' +
 			'</div></div>' +
-			'<div class="streak">' +
+			'<div class="' + streakCardClass(streakDays) + '">' +
 			'<div class="atm-aura"></div><span class="atm-dot d1"></span><span class="atm-dot d2"></span><span class="atm-dot d3"></span>' +
 			'<div class="streak-top">' +
 			'<span class="s-eye"><span class="pulse"></span>' + streakEye + '</span>' +
@@ -203,7 +231,7 @@
 			'<span class="s-lbl">' + streakLabel(streakDays) + '</span>' +
 			'<span class="s-meta">лига #' + esc(d.leagueRank) + ' · ' + esc(d.leagueSize) + ' учеников</span>' +
 			'</div></div>' +
-			'<div class="s-prog">' +
+			'<div class="s-prog" style="--streak-fill:' + Math.min(100, Math.round((Math.min(streakDays, 7) / 7) * 100)) + '%">' +
 			'<div class="s-caps" aria-label="' + streakDays + ' из 7 дней до награды">' + renderStreakCaps(streakDays) + '</div>' +
 			'<div class="s-prog-foot">' +
 			'<span class="left"><b>' + daysLeft + ' ' + daysLeftWord + '</b> до награды</span>' +
@@ -249,39 +277,6 @@
 		if (r === 'epic') return '◆ Эпическая';
 		if (r === 'rare') return '◇ Редкая';
 		return 'Обычная';
-	}
-
-	function renderAvatarPicker(d) {
-		if (!global.IqmoAvatar) return '';
-		var state = IqmoAvatar.read();
-		var cur = state.preset || 'default';
-		var customUrl = cur === 'custom' && state.custom ? state.custom : '';
-		function opt(preset, label, thumbUrl) {
-			var sel = cur === preset ? ' is-selected' : '';
-			return (
-				'<button type="button" class="prof-av-opt' + sel + '" data-avatar-preset="' + preset + '" aria-pressed="' + (sel ? 'true' : 'false') + '">' +
-				'<span class="prof-av-thumb"><img src="' + esc(thumbUrl) + '" alt="" /></span>' +
-				'<span class="prof-av-label">' + esc(label) + '</span></button>'
-			);
-		}
-		var uploadSel = cur === 'custom' ? ' is-selected' : '';
-		return (
-			'<section class="prof-avatar-picker" aria-label="Выбор аватара">' +
-			'<h2 class="prof-avatar-picker__title">Аватар</h2>' +
-			'<p class="prof-avatar-picker__sub">Выбери, как ты хочешь выглядеть в профиле</p>' +
-			'<div class="prof-av-grid">' +
-			opt('boy', 'Мальчик', IqmoAvatar.PRESET_URL.boy) +
-			opt('girl', 'Девочка', IqmoAvatar.PRESET_URL.girl) +
-			'<label class="prof-av-opt prof-av-upload' + uploadSel + '" data-avatar-upload>' +
-			'<span class="prof-av-thumb"><img src="' + esc(customUrl || IqmoAvatar.PRESET_URL.default) + '" alt="" data-avatar-upload-thumb /></span>' +
-			'<span class="prof-av-label">Загрузить свой</span>' +
-			'<input type="file" accept="image/jpeg,image/png,image/webp" aria-label="Загрузить свой аватар" /></label>' +
-			'</div>' +
-			'<div class="prof-av-custom-preview" data-avatar-custom-preview' + (customUrl ? '' : ' hidden') + '>' +
-			'<img src="' + esc(customUrl) + '" alt="" data-avatar-custom-img />' +
-			'<span>Свой аватар · JPG, PNG или WebP, до 2&nbsp;МБ</span></div>' +
-			'<p class="prof-av-err" data-avatar-err role="alert"></p></section>'
-		);
 	}
 
 	function renderAchievements(list, avatarUrl) {
@@ -491,7 +486,6 @@
 		root.innerHTML =
 			(isPublic ? renderPublicBanner(data) : '') +
 			renderHero(data) +
-			(isPublic ? '' : renderAvatarPicker(data.profileData)) +
 			renderGoals(data.nextGoalsData) +
 			(isPublic ? '' : renderXpGuide()) +
 			renderAchievements(data.achievementsData, data.profileData && data.profileData.avatarUrl) +
@@ -514,39 +508,134 @@
 		}
 	}
 
+	function ensureAvatarSheet() {
+		if (document.getElementById('iqmo-avatar-sheet')) return;
+		var el = document.createElement('div');
+		el.id = 'iqmo-avatar-sheet';
+		el.hidden = true;
+		el.innerHTML =
+			'<div class="av-sheet-backdrop" data-avatar-close tabindex="-1"></div>' +
+			'<div class="av-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="av-sheet-title">' +
+			'<div class="av-sheet-handle" aria-hidden="true"></div>' +
+			'<h2 class="av-sheet-title" id="av-sheet-title">Внешний вид профиля</h2>' +
+			'<p class="av-sheet-sub">Выбери, как ты будешь выглядеть</p>' +
+			'<div class="av-sheet-menu">' +
+			'<button type="button" class="av-sheet-opt" data-avatar-preset="boy">' +
+			'<span class="av-sheet-opt__thumb"><img src="' + IqmoAvatar.PRESET_URL.boy + '" alt="" /></span>' +
+			'<span class="av-sheet-opt__txt"><span class="av-sheet-opt__em">👦</span> Мальчик</span></button>' +
+			'<button type="button" class="av-sheet-opt" data-avatar-preset="girl">' +
+			'<span class="av-sheet-opt__thumb"><img src="' + IqmoAvatar.PRESET_URL.girl + '" alt="" /></span>' +
+			'<span class="av-sheet-opt__txt"><span class="av-sheet-opt__em">👧</span> Девочка</span></button>' +
+			'<button type="button" class="av-sheet-opt av-sheet-opt--upload" data-avatar-upload-btn>' +
+			'<span class="av-sheet-opt__thumb av-sheet-opt__thumb--upload"><span aria-hidden="true">⬆</span></span>' +
+			'<span class="av-sheet-opt__txt" data-avatar-upload-label>Загрузить свой</span></button>' +
+			'</div>' +
+			'<input type="file" id="iqmo-avatar-file" accept="image/jpeg,image/png,image/webp" hidden />' +
+			'<p class="av-sheet-hint">JPG, PNG или WebP · до 2&nbsp;МБ</p>' +
+			'<p class="av-sheet-err" data-avatar-err role="alert"></p></div>';
+		document.body.appendChild(el);
+	}
+
+	function syncSheetUi() {
+		var sheet = document.getElementById('iqmo-avatar-sheet');
+		if (!sheet || !global.IqmoAvatar) return;
+		var cur = IqmoAvatar.read().preset || 'default';
+		sheet.querySelectorAll('[data-avatar-preset]').forEach(function (btn) {
+			var on = btn.getAttribute('data-avatar-preset') === cur;
+			btn.classList.toggle('is-selected', on);
+			btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+		});
+		var up = sheet.querySelector('[data-avatar-upload-btn]');
+		if (up) up.classList.toggle('is-selected', cur === 'custom');
+		var lbl = sheet.querySelector('[data-avatar-upload-label]');
+		if (lbl) lbl.textContent = IqmoAvatar.uploadLabel();
+	}
+
+	function openAvatarSheet() {
+		ensureAvatarSheet();
+		syncSheetUi();
+		var sheet = document.getElementById('iqmo-avatar-sheet');
+		if (!sheet) return;
+		sheet.hidden = false;
+		document.body.classList.add('iqmo-av-sheet-open');
+		var first = sheet.querySelector('.av-sheet-opt');
+		if (first) first.focus();
+	}
+
+	function closeAvatarSheet() {
+		var sheet = document.getElementById('iqmo-avatar-sheet');
+		if (!sheet) return;
+		sheet.hidden = true;
+		document.body.classList.remove('iqmo-av-sheet-open');
+		var err = sheet.querySelector('[data-avatar-err]');
+		if (err) err.textContent = '';
+	}
+
+	function avatarErrMsg(err) {
+		if (err && err.message === 'type') return 'Подойдут только JPG, PNG или WebP.';
+		if (err && err.message === 'size') return 'Файл слишком большой. Максимум 2 МБ.';
+		return 'Не удалось загрузить изображение.';
+	}
+
+	function applyAvatarChoice(url) {
+		IqmoAvatar.syncProfileDom(url);
+		syncSheetUi();
+	}
+
 	function bindAvatarPicker() {
 		if (bindAvatarPicker._bound || !global.IqmoAvatar) return;
 		bindAvatarPicker._bound = true;
+		ensureAvatarSheet();
+
 		document.addEventListener('click', function (e) {
-			var btn = e.target.closest('[data-avatar-preset]');
-			if (!btn) return;
-			e.preventDefault();
-			var preset = btn.getAttribute('data-avatar-preset');
-			IqmoAvatar.setPreset(preset);
-			var err = document.querySelector('[data-avatar-err]');
-			if (err) err.textContent = '';
-			if (global.IqmoProfileApp && IqmoProfileApp.refresh) IqmoProfileApp.refresh();
+			if (e.target.closest('[data-avatar-trigger]')) {
+				e.preventDefault();
+				openAvatarSheet();
+				return;
+			}
+			if (e.target.closest('[data-avatar-close]')) {
+				e.preventDefault();
+				closeAvatarSheet();
+				return;
+			}
+			var presetBtn = e.target.closest('[data-avatar-preset]');
+			if (presetBtn) {
+				e.preventDefault();
+				var preset = presetBtn.getAttribute('data-avatar-preset');
+				var url = IqmoAvatar.setPreset(preset);
+				var err = document.querySelector('[data-avatar-err]');
+				if (err) err.textContent = '';
+				applyAvatarChoice(url);
+				closeAvatarSheet();
+				return;
+			}
+			var uploadBtn = e.target.closest('[data-avatar-upload-btn]');
+			if (uploadBtn) {
+				e.preventDefault();
+				var input = document.getElementById('iqmo-avatar-file');
+				if (input) input.click();
+			}
 		});
+
 		document.addEventListener('change', function (e) {
-			var input = e.target.closest('[data-avatar-upload] input[type="file"]');
-			if (!input || !input.files || !input.files[0]) return;
+			if (e.target.id !== 'iqmo-avatar-file' || !e.target.files || !e.target.files[0]) return;
 			var errEl = document.querySelector('[data-avatar-err]');
-			IqmoAvatar.setCustomFromFile(input.files[0])
-				.then(function () {
+			IqmoAvatar.setCustomFromFile(e.target.files[0])
+				.then(function (url) {
 					if (errEl) errEl.textContent = '';
-					if (global.IqmoProfileApp && IqmoProfileApp.refresh) IqmoProfileApp.refresh();
+					applyAvatarChoice(url);
+					closeAvatarSheet();
 				})
 				.catch(function (err) {
-					if (!errEl) return;
-					if (err && err.message === 'type') {
-						errEl.textContent = 'Подойдут только JPG, PNG или WebP.';
-					} else if (err && err.message === 'size') {
-						errEl.textContent = 'Файл слишком большой. Максимум 2 МБ.';
-					} else {
-						errEl.textContent = 'Не удалось загрузить изображение.';
-					}
+					if (errEl) errEl.textContent = avatarErrMsg(err);
 				});
-			input.value = '';
+			e.target.value = '';
+		});
+
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && document.body.classList.contains('iqmo-av-sheet-open')) {
+				closeAvatarSheet();
+			}
 		});
 	}
 

@@ -6,6 +6,7 @@
 	'use strict';
 
 	var STORAGE_KEY = 'iqmo-avatar-v1';
+	var CUSTOMIZED_KEY = 'iqmo-avatar-customized-v1';
 	var MAX_BYTES = 2 * 1024 * 1024;
 	var MAX_EDGE = 512;
 	var ALLOWED_TYPES = { 'image/jpeg': 1, 'image/png': 1, 'image/webp': 1 };
@@ -54,6 +55,26 @@
 		return lsSet(normalizeState(state));
 	}
 
+	function markCustomized() {
+		try { localStorage.setItem(CUSTOMIZED_KEY, '1'); } catch (e) {}
+	}
+
+	function isPristine() {
+		try {
+			if (localStorage.getItem(CUSTOMIZED_KEY) === '1') return false;
+			var raw = localStorage.getItem(STORAGE_KEY);
+			if (!raw) return true;
+			var s = normalizeState(JSON.parse(raw));
+			return s.preset === 'default';
+		} catch (e) {
+			return true;
+		}
+	}
+
+	function uploadLabel() {
+		return read().preset === 'custom' ? 'Заменить свой аватар' : 'Загрузить свой';
+	}
+
 	function getUrl(state) {
 		var s = normalizeState(state || read());
 		if (s.preset === 'custom' && s.custom) return s.custom;
@@ -63,6 +84,7 @@
 	function setPreset(preset) {
 		if (!PRESET_URL[preset]) preset = 'default';
 		save({ preset: preset });
+		if (preset !== 'default') markCustomized();
 		return getUrl({ preset: preset });
 	}
 
@@ -116,6 +138,7 @@
 				return Promise.reject(new Error('size'));
 			}
 			save({ preset: 'custom', custom: dataUrl });
+			markCustomized();
 			return dataUrl;
 		});
 	}
@@ -183,8 +206,20 @@
 		document.head.appendChild(s);
 	}
 
+	function syncProfileDom(url) {
+		url = url || getUrl();
+		var heroImg = document.querySelector('[data-avatar-hero-img]');
+		if (heroImg) heroImg.src = url;
+		var badge = document.querySelector('.iqmo-hero .av-cam-badge');
+		if (badge && !isPristine()) badge.classList.remove('is-hint');
+		paintNavAndCards();
+		var ach = document.querySelector('.prof-ach-avatar');
+		if (ach) ach.src = url;
+	}
+
 	global.IqmoAvatar = {
 		STORAGE_KEY: STORAGE_KEY,
+		CUSTOMIZED_KEY: CUSTOMIZED_KEY,
 		PRESET_URL: PRESET_URL,
 		MAX_BYTES: MAX_BYTES,
 		read: read,
@@ -193,6 +228,9 @@
 		setPreset: setPreset,
 		setCustomFromFile: setCustomFromFile,
 		urlFromStoredJson: urlFromStoredJson,
+		isPristine: isPristine,
+		uploadLabel: uploadLabel,
+		syncProfileDom: syncProfileDom,
 		paint: paint,
 		paintNavAndCards: paintNavAndCards,
 		ensureCss: ensureCss

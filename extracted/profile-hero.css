@@ -222,6 +222,8 @@
 
 /* ─── STREAK card (Violet Prestige) ─── */
 .iqmo-hero .streak{
+  --streak-glow: .38;
+  --streak-breathe: 5.2s;
   position:relative;
   border-radius:22px;
   padding:22px 22px 18px;
@@ -237,7 +239,57 @@
     inset 0 1px 0 rgba(255,255,255,.85),
     inset 0 0 0 1px rgba(124,58,237,.03),
     0 1px 2px rgba(15,18,38,.04),
-    0 22px 50px -28px rgba(124,58,237,.38);
+    0 22px 50px -28px rgba(124,58,237,calc(.28 + var(--streak-glow) * .22));
+  transition:transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, border-color .28s ease;
+  will-change:transform;
+}
+.iqmo-hero .streak.is-active{
+  animation:iqmoStreakCardBreathe var(--streak-breathe) ease-in-out infinite;
+}
+.iqmo-hero .streak.is-active.is-near-reward{
+  --streak-glow:.58;
+  --streak-breathe:3.8s;
+}
+.iqmo-hero .streak.is-active.is-near-reward .atm-aura{
+  animation:iqmoAuraNear 3.8s ease-in-out infinite;
+}
+@keyframes iqmoAuraNear{
+  0%,100%{transform:scale(1); opacity:.65;}
+  50%{transform:scale(1.1); opacity:1;}
+}
+.iqmo-hero .streak.is-active.is-complete{
+  --streak-glow:.48;
+}
+@keyframes iqmoStreakCardBreathe{
+  0%,100%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.85),
+      inset 0 0 0 1px rgba(124,58,237,.03),
+      0 1px 2px rgba(15,18,38,.04),
+      0 22px 50px -28px rgba(124,58,237,calc(.26 + var(--streak-glow) * .18));
+  }
+  50%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 0 0 1px rgba(124,58,237,.06),
+      0 1px 2px rgba(15,18,38,.04),
+      0 26px 56px -24px rgba(124,58,237,calc(.34 + var(--streak-glow) * .28));
+  }
+}
+.iqmo-hero .streak.is-active:hover,
+.iqmo-hero .streak.is-active:focus-within{
+  animation:none;
+  transform:translateY(-2px);
+  border-color:rgba(124,58,237,.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 0 0 1px rgba(124,58,237,.05),
+    0 4px 12px rgba(15,18,38,.06),
+    0 28px 60px -22px rgba(124,58,237,calc(.42 + var(--streak-glow) * .32));
+}
+.iqmo-hero .streak.is-active:hover .s-caps .cap.on,
+.iqmo-hero .streak.is-active:focus-within .s-caps .cap.on{
+  filter:brightness(1.06);
 }
 .iqmo-hero .streak::before{
   content:""; position:absolute; top:0; left:24px; right:24px; height:1px;
@@ -356,11 +408,38 @@
     0 4px 12px -6px rgba(124,58,237,.28);
 }
 .iqmo-hero .emblem .glyph{width:24px; height:24px; position:relative; z-index:2;}
+.iqmo-hero .streak.is-active .emblem .disc::after{
+  content:""; position:absolute; inset:-6px; border-radius:50%;
+  pointer-events:none; z-index:0;
+  background:radial-gradient(circle, rgba(167,139,250,.4), transparent 68%);
+  opacity:.35;
+  transform:scale(1);
+  animation:iqmoEmblemEnergy 4.2s ease-in-out infinite;
+}
+@keyframes iqmoEmblemEnergy{
+  0%,100%{opacity:.22; transform:scale(1);}
+  50%{opacity:.5; transform:scale(1.08);}
+}
+.iqmo-hero .streak.is-active .emblem .ring{
+  animation:iqmoRingSpin 72s linear infinite, iqmoStreakRingPulse 5.5s ease-in-out infinite;
+}
+@keyframes iqmoStreakRingPulse{
+  0%,100%{opacity:.85;}
+  50%{opacity:1;}
+}
 .iqmo-hero .emblem .aura{
   position:absolute; inset:-12px; border-radius:50%;
   pointer-events:none; z-index:-1;
   background:radial-gradient(circle, rgba(167,139,250,.32), transparent 65%);
   animation:iqmoAura 4.4s ease-in-out infinite;
+}
+.iqmo-hero .streak.is-active .emblem .aura{
+  animation:iqmoAura 4s ease-in-out infinite, iqmoEmblemAuraFlicker 6s ease-in-out infinite;
+}
+@keyframes iqmoEmblemAuraFlicker{
+  0%,100%{opacity:.7; transform:scale(1);}
+  40%{opacity:1; transform:scale(1.05);}
+  70%{opacity:.75; transform:scale(.98);}
 }
 .iqmo-hero .s-counter{display:flex; flex-direction:column;}
 .iqmo-hero .s-num{
@@ -382,24 +461,98 @@
   font-family:'JetBrains Mono',monospace; letter-spacing:.04em;
 }
 
-.iqmo-hero .s-prog{position:relative; z-index:3;}
-.iqmo-hero .s-caps{display:flex; gap:8px; align-items:center;}
+.iqmo-hero .s-prog{
+  position:relative; z-index:3;
+  padding:4px 0 2px;
+}
+.iqmo-hero .s-prog::before{
+  content:""; position:absolute; left:0; top:50%;
+  width:var(--streak-fill, 0%); height:4px;
+  transform:translateY(-50%);
+  border-radius:2px;
+  pointer-events:none; z-index:0;
+  background:linear-gradient(90deg, rgba(167,139,250,.22), rgba(124,58,237,.12));
+  filter:blur(5px);
+  opacity:.85;
+  animation:iqmoStreakTrackGlow 4.8s ease-in-out infinite;
+}
+@keyframes iqmoStreakTrackGlow{
+  0%,100%{opacity:.55;}
+  50%{opacity:.95;}
+}
+.iqmo-hero .s-caps{
+  display:flex; gap:8px; align-items:center;
+  position:relative; z-index:1;
+}
 .iqmo-hero .s-caps .cap{
   flex:1; height:4px; border-radius:2px;
   position:relative;
+  overflow:hidden;
   background:rgba(124,58,237,.10);
-  transition:background .2s;
+  transition:background .25s ease, box-shadow .25s ease, filter .25s ease;
 }
 .iqmo-hero .s-caps .cap.on{
-  background:linear-gradient(90deg, #a78bfa, #7c3aed);
-  box-shadow:0 0 6px rgba(124,58,237,.45);
+  background:linear-gradient(90deg, #c4b5fd 0%, #a78bfa 42%, #7c3aed 100%);
+  box-shadow:0 0 6px rgba(124,58,237,.42);
+  animation:iqmoStreakCapGlow 3.6s ease-in-out infinite;
+  animation-delay:calc((var(--cap-i, 1) - 1) * .14s);
+}
+.iqmo-hero .s-caps .cap.on::after{
+  content:""; position:absolute; inset:0;
+  border-radius:inherit;
+  background:linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(255,255,255,.55) 50%,
+    transparent 62%,
+    transparent 100%
+  );
+  transform:translate3d(-120%, 0, 0);
+  animation:iqmoStreakCapShimmer 3.8s ease-in-out infinite;
+  animation-delay:calc((var(--cap-i, 1) - 1) * .22s + .4s);
+  will-change:transform;
+}
+@keyframes iqmoStreakCapShimmer{
+  0%,18%{transform:translate3d(-120%, 0, 0); opacity:0;}
+  32%{opacity:.85;}
+  52%,100%{transform:translate3d(220%, 0, 0); opacity:0;}
+}
+@keyframes iqmoStreakCapGlow{
+  0%,100%{box-shadow:0 0 5px rgba(124,58,237,.38);}
+  50%{box-shadow:0 0 9px rgba(124,58,237,.58);}
+}
+.iqmo-hero .streak.is-near-reward .s-caps .cap.on{
+  animation:iqmoStreakCapGlowNear 3s ease-in-out infinite;
+  animation-delay:calc((var(--cap-i, 1) - 1) * .12s);
+}
+@keyframes iqmoStreakCapGlowNear{
+  0%,100%{box-shadow:0 0 6px rgba(124,58,237,.48);}
+  50%{box-shadow:0 0 12px rgba(124,58,237,.72);}
 }
 .iqmo-hero .s-caps .cap.on.now{
-  animation:iqmoCapPulse 2s ease-in-out infinite;
+  animation:iqmoCapPulse 2.2s ease-in-out infinite, iqmoStreakCapGlow 3.6s ease-in-out infinite;
 }
 @keyframes iqmoCapPulse{
-  0%,100%{box-shadow:0 0 5px rgba(124,58,237,.4);}
-  50%{box-shadow:0 0 12px rgba(124,58,237,.85);}
+  0%,100%{box-shadow:0 0 6px rgba(124,58,237,.45); transform:scaleY(1);}
+  50%{box-shadow:0 0 14px rgba(124,58,237,.78); transform:scaleY(1.35);}
+}
+.iqmo-hero .streak.is-near-reward .s-caps .cap.on.now{
+  animation:iqmoCapPulseNear 1.8s ease-in-out infinite, iqmoStreakCapGlowNear 3s ease-in-out infinite;
+}
+@keyframes iqmoCapPulseNear{
+  0%,100%{box-shadow:0 0 8px rgba(124,58,237,.55); transform:scaleY(1);}
+  50%{box-shadow:0 0 16px rgba(124,58,237,.88); transform:scaleY(1.4);}
+}
+.iqmo-hero .streak.is-active .atm-dot{
+  animation:iqmoStreakFloat 6s ease-in-out infinite, iqmoStreakParticleTwinkle 4.5s ease-in-out infinite;
+}
+.iqmo-hero .streak.is-active .atm-dot.d1{animation-delay:0s, 0s;}
+.iqmo-hero .streak.is-active .atm-dot.d2{animation-delay:1s, 1.2s;}
+.iqmo-hero .streak.is-active .atm-dot.d3{animation-delay:2.4s, 2.1s;}
+@keyframes iqmoStreakParticleTwinkle{
+  0%,100%{opacity:.4; transform:translate3d(0,0,0) scale(1);}
+  50%{opacity:1; transform:translate3d(0,-5px,0) scale(1.25);}
 }
 .iqmo-hero .s-prog-foot{
   margin-top:10px;
