@@ -470,7 +470,7 @@
 .lm .soc-compose-bar {
 	display: flex;
 	align-items: center;
-	justify-content: flex-end;
+	justify-content: flex-start;
 	gap: 8px;
 	flex-wrap: wrap;
 }
@@ -478,9 +478,10 @@
 .lm .soc-compose-hint {
 	flex: 1 1 auto;
 	min-width: 0;
-	margin-right: auto;
+	margin-left: auto;
 	font-size: 12px;
 	color: #a09bb8;
+	text-align: right;
 }
 
 .lm .soc-compose-send {
@@ -572,16 +573,19 @@
 
 	.lm .soc-compose-bar {
 		flex-direction: column;
-		align-items: stretch;
+		align-items: flex-start;
 	}
 
 	.lm .soc-compose-hint {
-		margin-right: 0;
+		order: -1;
+		width: 100%;
+		margin-left: 0;
+		text-align: left;
 	}
 
 	.lm .soc-compose-cancel,
 	.lm .soc-compose-send {
-		width: 100%;
+		width: auto;
 	}
 
 	.lm .soc-foot {
