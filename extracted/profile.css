@@ -1105,7 +1105,7 @@
 
   /* small screens fallback */
   @media (max-width: 1180px){
-    .hero-inner{grid-template-columns: 200px 1fr; }
+    .hero .hero-inner{grid-template-columns: 200px 1fr; }
     .h-quick{grid-column:1 / -1;}
     .ach-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
     .rare-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -1117,8 +1117,8 @@
 
 
 /* IQMO profile — mobile */
-@media (max-width:1180px){.hero-inner{grid-template-columns:200px 1fr}.h-quick{grid-column:1/-1}.ach-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.rare-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.row-2{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.courses{grid-template-columns:1fr}.nextrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:720px){.shell{padding:16px 14px 48px;gap:18px}.hero-inner{grid-template-columns:1fr;gap:20px;padding:24px 18px 22px;text-align:center}.av-wrap{margin:0 auto}.h-name-row{justify-content:center}.h-status{justify-content:center}.h-quick{grid-template-columns:1fr 1fr}.nextrow{grid-template-columns:1fr}.ach-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-grid{grid-template-columns:1fr}.h-name{font-size:28px}.sec-head{flex-direction:column;align-items:flex-start;gap:8px}}
+@media (max-width:1180px){.hero .hero-inner{grid-template-columns:200px 1fr}.h-quick{grid-column:1/-1}.ach-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.rare-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.row-2{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.courses{grid-template-columns:1fr}.nextrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.shell{padding:16px 14px 48px;gap:18px}.hero .hero-inner{grid-template-columns:1fr;gap:20px;padding:24px 18px 22px;text-align:center}.av-wrap{margin:0 auto}.h-name-row{justify-content:center}.h-status{justify-content:center}.h-quick{grid-template-columns:1fr 1fr}.nextrow{grid-template-columns:1fr}.ach-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-grid{grid-template-columns:1fr}.h-name{font-size:28px}.sec-head{flex-direction:column;align-items:flex-start;gap:8px}}
 
 /* ── Settings / account (preserved from legacy profile) ── */
 .prof-settings{
