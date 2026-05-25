@@ -88,7 +88,7 @@
 			+ '<span class="soc-hint"><span class="em">🔥</span><b>84%</b> со второго раза</span>'
 			+ '<span class="soc-hint"><span class="em">💀</span>чаще ошибаются в&nbsp;<b>варианте&nbsp;6</b></span>'
 			+ '</div>'
-			+ '<div class="soc-list is-collapsed">'
+			+ '<div class="soc-list">'
 			+ _item('iq-1842.png', 'IQ-1842', '2 ч назад', 'Босс жёстче чем в прошлой главе 💀', true, [
 				['❤️', 12, true], ['💀', 4, false]
 			], 2, false)
@@ -104,30 +104,8 @@
 			+ _item('iq-4408.png', 'IQ-4408', '12 ч назад', 'кто проходит сейчас? давайте вместе добивать 💪', false, [
 				['❤️', 7, false], ['🔥', 4, false]
 			], 3, false)
-			+ _item('iq-2210.png', 'IQ-2210', '14 ч назад', 'там подвох в формуле — пересчитай моли, и всё сойдётся', false, [
-				['❤️', 6, false], ['🔥', 2, false]
-			], 0, true)
-			+ _item('iq-9973.png', 'IQ-9973', 'вчера', 'момент с реакциями — топ объяснение, нигде такого не видел', false, [
-				['❤️', 11, false]
-			], 0, true)
-			+ _item('iq-1842.png', 'IQ-1842', 'вчера', 'прошёл босса с 5 попытки, но оно того 🙏', true, [
-				['🔥', 6, false], ['❤️', 4, false]
-			], 0, true)
-			+ _item('iq-5521.png', 'IQ-5521', '2 дня назад', 'спасибо за подсказку про моли, вытянул 15 задание', false, [
-				['❤️', 14, false], ['🔥', 3, false]
-			], 0, true)
-			+ _item('iq-1024.png', 'IQ-1024', '2 дня назад', 'вариант 12 забрал 1.5 часа жизни, но разобрался', false, [
-				['🔥', 5, false], ['😭', 2, false]
-			], 2, true)
-			+ _item('iq-1337.png', 'IQ-1337', '3 дня назад', 'лучшая глава за всю платформу, не меняйте задания', false, [
-				['❤️', 19, false], ['🔥', 6, false]
-			], 0, true)
-			+ _item('iq-4408.png', 'IQ-4408', '4 дня назад', 'с третьего раза прошёл, но было приятно 🙂', false, [
-				['❤️', 4, false], ['🔥', 2, false]
-			], 0, true)
 			+ '</div>'
 			+ '<div class="soc-foot">'
-			+ '<button class="soc-more" type="button" data-target=".soc-list">Показать ещё 7 ↓</button>'
 			+ '<button class="soc-write" type="button">'
 			+ '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>'
 			+ 'Поделитесь впечатлением о главе…'
@@ -316,18 +294,6 @@
 					if (me && me.id != null) openCompose(card, subject, chapter, draft);
 				});
 			}
-
-			card.querySelectorAll('.soc-more').forEach(function (btn) {
-				if (btn.dataset.socBound) return;
-				btn.dataset.socBound = '1';
-				btn.addEventListener('click', function () {
-					var sel = btn.getAttribute('data-target');
-					var list = sel ? btn.closest('.soc-card').querySelector(sel) : null;
-					if (!list) return;
-					list.classList.remove('is-collapsed');
-					btn.style.display = 'none';
-				});
-			});
 
 			card.querySelectorAll('.soc-sort').forEach(function (grp) {
 				if (grp.dataset.socBound) return;
