@@ -300,15 +300,13 @@
 			'<article class="ngoal reward-shop" tabindex="0" role="note" aria-label="Лавка наград — откроется с 15 уровня">' +
 			'<span class="reward-shop__shimmer" aria-hidden="true"></span>' +
 			'<span class="reward-shop__glow" aria-hidden="true"></span>' +
+			'<span class="reward-shop__lock" aria-hidden="true">' + LOCK_SVG + '</span>' +
 			'<div class="reward-shop__inner">' +
-			'<div class="reward-shop__art" aria-hidden="true">' +
-			'<img src="/site/assets/rewards-shop-teaser.png" alt="" width="160" height="120" decoding="async" />' +
+			'<div class="reward-shop__art">' +
+			'<img src="/site/assets/rewards-shop-bag.png" alt="" width="84" height="84" decoding="async" draggable="false" />' +
 			'</div>' +
 			'<div class="reward-shop__body">' +
-			'<div class="reward-shop__head">' +
-			'<span class="reward-shop__eye">Лавка наград</span>' +
-			'<span class="reward-shop__lock">' + LOCK_SVG + '</span>' +
-			'</div>' +
+			'<h3 class="reward-shop__title">Лавка наград</h3>' +
 			'<p class="reward-shop__desc">Обменивайте XP на реальные подарки</p>' +
 			'<p class="reward-shop__sub">Откроется с ' + REWARD_SHOP_UNLOCK + ' уровня</p>' +
 			'</div></div>' +
