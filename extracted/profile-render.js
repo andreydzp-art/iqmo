@@ -295,45 +295,43 @@
 		);
 	}
 
-	function renderRewardShopTeaser() {
+	function renderRewardShopCard() {
 		return (
-			'<div class="reward-teaser" tabindex="0" role="note" aria-label="Лавка наград — откроется на 15 уровне">' +
-			'<span class="reward-teaser__shimmer" aria-hidden="true"></span>' +
-			'<span class="reward-teaser__glow" aria-hidden="true"></span>' +
-			'<div class="reward-teaser__art" aria-hidden="true">' +
-			'<img src="/site/assets/rewards-shop-teaser.png" alt="" width="120" height="90" decoding="async" />' +
+			'<article class="ngoal reward-shop" tabindex="0" role="note" aria-label="Лавка наград — откроется с 15 уровня">' +
+			'<span class="reward-shop__shimmer" aria-hidden="true"></span>' +
+			'<span class="reward-shop__glow" aria-hidden="true"></span>' +
+			'<div class="reward-shop__inner">' +
+			'<div class="reward-shop__art" aria-hidden="true">' +
+			'<img src="/site/assets/rewards-shop-teaser.png" alt="" width="160" height="120" decoding="async" />' +
 			'</div>' +
-			'<div class="reward-teaser__body">' +
-			'<div class="reward-teaser__head">' +
-			'<span class="reward-teaser__title">Лавка наград</span>' +
-			'<span class="reward-teaser__lock">' + LOCK_SVG + '</span>' +
+			'<div class="reward-shop__body">' +
+			'<div class="reward-shop__head">' +
+			'<span class="reward-shop__eye">Лавка наград</span>' +
+			'<span class="reward-shop__lock">' + LOCK_SVG + '</span>' +
 			'</div>' +
-			'<p class="reward-teaser__text">Обменивайте XP на реальные подарки</p>' +
-			'<p class="reward-teaser__sub">Откроется на ' + REWARD_SHOP_UNLOCK + ' уровне</p>' +
-			'</div>' +
-			'<div class="reward-teaser__tip" role="tooltip">Достигните ' + REWARD_SHOP_UNLOCK + ' уровня, чтобы открыть магазин наград</div>' +
-			'</div>'
+			'<p class="reward-shop__desc">Обменивайте XP на реальные подарки</p>' +
+			'<p class="reward-shop__sub">Откроется с ' + REWARD_SHOP_UNLOCK + ' уровня</p>' +
+			'</div></div>' +
+			'<div class="reward-shop__tip" role="tooltip">Достигните ' + REWARD_SHOP_UNLOCK + ' уровня, чтобы открыть магазин наград</div>' +
+			'</article>'
 		);
 	}
 
 	function renderGoals(goals, isPublic) {
+		var cards = [];
+		goals.forEach(function (g) {
+			cards.push(
+				'<div class="ngoal ' + g.kind + (g.primary ? ' is--primary' : '') + '">' +
+				renderGoalCard(g) +
+				'</div>'
+			);
+			if (g.primary && !isPublic) {
+				cards.push(renderRewardShopCard());
+			}
+		});
 		return (
-			'<section class="nextrow">' +
-			goals.map(function (g) {
-				if (g.primary && !isPublic) {
-					return (
-						'<div class="ngoal ' + g.kind + ' is--primary has-reward-teaser">' +
-						'<div class="ng-main">' + renderGoalCard(g) + '</div>' +
-						renderRewardShopTeaser() +
-						'</div>'
-					);
-				}
-				return (
-					'<div class="ngoal ' + g.kind + (g.primary ? ' is--primary' : '') + '">' +
-					renderGoalCard(g) +
-					'</div>'
-				);
-			}).join('') +
+			'<section class="nextrow' + (!isPublic ? ' nextrow--with-reward' : '') + '">' +
+			cards.join('') +
 			'</section>'
 		);
 	}
