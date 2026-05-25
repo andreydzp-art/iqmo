@@ -11,6 +11,7 @@
 	];
 	var STORAGE_KEY = 'iqmo-chapter-comments-v1';
 	var DRAFT_KEY = 'iqmo-chapter-compose-draft-v1';
+	var EXPANDED_KEY = 'iqmo-chapter-expanded-v1';
 	var MIN_LEN = 2;
 	var MAX_LEN = 280;
 
@@ -88,7 +89,7 @@
 			+ '<span class="soc-hint"><span class="em">🔥</span><b>84%</b> со второго раза</span>'
 			+ '<span class="soc-hint"><span class="em">💀</span>чаще ошибаются в&nbsp;<b>варианте&nbsp;6</b></span>'
 			+ '</div>'
-			+ '<div class="soc-list">'
+			+ '<div class="soc-list is-collapsed">'
 			+ _item('iq-1842.png', 'IQ-1842', '2 ч назад', 'Босс жёстче чем в прошлой главе 💀', true, [
 				['❤️', 12, true], ['💀', 4, false]
 			], 2, false)
@@ -104,8 +105,30 @@
 			+ _item('iq-4408.png', 'IQ-4408', '12 ч назад', 'кто проходит сейчас? давайте вместе добивать 💪', false, [
 				['❤️', 7, false], ['🔥', 4, false]
 			], 3, false)
+			+ _item('iq-2210.png', 'IQ-2210', '14 ч назад', 'там подвох в формуле — пересчитай моли, и всё сойдётся', false, [
+				['❤️', 6, false], ['🔥', 2, false]
+			], 0, true)
+			+ _item('iq-9973.png', 'IQ-9973', 'вчера', 'момент с реакциями — топ объяснение, нигде такого не видел', false, [
+				['❤️', 11, false]
+			], 0, true)
+			+ _item('iq-1842.png', 'IQ-1842', 'вчера', 'прошёл босса с 5 попытки, но оно того 🙏', true, [
+				['🔥', 6, false], ['❤️', 4, false]
+			], 0, true)
+			+ _item('iq-5521.png', 'IQ-5521', '2 дня назад', 'спасибо за подсказку про моли, вытянул 15 задание', false, [
+				['❤️', 14, false], ['🔥', 3, false]
+			], 0, true)
+			+ _item('iq-1024.png', 'IQ-1024', '2 дня назад', 'вариант 12 забрал 1.5 часа жизни, но разобрался', false, [
+				['🔥', 5, false], ['😭', 2, false]
+			], 2, true)
+			+ _item('iq-1337.png', 'IQ-1337', '3 дня назад', 'лучшая глава за всю платформу, не меняйте задания', false, [
+				['❤️', 19, false], ['🔥', 6, false]
+			], 0, true)
+			+ _item('iq-4408.png', 'IQ-4408', '4 дня назад', 'с третьего раза прошёл, но было приятно 🙂', false, [
+				['❤️', 4, false], ['🔥', 2, false]
+			], 0, true)
 			+ '</div>'
 			+ '<div class="soc-foot">'
+			+ '<button class="soc-more" type="button" data-target=".soc-list">Показать ещё 7 ↓</button>'
 			+ '<button class="soc-write" type="button">'
 			+ '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>'
 			+ 'Поделитесь впечатлением о главе…'
@@ -175,6 +198,31 @@
 				btn.innerHTML = btn.innerHTML.replace(/(\d+)\s*$/, String(n));
 			});
 		});
+	}
+
+	function expandedSlot(subject, chapter) {
+		return EXPANDED_KEY + ':' + subject + ':ch' + chapter;
+	}
+
+	function isExpanded(subject, chapter) {
+		try { return sessionStorage.getItem(expandedSlot(subject, chapter)) === '1'; } catch (e) { return false; }
+	}
+
+	function setExpanded(subject, chapter, on) {
+		try {
+			if (on) sessionStorage.setItem(expandedSlot(subject, chapter), '1');
+			else sessionStorage.removeItem(expandedSlot(subject, chapter));
+		} catch (e) {}
+	}
+
+	function expandMoreComments(card, subject, chapter) {
+		var list = card.querySelector('.soc-list');
+		var btn = card.querySelector('.soc-more');
+		if (!list) return;
+		list.classList.remove('is-collapsed');
+		if (btn) btn.hidden = true;
+		setExpanded(subject, chapter, true);
+		bindReactions(card);
 	}
 
 	function prependUserComments(card, subject, chapter) {
@@ -294,6 +342,18 @@
 					if (me && me.id != null) openCompose(card, subject, chapter, draft);
 				});
 			}
+
+			if (isExpanded(subject, chapter)) {
+				expandMoreComments(card, subject, chapter);
+			}
+
+			card.querySelectorAll('.soc-more').forEach(function (btn) {
+				if (btn.dataset.socBound) return;
+				btn.dataset.socBound = '1';
+				btn.addEventListener('click', function () {
+					expandMoreComments(card, subject, chapter);
+				});
+			});
 
 			card.querySelectorAll('.soc-sort').forEach(function (grp) {
 				if (grp.dataset.socBound) return;

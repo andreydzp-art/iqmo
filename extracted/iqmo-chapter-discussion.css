@@ -343,6 +343,10 @@
 	display: none;
 }
 
+.lm .soc-foot .soc-more[hidden] {
+	display: none !important;
+}
+
 .lm .soc-foot {
 	display: flex;
 	align-items: center;
@@ -354,6 +358,7 @@
 }
 
 .lm .soc-more {
+	flex-shrink: 0;
 	background: transparent;
 	border: none;
 	color: #5a557a;
