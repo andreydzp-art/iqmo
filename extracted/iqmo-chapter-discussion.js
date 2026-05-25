@@ -88,6 +88,7 @@
 			+ '<span class="soc-hint"><span class="em">👀</span><b>14</b> сейчас проходят</span>'
 			+ '<span class="soc-hint"><span class="em">🔥</span><b>84%</b> со второго раза</span>'
 			+ '<span class="soc-hint"><span class="em">💀</span>чаще ошибаются в&nbsp;<b>варианте&nbsp;6</b></span>'
+			+ '<span class="soc-hint soc-hint--warn"><span class="em">🚫</span>Сплойлеры запрещены — нельзя писать правильные ответы</span>'
 			+ '</div>'
 			+ '<div class="soc-list is-collapsed">'
 			+ _item('iq-1842.png', 'IQ-1842', '2 ч назад', 'Босс жёстче чем в прошлой главе 💀', true, [

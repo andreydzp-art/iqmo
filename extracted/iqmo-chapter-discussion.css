@@ -130,6 +130,16 @@
 	font-weight: 700;
 }
 
+.lm .soc-hint--warn {
+	background: #fff8f0;
+	border-color: #fde6c8;
+	color: #8a4b12;
+}
+
+.lm .soc-hint--warn b {
+	color: #7c3a0a;
+}
+
 .lm .soc-list {
 	display: flex;
 	flex-direction: column;
