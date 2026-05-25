@@ -127,10 +127,12 @@ async function main() {
 	}
 
 	const bundleSize = await buildChemistryBanksBundle();
+	const assetsCopied = await mirrorAssetsToPublic();
 
 	console.log(`[sync-site] source: ${SRC}`);
 	console.log(`[sync-site] target: ${DST}`);
 	console.log(`[sync-site] copied=${copied}, removed=${removed}, total=${srcRel.length}`);
+	console.log(`[sync-site] assets→public/assets: copied=${assetsCopied}`);
 	console.log(`[sync-site] bundle: ${BUNDLE_NAME} (${bundleSize} bytes, ${BANK_FILES.length} banks)`);
 }
 
@@ -176,6 +178,31 @@ async function buildChemistryBanksBundle() {
 	await writeFile(outB, bundle, 'utf8');
 
 	return bundle.length;
+}
+
+/** `/assets/*` отдаётся из `laravel/public/assets/`, не из `public/site/`. */
+async function mirrorAssetsToPublic() {
+	const assetsSrc = join(SRC, 'assets');
+	const assetsDst = resolve(ROOT, 'laravel', 'public', 'assets');
+	if (!existsSync(assetsSrc)) return 0;
+	const rels = await walk(assetsSrc, assetsSrc);
+	let copied = 0;
+	for (const rel of rels) {
+		const from = join(assetsSrc, rel);
+		const to = join(assetsDst, rel);
+		await ensureDir(dirname(to));
+		const srcStat = await stat(from);
+		let upToDate = false;
+		if (existsSync(to)) {
+			const dstStat = await stat(to);
+			upToDate = dstStat.size === srcStat.size && dstStat.mtimeMs >= srcStat.mtimeMs;
+		}
+		if (!upToDate) {
+			await copyFile(from, to);
+			copied++;
+		}
+	}
+	return copied;
 }
 
 main().catch((e) => {
