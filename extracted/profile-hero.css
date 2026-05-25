@@ -133,30 +133,43 @@
   flex:1 1 auto; min-width:0; gap:8px;
 }
 .iqmo-hero .h-name-row{
-  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
 }
 .iqmo-hero .h-name-view{
-  display:inline-flex; align-items:center; gap:6px; min-width:0;
+  display:inline-flex; align-items:baseline; gap:3px; min-width:0; max-width:100%;
 }
 .iqmo-hero .h-name-edit{
   flex-shrink:0;
-  width:30px; height:30px;
-  border:1px solid rgba(124,58,237,.2);
-  border-radius:9px;
-  background:rgba(255,255,255,.85);
-  color:#7c3aed;
-  display:inline-grid; place-items:center;
+  width:auto; height:auto;
+  margin:0 0 0 1px;
+  padding:3px;
+  border:none;
+  border-radius:5px;
+  background:transparent;
+  color:var(--muted-2);
+  opacity:.5;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  align-self:baseline;
   cursor:pointer;
-  padding:0;
-  transition:background .15s ease, border-color .15s ease, transform .12s ease, box-shadow .15s ease;
+  line-height:0;
+  transform:translateY(-0.06em);
+  transition:opacity .16s ease, color .16s ease, background .16s ease, box-shadow .16s ease;
 }
-.iqmo-hero .h-name-edit svg{width:14px; height:14px;}
+.iqmo-hero .h-name-edit svg{width:15px; height:15px; display:block;}
 .iqmo-hero .h-name-edit:hover{
-  background:#f5f3ff;
-  border-color:rgba(124,58,237,.35);
-  box-shadow:0 4px 12px rgba(124,58,237,.12);
+  opacity:1;
+  color:var(--muted);
+  background:rgba(124,58,237,.06);
+  box-shadow:0 0 0 5px rgba(124,58,237,.07);
 }
-.iqmo-hero .h-name-edit:active{transform:scale(.96);}
+.iqmo-hero .h-name-edit:focus-visible{
+  opacity:1;
+  outline:2px solid rgba(99,102,241,.32);
+  outline-offset:2px;
+}
+.iqmo-hero .h-name-edit:active{opacity:.78;}
 .iqmo-hero .h-name-edit-form{
   display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap;
   min-width:min(100%, 320px);
@@ -777,6 +790,10 @@
   }
   .iqmo-hero .h-id{width:100%; align-items:stretch;}
   .iqmo-hero .h-name-row{justify-content:center;}
+  .iqmo-hero .h-name-edit{
+    padding:7px;
+    margin:-3px -3px -3px 0;
+  }
   .iqmo-hero .h-meta-row{justify-content:center;}
   .iqmo-hero .av{width:152px; height:152px;}
   .iqmo-hero .av-img{width:128px; height:128px;}
