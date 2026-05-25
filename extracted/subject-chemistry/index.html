@@ -808,6 +808,7 @@
 </div>
 
 <script src="/chemistry-bank.js?v=11"></script>
+<script src="/iqmo-avatar.js?v=1"></script>
 <script src="/chem-progress.js?v=7"></script>
 <script src="/mistakes-store.js"></script>
 <script src="/chemistry-topic-map.js"></script>
@@ -815,7 +816,7 @@
 <script src="/iqmo-sync.js"></script>
 <script src="/iqmo-nav.js"></script>
 <script src="/iqmo-companion.js"></script>
-<script src="/iqmo-leaderboard-ui.js?v=1"></script>
+<script src="/iqmo-leaderboard-ui.js?v=2"></script>
 <script>
 (function () {
   function pluralize(n, one, few, many) {
@@ -914,10 +915,14 @@
     // и однозначно говорит «у меня 7-й уровень в IQMO».
     var lvlText = String(stg);
     var lvlTitle = 'Уровень ' + stg + (stageTitle ? ' · ' + stageTitle : '');
-    var av = document.getElementById('pc-avatar');
-    if (av) { av.textContent = lvlText; av.setAttribute('title', lvlTitle); av.setAttribute('aria-label', lvlTitle); }
-    var nav = document.getElementById('nav-avatar');
-    if (nav) { nav.textContent = lvlText; nav.setAttribute('title', lvlTitle); nav.setAttribute('aria-label', lvlTitle); }
+    if (window.IqmoAvatar && IqmoAvatar.paintNavAndCards) {
+      IqmoAvatar.paintNavAndCards();
+    } else {
+      var av = document.getElementById('pc-avatar');
+      if (av) { av.textContent = lvlText; av.setAttribute('title', lvlTitle); av.setAttribute('aria-label', lvlTitle); }
+      var nav = document.getElementById('nav-avatar');
+      if (nav) { nav.textContent = lvlText; nav.setAttribute('title', lvlTitle); nav.setAttribute('aria-label', lvlTitle); }
+    }
 
     // days on platform: для авторизованных — от даты регистрации; для гостей — от первого
     // визита в этом браузере (localStorage). createdAt прилетает из /api/me через iqmo-nav.js.
@@ -978,13 +983,11 @@
         list.innerHTML = items.map(function (it, idx) {
           var rankCls = ['', 'pf--1', 'pf--2', 'pf--3'][it.rank] || '';
           var meCls = it.is_me ? ' pf--me' : '';
-          var seed = String(it.uid || it.display || idx);
-          var bg = avatarBg(seed, it.is_me);
-          var ini = (it.initials || '?').slice(0, 2);
           var nameCell = IqmoLeaderboardUi.profileNameHtml(it, { tag: 'span', className: 'pf__name' });
+          var avCell = IqmoLeaderboardUi.avatarCellHtml(it);
           return '<div class="pf ' + rankCls + meCls + '">' +
             '<span class="pf__rank">' + it.rank + '</span>' +
-            '<span class="pf__avatar" style="background:' + bg + '">' + ini + '</span>' +
+            avCell +
             nameCell +
             '<span class="pf__score">' + fmtPts(it.xp) + '</span>' +
             '</div>';
@@ -992,12 +995,11 @@
         // Если меня нет в топе, но я авторизован — добавим строку «Вы · #N»
         if (meIdx < 0 && data && data.me && data.me.uid) {
           var me = data.me;
-          var bg = avatarBg(String(me.uid), true);
-          var ini = (me.initials || 'ИК').slice(0, 2);
+          var meRow = { is_me: true, uid: me.uid, profileId: me.profileId, avatarUrl: me.avatarUrl, initials: me.initials };
           list.insertAdjacentHTML('beforeend',
             '<div class="pf pf--me" style="border-top:1px dashed var(--line); margin-top:6px; padding-top:8px;">' +
             '<span class="pf__rank">#' + me.rank + '</span>' +
-            '<span class="pf__avatar" style="background:' + bg + '">' + ini + '</span>' +
+            IqmoLeaderboardUi.avatarCellHtml(meRow) +
             IqmoLeaderboardUi.profileNameHtml({ is_me: true, display: 'Вы', uid: me.uid, profileId: me.profileId }, { tag: 'span', className: 'pf__name' }) +
             '<span class="pf__score">' + fmtPts(me.xp) + '</span>' +
             '</div>'

@@ -535,7 +535,8 @@
 				accuracyPct: accuracyPct,
 				equippedFrame: equippedFrame,
 				memberSince: meUser && meUser.created_at ? meUser.created_at : null,
-				avatarUrl: null
+				avatarUrl: global.IqmoAvatar ? IqmoAvatar.getUrl() : '/assets/avatars/avatar-default.png',
+				avatarPreset: global.IqmoAvatar ? IqmoAvatar.read().preset : 'default'
 			},
 			socialSignals: buildSocialSignals(snap, subjects),
 			nextGoalsData: buildNextGoals(snap),
@@ -548,12 +549,19 @@
 		};
 	}
 
+	function resolveAvatarUrlFromKeys(keys) {
+		if (!keys || !global.IqmoAvatar) return IqmoAvatar.PRESET_URL.default;
+		var raw = keys[IqmoAvatar.STORAGE_KEY];
+		return IqmoAvatar.urlFromStoredJson(raw);
+	}
+
 	global.IqmoProfileData = {
 		build: build,
 		ACHIEVEMENT_CATALOG: ACHIEVEMENT_CATALOG,
 		fmtPts: fmtPts,
 		readStoredDisplayName: readStoredDisplayName,
 		saveDisplayName: saveDisplayName,
-		displayNameFromEmail: displayNameFromEmail
+		displayNameFromEmail: displayNameFromEmail,
+		resolveAvatarUrlFromKeys: resolveAvatarUrlFromKeys
 	};
 })(typeof window !== 'undefined' ? window : global);

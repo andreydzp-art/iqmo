@@ -251,8 +251,44 @@
 		return 'Обычная';
 	}
 
-	function renderAchievements(list) {
+	function renderAvatarPicker(d) {
+		if (!global.IqmoAvatar) return '';
+		var state = IqmoAvatar.read();
+		var cur = state.preset || 'default';
+		var customUrl = cur === 'custom' && state.custom ? state.custom : '';
+		function opt(preset, label, thumbUrl) {
+			var sel = cur === preset ? ' is-selected' : '';
+			return (
+				'<button type="button" class="prof-av-opt' + sel + '" data-avatar-preset="' + preset + '" aria-pressed="' + (sel ? 'true' : 'false') + '">' +
+				'<span class="prof-av-thumb"><img src="' + esc(thumbUrl) + '" alt="" /></span>' +
+				'<span class="prof-av-label">' + esc(label) + '</span></button>'
+			);
+		}
+		var uploadSel = cur === 'custom' ? ' is-selected' : '';
+		return (
+			'<section class="prof-avatar-picker" aria-label="Выбор аватара">' +
+			'<h2 class="prof-avatar-picker__title">Аватар</h2>' +
+			'<p class="prof-avatar-picker__sub">Выбери, как ты хочешь выглядеть в профиле</p>' +
+			'<div class="prof-av-grid">' +
+			opt('boy', 'Мальчик', IqmoAvatar.PRESET_URL.boy) +
+			opt('girl', 'Девочка', IqmoAvatar.PRESET_URL.girl) +
+			'<label class="prof-av-opt prof-av-upload' + uploadSel + '" data-avatar-upload>' +
+			'<span class="prof-av-thumb"><img src="' + esc(customUrl || IqmoAvatar.PRESET_URL.default) + '" alt="" data-avatar-upload-thumb /></span>' +
+			'<span class="prof-av-label">Загрузить свой</span>' +
+			'<input type="file" accept="image/jpeg,image/png,image/webp" aria-label="Загрузить свой аватар" /></label>' +
+			'</div>' +
+			'<div class="prof-av-custom-preview" data-avatar-custom-preview' + (customUrl ? '' : ' hidden') + '>' +
+			'<img src="' + esc(customUrl) + '" alt="" data-avatar-custom-img />' +
+			'<span>Свой аватар · JPG, PNG или WebP, до 2&nbsp;МБ</span></div>' +
+			'<p class="prof-av-err" data-avatar-err role="alert"></p></section>'
+		);
+	}
+
+	function renderAchievements(list, avatarUrl) {
 		var earned = list.filter(function (a) { return a.unlocked; }).length;
+		var avChip = avatarUrl
+			? '<img class="prof-ach-avatar" src="' + esc(avatarUrl) + '" alt="" width="40" height="40" />'
+			: '';
 		var cards = list.map(function (a) {
 			var cls = a.locked ? 'locked' : a.rarity;
 			var icon = ICONS[a.icon] || ICONS.star;
@@ -270,7 +306,8 @@
 			);
 		}).join('');
 		return (
-			'<section><div class="sec-head"><div><div class="sec-eye">Коллекция</div><h2 class="sec-title">Награды и достижения</h2></div></div>' +
+			'<section><div class="sec-head"><div class="sec-head-with-av">' + avChip +
+			'<div><div class="sec-eye">Коллекция</div><h2 class="sec-title">Награды и достижения</h2></div></div></div>' +
 			'<div class="panel ach-panel"><div class="ach-toolbar"><div class="ach-counter">' +
 			'<span><span class="cnt-big">' + earned + '</span> / ' + list.length + ' получено</span></div></div>' +
 			'<div class="ach-grid">' + cards + '</div></div></section>'
@@ -454,20 +491,63 @@
 		root.innerHTML =
 			(isPublic ? renderPublicBanner(data) : '') +
 			renderHero(data) +
+			(isPublic ? '' : renderAvatarPicker(data.profileData)) +
 			renderGoals(data.nextGoalsData) +
 			(isPublic ? '' : renderXpGuide()) +
-			renderAchievements(data.achievementsData) +
+			renderAchievements(data.achievementsData, data.profileData && data.profileData.avatarUrl) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +
 			renderSubjects(data.subjectsProgressData) +
 			(isPublic ? '' : renderCollectibles(data.collectiblesData || [])) +
 			'<p class="footnote">Уровни, рамки и значки — дополнительная мотивация, а не учебный результат. Главная цель — освоение тем и подготовка к экзамену.</p>' +
 			settingsBlock;
 
-		var navAv = document.getElementById('nav-avatar');
-		if (navAv && data.profileData) {
-			navAv.textContent = String(data.profileData.level);
-			navAv.setAttribute('title', 'Уровень ' + data.profileData.level);
+		if (global.IqmoAvatar && data.profileData) {
+			var navAv = document.getElementById('nav-avatar');
+			if (navAv) {
+				IqmoAvatar.paint(navAv, {
+					url: data.profileData.avatarUrl,
+					fallbackText: String(data.profileData.level),
+					title: 'Уровень ' + data.profileData.level,
+					imgClass: 'iqmo-av-img iqmo-av-img--nav'
+				});
+			}
 		}
+	}
+
+	function bindAvatarPicker() {
+		if (bindAvatarPicker._bound || !global.IqmoAvatar) return;
+		bindAvatarPicker._bound = true;
+		document.addEventListener('click', function (e) {
+			var btn = e.target.closest('[data-avatar-preset]');
+			if (!btn) return;
+			e.preventDefault();
+			var preset = btn.getAttribute('data-avatar-preset');
+			IqmoAvatar.setPreset(preset);
+			var err = document.querySelector('[data-avatar-err]');
+			if (err) err.textContent = '';
+			if (global.IqmoProfileApp && IqmoProfileApp.refresh) IqmoProfileApp.refresh();
+		});
+		document.addEventListener('change', function (e) {
+			var input = e.target.closest('[data-avatar-upload] input[type="file"]');
+			if (!input || !input.files || !input.files[0]) return;
+			var errEl = document.querySelector('[data-avatar-err]');
+			IqmoAvatar.setCustomFromFile(input.files[0])
+				.then(function () {
+					if (errEl) errEl.textContent = '';
+					if (global.IqmoProfileApp && IqmoProfileApp.refresh) IqmoProfileApp.refresh();
+				})
+				.catch(function (err) {
+					if (!errEl) return;
+					if (err && err.message === 'type') {
+						errEl.textContent = 'Подойдут только JPG, PNG или WebP.';
+					} else if (err && err.message === 'size') {
+						errEl.textContent = 'Файл слишком большой. Максимум 2 МБ.';
+					} else {
+						errEl.textContent = 'Не удалось загрузить изображение.';
+					}
+				});
+			input.value = '';
+		});
 	}
 
 	function bindCollectibles() {
@@ -488,6 +568,7 @@
 	global.IqmoProfileRender = {
 		render: render,
 		renderError: renderError,
-		bindCollectibles: bindCollectibles
+		bindCollectibles: bindCollectibles,
+		bindAvatarPicker: bindAvatarPicker
 	};
 })(typeof window !== 'undefined' ? window : global);

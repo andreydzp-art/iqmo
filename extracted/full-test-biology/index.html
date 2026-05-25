@@ -1390,6 +1390,7 @@
 		<script src="/mistakes-store.js"></script>
 		<script src="/level-map-xp.js?v=3"></script>
 		<script src="/level-map-state.js?v=2"></script>
+		<script src="/iqmo-avatar.js?v=1"></script>
 		<script src="/chem-progress.js?v=7"></script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
@@ -2708,6 +2709,10 @@
 			// ============================================================
 			function fillHubNavAvatar() {
 				try {
+					if (window.IqmoAvatar && IqmoAvatar.paintNavAndCards) {
+						IqmoAvatar.paintNavAndCards();
+						return;
+					}
 					if (!window.ChemProgress) return;
 					var snap = ChemProgress.getGamificationSnapshot();
 					if (!snap || !snap.level) return;

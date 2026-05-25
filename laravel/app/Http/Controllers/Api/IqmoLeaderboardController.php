@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\IqmoAvatarResolver;
 use App\Services\IqmoGamificationMath;
 use App\Services\IqmoJwt;
 use Illuminate\Http\Request;
@@ -41,18 +42,20 @@ final class IqmoLeaderboardController extends Controller
         $meId = $this->resolveCurrentUserId($request);
 
         $xpPath = '$."' . self::XP_KEY . '"';
+        $avatarPath = '$."'.IqmoAvatarResolver::STORAGE_KEY.'"';
 
         // Top N. JOIN на profile_state может быть NULL (если у пользователя ни одной
         // синхронизации не было) — тогда COALESCE даёт 0, и такой пользователь окажется
         // в самом конце.
         $topRows = DB::connection('iqmo')->select(
             "SELECT u.id AS uid, u.email,
-                    COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS UNSIGNED), 0) AS xp
+                    COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS UNSIGNED), 0) AS xp,
+                    JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS avatar_raw
              FROM users u
              LEFT JOIN profile_state ps ON ps.user_id = u.id
              ORDER BY xp DESC, u.id ASC
              LIMIT " . $limit,
-            [$xpPath]
+            [$xpPath, $avatarPath]
         );
 
         $items = [];
@@ -65,6 +68,7 @@ final class IqmoLeaderboardController extends Controller
                 'profileId' => IqmoGamificationMath::formatProfileId($uid),
                 'display' => $this->maskEmail((string) $r->email),
                 'initials' => $this->initialsFromEmail((string) $r->email),
+                'avatarUrl' => IqmoAvatarResolver::urlFromStoredValue($r->avatar_raw ?? null),
                 'xp' => $xp,
                 'level' => $this->levelFromXp($xp),
                 'is_me' => $meId > 0 && $uid === $meId,
@@ -75,11 +79,12 @@ final class IqmoLeaderboardController extends Controller
         if ($meId > 0) {
             $meRow = DB::connection('iqmo')->selectOne(
                 "SELECT u.email,
-                        COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS UNSIGNED), 0) AS xp
+                        COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS UNSIGNED), 0) AS xp,
+                        JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS avatar_raw
                  FROM users u
                  LEFT JOIN profile_state ps ON ps.user_id = u.id
                  WHERE u.id = ?",
-                [$xpPath, $meId]
+                [$xpPath, $avatarPath, $meId]
             );
             if ($meRow) {
                 $myXp = (int) $meRow->xp;
@@ -96,6 +101,7 @@ final class IqmoLeaderboardController extends Controller
                     'xp' => $myXp,
                     'level' => $this->levelFromXp($myXp),
                     'initials' => $this->initialsFromEmail((string) $meRow->email),
+                    'avatarUrl' => IqmoAvatarResolver::urlFromStoredValue($meRow->avatar_raw ?? null),
                 ];
             }
         }

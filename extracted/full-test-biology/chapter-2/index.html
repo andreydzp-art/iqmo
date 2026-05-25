@@ -791,6 +791,7 @@
 <script src="/iqmo-sync.js?v=4"></script>
 <script src="/iqmo-nav.js"></script>
 <script src="/iqmo-companion.js"></script>
+<script src="/iqmo-avatar.js?v=1"></script>
 <script src="/chem-progress.js?v=7"></script>
 <script src="/iqmo-leaderboard-ui.js?v=1"></script>
 <script>
@@ -939,8 +940,12 @@
 					? 'Уровень · ' + fmtNum(Math.max(0, nx - curXp)) + ' XP до след.'
 					: 'Уровень';
 			setText('ch2-level-sub', sub);
-			var navAv = document.getElementById('nav-avatar');
-			if (navAv && lv.current != null) navAv.textContent = String(lv.current);
+			if (window.IqmoAvatar && IqmoAvatar.paintNavAndCards) {
+				IqmoAvatar.paintNavAndCards();
+			} else {
+				var navAv = document.getElementById('nav-avatar');
+				if (navAv && lv.current != null) navAv.textContent = String(lv.current);
+			}
 		} catch (e) {}
 		setText('ch2-streak-days', String(loadStreakDays()));
 		if (window.__ch2HeroStats) {

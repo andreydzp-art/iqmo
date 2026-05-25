@@ -126,7 +126,8 @@
 						'iqmo-analytics-queue-v1',
 						'iqmo-regnudge-dismissed-at',
 						'iqmo-last-uid',
-						'iqmo_auth_hint'
+						'iqmo_auth_hint',
+						'iqmo-avatar-v1'
 					];
 					var toWipe = [];
 					for (var i = 0; i < localStorage.length; i++) {
@@ -240,6 +241,10 @@
 				});
 			} catch (eHome) {}
 		}
+
+		try {
+			if (global.IqmoAvatar && IqmoAvatar.paintNavAndCards) IqmoAvatar.paintNavAndCards();
+		} catch (eAv) {}
 
 		return loggedIn;
 	}

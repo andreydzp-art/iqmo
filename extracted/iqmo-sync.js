@@ -3,7 +3,7 @@
 (function () {
 	'use strict';
 
-	const SYNC_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
+	const SYNC_PREFIXES = ['iqmo-chem-', 'iqmo-bio-', 'iqmo-avatar-'];
 
 	function hasSyncPrefix(key) {
 		if (typeof key !== 'string') return false;
@@ -108,7 +108,7 @@
 		'iqmo_purchase_',
 		'iqmo_express_start_'
 	];
-	const USER_SCOPED_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at'];
+	const USER_SCOPED_KEYS = ['iqmo-analytics-queue-v1', 'iqmo-regnudge-dismissed-at', 'iqmo-avatar-v1'];
 
 	function isUserScopedKey(k) {
 		if (typeof k !== 'string') return false;

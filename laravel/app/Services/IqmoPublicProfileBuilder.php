@@ -164,7 +164,7 @@ final class IqmoPublicProfileBuilder
                 'accuracyPct' => $accuracyAvg,
                 'equippedFrame' => null,
                 'memberSince' => $memberSince,
-                'avatarUrl' => null,
+                'avatarUrl' => IqmoAvatarResolver::urlFromKeys($keys),
             ],
             'socialSignals' => self::socialSignals($levelTitle, $subjects, $league),
             'nextGoalsData' => self::nextGoals($level, $levelTitle, $streakDays, $keys, $league),

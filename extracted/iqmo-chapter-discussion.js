@@ -171,12 +171,14 @@
 	}
 
 	function userItemHtml(comment) {
+		var avUrl = comment.avatarUrl
+			|| (global.IqmoAvatar ? IqmoAvatar.getUrl() : avatarForUid(comment.uid));
 		return _item('', profileIdFromUid(comment.uid), timeLabel(comment.ts), comment.text, true, [
 			['❤️', 0, false]
 		], 0, false, {
 			user: true,
 			id: comment.id,
-			avatarUrl: avatarForUid(comment.uid)
+			avatarUrl: avUrl
 		});
 	}
 
@@ -310,7 +312,8 @@
 			id: 'u-' + Date.now(),
 			uid: uid,
 			text: text,
-			ts: Date.now()
+			ts: Date.now(),
+			avatarUrl: global.IqmoAvatar ? IqmoAvatar.getUrl() : null
 		};
 		var stored = loadStored(subject, chapter);
 		stored.unshift(comment);
