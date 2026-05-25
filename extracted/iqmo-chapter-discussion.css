@@ -140,6 +140,45 @@
 	color: #7c3a0a;
 }
 
+.lm .soc-hint--live {
+	background: #f0fdf6;
+	border-color: #c6f0d9;
+	color: #166534;
+	cursor: default;
+	transition: background .15s ease, border-color .15s ease;
+}
+
+.lm .soc-hint--live:hover {
+	background: #ecfdf5;
+	border-color: #a7e8c4;
+}
+
+.lm .soc-hint--live b {
+	color: #15803d;
+	font-weight: 700;
+}
+
+.lm .soc-live-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #10b981;
+	flex-shrink: 0;
+	box-shadow: 0 0 0 2px rgba(16, 185, 129, .14);
+	animation: socLiveDotPulse 2s ease-in-out infinite;
+}
+
+@keyframes socLiveDotPulse {
+	0%, 100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: .5;
+		transform: scale(.9);
+	}
+}
+
 .lm .soc-list {
 	display: flex;
 	flex-direction: column;

@@ -86,7 +86,7 @@
 			+ '</header>'
 			+ '<div class="soc-hints">'
 			+ '<span class="soc-hint soc-hint--warn"><span class="em">🚫</span>Сплойлеры запрещены — нельзя писать правильные ответы</span>'
-			+ '<span class="soc-hint"><span class="em">👀</span><b>14</b> сейчас проходят</span>'
+			+ '<span class="soc-hint soc-hint--live" title="Ученики, которые сейчас проходят эту главу"><span class="soc-live-dot" aria-hidden="true"></span><span><b>14</b> проходят сейчас</span></span>'
 			+ '<span class="soc-hint"><span class="em">🔥</span><b>84%</b> со второго раза</span>'
 			+ '<span class="soc-hint"><span class="em">💀</span>чаще ошибаются в&nbsp;<b>варианте&nbsp;6</b></span>'
 			+ '</div>'
