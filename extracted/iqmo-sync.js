@@ -24,6 +24,7 @@
 	let lastKnownRevision = null;
 	let dirtyTimer = null;
 	let authed = false;
+	let initSettled = false;
 	// UID, под которым эта вкладка стартовала (записывается в init() после
 	// /api/me). Не меняется в течение жизни вкладки. Используется в двух
 	// местах для защиты от stale-tab race (audit #4):
@@ -377,12 +378,26 @@
 		} catch (e) {
 			authed = false;
 		} finally {
+			initSettled = true;
 			try {
 				window.dispatchEvent(
 					new CustomEvent('iqmo-sync-ready', { detail: { authed: authed } })
 				);
 			} catch (e2) {}
 		}
+	}
+
+	function whenReady() {
+		if (initSettled) return Promise.resolve({ authed: authed });
+		return new Promise(function (resolve) {
+			window.addEventListener(
+				'iqmo-sync-ready',
+				function () {
+					resolve({ authed: authed });
+				},
+				{ once: true }
+			);
+		});
 	}
 
 	window.IqmoSync = {
@@ -398,6 +413,7 @@
 		isAuthed: function () {
 			return authed;
 		},
+		whenReady: whenReady,
 		refreshAuth: async function () {
 			try {
 				const me = await fetch(API + '/api/me', { credentials: 'include', cache: 'no-store' });

@@ -74,6 +74,9 @@ jobs:
       - name: Validate chemistry bank
         run: node scripts/validate-chemistry-bank.mjs
 
+      - name: Validate variant-best helper
+        run: node scripts/validate-variant-best.mjs
+
       - name: Build static (sync-site)
         run: node scripts/sync-site.mjs
 

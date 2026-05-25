@@ -569,6 +569,7 @@
 <script src="/level-map-state.js?v=2"></script>
 <script src="/level-map-xp.js?v=3"></script>
 <script src="/biology-level-map-render.js?v=4"></script>
+<script src="/iqmo-variant-best.js?v=1"></script>
 <script>
 (function () {
   var CH2_SLOTS = [
@@ -621,24 +622,9 @@
   }
 
   function variantBest(vid) {
-    try {
-      var raw = localStorage.getItem('iqmo-bio-v-' + vid);
-      if (!raw) return null;
-      var s = JSON.parse(raw);
-      if (!s || !s.finished) return null;
-      var v = findVariant(vid);
-      if (!v) return null;
-      var ok = 0, total = 0;
-      (v.qids || []).forEach(function (qid) {
-        var q = BANK.find(function (b) { return b.id === qid; });
-        if (!q || q.type === 'written') return;
-        total++;
-        var given = s.answers ? s.answers[q.id] : undefined;
-        if (checkAns(q, given) === 'ok') ok++;
-      });
-      if (!total) return null;
-      return { ok: ok, total: total, percent: Math.round(100 * ok / total) };
-    } catch (e) { return null; }
+    var v = findVariant(vid);
+    if (!v || !window.IqmoVariantBest) return null;
+    return IqmoVariantBest.readLocal('iqmo-bio-v-', v, BANK, checkAns);
   }
 
   function starsForPercent(p) {
@@ -800,8 +786,9 @@
   window.__ch2HeroStats = stats;
 })();
 </script>
-<script src="/iqmo-chapter2-access.js?v=4"></script>
-<script src="/iqmo-sync.js"></script>
+<script src="/iqmo-variant-best.js?v=1"></script>
+<script src="/iqmo-chapter2-access.js?v=5"></script>
+<script src="/iqmo-sync.js?v=4"></script>
 <script src="/iqmo-nav.js"></script>
 <script src="/iqmo-companion.js"></script>
 <script src="/chem-progress.js?v=7"></script>
@@ -976,6 +963,9 @@
 				if (loader) loader.style.display = 'none';
 				denyGuest();
 				return;
+			}
+			if (window.IqmoSync && IqmoSync.whenReady) {
+				await IqmoSync.whenReady();
 			}
 			if (!window.IqmoChapter2Access || !IqmoChapter2Access.isChapter1Complete(SUBJ)) {
 				if (loader) loader.style.display = 'none';
