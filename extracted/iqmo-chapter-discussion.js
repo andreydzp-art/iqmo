@@ -10,6 +10,7 @@
 		'iq-4408.png', 'iq-2210.png', 'iq-9973.png'
 	];
 	var STORAGE_KEY = 'iqmo-chapter-comments-v1';
+	var DRAFT_KEY = 'iqmo-chapter-compose-draft-v1';
 	var MIN_LEN = 2;
 	var MAX_LEN = 280;
 
@@ -210,7 +211,36 @@
 		}
 	}
 
-	function openCompose(card) {
+	function saveDraft(subject, chapter, text) {
+		try {
+			sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+				subject: subject,
+				chapter: chapter,
+				text: text,
+				ts: Date.now()
+			}));
+		} catch (e) {}
+	}
+
+	function clearDraft() {
+		try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) {}
+	}
+
+	function readDraft(subject, chapter) {
+		try {
+			var d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || 'null');
+			if (!d || d.subject !== subject || d.chapter !== chapter) return '';
+			if (Date.now() - (d.ts || 0) > 30 * 60 * 1000) {
+				clearDraft();
+				return '';
+			}
+			return String(d.text || '');
+		} catch (e) {
+			return '';
+		}
+	}
+
+	function openCompose(card, subject, chapter, initialText) {
 		var foot = card.querySelector('.soc-foot');
 		var compose = card.querySelector('.soc-compose');
 		var input = card.querySelector('.soc-compose-input');
@@ -219,11 +249,12 @@
 		if (loginHint) loginHint.hidden = true;
 		foot.classList.add('is-composing');
 		compose.hidden = false;
-		input.value = '';
+		input.value = initialText != null ? initialText : '';
 		input.focus();
+		if (subject && chapter && input.value) saveDraft(subject, chapter, input.value);
 	}
 
-	function closeCompose(card) {
+	function closeCompose(card, subject, chapter) {
 		var foot = card.querySelector('.soc-foot');
 		var compose = card.querySelector('.soc-compose');
 		var input = card.querySelector('.soc-compose-input');
@@ -231,6 +262,7 @@
 		foot.classList.remove('is-composing');
 		compose.hidden = true;
 		if (input) input.value = '';
+		clearDraft();
 	}
 
 	function showLoginHint(card) {
@@ -266,7 +298,7 @@
 		var node = wrap.firstElementChild;
 		if (node) list.insertBefore(node, list.firstChild);
 		bindReactions(card);
-		closeCompose(card);
+		closeCompose(card, subject, chapter);
 	}
 
 	function init(root, opts) {
@@ -277,6 +309,13 @@
 
 		root.querySelectorAll('.soc-card').forEach(function (card) {
 			prependUserComments(card, subject, chapter);
+
+			var draft = readDraft(subject, chapter);
+			if (draft) {
+				fetchMe().then(function (me) {
+					if (me && me.id != null) openCompose(card, subject, chapter, draft);
+				});
+			}
 
 			card.querySelectorAll('.soc-more').forEach(function (btn) {
 				if (btn.dataset.socBound) return;
@@ -316,7 +355,7 @@
 							showLoginHint(card);
 							return;
 						}
-						openCompose(card);
+						openCompose(card, subject, chapter, readDraft(subject, chapter));
 					});
 				});
 			}
@@ -324,7 +363,7 @@
 			if (cancelBtn && !cancelBtn.dataset.socBound) {
 				cancelBtn.dataset.socBound = '1';
 				cancelBtn.addEventListener('click', function () {
-					closeCompose(card);
+					closeCompose(card, subject, chapter);
 				});
 			}
 
@@ -338,7 +377,7 @@
 					}
 					fetchMe().then(function (me) {
 						if (!me || me.id == null) {
-							closeCompose(card);
+							closeCompose(card, subject, chapter);
 							showLoginHint(card);
 							return;
 						}
@@ -346,12 +385,15 @@
 					});
 				};
 				sendBtn.addEventListener('click', submit);
+				input.addEventListener('input', function () {
+					saveDraft(subject, chapter, input.value);
+				});
 				input.addEventListener('keydown', function (e) {
 					if (e.key === 'Enter' && !e.shiftKey) {
 						e.preventDefault();
 						submit();
 					}
-					if (e.key === 'Escape') closeCompose(card);
+					if (e.key === 'Escape') closeCompose(card, subject, chapter);
 				});
 			}
 		});

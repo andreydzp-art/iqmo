@@ -448,18 +448,61 @@
 	color: #a09bb8;
 }
 
-.lm .soc-compose-bar {
+.lm .soc-foot.is-composing {
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.lm .soc-foot.is-composing .soc-more {
+	order: -1;
+}
+
+.lm .soc-compose[hidden] {
+	display: none !important;
+}
+
+.lm .soc-foot.is-composing .soc-compose {
 	display: flex;
-	align-items: center;
+}
+
+.lm .soc-compose-bar {
+	display: grid;
+	grid-template-columns: 1fr auto auto;
 	gap: 8px;
-	flex-wrap: wrap;
+	align-items: center;
 }
 
 .lm .soc-compose-hint {
-	flex: 1;
-	min-width: 140px;
+	grid-column: 1 / -1;
+	flex: none;
+	min-width: 0;
 	font-size: 12px;
 	color: #a09bb8;
+}
+
+.lm .soc-compose-cancel {
+	justify-self: end;
+}
+
+.lm .soc-compose-send {
+	justify-self: end;
+	white-space: nowrap;
+}
+
+.lm .soc-card button.soc-compose-send {
+	background: #5b21b6;
+	color: #fff;
+	border: 1px solid #5b21b6;
+}
+
+.lm .soc-card button.soc-compose-send:hover {
+	background: #4c1d95;
+	border-color: #4c1d95;
+}
+
+.lm .soc-compose-cancel:hover {
+	background: #faf9fd;
+	color: #1b1733;
 }
 
 .lm .soc-compose-cancel,
@@ -470,28 +513,7 @@
 	font-size: 13px;
 	font-weight: 600;
 	cursor: pointer;
-	border: 1px solid transparent;
 	transition: background .15s ease, border-color .15s ease, color .15s ease;
-}
-
-.lm .soc-compose-cancel {
-	background: transparent;
-	color: #7a7592;
-	border-color: #ecebf3;
-}
-
-.lm .soc-compose-cancel:hover {
-	background: #faf9fd;
-	color: #1b1733;
-}
-
-.lm .soc-compose-send {
-	background: #5b21b6;
-	color: #fff;
-}
-
-.lm .soc-compose-send:hover {
-	background: #4c1d95;
 }
 
 .lm .soc-login-hint {
