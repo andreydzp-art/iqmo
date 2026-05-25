@@ -535,7 +535,7 @@
 				accuracyPct: accuracyPct,
 				equippedFrame: equippedFrame,
 				memberSince: meUser && meUser.created_at ? meUser.created_at : null,
-				avatarUrl: global.IqmoAvatar ? IqmoAvatar.getUrl() : '/assets/avatars/avatar-default.png',
+				avatarUrl: global.IqmoAvatar ? IqmoAvatar.getUrl() : '/site/assets/avatars/avatar-default.png',
 				avatarPreset: global.IqmoAvatar ? IqmoAvatar.read().preset : 'default'
 			},
 			socialSignals: buildSocialSignals(snap, subjects),
