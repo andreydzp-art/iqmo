@@ -39,21 +39,30 @@
 .iqmo-hero .hero-deco .pp.c{ width:3px;height:3px; bottom:60px; left:340px; background:rgba(167,139,250,.35); animation:iqmoFloat 5.5s ease-in-out infinite .5s;}
 @keyframes iqmoFloat{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
-/* dashboard grid: avatar | identity + XP + stats | streak */
+/* hero card: left cluster (avatar + identity) | streak */
 .iqmo-hero .hero-inner{
   position:relative; z-index:2;
-  display:grid;
-  grid-template-columns:minmax(168px, 188px) minmax(0, 1fr) minmax(268px, 320px);
-  gap:18px 22px;
-  align-items:start;
-  padding:16px 18px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px 24px;
+  padding:20px 22px;
+  min-width:0;
+}
+.iqmo-hero .hero-main{
+  display:flex;
+  align-items:center;
+  gap:18px 20px;
+  flex:1 1 auto;
+  min-width:0;
 }
 
 /* ─── AVATAR + LVL ring ─── */
 .iqmo-hero .av{
   position:relative;
   width:176px; height:176px;
-  align-self:start; justify-self:center;
+  flex-shrink:0;
+  align-self:center;
   display:grid; place-items:center;
 }
 .iqmo-hero .av::before{
@@ -120,8 +129,8 @@
 
 /* ─── IDENTITY ─── */
 .iqmo-hero .h-id{
-  display:flex; flex-direction:column; justify-content:flex-start; align-self:start;
-  gap:8px; min-width:0;
+  display:flex; flex-direction:column; justify-content:center;
+  flex:1 1 auto; min-width:0; gap:8px;
 }
 .iqmo-hero .h-name-row{
   display:flex; align-items:center; gap:10px; flex-wrap:wrap;
@@ -280,7 +289,10 @@
   padding:14px 16px 12px;
   overflow:hidden;
   display:flex; flex-direction:column; gap:10px;
-  align-self:stretch;
+  flex:0 0 min(100%, 300px);
+  width:min(100%, 300px);
+  max-width:300px;
+  align-self:center;
   background:
     radial-gradient(280px 220px at 100% 0%, rgba(167,139,250,.16), transparent 60%),
     radial-gradient(260px 200px at 0% 100%, rgba(99,102,241,.10), transparent 65%),
@@ -741,19 +753,35 @@
 /* responsive collapse */
 @media (max-width:1180px){
   .iqmo-hero .hero-inner{
-    grid-template-columns:minmax(148px, 168px) minmax(0, 1fr);
+    flex-direction:column;
+    align-items:stretch;
+    gap:16px;
+    padding:18px 20px;
   }
-  .iqmo-hero .streak{grid-column:1 / -1;}
+  .iqmo-hero .hero-main{width:100%;}
+  .iqmo-hero .streak{
+    width:100%;
+    max-width:none;
+    flex:none;
+  }
 }
 @media (max-width:720px){
   .iqmo-hero .hero-inner{
-    grid-template-columns:1fr;
     gap:14px;
-    padding:16px 14px 14px;
+    padding:16px 14px;
   }
-  .iqmo-hero .av{width:152px; height:152px; justify-self:center;}
+  .iqmo-hero .hero-main{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+  .iqmo-hero .h-id{width:100%; align-items:stretch;}
+  .iqmo-hero .h-name-row{justify-content:center;}
+  .iqmo-hero .h-meta-row{justify-content:center;}
+  .iqmo-hero .av{width:152px; height:152px;}
   .iqmo-hero .av-img{width:128px; height:128px;}
   .iqmo-hero .hero-stats{grid-template-columns:1fr;}
+  .iqmo-hero .xp-foot{flex-wrap:wrap; gap:6px;}
 }
 
 /* respect reduced motion */

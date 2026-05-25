@@ -222,6 +222,7 @@
 			'<section class="iqmo-hero">' +
 			'<div class="hero-deco"><span class="pp a"></span><span class="pp b"></span><span class="pp c"></span></div>' +
 			'<div class="hero-inner">' +
+			'<div class="hero-main">' +
 			avBlock +
 			'<div class="h-id">' +
 			renderNameRow(d, isPublic) +
@@ -245,7 +246,7 @@
 			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div></div>' +
 			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
 			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Пройдено курса</div></div></div>' +
-			'</div></div>' +
+			'</div></div></div>' +
 			'<div class="' + streakCardClass(streakDays) + '">' +
 			'<div class="atm-aura"></div><span class="atm-dot d1"></span><span class="atm-dot d2"></span><span class="atm-dot d3"></span>' +
 			'<div class="streak-top">' +
