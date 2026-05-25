@@ -303,7 +303,7 @@
 			'<span class="reward-shop__lock" aria-hidden="true">' + LOCK_SVG + '</span>' +
 			'<div class="reward-shop__inner">' +
 			'<div class="reward-shop__art">' +
-			'<img src="/site/assets/rewards-shop-bag.png" alt="" width="84" height="84" decoding="async" draggable="false" />' +
+			'<img src="/site/assets/rewards-shop-bag.png" alt="" width="96" height="96" decoding="async" draggable="false" />' +
 			'</div>' +
 			'<div class="reward-shop__body">' +
 			'<h3 class="reward-shop__title">Лавка наград</h3>' +

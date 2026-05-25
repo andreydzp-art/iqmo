@@ -507,18 +507,21 @@
   .reward-shop__inner{
     position:relative; z-index:2;
     display:grid;
-    grid-template-columns:84px minmax(0, 1fr);
-    gap:12px;
+    grid-template-columns:96px minmax(0, 1fr);
+    gap:10px;
     align-items:center;
     min-height:100%;
-    padding:16px 38px 16px 16px;
+    padding:14px 38px 14px 14px;
   }
   .reward-shop__art{
+    width:96px; height:96px;
+    flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
     animation:rewardShopFloat 4.8s ease-in-out infinite;
   }
   .reward-shop__art img{
-    width:84px; height:84px;
+    width:96px; height:96px;
+    min-width:96px;
     display:block;
     object-fit:contain;
     filter:drop-shadow(0 6px 14px rgba(124,58,237,.22));
@@ -1273,7 +1276,7 @@
 
 /* IQMO profile — mobile */
 @media (max-width:1180px){.hero .hero-inner{grid-template-columns:200px 1fr}.h-quick{grid-column:1/-1}.ach-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.rare-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.row-2{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.courses{grid-template-columns:1fr}.nextrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:720px){.shell{padding:16px 14px 48px;gap:18px}.hero .hero-inner{grid-template-columns:1fr;gap:20px;padding:24px 18px 22px;text-align:center}.av-wrap{margin:0 auto}.h-name-row{justify-content:center}.h-status{justify-content:center}.h-quick{grid-template-columns:1fr 1fr}.nextrow{grid-template-columns:1fr}.nextrow--with-reward{grid-template-columns:1fr}.reward-shop__inner{grid-template-columns:76px minmax(0,1fr);padding:16px 36px 16px 14px}.reward-shop__art img{width:76px;height:76px}.ach-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-grid{grid-template-columns:1fr}.h-name{font-size:28px}.sec-head{flex-direction:column;align-items:flex-start;gap:8px}}
+@media (max-width:720px){.shell{padding:16px 14px 48px;gap:18px}.hero .hero-inner{grid-template-columns:1fr;gap:20px;padding:24px 18px 22px;text-align:center}.av-wrap{margin:0 auto}.h-name-row{justify-content:center}.h-status{justify-content:center}.h-quick{grid-template-columns:1fr 1fr}.nextrow{grid-template-columns:1fr}.nextrow--with-reward{grid-template-columns:1fr}.reward-shop__inner{grid-template-columns:88px minmax(0,1fr);padding:14px 36px 14px 14px}.reward-shop__art{width:88px;height:88px}.reward-shop__art img{width:88px;height:88px;min-width:88px}.ach-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-grid{grid-template-columns:1fr}.h-name{font-size:28px}.sec-head{flex-direction:column;align-items:flex-start;gap:8px}}
 
 /* ── Settings / account (preserved from legacy profile) ── */
 .prof-settings{
