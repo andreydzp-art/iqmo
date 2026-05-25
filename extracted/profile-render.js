@@ -491,7 +491,7 @@
 		return (
 			'<section class="prof-settings" id="prof-account">' +
 			'<h2>Аккаунт и данные</h2>' +
-			'<p>Управление сессией и локальным прогрессом. Сброс затрагивает только данные по химии в этом браузере.</p>' +
+			'<p>Управление сессией и именем в профиле.</p>' +
 			'<div class="prof-settings__grid">' +
 			'<div class="prof-settings__box prof-settings__box--wide">' +
 			'<h3 style="margin:0 0 8px;font-size:14px">Имя в профиле</h3>' +
@@ -503,17 +503,10 @@
 			'<button type="submit" class="btn btn--ghost" id="prof-save-name">Сохранить</button>' +
 			'</form>' +
 			'<p id="prof-name-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
-			'<div class="prof-settings__box"><h3 style="margin:0 0 8px;font-size:14px">Сброс прогресса</h3>' +
-			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Очистить iqmo-chem-* (и на сервере, если вы вошли).</p>' +
-			'<button type="button" class="btn btn--danger" id="prof-reset">Сбросить данные химии</button></div>' +
 			'<div class="prof-settings__box iqmo-only-authed"><h3 style="margin:0 0 8px;font-size:14px">Сессии</h3>' +
 			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Завершить вход на всех устройствах.</p>' +
 			'<button type="button" class="btn btn--ghost" id="prof-logout-everywhere">Выйти на всех устройствах</button>' +
 			'<p id="prof-logout-everywhere-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
-			'<div class="prof-settings__box iqmo-only-authed"><h3 style="margin:0 0 8px;font-size:14px">Удаление аккаунта</h3>' +
-			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Безвозвратно: e-mail, пароль и прогресс на сервере.</p>' +
-			'<button type="button" class="btn btn--danger" id="prof-delete-account">Удалить аккаунт</button>' +
-			'<p id="prof-delete-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
 			pubLink +
 			'</div></section>'
 		);

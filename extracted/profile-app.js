@@ -143,39 +143,6 @@
 				return;
 			}
 
-			var resetBtn = e.target.closest('#prof-reset');
-			if (resetBtn) {
-				if (!confirm('Удалить все данные IQMO по химии в этом браузере (и на сервере, если вы вошли)?')) return;
-				var CHEM_PREFIXES = ['iqmo-chem-', 'iqmo:chem:'];
-				try {
-					for (var i = localStorage.length - 1; i >= 0; i--) {
-						var k = localStorage.key(i);
-						if (!k) continue;
-						for (var p = 0; p < CHEM_PREFIXES.length; p++) {
-							if (k.indexOf(CHEM_PREFIXES[p]) === 0) {
-								localStorage.removeItem(k);
-								break;
-							}
-						}
-					}
-				} catch (err) {
-					alert('Ошибка: ' + (err.message || err));
-					return;
-				}
-				try {
-					if (global.IqmoSync && IqmoSync.isAuthed && IqmoSync.isAuthed()) {
-						await fetch('/api/profile/state', {
-							method: 'PUT',
-							credentials: 'include',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ baseRevision: null, keys: {} })
-						});
-					}
-				} catch (e2) {}
-				location.reload();
-				return;
-			}
-
 			var logoutBtn = e.target.closest('#prof-logout-everywhere');
 			if (logoutBtn) {
 				if (!confirm('Завершить сессии на всех устройствах? На этом устройстве вход тоже будет завершён.')) return;
@@ -204,43 +171,6 @@
 				wipeLocalUserData();
 				location.href = '/login.html';
 				return;
-			}
-
-			var deleteBtn = e.target.closest('#prof-delete-account');
-			if (deleteBtn) {
-				if (!confirm('Удалить аккаунт без возможности восстановления?')) return;
-				var typed = prompt('Введите слово УДАЛИТЬ заглавными буквами:');
-				var deleteStatus = document.getElementById('prof-delete-status');
-				if (typed !== 'УДАЛИТЬ') {
-					if (deleteStatus) {
-						deleteStatus.hidden = false;
-						deleteStatus.textContent = 'Подтверждение не получено.';
-					}
-					return;
-				}
-				deleteBtn.disabled = true;
-				if (deleteStatus) {
-					deleteStatus.hidden = false;
-					deleteStatus.textContent = 'Удаляем…';
-				}
-				try {
-					var rDel = await fetch('/api/auth/me', {
-						method: 'DELETE',
-						credentials: 'include',
-						headers: { Accept: 'application/json' }
-					});
-					if (!rDel.ok) {
-						if (deleteStatus) deleteStatus.textContent = 'Не удалось (HTTP ' + rDel.status + ').';
-						deleteBtn.disabled = false;
-						return;
-					}
-				} catch (e3) {
-					if (deleteStatus) deleteStatus.textContent = 'Сеть недоступна.';
-					deleteBtn.disabled = false;
-					return;
-				}
-				wipeLocalUserData();
-				location.href = '/';
 			}
 		});
 	}
