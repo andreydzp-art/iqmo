@@ -47,6 +47,8 @@
 			if (!raw) return null;
 			var s = JSON.parse(raw);
 			if (!s || !s.finished) return null;
+			var storedPct = s.part1Percent != null ? Number(s.part1Percent)
+				: (s.percent != null ? Number(s.percent) : null);
 			var ok = 0;
 			var total = 0;
 			(v.qids || []).forEach(function (qid) {
@@ -62,8 +64,15 @@
 				var given = s.answers ? s.answers[q.id] : undefined;
 				if (checkAnswerStatic(q, given) === 'ok') ok++;
 			});
-			if (!total) return null;
-			return { ok: ok, total: total, percent: Math.round((100 * ok) / total) };
+			if (!total) {
+				if (storedPct == null || !isFinite(storedPct)) return null;
+				return { ok: Math.round(storedPct), total: 100, percent: storedPct };
+			}
+			var computed = Math.round((100 * ok) / total);
+			var percent = (computed > 0 || storedPct == null || !isFinite(storedPct))
+				? computed
+				: storedPct;
+			return { ok: ok, total: total, percent: percent };
 		} catch (e) {
 			return null;
 		}
