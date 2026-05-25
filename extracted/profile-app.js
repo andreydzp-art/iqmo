@@ -108,10 +108,12 @@
 		bindAccountHandlers._bound = true;
 
 		document.addEventListener('submit', function (e) {
-			var form = e.target.closest('#prof-name-form');
+			var form = e.target.closest('#prof-name-form, #prof-hero-name-form');
 			if (!form) return;
 			e.preventDefault();
-			var input = document.getElementById('prof-display-name');
+			var input = form.id === 'prof-hero-name-form'
+				? document.getElementById('prof-hero-name-input')
+				: document.getElementById('prof-display-name');
 			if (!input || !global.IqmoProfileData || !IqmoProfileData.saveDisplayName) return;
 			var res = IqmoProfileData.saveDisplayName(input.value);
 			if (!res.ok) {
@@ -301,6 +303,9 @@
 		}
 		if (global.IqmoProfileRender && IqmoProfileRender.bindAvatarPicker) {
 			IqmoProfileRender.bindAvatarPicker();
+		}
+		if (global.IqmoProfileRender && IqmoProfileRender.bindNameEdit) {
+			IqmoProfileRender.bindNameEdit();
 		}
 		publicProfileId = parsePublicProfileId();
 		meUser = await fetchMe();

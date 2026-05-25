@@ -127,6 +127,35 @@
 	}
 
 	var CAM_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-1V7a3 3 0 0 0-3-3H9zm0 2h6a1 1 0 0 1 1 1v1H8V7a1 1 0 0 1 1-1zm-2 5h10l-4.5 5.4L11 13l-2 2.4L7 13z"/></svg>';
+	var PEN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+
+	function renderNameRow(d, isPublic) {
+		if (isPublic) {
+			return (
+				'<div class="h-name-row">' +
+				'<h1 class="h-name">' + esc(d.name) + '</h1>' +
+				'<span class="h-handle">' + esc(d.profileId) + '</span></div>'
+			);
+		}
+		var stored = global.IqmoProfileData && IqmoProfileData.readStoredDisplayName
+			? IqmoProfileData.readStoredDisplayName()
+			: null;
+		var inputVal = stored || d.name || '';
+		return (
+			'<div class="h-name-row">' +
+			'<div class="h-name-view" id="prof-hero-name-view">' +
+			'<h1 class="h-name" id="prof-hero-name">' + esc(d.name) + '</h1>' +
+			'<button type="button" class="h-name-edit" data-name-edit aria-label="Изменить имя в профиле" title="Изменить имя">' + PEN_SVG + '</button>' +
+			'</div>' +
+			'<form class="h-name-edit-form" id="prof-hero-name-form" hidden>' +
+			'<input type="text" class="h-name-edit-input" id="prof-hero-name-input" maxlength="32" ' +
+			'value="' + esc(inputVal) + '" autocomplete="nickname" aria-label="Имя в профиле" placeholder="Ваше имя" />' +
+			'<button type="submit" class="h-name-edit-save">Сохранить</button>' +
+			'<button type="button" class="h-name-edit-cancel" data-name-cancel>Отмена</button>' +
+			'</form>' +
+			'<span class="h-handle">' + esc(d.profileId) + '</span></div>'
+		);
+	}
 
 	function renderHero(p) {
 		var d = p.profileData;
@@ -195,10 +224,7 @@
 			'<div class="hero-inner">' +
 			avBlock +
 			'<div class="h-id">' +
-			'<div class="h-name-row">' +
-			'<h1 class="h-name">' + esc(d.name) + '</h1>' +
-			'<span class="h-handle">' + esc(d.profileId) + '</span>' +
-			'</div>' +
+			renderNameRow(d, isPublic) +
 			'<div class="h-meta-row">' +
 			'<span class="rank">' + metaRankLine(sig, d) + '</span>' +
 			'<span class="dot" aria-hidden="true"></span>' +
@@ -639,6 +665,39 @@
 		});
 	}
 
+	function closeHeroNameEdit() {
+		var view = document.getElementById('prof-hero-name-view');
+		var form = document.getElementById('prof-hero-name-form');
+		if (view) view.hidden = false;
+		if (form) form.hidden = true;
+	}
+
+	function bindNameEdit() {
+		if (bindNameEdit._bound) return;
+		bindNameEdit._bound = true;
+		document.addEventListener('click', function (e) {
+			var editBtn = e.target.closest('[data-name-edit]');
+			if (editBtn) {
+				e.preventDefault();
+				var view = document.getElementById('prof-hero-name-view');
+				var form = document.getElementById('prof-hero-name-form');
+				var input = document.getElementById('prof-hero-name-input');
+				var title = document.getElementById('prof-hero-name');
+				if (!view || !form || !input) return;
+				input.value = (title && title.textContent) ? title.textContent.trim() : input.value;
+				view.hidden = true;
+				form.hidden = false;
+				input.focus();
+				input.select();
+				return;
+			}
+			if (e.target.closest('[data-name-cancel]')) {
+				e.preventDefault();
+				closeHeroNameEdit();
+			}
+		});
+	}
+
 	function bindCollectibles() {
 		document.addEventListener('click', function (e) {
 			var t = e.target.closest('[data-frame-equip]');
@@ -658,6 +717,7 @@
 		render: render,
 		renderError: renderError,
 		bindCollectibles: bindCollectibles,
-		bindAvatarPicker: bindAvatarPicker
+		bindAvatarPicker: bindAvatarPicker,
+		bindNameEdit: bindNameEdit
 	};
 })(typeof window !== 'undefined' ? window : global);

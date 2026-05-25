@@ -120,7 +120,69 @@
 
 /* ─── IDENTITY ─── */
 .iqmo-hero .h-id{display:flex; flex-direction:column; justify-content:center; min-width:0;}
-.iqmo-hero .h-name-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.iqmo-hero .h-name-row{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.iqmo-hero .h-name-view{
+  display:inline-flex; align-items:center; gap:6px; min-width:0;
+}
+.iqmo-hero .h-name-edit{
+  flex-shrink:0;
+  width:30px; height:30px;
+  border:1px solid rgba(124,58,237,.2);
+  border-radius:9px;
+  background:rgba(255,255,255,.85);
+  color:#7c3aed;
+  display:inline-grid; place-items:center;
+  cursor:pointer;
+  padding:0;
+  transition:background .15s ease, border-color .15s ease, transform .12s ease, box-shadow .15s ease;
+}
+.iqmo-hero .h-name-edit svg{width:14px; height:14px;}
+.iqmo-hero .h-name-edit:hover{
+  background:#f5f3ff;
+  border-color:rgba(124,58,237,.35);
+  box-shadow:0 4px 12px rgba(124,58,237,.12);
+}
+.iqmo-hero .h-name-edit:active{transform:scale(.96);}
+.iqmo-hero .h-name-edit-form{
+  display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap;
+  min-width:min(100%, 320px);
+}
+.iqmo-hero .h-name-edit-form[hidden]{display:none!important;}
+.iqmo-hero .h-name-view[hidden]{display:none!important;}
+.iqmo-hero .h-name-edit-input{
+  flex:1 1 160px; min-width:120px;
+  padding:8px 11px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  font:inherit; font-size:15px; font-weight:700;
+  color:var(--ink);
+  background:#fff;
+}
+.iqmo-hero .h-name-edit-input:focus{
+  outline:2px solid rgba(99,102,241,.28);
+  border-color:rgba(99,102,241,.45);
+}
+.iqmo-hero .h-name-edit-save,
+.iqmo-hero .h-name-edit-cancel{
+  font:inherit;
+  font-size:12px; font-weight:700;
+  padding:7px 12px;
+  border-radius:9px;
+  cursor:pointer;
+  border:1px solid transparent;
+}
+.iqmo-hero .h-name-edit-save{
+  background:linear-gradient(180deg,#6366f1,#7c3aed);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(124,58,237,.28);
+}
+.iqmo-hero .h-name-edit-cancel{
+  background:#fff;
+  color:var(--muted);
+  border-color:var(--line);
+}
 .iqmo-hero .h-name{
   margin:0;
   font-size:28px; font-weight:800; letter-spacing:-.025em;
