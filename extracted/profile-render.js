@@ -211,6 +211,14 @@
 			'<div class="xp-fill" style="width:' + xpPct + '%"></div>' +
 			'<div class="xp-dot" style="left:' + xpPct + '%"></div></div>' +
 			'<div class="xp-foot"><span>' + xpFootLeft + '</span><span class="week">за неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b></span></div>' +
+			'</div>' +
+			'<div class="hero-stats" role="group" aria-label="Краткая статистика">' +
+			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
+			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига</div></div>' + leagueDelta + '</div>' +
+			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
+			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div></div>' +
+			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
+			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Пройдено курса</div></div></div>' +
 			'</div></div>' +
 			'<div class="' + streakCardClass(streakDays) + '">' +
 			'<div class="atm-aura"></div><span class="atm-dot d1"></span><span class="atm-dot d2"></span><span class="atm-dot d3"></span>' +
@@ -243,14 +251,6 @@
 			'<div class="vault-name">' + esc(vaultName) + '</div><div class="vault-xp">' + vaultXp + '</div></div>' +
 			'<span class="vault-tag">★ Rare</span></div>' +
 			(streakUrg ? '<div class="s-urg"><span class="pulse"></span><span>' + streakUrg + '</span></div>' : '') +
-			'</div></div>' +
-			'<div class="hero-secondary"><div></div><div class="sec-row">' +
-			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига</div></div>' + leagueDelta + '</div>' +
-			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div></div>' +
-			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Пройдено курса</div></div></div>' +
 			'</div></div></section>'
 		);
 	}
