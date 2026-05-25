@@ -11,10 +11,12 @@
 	var MAX_EDGE = 512;
 	var ALLOWED_TYPES = { 'image/jpeg': 1, 'image/png': 1, 'image/webp': 1 };
 
+	// Пресеты зеркалятся в `public/site/assets/` (deploy rsync site/).
+	// `/assets/avatars/iq-*.png` — legacy в `public/assets/`; boy/girl только в site/.
 	var PRESET_URL = {
-		default: '/assets/avatars/avatar-default.png',
-		boy: '/assets/avatars/avatar-boy.png',
-		girl: '/assets/avatars/avatar-girl.png'
+		default: '/site/assets/avatars/avatar-default.png',
+		boy: '/site/assets/avatars/avatar-boy.png',
+		girl: '/site/assets/avatars/avatar-girl.png'
 	};
 
 	function lsGet() {

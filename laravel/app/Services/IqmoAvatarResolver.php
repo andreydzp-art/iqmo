@@ -11,9 +11,9 @@ final class IqmoAvatarResolver
 
     /** @var array<string, string> */
     private const PRESET_URL = [
-        'default' => '/assets/avatars/avatar-default.png',
-        'boy' => '/assets/avatars/avatar-boy.png',
-        'girl' => '/assets/avatars/avatar-girl.png',
+        'default' => '/site/assets/avatars/avatar-default.png',
+        'boy' => '/site/assets/avatars/avatar-boy.png',
+        'girl' => '/site/assets/avatars/avatar-girl.png',
     ];
 
     /**
