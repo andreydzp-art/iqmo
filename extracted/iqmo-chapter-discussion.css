@@ -415,17 +415,18 @@
 }
 
 .lm .soc-compose {
-	flex: 1 1 100%;
+	width: 100%;
 	min-width: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	margin-left: auto;
+	align-self: stretch;
 }
 
 .lm .soc-compose-input {
 	width: 100%;
-	min-height: 72px;
+	box-sizing: border-box;
+	min-height: 88px;
 	resize: vertical;
 	border: 1px solid #ecebf3;
 	border-radius: 10px;
@@ -454,7 +455,7 @@
 }
 
 .lm .soc-foot.is-composing .soc-more {
-	order: -1;
+	display: none;
 }
 
 .lm .soc-compose[hidden] {
@@ -463,30 +464,28 @@
 
 .lm .soc-foot.is-composing .soc-compose {
 	display: flex;
+	width: 100%;
 }
 
 .lm .soc-compose-bar {
-	display: grid;
-	grid-template-columns: 1fr auto auto;
-	gap: 8px;
+	display: flex;
 	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	flex-wrap: wrap;
 }
 
 .lm .soc-compose-hint {
-	grid-column: 1 / -1;
-	flex: none;
+	flex: 1 1 auto;
 	min-width: 0;
+	margin-right: auto;
 	font-size: 12px;
 	color: #a09bb8;
 }
 
-.lm .soc-compose-cancel {
-	justify-self: end;
-}
-
 .lm .soc-compose-send {
-	justify-self: end;
 	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 .lm .soc-card button.soc-compose-send {
@@ -564,6 +563,25 @@
 	.lm .soc-avatar {
 		width: 38px;
 		height: 38px;
+	}
+
+	.lm .soc-foot.is-composing {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.lm .soc-compose-bar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.lm .soc-compose-hint {
+		margin-right: 0;
+	}
+
+	.lm .soc-compose-cancel,
+	.lm .soc-compose-send {
+		width: 100%;
 	}
 
 	.lm .soc-foot {
