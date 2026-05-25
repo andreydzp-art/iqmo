@@ -36,7 +36,7 @@
 		<link rel="stylesheet" href="/iqmo-base.css?v=6" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
 		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=3" />
-		<link rel="stylesheet" href="/biology-level-map.css?v=2" />
+		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
 		<style>
@@ -1395,6 +1395,7 @@
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
+		<script src="/chemistry-level-map-render.js?v=5"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from biology-bank.js)
@@ -2895,37 +2896,37 @@
 					<div class="lm lm-shell">
 						${lmHeroHtml({ heroEyebrow, heroLead, heroCtaLabel, stats, heroStats, streakStatus, nextActionId })}
 						${bossBest ? lmCh2PromoHtml() : ''}
-						${lmMapHtml({ variantInfos, bossInfo, currentIdx, stats })}
+						<div id="bio-map-host"></div>
 						${IqmoChapterDiscussion.html()}
 						${lmGrid4Html({ stats, globalStats, streakStatus })}
 						${lmTipHtml(stats, bossInfo)}
 					</div>
 				`;
 
-				// Wire clicks
-				function pdGoVariant(v, st) {
-					if (st === 'locked') {
-						alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
-						return;
-					}
-					window.location.search = '?v=' + v;
+				const mapHost = document.getElementById('bio-map-host');
+				if (mapHost && window.IqmoChemLevelMap) {
+					const mapSub = variantInfos.length + ' ' + (variantInfos.length === 1 ? 'этап' : variantInfos.length < 5 ? 'этапа' : 'этапов') + ' · 1 финальный босс';
+					IqmoChemLevelMap.render(mapHost, {
+						chapterEyebrow: 'Глава 1 · Биология',
+						chapterSubInProgress: mapSub,
+						bossName: bossSlot.title || 'Магистр биологии',
+						completeRecapPrefix: 'Глава 1 завершена',
+						completeCtaHref: '/full-test-biology/chapter-2/',
+						completeCtaLabel: 'К Главе 2 →',
+						variantInfos: variantInfos,
+						bossInfo: bossInfo,
+						currentIdx: currentIdx,
+						stats: stats,
+						starsForPercent: gmStarsForPercent,
+						onGo: function (v, st) {
+							if (st === 'locked') {
+								alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
+								return;
+							}
+							window.location.search = '?v=' + v;
+						}
+					});
 				}
-				picker.querySelectorAll('.pd-node[data-v]').forEach(el => {
-					if (el.dataset.state === 'locked') return;
-					el.addEventListener('click', e => {
-						if (e.target.closest('.pd-cta')) return;
-						pdGoVariant(el.dataset.v, el.dataset.state);
-					});
-					el.addEventListener('keydown', e => {
-						if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pdGoVariant(el.dataset.v, el.dataset.state); }
-					});
-				});
-				picker.querySelectorAll('.pd-cta[data-v]').forEach(btn => {
-					btn.addEventListener('click', e => {
-						e.stopPropagation();
-						pdGoVariant(btn.dataset.v, 'current');
-					});
-				});
 				// Метрика по клику на primary CTA в hero
 				picker.querySelectorAll('.lm-btn-primary[href*="?v="]').forEach(link => {
 					link.addEventListener('click', () => {

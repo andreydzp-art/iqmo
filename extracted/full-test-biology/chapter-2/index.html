@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="/iqmo-base.css?v=5" />
 <link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
 <link rel="stylesheet" href="/iqmo-hub-hero.css?v=3" />
-<link rel="stylesheet" href="/biology-level-map.css?v=2" />
+<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 <style>
   :root{
     --bg:#f6f7fb; --bg-2:#eef0f7; --surface:#fff;
@@ -568,7 +568,7 @@
 <script src="/biology-variants.js?v=9"></script>
 <script src="/level-map-state.js?v=2"></script>
 <script src="/level-map-xp.js?v=3"></script>
-<script src="/biology-level-map-render.js?v=4"></script>
+<script src="/chemistry-level-map-render.js?v=5"></script>
 <script src="/iqmo-variant-best.js?v=1"></script>
 <script>
 (function () {
@@ -697,8 +697,8 @@
   stats.avgScore = scoredCount ? Math.round(totalScore / scoredCount) : 0;
 
   var mapHost = document.getElementById('ch2-map-host');
-  if (mapHost && window.IqmoBioLevelMap) {
-    IqmoBioLevelMap.render(mapHost, {
+  if (mapHost && window.IqmoChemLevelMap) {
+    IqmoChemLevelMap.render(mapHost, {
       chapterEyebrow: 'Глава 2 · Биология',
       chapterSubInProgress: '7 вариантов · сложность <b>повышенная</b>',
       bossName: 'Магистр биологии',

@@ -1,6 +1,6 @@
 /**
- * Shared biology level-map renderer (pd/pe design).
- * Used by full-test-biology hub and chapter-2.
+ * Chemistry level-map renderer (pd/pf/pg design).
+ * Used by full-test-chemistry hub and chapter-2.
  */
 (function (global) {
 	'use strict';
@@ -28,39 +28,92 @@
 	}
 
 	function pdDecoHtml(chapterComplete) {
-		const stroke1 = chapterComplete ? '#10b981' : '#5b21b6';
-		const stroke3 = chapterComplete ? '#fbbf24' : '#5b21b6';
-		return `
+		if (chapterComplete) {
+			return `
 			<div class="pd-deco" aria-hidden="true">
 		<svg class="pd-d1" viewBox="0 0 200 200">
-			<g fill="none" stroke="${stroke1}" stroke-width="2.5" stroke-linecap="round">
-				<path d="M40 10 C 120 50, 80 100, 160 140"/>
-				<path d="M160 10 C 80 50, 120 100, 40 140"/>
-				<line x1="55" y1="22" x2="138" y2="22"/>
-				<line x1="78" y1="48" x2="118" y2="48"/>
-				<line x1="78" y1="102" x2="118" y2="102"/>
-				<line x1="55" y1="128" x2="138" y2="128"/>
+			<g fill="none" stroke="#10b981" stroke-width="2.5">
+				<ellipse cx="100" cy="100" rx="80" ry="30"/>
+				<ellipse cx="100" cy="100" rx="80" ry="30" transform="rotate(60 100 100)"/>
+				<ellipse cx="100" cy="100" rx="80" ry="30" transform="rotate(120 100 100)"/>
+				<circle cx="100" cy="100" r="9" fill="#10b981"/>
+				<circle cx="178" cy="100" r="4" fill="#10b981"/>
+				<circle cx="60" cy="160" r="4" fill="#10b981"/>
+				<circle cx="60" cy="40" r="4" fill="#10b981"/>
 			</g>
 		</svg>
 		<svg class="pd-d2" viewBox="0 0 200 200">
-			<circle cx="100" cy="100" r="78" fill="none" stroke="#10b981" stroke-width="2.5"/>
-			<circle cx="115" cy="92" r="20" fill="none" stroke="#10b981" stroke-width="2.5"/>
-			<circle cx="115" cy="92" r="7" fill="#10b981"/>
+			<g fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round">
+				<path d="M70 30 L 70 80 L 40 160 Q 100 180 160 160 L 130 80 L 130 30 Z"/>
+				<line x1="60" y1="30" x2="140" y2="30"/>
+				<circle cx="80" cy="135" r="4" fill="#f59e0b"/>
+				<circle cx="115" cy="145" r="3" fill="#f59e0b"/>
+				<circle cx="95" cy="155" r="3" fill="#f59e0b"/>
+			</g>
 		</svg>
 		<svg class="pd-d3" viewBox="0 0 200 200">
-			<g fill="none" stroke="${stroke3}" stroke-width="2.5">
+			<g fill="none" stroke="#b45309" stroke-width="2.5">
 				<line x1="50" y1="60" x2="100" y2="100"/>
 				<line x1="100" y1="100" x2="150" y2="60"/>
 				<line x1="100" y1="100" x2="100" y2="160"/>
-				<circle cx="50" cy="60" r="12" fill="${stroke3}" fill-opacity=".35"/>
-				<circle cx="150" cy="60" r="12" fill="${stroke3}" fill-opacity=".35"/>
-				<circle cx="100" cy="100" r="16" fill="${stroke3}" fill-opacity=".45"/>
-				<circle cx="100" cy="160" r="12" fill="${stroke3}" fill-opacity=".35"/>
+				<circle cx="50" cy="60" r="12" fill="#b45309" fill-opacity=".35"/>
+				<circle cx="150" cy="60" r="12" fill="#b45309" fill-opacity=".35"/>
+				<circle cx="100" cy="100" r="16" fill="#b45309" fill-opacity=".45"/>
+				<circle cx="100" cy="160" r="12" fill="#b45309" fill-opacity=".35"/>
 			</g>
 		</svg>
 		<svg class="pd-d4" viewBox="0 0 200 200">
-			<path d="M40 160 C 40 60, 130 30, 170 40 C 170 130, 110 170, 40 160 Z" fill="none" stroke="#10b981" stroke-width="2.5"/>
-			<path d="M40 160 C 80 130, 130 90, 170 40" fill="none" stroke="#10b981" stroke-width="2.5"/>
+			<g fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round">
+				<path d="M80 20 L 80 150 Q 80 178 100 178 Q 120 178 120 150 L 120 20 Z"/>
+				<line x1="74" y1="20" x2="126" y2="20"/>
+				<line x1="80" y1="105" x2="120" y2="105"/>
+				<circle cx="92" cy="155" r="4" fill="#fbbf24"/>
+				<circle cx="108" cy="165" r="3" fill="#fbbf24"/>
+			</g>
+		</svg>
+			</div>`;
+		}
+		return `
+			<div class="pd-deco" aria-hidden="true">
+		<svg class="pd-d1" viewBox="0 0 200 200">
+			<g fill="none" stroke="#1e3a8a" stroke-width="2.5">
+				<ellipse cx="100" cy="100" rx="80" ry="30"/>
+				<ellipse cx="100" cy="100" rx="80" ry="30" transform="rotate(60 100 100)"/>
+				<ellipse cx="100" cy="100" rx="80" ry="30" transform="rotate(120 100 100)"/>
+				<circle cx="100" cy="100" r="9" fill="#1e3a8a"/>
+				<circle cx="178" cy="100" r="4" fill="#1e3a8a"/>
+				<circle cx="60" cy="160" r="4" fill="#1e3a8a"/>
+				<circle cx="60" cy="40" r="4" fill="#1e3a8a"/>
+			</g>
+		</svg>
+		<svg class="pd-d2" viewBox="0 0 200 200">
+			<g fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round">
+				<path d="M70 30 L 70 80 L 40 160 Q 100 180 160 160 L 130 80 L 130 30 Z"/>
+				<line x1="60" y1="30" x2="140" y2="30"/>
+				<circle cx="80" cy="135" r="4" fill="#0ea5e9"/>
+				<circle cx="115" cy="145" r="3" fill="#0ea5e9"/>
+				<circle cx="95" cy="155" r="3" fill="#0ea5e9"/>
+			</g>
+		</svg>
+		<svg class="pd-d3" viewBox="0 0 200 200">
+			<g fill="none" stroke="#0ea5e9" stroke-width="2.5">
+				<line x1="50" y1="60" x2="100" y2="100"/>
+				<line x1="100" y1="100" x2="150" y2="60"/>
+				<line x1="100" y1="100" x2="100" y2="160"/>
+				<circle cx="50" cy="60" r="12" fill="#0ea5e9" fill-opacity=".35"/>
+				<circle cx="150" cy="60" r="12" fill="#0ea5e9" fill-opacity=".35"/>
+				<circle cx="100" cy="100" r="16" fill="#0ea5e9" fill-opacity=".45"/>
+				<circle cx="100" cy="160" r="12" fill="#0ea5e9" fill-opacity=".35"/>
+			</g>
+		</svg>
+		<svg class="pd-d4" viewBox="0 0 200 200">
+			<g fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round">
+				<path d="M80 20 L 80 150 Q 80 178 100 178 Q 120 178 120 150 L 120 20 Z"/>
+				<line x1="74" y1="20" x2="126" y2="20"/>
+				<line x1="80" y1="105" x2="120" y2="105"/>
+				<circle cx="92" cy="155" r="4" fill="#f59e0b"/>
+				<circle cx="108" cy="165" r="3" fill="#f59e0b"/>
+			</g>
 		</svg>
 			</div>`;
 	}
@@ -76,14 +129,14 @@
 
 	function pdHeadHtml(cfg, stats, chapterComplete, chapterPassed, chapterTotal, ringPct, ringOffset) {
 		const completedChip = chapterComplete
-			? `<span class="pe-completed-chip">${PD_CHECK_SVG} Завершена</span>`
+			? `<span class="pg-completed-chip">${PD_CHECK_SVG} Завершена</span>`
 			: '';
 		const subDone = chapterComplete
 			? (cfg.chapterSubComplete || ('Все <b>' + chapterTotal + ' вариантов пройдены</b> · средний балл <b>' + stats.avgScore + '%</b>'))
 			: (cfg.chapterSubInProgress || (chapterTotal + ' вариантов · сложность <b>повышенная</b>'));
-		const progressLabel = chapterPassed + ' / ' + chapterTotal + ' пройдено';
-		const ringGrad = chapterComplete ? 'peRingGrad' : 'pdRingGrad';
-		const ringStroke = chapterComplete ? '#dcfae6' : '#ece8f5';
+		var progressLabel = chapterPassed + ' / ' + chapterTotal + ' пройдено';
+		const ringGrad = chapterComplete ? 'pgRingGrad' : 'pfRingGrad';
+		const ringStroke = chapterComplete ? '#fed7aa' : '#dbeafe';
 		const metaRow = chapterComplete ? `
 			<div class="pe-meta-row">
 		<div class="pe-meta" title="XP за главу">
@@ -104,7 +157,7 @@
 		return `
 			<header class="pd-head">
 		<div>
-			<span class="pd-eyebrow">${cfg.chapterEyebrow}</span>
+			<span class="pd-eyebrow">${cfg.chapterEyebrow || 'Глава · Химия'}</span>
 			<h2 class="pd-title">Карта уровней ${completedChip}</h2>
 			<div class="pd-sub">${subDone}</div>
 		</div>
@@ -119,13 +172,13 @@
 					stroke-dasharray="94.25" stroke-dashoffset="${ringOffset}"
 					transform="rotate(-90 18 18)"/>
 				<defs>
-					<linearGradient id="pdRingGrad" x1="0" x2="1" y1="0" y2="1">
-				<stop offset="0" stop-color="#10b981"/>
-				<stop offset="1" stop-color="#7c66ff"/>
+					<linearGradient id="pfRingGrad" x1="0" x2="1" y1="0" y2="1">
+				<stop offset="0" stop-color="#0ea5e9"/>
+				<stop offset="1" stop-color="#f59e0b"/>
 					</linearGradient>
-					<linearGradient id="peRingGrad" x1="0" x2="1" y1="0" y2="1">
-				<stop offset="0" stop-color="#10b981"/>
-				<stop offset="1" stop-color="#fbbf24"/>
+					<linearGradient id="pgRingGrad" x1="0" x2="1" y1="0" y2="1">
+				<stop offset="0" stop-color="#fbbf24"/>
+				<stop offset="1" stop-color="#b45309"/>
 					</linearGradient>
 				</defs>
 			</svg>
@@ -146,60 +199,67 @@
 			return `
 		<svg class="pd-svg" viewBox="0 0 1400 130" preserveAspectRatio="none" aria-hidden="true">
 			<defs>
-				<linearGradient id="peGrad" x1="0" x2="1" y1="0" y2="0">
+				<linearGradient id="pgPath" x1="0" x2="1" y1="0" y2="0">
 			<stop offset="0" stop-color="#10b981"/>
 			<stop offset="0.5" stop-color="#10b981"/>
-			<stop offset="0.85" stop-color="#34d399"/>
-			<stop offset="1" stop-color="#fbbf24"/>
+			<stop offset="0.85" stop-color="#fbbf24"/>
+			<stop offset="1" stop-color="#b45309"/>
 				</linearGradient>
-				<linearGradient id="peGradSoft" x1="0" x2="1" y1="0" y2="0">
+				<linearGradient id="pgPathSoft" x1="0" x2="1" y1="0" y2="0">
 			<stop offset="0" stop-color="#10b981" stop-opacity=".22"/>
 			<stop offset="0.6" stop-color="#10b981" stop-opacity=".22"/>
-			<stop offset="1" stop-color="#fbbf24" stop-opacity=".22"/>
+			<stop offset="1" stop-color="#b45309" stop-opacity=".22"/>
 				</linearGradient>
-				<filter id="peGlow" x="-20%" y="-50%" width="140%" height="200%">
+				<filter id="pgGlow" x="-20%" y="-50%" width="140%" height="200%">
 			<feGaussianBlur stdDeviation="3"/>
 				</filter>
 			</defs>
-			<path id="peRoute" d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
-				fill="none" stroke="url(#peGradSoft)" stroke-width="14" stroke-linecap="round" filter="url(#peGlow)"/>
+			<path id="pgRoute" d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
+				fill="none" stroke="url(#pgPathSoft)" stroke-width="14" stroke-linecap="round" filter="url(#pgGlow)"/>
 			<path d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
 				fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".55"/>
 			<path d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
-				fill="none" stroke="url(#peGrad)" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="2 9"/>
+				fill="none" stroke="url(#pgPath)" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="2 9"/>
+			<circle r="3.5" fill="#fbbf24">
+				<animateMotion dur="5s" repeatCount="indefinite" rotate="auto"><mpath href="#pgRoute"/></animateMotion>
+			</circle>
+			<circle r="2.5" fill="#10b981">
+				<animateMotion dur="5s" begin="-1.6s" repeatCount="indefinite" rotate="auto"><mpath href="#pgRoute"/></animateMotion>
+			</circle>
+			<circle r="2" fill="#fde68a">
+				<animateMotion dur="5s" begin="-3.2s" repeatCount="indefinite" rotate="auto"><mpath href="#pgRoute"/></animateMotion>
+			</circle>
 		</svg>`;
 		}
 		return `
 			<svg class="pd-svg" viewBox="0 0 1400 130" preserveAspectRatio="none" aria-hidden="true">
 		<defs>
-			<linearGradient id="pdPath" x1="0" x2="1" y1="0" y2="0">
+			<linearGradient id="pfPath" x1="0" x2="1" y1="0" y2="0">
 				<stop offset="0" stop-color="#10b981"/>
-				<stop offset="0.18" stop-color="#7c66ff"/>
-				<stop offset="0.78" stop-color="#c4bde0"/>
-				<stop offset="1" stop-color="#6d28d9"/>
+				<stop offset="0.18" stop-color="#0ea5e9"/>
+				<stop offset="0.78" stop-color="#c4d4e9"/>
+				<stop offset="1" stop-color="#b45309"/>
 			</linearGradient>
-			<linearGradient id="pdPathSoft" x1="0" x2="1" y1="0" y2="0">
-				<stop offset="0" stop-color="#10b981" stop-opacity=".15"/>
-				<stop offset="0.5" stop-color="#7c66ff" stop-opacity=".18"/>
-				<stop offset="1" stop-color="#6d28d9" stop-opacity=".15"/>
+			<linearGradient id="pfPathSoft" x1="0" x2="1" y1="0" y2="0">
+				<stop offset="0" stop-color="#0ea5e9" stop-opacity=".18"/>
+				<stop offset="0.5" stop-color="#0ea5e9" stop-opacity=".18"/>
+				<stop offset="1" stop-color="#b45309" stop-opacity=".18"/>
 			</linearGradient>
-			<filter id="pdGlow" x="-20%" y="-50%" width="140%" height="200%">
+			<filter id="pfGlow" x="-20%" y="-50%" width="140%" height="200%">
 				<feGaussianBlur stdDeviation="3"/>
 			</filter>
 		</defs>
-		<path id="pdRoute" d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
-			fill="none" stroke="url(#pdPathSoft)" stroke-width="14" stroke-linecap="round" filter="url(#pdGlow)"/>
+		<path id="pfRoute" d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
+			fill="none" stroke="url(#pfPathSoft)" stroke-width="14" stroke-linecap="round" filter="url(#pfGlow)"/>
 		<path d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
 			fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".55"/>
 		<path d="M 90 78 C 220 30, 340 30, 460 70 S 700 110, 820 65 S 1060 30, 1180 70 S 1290 95, 1340 80"
-			fill="none" stroke="url(#pdPath)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 9"/>
-		<circle r="4" fill="#7c66ff">
-			<animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
-				<mpath href="#pdRoute"/>
-			</animateMotion>
+			fill="none" stroke="url(#pfPath)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 9"/>
+		<circle r="4" fill="#0ea5e9">
+			<animateMotion dur="6s" repeatCount="indefinite" rotate="auto"><mpath href="#pfRoute"/></animateMotion>
 			<animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="6s" repeatCount="indefinite"/>
 		</circle>
-		<g transform="translate(1340 80)"><path d="M -6 -6 L 4 0 L -6 6 Z" fill="#6d28d9"/></g>
+		<g transform="translate(1340 80)"><path d="M -6 -6 L 4 0 L -6 6 Z" fill="#b45309"/></g>
 			</svg>`;
 	}
 
@@ -221,7 +281,7 @@
 		} else {
 			circleInner = '<span class="num">' + v.id + '</span>';
 			if (pdState === 'passed') {
-		circleInner += '<span class="pd-check" aria-label="Пройден">' + PD_CHECK_SVG + '</span>';
+				circleInner += '<span class="pd-check" aria-label="Пройден">' + PD_CHECK_SVG + '</span>';
 			}
 		}
 		let body = '';
@@ -261,7 +321,7 @@
 	function pdBossNodeHtml(cfg, bossInfo, chapterComplete) {
 		const v = bossInfo.v;
 		const state = bossInfo.state;
-		const bossName = cfg.bossName || bossInfo.v.title || ('Вариант ' + bossInfo.v.id);
+		const bossName = cfg.bossName || 'Магистр химии';
 		if (chapterComplete && bossInfo.best) {
 			const stars = _mapCfg.starsForPercent(bossInfo.best.percent);
 			const bossXp = global.IqmoLevelMapXp
@@ -338,27 +398,27 @@
 		let nextHtml = '';
 		if (chapterComplete) {
 			nextHtml = `
-		<div class="pe-recap">
+		<div class="pg-recap">
 			<svg viewBox="0 0 24 24"><path d="${PD_STAR_PATH}"/></svg>
-			${cfg.completeRecapPrefix || "Глава завершена"} · <b>${stats.totalStars} / ${stats.maxStars} звёзд</b> · средний <b>${stats.avgScore}%</b> · <b>+${_lmFmtNum(stats.totalXp)} XP</b>
+			${cfg.completeRecapPrefix || 'Глава завершена'} · <b>${stats.totalStars} / ${stats.maxStars} звёзд</b> · средний <b>${stats.avgScore}%</b> · <b>+${_lmFmtNum(stats.totalXp)} XP</b>
 		</div>
-		<a class="pe-cta-replay" href="${cfg.completeCtaHref || "/subject-biology/"}">
+		<a class="pg-cta-replay" href="${cfg.completeCtaHref || '/subject-chemistry/'}">
 			<svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.74 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-			${cfg.completeCtaLabel || "К предмету →"}
+			${cfg.completeCtaLabel || 'К предмету →'}
 		</a>`;
 		} else {
 			let nextGoal = 'пройти следующий вариант';
 			if (currentIdx >= 0) {
-		const cur = variantInfos[currentIdx];
-		const nxt = variantInfos[currentIdx + 1];
-		const curLabel = cur.v.title || ('Вариант ' + cur.v.id);
-		if (nxt) {
-			const nxtLabel = nxt.v.title || ('Вариант ' + nxt.v.id);
-			nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + nxtLabel + '</b>';
-		} else {
-			const bossLabel = (cfg.bossName || bossInfo.v.title || ('Вариант ' + bossInfo.v.id));
-			nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + bossLabel + '</b>';
-		}
+				const cur = variantInfos[currentIdx];
+				const nxt = variantInfos[currentIdx + 1];
+				const curLabel = cur.v.title || ('Вариант ' + cur.v.id);
+				if (nxt) {
+					const nxtLabel = nxt.v.title || ('Вариант ' + nxt.v.id);
+					nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + nxtLabel + '</b>';
+				} else {
+					const bossLabel = (cfg.bossName || bossInfo.v.title || ('Вариант ' + bossInfo.v.id));
+					nextGoal = 'пройти <b>' + curLabel + '</b>, чтобы открыть <b>' + bossLabel + '</b>';
+				}
 			}
 			const stepsLeft = chapterTotal - chapterPassed;
 			nextHtml = '<div class="pd-next">Следующая цель: ' + nextGoal + ' · до финала <b>' + stepsLeft + ' ' + plural(stepsLeft, ['шаг', 'шага', 'шагов']) + '</b></div>';
@@ -385,7 +445,7 @@
 		const ringPct = ch.total ? Math.round(100 * ch.passed / ch.total) : 0;
 		const ringOffset = (94.25 * (1 - ringPct / 100)).toFixed(1);
 		const meterPct = ch.total ? (100 * ch.passed / ch.total) : 0;
-		const cardCls = chapterComplete ? 'map-card pd-card pe-card' : 'map-card pd-card';
+		const cardCls = chapterComplete ? 'map-card pd-card pf-card pg-card' : 'map-card pd-card pf-card';
 		return `
 			<section class="${cardCls}" aria-label="Карта уровней">
 		${pdDecoHtml(chapterComplete)}
@@ -401,8 +461,6 @@
 			</section>`;
 	}
 
-
-
 	function plural(n, forms) {
 		const a = Math.abs(n) % 100;
 		const b = a % 10;
@@ -411,7 +469,6 @@
 		if (b === 1) return forms[0];
 		return forms[2];
 	}
-
 
 	function wireMap(host, cfg) {
 		var onGo = cfg.onGo || function (v, st) {
