@@ -282,17 +282,56 @@
 		);
 	}
 
-	function renderGoals(goals) {
+	var REWARD_SHOP_UNLOCK = 15;
+	var LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+
+	function renderGoalCard(g) {
+		return (
+			'<div class="ng-top"><div class="ng-ico"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg></div>' +
+			'<div class="ng-eye">' + esc(g.eye) + '</div></div>' +
+			'<div class="ng-text"><span class="num-big">' + esc(g.big) + '</span> ' + esc(g.text) + '</div>' +
+			'<div class="ng-bar"><i style="width:' + g.pct + '%"></i></div>' +
+			'<div class="ng-foot">' + g.foot + '</div>'
+		);
+	}
+
+	function renderRewardShopTeaser() {
+		return (
+			'<div class="reward-teaser" tabindex="0" role="note" aria-label="Лавка наград — откроется на 15 уровне">' +
+			'<span class="reward-teaser__shimmer" aria-hidden="true"></span>' +
+			'<span class="reward-teaser__glow" aria-hidden="true"></span>' +
+			'<div class="reward-teaser__art" aria-hidden="true">' +
+			'<img src="/site/assets/rewards-shop-teaser.png" alt="" width="120" height="90" decoding="async" />' +
+			'</div>' +
+			'<div class="reward-teaser__body">' +
+			'<div class="reward-teaser__head">' +
+			'<span class="reward-teaser__title">Лавка наград</span>' +
+			'<span class="reward-teaser__lock">' + LOCK_SVG + '</span>' +
+			'</div>' +
+			'<p class="reward-teaser__text">Обменивайте XP на реальные подарки</p>' +
+			'<p class="reward-teaser__sub">Откроется на ' + REWARD_SHOP_UNLOCK + ' уровне</p>' +
+			'</div>' +
+			'<div class="reward-teaser__tip" role="tooltip">Достигните ' + REWARD_SHOP_UNLOCK + ' уровня, чтобы открыть магазин наград</div>' +
+			'</div>'
+		);
+	}
+
+	function renderGoals(goals, isPublic) {
 		return (
 			'<section class="nextrow">' +
 			goals.map(function (g) {
+				if (g.primary && !isPublic) {
+					return (
+						'<div class="ngoal ' + g.kind + ' is--primary has-reward-teaser">' +
+						'<div class="ng-main">' + renderGoalCard(g) + '</div>' +
+						renderRewardShopTeaser() +
+						'</div>'
+					);
+				}
 				return (
 					'<div class="ngoal ' + g.kind + (g.primary ? ' is--primary' : '') + '">' +
-					'<div class="ng-top"><div class="ng-ico"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg></div>' +
-					'<div class="ng-eye">' + esc(g.eye) + '</div></div>' +
-					'<div class="ng-text"><span class="num-big">' + esc(g.big) + '</span> ' + esc(g.text) + '</div>' +
-					'<div class="ng-bar"><i style="width:' + g.pct + '%"></i></div>' +
-					'<div class="ng-foot">' + g.foot + '</div></div>'
+					renderGoalCard(g) +
+					'</div>'
 				);
 			}).join('') +
 			'</section>'
@@ -513,7 +552,7 @@
 		root.innerHTML =
 			(isPublic ? renderPublicBanner(data) : '') +
 			renderHero(data) +
-			renderGoals(data.nextGoalsData) +
+			renderGoals(data.nextGoalsData, isPublic) +
 			(isPublic ? '' : renderXpGuide()) +
 			renderAchievements(data.achievementsData, data.profileData && data.profileData.avatarUrl) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +
