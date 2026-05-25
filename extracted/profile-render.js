@@ -347,12 +347,12 @@
 			renderHero(data) +
 			renderGoals(data.nextGoalsData) +
 			(isPublic ? '' : renderXpGuide()) +
-			settingsBlock +
 			renderAchievements(data.achievementsData) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +
 			renderSubjects(data.subjectsProgressData) +
 			(isPublic ? '' : renderCollectibles(data.collectiblesData || [])) +
-			'<p class="footnote">Уровни, рамки и значки — дополнительная мотивация, а не учебный результат. Главная цель — освоение тем и подготовка к экзамену.</p>';
+			'<p class="footnote">Уровни, рамки и значки — дополнительная мотивация, а не учебный результат. Главная цель — освоение тем и подготовка к экзамену.</p>' +
+			settingsBlock;
 
 		var navAv = document.getElementById('nav-avatar');
 		if (navAv && data.profileData) {
