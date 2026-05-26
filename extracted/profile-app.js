@@ -17,10 +17,10 @@
 		}
 	}
 
-	function refresh() {
+	function refresh(fromSync) {
 		if (!global.IqmoProfileData || !global.IqmoProfileRender) return;
 		var data = IqmoProfileData.build(meUser);
-		IqmoProfileRender.render(data);
+		IqmoProfileRender.render(data, { preserveHero: !!fromSync });
 		syncProfAuthVisibility(!!(meUser && meUser.id != null));
 		tryCelebrate(data);
 	}
@@ -246,11 +246,11 @@
 			return;
 		}
 
-		refresh();
+		refresh(false);
 		if (global.__IQMO_SYNC__) {
-			global.addEventListener('iqmo-sync-ready', refresh, { once: true });
+			global.addEventListener('iqmo-sync-ready', function () { refresh(true); }, { once: true });
 		}
-		global.addEventListener('iqmo-sync', refresh);
+		global.addEventListener('iqmo-sync', function () { refresh(true); });
 	}
 
 	global.IqmoProfileApp = {

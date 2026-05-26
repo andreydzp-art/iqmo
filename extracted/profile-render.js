@@ -573,15 +573,135 @@
 		);
 	}
 
-	function render(data) {
-		var root = document.getElementById('prof-root');
-		if (!root || !data) return;
+	/** Обновляет цифры/полосы в шапке без пересоздания .orb-orbit (анимация точек не сбрасывается). */
+	function patchHero(hero, p) {
+		var d = p.profileData;
+		if (!d || !hero) return;
+		var sig = p.socialSignals || [];
+		var streakDays = d.streakDays || 0;
+		var xpPct = d.xpPct || 0;
+		var avUrl = d.avatarUrl || (global.IqmoAvatar ? IqmoAvatar.getUrl() : '');
+		var avOuter = hero.querySelector('.av-outer');
+		if (avOuter) avOuter.setAttribute('style', avHoloRingStyle(xpPct));
+		var avPct = hero.querySelector('.av-pct');
+		if (avPct) avPct.textContent = xpPct + '%';
+		var avChip = hero.querySelector('.av-chip');
+		if (avChip) {
+			avChip.innerHTML =
+				'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>Ур. ' + d.level;
+		}
+		var avImg = hero.querySelector('[data-avatar-hero-img]');
+		var avInitials = hero.querySelector('.av-initials');
+		if (avUrl && avImg) {
+			avImg.src = avUrl;
+			if (avInitials) avInitials.remove();
+		} else if (!avUrl && avImg) {
+			avImg.remove();
+			if (!avInitials) {
+				var box = hero.querySelector('.av-img');
+				if (box) {
+					box.innerHTML = '<div class="av-initials" aria-hidden="true">' + esc(d.initials) + '</div>';
+				}
+			} else {
+				avInitials.textContent = d.initials;
+			}
+		}
+		var nameEl = hero.querySelector('#prof-hero-name');
+		var nameForm = hero.querySelector('#prof-hero-name-form');
+		if (nameEl && (!nameForm || nameForm.hidden)) nameEl.textContent = d.name;
+		var handleEl = hero.querySelector('.h-handle');
+		if (handleEl) handleEl.textContent = d.profileId;
+		var rankEl = hero.querySelector('.h-meta-row .rank');
+		if (rankEl) rankEl.innerHTML = metaRankLineV3(sig, d);
+		var metaSpans = hero.querySelectorAll('.h-meta-row > span:not(.rank):not(.dot)');
+		if (metaSpans[0]) metaSpans[0].innerHTML = courseMetaLineV3(sig, d);
+		var xpMax = d.nextLevel ? d.xpLevelMax : d.xpCurrent;
+		var xpNums = IqmoProfileData.fmtPts(d.xpCurrent) + ' / ' + IqmoProfileData.fmtPts(xpMax);
+		var xpEye = d.nextLevel
+			? 'XP · ур. ' + d.level + ' → ' + d.nextLevel
+			: 'XP · ур. ' + d.level;
+		var xpNext = d.nextLevel
+			? 'след.: <b>' + d.nextLevel + ' · «' + esc(d.levelTitle || '') + '»</b>'
+			: 'макс. уровень';
+		var xpUntil = d.nextLevel
+			? '▸ ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до ур. ' + d.nextLevel
+			: '';
+		var eyeEl = hero.querySelector('.xp-curr .eye');
+		if (eyeEl) eyeEl.textContent = xpEye;
+		var xpNumEl = hero.querySelector('.xp-curr .num');
+		if (xpNumEl) xpNumEl.textContent = xpNums;
+		var xpNextEl = hero.querySelector('.xp-next');
+		if (xpNextEl) xpNextEl.innerHTML = xpNext;
+		var xpBar = hero.querySelector('.xp-bar');
+		var xpFill = hero.querySelector('.xp-fill');
+		if (xpFill) xpFill.style.width = xpPct + '%';
+		if (xpBar) {
+			xpBar.setAttribute('aria-valuenow', String(xpPct));
+		}
+		var xpFoot = hero.querySelector('.xp-foot');
+		if (xpFoot) {
+			xpFoot.innerHTML =
+				'<span>За неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b> · серия ' + streakMultLabel(streakDays) + '</span>' +
+				(xpUntil ? '<span class="untill">' + xpUntil + '</span>' : '<span class="untill"></span>');
+		}
+		var secRow = hero.querySelector('.h-id .sec-row');
+		if (secRow) {
+			var leagueDelta = d.leagueDelta ? '<div class="q-delta">▲ ' + d.leagueDelta + '</div>' : '';
+			secRow.outerHTML = renderHeroStatsRow(d, leagueDelta, '', '');
+		}
+		var streakTop = hero.querySelector('.streak-top');
+		if (streakTop) {
+			var eyeStreak = streakTop.querySelector('.s-eye');
+			if (eyeStreak) {
+				eyeStreak.innerHTML = '<span class="pulse"></span>STREAK · ' + pad2(streakDays);
+			}
+			var bonus = streakTop.querySelector('.s-bonus');
+			if (streakDays > 0) {
+				var bonusHtml =
+					'<span class="s-bonus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>BONUS ' +
+					streakMultLabel(streakDays) + '</span>';
+				if (bonus) bonus.outerHTML = bonusHtml;
+				else if (eyeStreak) eyeStreak.insertAdjacentHTML('afterend', bonusHtml);
+			} else if (bonus) {
+				bonus.remove();
+			}
+		}
+		var sNum = hero.querySelector('.s-big .num');
+		if (sNum) sNum.textContent = String(streakDays);
+		var sLbl = hero.querySelector('.s-big .lbl');
+		if (sLbl) sLbl.textContent = streakLabel(streakDays);
+		var sWarn = hero.querySelector('.s-warn');
+		if (sWarn) {
+			sWarn.innerHTML = streakDays > 0
+				? 'Серия заряжена — продли до конца дня <b>сегодня</b>'
+				: 'Начните серию — закройте дневную цель';
+		}
+		var streakFill = Math.min(100, Math.round((Math.min(streakDays, 7) / 7) * 100));
+		var daysLeft = Math.max(0, 7 - streakDays);
+		var vaultTitle = 'Неделя ритма';
+		if (global.IqmoProfileData && IqmoProfileData.ACHIEVEMENT_CATALOG) {
+			var ach = IqmoProfileData.ACHIEVEMENT_CATALOG.find(function (a) { return a.id === 'streak7'; });
+			if (ach) vaultTitle = String(ach.title).replace(/[«»]/g, '').trim();
+		}
+		var daysLeftWord = pluralRu(daysLeft, ['день', 'дня', 'дней']);
+		var progFill = hero.querySelector('.s-prog-fill');
+		if (progFill) progFill.style.width = streakFill + '%';
+		var progBar = hero.querySelector('.s-prog-bar');
+		if (progBar) progBar.setAttribute('aria-label', streakDays + ' из 7 дней');
+		var progFoot = hero.querySelector('.s-prog-foot');
+		if (progFoot) {
+			progFoot.innerHTML =
+				'<span>' + pad2(Math.min(streakDays, 7)) + ' / 07 → <b>+' + daysLeft + ' ' + daysLeftWord + '</b></span>' +
+				'<span class="rew"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4z"/></svg>' +
+				esc(vaultTitle) + ' +200 XP</span>';
+		}
+	}
+
+	function renderProfileTail(data) {
 		var isPublic = !!data.isPublic;
 		var profileId = data.profileData && data.profileData.profileId;
 		var settingsBlock = isPublic ? '' : renderSettingsGuest() + renderSettingsAccount(profileId, data.profileData);
-		root.innerHTML =
-			(isPublic ? renderPublicBanner(data) : '') +
-			renderHero(data) +
+		return (
 			renderGoals(data.nextGoalsData, isPublic) +
 			(isPublic ? '' : renderXpGuide()) +
 			renderAchievements(data.achievementsData, data.profileData && data.profileData.avatarUrl) +
@@ -589,19 +709,50 @@
 			renderSubjects(data.subjectsProgressData) +
 			(isPublic ? '' : renderCollectibles(data.collectiblesData || [])) +
 			'<p class="footnote">Уровни, рамки и значки — дополнительная мотивация, а не учебный результат. Главная цель — освоение тем и подготовка к экзамену.</p>' +
-			settingsBlock;
+			settingsBlock
+		);
+	}
 
-		if (global.IqmoAvatar && data.profileData) {
-			var navAv = document.getElementById('nav-avatar');
-			if (navAv) {
-				IqmoAvatar.paint(navAv, {
-					url: data.profileData.avatarUrl,
-					fallbackText: String(data.profileData.level),
-					title: 'Уровень ' + data.profileData.level,
-					imgClass: 'iqmo-av-img iqmo-av-img--nav'
-				});
+	function paintNavAvatar(data) {
+		if (!global.IqmoAvatar || !data.profileData) return;
+		var navAv = document.getElementById('nav-avatar');
+		if (!navAv) return;
+		IqmoAvatar.paint(navAv, {
+			url: data.profileData.avatarUrl,
+			fallbackText: String(data.profileData.level),
+			title: 'Уровень ' + data.profileData.level,
+			imgClass: 'iqmo-av-img iqmo-av-img--nav'
+		});
+	}
+
+	function render(data, options) {
+		options = options || {};
+		var root = document.getElementById('prof-root');
+		if (!root || !data) return;
+		var isPublic = !!data.isPublic;
+		var existingHero = root.querySelector('.iqmo-hero.v3');
+
+		if (options.preserveHero && existingHero && !isPublic) {
+			patchHero(existingHero, data);
+			var node = existingHero.nextSibling;
+			while (node) {
+				var next = node.nextSibling;
+				node.remove();
+				node = next;
 			}
+			var tail = document.createElement('div');
+			tail.innerHTML = renderProfileTail(data);
+			while (tail.firstChild) {
+				root.appendChild(tail.firstChild);
+			}
+		} else {
+			root.innerHTML =
+				(isPublic ? renderPublicBanner(data) : '') +
+				renderHero(data) +
+				renderProfileTail(data);
 		}
+
+		paintNavAvatar(data);
 	}
 
 	function ensureAvatarSheet() {

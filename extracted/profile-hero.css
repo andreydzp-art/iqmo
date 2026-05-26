@@ -414,6 +414,8 @@
     width:7px; height:7px; margin:-3.5px 0 0 -3.5px;
     border-radius:50%;
     display:block;
+    will-change:transform;
+    backface-visibility:hidden;
   }
 .iqmo-hero.v3 .orb-orbit i.a{
     background:#22c55e;
