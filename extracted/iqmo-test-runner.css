@@ -822,20 +822,21 @@
 
 /* === Hub (выбор варианта): не применять глобальные правила runner === */
 html.is--hub .shell{
-  max-width: none;
-  margin: 0;
-  padding: 0 0 56px;
+  max-width: var(--site-max, 1280px);
+  margin: 0 auto;
+  padding: 24px var(--site-gutter, 28px) 56px;
+  box-sizing: border-box;
 }
 html.is--hub body{
   font-family: 'Manrope', system-ui, sans-serif;
   min-height: 0;
 }
 html.is--hub .topnav .brand-mark{
-  width: auto;
-  height: auto;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
 }
 html.is--hub .topnav .brand-mark::after{ content: none; }
 
