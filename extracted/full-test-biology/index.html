@@ -33,12 +33,11 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-		<link rel="stylesheet" href="/iqmo-base.css?v=6" />
+		<link rel="stylesheet" href="/iqmo-base.css?v=7" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
 		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=3" />
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
-		<link rel="stylesheet" href="/iqmo-answer-feedback.css?v=1" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
 		<style>
 			html.is--hub #test-root { display: none !important; }
@@ -1395,8 +1394,6 @@
 		<link rel="stylesheet" href="/iqmo-live-activity.css?v=1" />
 		<script src="/chem-progress.js?v=9"></script>
 		<script src="/iqmo-live-activity.js?v=1"></script>
-		<script src="/iqmo-answer-reward.js?v=1"></script>
-		<script src="/iqmo-test-feedback.js?v=1"></script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
@@ -1806,15 +1803,13 @@
 					</div>
 					<div class="q-body">${formatBody(q.body)}</div>
 					${inputHtml}
-					${(window.IqmoTestFeedback ? IqmoTestFeedback.feedbackSlotHtml() : '')}
 					<div class="q-foot">
 						<div class="q-foot__left">
 							${state.current > 0 ? `<button type="button" class="btn btn--ghost" id="btn-prev" title="Перейти к предыдущему заданию">← Назад</button>` : ''}
 						</div>
 						<div class="q-foot__right">
-							${q.type === 'input' && window.IqmoTestFeedback ? IqmoTestFeedback.inputCheckButtonHtml() : ''}
 							<button type="button" class="btn btn--ghost" id="btn-clear">Очистить</button>
-							<button type="button" class="btn btn--blue" id="btn-next">${state.current===QCOUNT-1?'К завершению →':'Дальше →'}</button>
+							<button type="button" class="btn btn--blue" id="btn-next">${state.current===QCOUNT-1?'К завершению →':'Следующее →'}</button>
 						</div>
 					</div>
 				`;
@@ -1854,28 +1849,33 @@
 					else { finishTest(); }
 				});
 				document.getElementById('btn-clear').addEventListener('click', () => {
-					if (window.IqmoTestFeedback && IqmoTestFeedback.isGradable(q) && IqmoTestFeedback.isRevealed(state, q)) return;
 					delete state.answers[q.id];
-					if (state.feedback && state.feedback.byQ) delete state.feedback.byQ[q.id];
 					saveState();
 					renderAll();
 				});
 
-				if (window.IqmoTestFeedback && IqmoTestFeedback.isGradable(q)) {
-					IqmoTestFeedback.wireGradableQuestion({
-						q: q,
-						state: state,
-						saveState: saveState,
-						elCard: elCard,
-						questions: QUESTIONS,
-						subject: EXAM_SUBJECT,
-						checkAnswerStatic: (given) => checkAnswerStatic(q, given),
-						onLevelUp: (lv, title) => {
-							try {
-								if (typeof window.gmShowLevelUp === 'function') window.gmShowLevelUp(lv, title);
-							} catch (eLu) {}
-						},
-						renderNav: renderNav
+				if (q.type === 'single' || q.type === 'multi') {
+					const isMulti = q.type === 'multi';
+					elCard.querySelectorAll('.option').forEach(el => {
+						el.addEventListener('click', () => {
+							const id = el.dataset.id;
+							if (!isMulti) {
+								state.answers[q.id] = id;
+							} else {
+								const cur = new Set(Array.isArray(state.answers[q.id]) ? state.answers[q.id] : []);
+								if (cur.has(id)) cur.delete(id);
+								else {
+									if (q.pickCount && cur.size >= q.pickCount) {
+										const first = cur.values().next().value;
+										cur.delete(first);
+									}
+									cur.add(id);
+								}
+								state.answers[q.id] = Array.from(cur);
+							}
+							saveState();
+							renderAll();
+						});
 					});
 				}
 				else if (q.type === 'input') {

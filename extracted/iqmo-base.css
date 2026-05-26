@@ -56,7 +56,7 @@ a {
 	text-decoration: none;
 }
 
-button:not(.pill-btn):not(.lm-btn):not(.pd-cta):not(.soc-write):not(.soc-compose-send):not(.soc-compose-cancel):not(.soc-more):not(.soc-react):not(.soc-replies) {
+button:not(.pill-btn):not(.lm-btn):not(.pd-cta):not(.nav-task):not(.soc-write):not(.soc-compose-send):not(.soc-compose-cancel):not(.soc-more):not(.soc-react):not(.soc-replies) {
 	font-family: inherit;
 	cursor: pointer;
 	border: 0;
