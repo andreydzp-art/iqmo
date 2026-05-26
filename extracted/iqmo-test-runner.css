@@ -820,6 +820,25 @@
     .qcard::after{ font-size: 120px; }
   }
 
+/* === Hub (выбор варианта): не применять глобальные правила runner === */
+html.is--hub .shell{
+  max-width: none;
+  margin: 0;
+  padding: 0 0 56px;
+}
+html.is--hub body{
+  font-family: 'Manrope', system-ui, sans-serif;
+  min-height: 0;
+}
+html.is--hub .topnav .brand-mark{
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+html.is--hub .topnav .brand-mark::after{ content: none; }
+
 /* === IQMO prod: hub + legacy question markup inside runner v4 === */
 html.is--runner-v4 body{ background: var(--bg); }
 html.is--runner-v4 #hub-shell .topnav{ margin-bottom: 0; }
