@@ -342,15 +342,15 @@
 			'<span class="reward-shop__shimmer" aria-hidden="true"></span>' +
 			'<span class="reward-shop__glow" aria-hidden="true"></span>' +
 			'<span class="reward-shop__lock" aria-hidden="true">' + LOCK_SVG + '</span>' +
-			'<div class="reward-shop__inner">' +
-			'<div class="reward-shop__art">' +
-			'<img src="/site/assets/rewards-shop-bag.png" alt="" width="96" height="96" decoding="async" draggable="false" />' +
+			'<div class="ng-top">' +
+			'<div class="ng-ico reward-shop__ico">' +
+			'<img class="reward-shop__bag" src="/site/assets/rewards-shop-bag.png" alt="" width="24" height="24" decoding="async" draggable="false" />' +
 			'</div>' +
-			'<div class="reward-shop__body">' +
-			'<h3 class="reward-shop__title">Лавка наград</h3>' +
-			'<p class="reward-shop__desc">Обменивайте XP на реальные подарки</p>' +
-			'<p class="reward-shop__sub">Откроется с ' + REWARD_SHOP_UNLOCK + ' уровня</p>' +
-			'</div></div>' +
+			'<span class="reward-shop__title">Лавка наград</span>' +
+			'</div>' +
+			'<div class="ng-text">Обменивайте XP на реальные подарки</div>' +
+			'<div class="ng-bar" aria-hidden="true"><i style="width:0"></i></div>' +
+			'<div class="ng-foot">Откроется с ' + REWARD_SHOP_UNLOCK + ' уровня</div>' +
 			'<div class="reward-shop__tip" role="tooltip">Достигните ' + REWARD_SHOP_UNLOCK + ' уровня, чтобы открыть магазин наград</div>' +
 			'</article>'
 		);
