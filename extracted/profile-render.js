@@ -721,13 +721,8 @@
 		var isPublic = !!data.isPublic;
 		var profileId = data.profileData && data.profileData.profileId;
 		var settingsBlock = isPublic ? '' : renderSettingsGuest() + renderSettingsAccount(profileId, data.profileData);
-		var liveBlock = isPublic
-			? ''
-			: '<section class="prof-live-act" aria-label="Активность на платформе">' +
-			  '<div data-iqmo-live-feed data-title="Что происходит в IQMO"></div></section>';
 		return (
 			renderGoals(data.nextGoalsData, isPublic) +
-			liveBlock +
 			(isPublic ? '' : renderXpGuide()) +
 			renderAchievements(data.achievementsData, data.profileData && data.profileData.avatarUrl) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +

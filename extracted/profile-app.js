@@ -32,13 +32,6 @@
 			if (pub && global.IqmoLiveActivity) {
 				pub.checked = !!IqmoLiveActivity.readPublicOptIn();
 			}
-			var feed = document.querySelector('#prof-root [data-iqmo-live-feed]');
-			if (feed && global.IqmoLiveActivity && IqmoLiveActivity.mountFeed) {
-				IqmoLiveActivity.mountFeed(feed, { title: 'Что происходит в IQMO', place: 'profile' });
-			}
-			if (global.IqmoLiveActivity && IqmoLiveActivity.init) {
-				IqmoLiveActivity.init({});
-			}
 		} catch (eLive) {}
 	}
 
