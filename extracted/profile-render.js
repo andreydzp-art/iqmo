@@ -161,11 +161,14 @@
 		return (
 			'<div class="sec-row" role="group" aria-label="Краткая статистика">' +
 			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига · неделя</div></div>' + leagueDelta + '</div>' +
+			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига · неделя</div></div>' +
+			(leagueDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
 			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div>' + accDelta + '</div>' +
+			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div>' +
+			(accDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
 			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Курс · биология</div></div>' + courseDelta + '</div>' +
+			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Курс · биология</div></div>' +
+			(courseDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
 			'</div>'
 		);
 	}

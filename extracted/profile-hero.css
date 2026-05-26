@@ -542,7 +542,7 @@
     backdrop-filter:blur(10px);
     border:1px solid rgba(124,58,237,.14);
     border-radius:14px;
-    display:flex; align-items:center; gap:12px;
+    display:flex; align-items:flex-start; gap:12px;
     overflow:hidden;
     box-shadow: 0 6px 16px -10px rgba(56,90,200,.2), inset 0 1px 0 rgba(255,255,255,.8);
   }
@@ -572,11 +572,20 @@
     font-family:'JetBrains Mono',monospace;
   }
 .iqmo-hero.v3 .qstat .q-delta{
+    flex:0 0 auto;
+    align-self:center;
     margin-left:auto;
     font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:800;
     padding:3px 7px; border-radius:6px;
     background:rgba(16,185,129,.10); color:#047857;
     border:1px solid rgba(16,185,129,.25);
+  }
+.iqmo-hero.v3 .qstat .q-delta:empty{
+    visibility:hidden;
+    min-width:42px;
+    padding:3px 7px;
+    border-color:transparent;
+    background:transparent;
   }
 .iqmo-hero.v3 .qstat.league .q-delta{background:rgba(14,165,233,.10); color:#0369a1; border-color:rgba(14,165,233,.25);}
 .iqmo-hero.v3 .qstat.course .q-delta{background:rgba(124,58,237,.10); color:#5b21b6; border-color:rgba(124,58,237,.25);}
