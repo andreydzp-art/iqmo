@@ -265,12 +265,33 @@
 		}
 	}
 
+	var BADGE_LIVE_TITLES = {
+		welcome: 'Старт',
+		three_tests: 'Тройка тестов',
+		streak7: 'Неделя ритма',
+		chem_stage1: 'Этап 1 · Химия',
+		bio_stage1: 'Этап 1 · Биология',
+		ten_tests: 'Десятка',
+		perfect_run: 'Без ошибок',
+		topic_star: 'Мастер темы',
+		final_sprint: 'Финишный рывок'
+	};
+
 	function unlockBadge(id) {
 		if (!id) return;
 		const b = loadBadges();
 		if (b[id]) return;
 		b[id] = Date.now();
 		lsSet(KEY_BADGES, b);
+		try {
+			if (global.IqmoLiveActivity && IqmoLiveActivity.emit) {
+				IqmoLiveActivity.emit({
+					type: 'badge_earned',
+					badgeId: id,
+					badgeName: BADGE_LIVE_TITLES[id] || id
+				});
+			}
+		} catch (eLive) {}
 		if (id === 'three_tests') {
 			try {
 				queueProfileCelebration('three_tests');
@@ -643,6 +664,14 @@
 				streak.lastDay = today;
 			}
 			lsSet(KEY_STREAK, streak);
+			try {
+				if (global.IqmoLiveActivity && IqmoLiveActivity.emit && (streak.days || 0) >= 2) {
+					IqmoLiveActivity.emit({ type: 'streak_saved', streakDays: streak.days });
+				}
+				if (global.IqmoLiveActivity && IqmoLiveActivity.emit) {
+					IqmoLiveActivity.emit({ type: 'daily_goal_completed' });
+				}
+			} catch (eSt) {}
 			if ((streak.days || 0) >= 7) {
 				unlockBadge('streak7');
 			}

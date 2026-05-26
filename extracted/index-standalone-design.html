@@ -248,6 +248,10 @@ h1,h2,h3,p{margin:0}
   box-shadow:var(--shadow-card);
 }
 .hero__pill .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgba(35,211,164,.2);animation:pulse 2s infinite}
+.hero__live{margin-bottom:14px}
+.hero__live .live-act-ticker-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.hero__live .live-act-online{font-size:13px;font-weight:600;color:var(--ink-2)}
+.hero__live .live-act-ticker{font-size:12px;color:var(--muted);min-height:20px}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(35,211,164,.2)}50%{box-shadow:0 0 0 8px rgba(35,211,164,0)}}
 
 .hero h1{
@@ -953,7 +957,7 @@ h1,h2,h3,p{margin:0}
   <div class="hero__deco"></div>
   <div class="wrap hero__grid">
     <div class="hero__copy">
-      <span class="hero__pill"><span class="dot"></span>Сейчас занимается 1 247 человек</span>
+      <div class="hero__live" data-iqmo-live-ticker></div>
       <h1>
         Подготовка к ОГЭ —<br/>
         как <span class="underline">игра</span>,<br/>
@@ -1315,8 +1319,10 @@ h1,h2,h3,p{margin:0}
   </div>
 </footer>
 
+<link rel="stylesheet" href="/iqmo-live-activity.css?v=1" />
 <script src="./iqmo-sync.js"></script>
-<script src="./chem-progress.js"></script>
+<script src="./chem-progress.js?v=9"></script>
+<script src="/iqmo-live-activity.js?v=1"></script>
 <script src="./iqmo-nav.js"></script>
 <script>
 (function () {

@@ -22,7 +22,24 @@
 		var data = IqmoProfileData.build(meUser);
 		IqmoProfileRender.render(data, { preserveHero: !!fromSync });
 		syncProfAuthVisibility(!!(meUser && meUser.id != null));
+		syncLiveActivityProfile();
 		tryCelebrate(data);
+	}
+
+	function syncLiveActivityProfile() {
+		try {
+			var pub = document.getElementById('prof-live-activity-public');
+			if (pub && global.IqmoLiveActivity) {
+				pub.checked = !!IqmoLiveActivity.readPublicOptIn();
+			}
+			var feed = document.querySelector('#prof-root [data-iqmo-live-feed]');
+			if (feed && global.IqmoLiveActivity && IqmoLiveActivity.mountFeed) {
+				IqmoLiveActivity.mountFeed(feed, { title: 'Что происходит в IQMO', place: 'profile' });
+			}
+			if (global.IqmoLiveActivity && IqmoLiveActivity.init) {
+				IqmoLiveActivity.init({});
+			}
+		} catch (eLive) {}
 	}
 
 	function syncProfAuthVisibility(loggedIn) {
@@ -124,6 +141,12 @@
 			}
 			refresh();
 			iqmoToast(res.name ? 'Имя в профиле обновлено' : 'Имя сброшено');
+		});
+
+		document.addEventListener('change', function (e) {
+			var livePub = e.target.closest('#prof-live-activity-public');
+			if (!livePub || !global.IqmoLiveActivity || !IqmoLiveActivity.setPublicOptIn) return;
+			IqmoLiveActivity.setPublicOptIn(!!livePub.checked);
 		});
 
 		document.addEventListener('click', async function (e) {

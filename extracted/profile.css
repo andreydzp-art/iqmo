@@ -1323,6 +1323,13 @@
   margin-top:16px;
 }
 .prof-settings .prof-settings__box--wide{grid-column:1/-1}
+.prof-live-opt{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;color:var(--ink-2);line-height:1.45;cursor:pointer;
+}
+.prof-live-opt input{margin-top:3px;accent-color:var(--primary)}
+.prof-live-act{margin:0 0 20px}
+.prof-live-act .live-act-card{margin:0}
 .prof-name-form{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .prof-name-input{
   flex:1 1 180px;min-width:0;height:38px;padding:0 12px;

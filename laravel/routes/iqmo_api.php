@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AnalyticsIngestController;
 use App\Http\Controllers\Api\IqmoPublicProfileController;
 use App\Http\Controllers\Api\IqmoAuthController;
 use App\Http\Controllers\Api\IqmoLeaderboardController;
+use App\Http\Controllers\Api\IqmoLiveActivityController;
 use App\Http\Controllers\Api\IqmoProfileController;
 use App\Http\Controllers\Api\QuizLeadController;
 use App\Http\Controllers\Api\QuizTrackController;
@@ -26,6 +27,9 @@ Route::prefix('api')->group(function (): void {
     Route::get('/me', [IqmoAuthController::class, 'me']);
 
     Route::get('/leaderboard', [IqmoLeaderboardController::class, 'index']);
+
+    Route::get('/live-activity', [IqmoLiveActivityController::class, 'index'])
+        ->middleware('throttle:60,1');
 
     // Публичный профиль по Profile ID (IQ-0868). Без auth; без e-mail.
     Route::get('/profile/{profileId}', [IqmoPublicProfileController::class, 'show'])
@@ -48,6 +52,9 @@ Route::prefix('api')->group(function (): void {
 
         Route::post('/analytics/events', [AnalyticsIngestController::class, 'store'])
             ->middleware('throttle:analytics-ingest');
+
+        Route::post('/live-activity', [IqmoLiveActivityController::class, 'store'])
+            ->middleware('throttle:30,1');
     });
 
     // Anonymous quiz tracking (no auth). Stores drop-off + email-gate funnel.

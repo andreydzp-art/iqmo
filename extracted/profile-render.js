@@ -559,6 +559,11 @@
 			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Завершить вход на всех устройствах.</p>' +
 			'<button type="button" class="btn btn--ghost" id="prof-logout-everywhere">Выйти на всех устройствах</button>' +
 			'<p id="prof-logout-everywhere-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
+			'<div class="prof-settings__box prof-settings__box--wide">' +
+			'<h3 style="margin:0 0 8px;font-size:14px">Живая активность</h3>' +
+			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Имя в ленте достижений (без фамилии и школы). Если выключено — «Ученик прошёл тему…».</p>' +
+			'<label class="prof-live-opt"><input type="checkbox" id="prof-live-activity-public" /> ' +
+			'Показывать мои достижения в общей активности</label></div>' +
 			pubLink +
 			'</div></section>'
 		);
@@ -716,8 +721,13 @@
 		var isPublic = !!data.isPublic;
 		var profileId = data.profileData && data.profileData.profileId;
 		var settingsBlock = isPublic ? '' : renderSettingsGuest() + renderSettingsAccount(profileId, data.profileData);
+		var liveBlock = isPublic
+			? ''
+			: '<section class="prof-live-act" aria-label="Активность на платформе">' +
+			  '<div data-iqmo-live-feed data-title="Что происходит в IQMO"></div></section>';
 		return (
 			renderGoals(data.nextGoalsData, isPublic) +
+			liveBlock +
 			(isPublic ? '' : renderXpGuide()) +
 			renderAchievements(data.achievementsData, data.profileData && data.profileData.avatarUrl) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +

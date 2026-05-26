@@ -356,7 +356,7 @@
 
 </style>
 </head>
-<body>
+<body data-live-subject="chemistry">
 <div class="shell">
 
   <!-- TOP NAV (unified) -->
@@ -387,6 +387,10 @@
        мог скрыть разделитель рядом с «Главная», см. ветку BREADCRUMB_SEL. -->
   <div class="crumbs breadcrumbs">
     <a href="/" class="iqmo-only-guest">Главная</a><span class="sep crumbs__sep iqmo-only-guest">/</span><span>Предметы</span><span class="sep crumbs__sep">/</span><b>Химия · ОГЭ 2026</b>
+  </div>
+
+  <div class="subj-live-wrap" style="max-width:1320px;margin:0 auto 14px;padding:0 24px">
+    <div data-iqmo-live-feed data-title="Сейчас в химии"></div>
   </div>
 
   <!-- PAGE HEAD -->
@@ -809,7 +813,9 @@
 
 <script src="/chemistry-bank.js?v=11"></script>
 <script src="/iqmo-avatar.js?v=1"></script>
-<script src="/chem-progress.js?v=7"></script>
+<link rel="stylesheet" href="/iqmo-live-activity.css?v=1" />
+<script src="/chem-progress.js?v=9"></script>
+<script src="/iqmo-live-activity.js?v=1"></script>
 <script src="/mistakes-store.js"></script>
 <script src="/chemistry-topic-map.js"></script>
 <script src="/chemistry-categories.js?v=9"></script>
