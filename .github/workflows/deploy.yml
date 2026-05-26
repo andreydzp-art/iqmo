@@ -363,6 +363,13 @@ jobs:
             exit 1
           fi
 
+          code_bio_leg=$(curl -sS -o /dev/null -w "%{http_code}" \
+            "$BASE/img/biology/q165-t16-leg-skeleton.png" || true)
+          if [ "$code_bio_leg" != "200" ]; then
+            echo "GET /img/biology/q165-t16-leg-skeleton.png expected 200, got $code_bio_leg"
+            exit 1
+          fi
+
           for doc in oferta.pdf privacy_policy.pdf; do
             code_doc=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/docs/$doc" || true)
             if [ "$code_doc" != "200" ]; then

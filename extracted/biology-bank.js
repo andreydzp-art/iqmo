@@ -2668,7 +2668,7 @@ window.BIOLOGY_QUESTIONS = [
 		body:
 			'<p>Выберите <b>три</b> верно обозначенные подписи к рисунку, на котором изображено строение скелета ног человека.</p>' +
 			'<figure class="q-figure" role="group" aria-label="Скелет нижних конечностей">' +
-			'<img class="q-figure__img" src="/img/biology/q165-t16-leg-skeleton.png?v=1" alt="Скелет ног: 1 — тазобедренные кости, 2 — бедренная кость, 3 — малая берцовая кость, 4 — большая берцовая кость, 5 — кости кисти, 6 — кость предплюсны" loading="lazy" decoding="async" />' +
+			'<img class="q-figure__img" src="/img/biology/q165-t16-leg-skeleton.png?v=2" alt="Скелет ног: 1 — тазобедренные кости, 2 — бедренная кость, 3 — малая берцовая кость, 4 — большая берцовая кость, 5 — кости кисти, 6 — кость предплюсны" loading="lazy" decoding="async" />' +
 			'</figure>',
 		options: [
 			{ id: '1', label: 'тазобедренные кости' },
