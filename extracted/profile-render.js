@@ -108,22 +108,15 @@
 	function daysInIqmoShort(ts) {
 		if (!ts) return '';
 		var days = Math.max(1, Math.floor((Date.now() - ts * 1000) / 86400000));
-		return 'D+' + days + ' / IQMO';
+		return days + ' ' + pluralRu(days, ['день', 'дня', 'дней']) + ' в IQMO';
 	}
 
 	function metaRankLineV3(signals, d) {
-		var rank = (signals || []).find(function (s) { return s.kind === 'rank'; });
-		if (rank) {
-			var t = String(rank.text || '');
-			return 'RANK · ' + esc(t.replace(/^Ранг\s*/i, ''));
-		}
-		return 'RANK · «' + esc(d.levelTitle || 'Старт') + '»';
+		return metaRankLine(signals, d);
 	}
 
 	function courseMetaLineV3(signals, d) {
-		var top = (signals || []).find(function (s) { return s.kind === 'top'; });
-		if (top) return esc(top.text).toUpperCase();
-		return 'TOP ' + esc(d.coursePct) + '%';
+		return courseMetaLine(signals, d);
 	}
 
 	function renderStreakCaps(days) {
@@ -168,11 +161,11 @@
 		return (
 			'<div class="sec-row" role="group" aria-label="Краткая статистика">' +
 			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">LEAGUE · WEEK</div></div>' + leagueDelta + '</div>' +
+			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига · неделя</div></div>' + leagueDelta + '</div>' +
 			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">ACCURACY</div></div>' + accDelta + '</div>' +
+			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div>' + accDelta + '</div>' +
 			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">COURSE · BIO</div></div>' + courseDelta + '</div>' +
+			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Курс · биология</div></div>' + courseDelta + '</div>' +
 			'</div>'
 		);
 	}
@@ -221,7 +214,7 @@
 		var holoRing = avHoloRingStyle(xpPct);
 		var avPctChip =
 			'<div class="av-pct">' + xpPct + '%</div>' +
-			'<div class="av-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>LVL ' + d.level + '</div>';
+			'<div class="av-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>Ур. ' + d.level + '</div>';
 		var avBlock = canEdit
 			? (
 				'<div class="av av--editable">' +
@@ -242,21 +235,22 @@
 		var xpMax = d.nextLevel ? d.xpLevelMax : d.xpCurrent;
 		var xpNums = IqmoProfileData.fmtPts(d.xpCurrent) + ' / ' + IqmoProfileData.fmtPts(xpMax);
 		var xpEye = d.nextLevel
-			? 'XP · LVL ' + d.level + ' → ' + d.nextLevel
-			: 'XP · LVL ' + d.level;
+			? 'XP · ур. ' + d.level + ' → ' + d.nextLevel
+			: 'XP · ур. ' + d.level;
 		var xpNext = d.nextLevel
-			? 'next: <b>' + d.nextLevel + ' · «' + esc(d.levelTitle || '') + '»</b>'
-			: 'max level';
+			? 'след.: <b>' + d.nextLevel + ' · «' + esc(d.levelTitle || '') + '»</b>'
+			: 'макс. уровень';
 		var xpUntil = d.nextLevel
-			? '▸ ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до LVL ' + d.nextLevel
+			? '▸ ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до ур. ' + d.nextLevel
 			: '';
 		var streakFill = Math.min(100, Math.round((Math.min(streakDays, 7) / 7) * 100));
 		var daysLeft = Math.max(0, 7 - streakDays);
-		var vaultTitle = 'IRON WILL';
+		var vaultTitle = 'Неделя ритма';
 		if (global.IqmoProfileData && IqmoProfileData.ACHIEVEMENT_CATALOG) {
 			var ach = IqmoProfileData.ACHIEVEMENT_CATALOG.find(function (a) { return a.id === 'streak7'; });
-			if (ach) vaultTitle = String(ach.title).replace(/[«»]/g, '').trim().toUpperCase();
+			if (ach) vaultTitle = String(ach.title).replace(/[«»]/g, '').trim();
 		}
+		var daysLeftWord = pluralRu(daysLeft, ['день', 'дня', 'дней']);
 		var streakWarn = streakDays > 0
 			? 'Серия заряжена — продли до конца дня <b>сегодня</b>'
 			: 'Начните серию — закройте дневную цель';
@@ -288,7 +282,7 @@
 			'<div class="xp-bar" role="progressbar" aria-valuenow="' + xpPct + '" aria-valuemin="0" aria-valuemax="100">' +
 			'<div class="xp-fill" style="width:' + xpPct + '%"></div></div>' +
 			'<div class="xp-foot">' +
-			'<span>WEEKLY <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b> · streak ' + streakMultLabel(streakDays) + '</span>' +
+			'<span>За неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b> · серия ' + streakMultLabel(streakDays) + '</span>' +
 			(xpUntil ? '<span class="untill">' + xpUntil + '</span>' : '<span class="untill"></span>') +
 			'</div></div>' +
 			renderHeroStatsRow(d, leagueDelta, accDelta, courseDelta) +
@@ -314,17 +308,17 @@
 			'</svg></span></div>' +
 			'<div class="s-big">' +
 			'<span class="num">' + streakDays + '</span>' +
-			'<span class="lbl">DAYS / СЕРИЯ</span></div></div>' +
+			'<span class="lbl">' + streakLabel(streakDays) + '</span></div></div>' +
 			'<div class="s-warn">' + streakWarn + '</div>' +
 			'<div class="s-prog">' +
 			'<div class="s-prog-bar" aria-label="' + streakDays + ' из 7 дней"><div class="s-prog-fill" style="width:' + streakFill + '%"></div></div>' +
 			'<div class="s-prog-foot">' +
-			'<span>' + pad2(Math.min(streakDays, 7)) + ' / 07 → <b>+' + daysLeft + ' DAY</b></span>' +
+			'<span>' + pad2(Math.min(streakDays, 7)) + ' / 07 → <b>+' + daysLeft + ' ' + daysLeftWord + '</b></span>' +
 			'<span class="rew"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4z"/></svg>' +
-			esc(vaultTitle) + ' +200XP</span></div></div>' +
+			esc(vaultTitle) + ' +200 XP</span></div></div>' +
 			'<a class="s-cta" href="' + esc(reviewHref) + '">' +
 			'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>' +
-			'▸ QUICK REVIEW · 5 MIN</a>' +
+			'▸ Быстрое повторение · 5 мин</a>' +
 			'</div></div></section>'
 		);
 	}
