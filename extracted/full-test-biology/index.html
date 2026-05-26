@@ -1684,7 +1684,9 @@
 
 			function isAnswered(id) {
 				const a = state.answers[id];
-				if (Array.isArray(a)) return a.length > 0;
+				if (Array.isArray(a)) {
+					return a.some(v => v !== undefined && v !== null && String(v).trim() !== '');
+				}
 				return a !== undefined && a !== '';
 			}
 
@@ -1986,11 +1988,13 @@
 				else if (q.type === 'match') {
 					elCard.querySelectorAll('.match__select').forEach(sel => {
 						sel.addEventListener('change', () => {
+							const was = isAnswered(q.id);
 							const cur = Array.isArray(state.answers[q.id]) ? [...state.answers[q.id]] : [];
 							const idx = Number(sel.dataset.idx);
 							cur[idx] = sel.value;
 							state.answers[q.id] = cur;
 							saveState();
+							if (!was && isAnswered(q.id)) rewardAfterAnswer(q, sel);
 							renderNav();
 						});
 					});
