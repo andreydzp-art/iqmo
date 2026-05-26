@@ -129,6 +129,23 @@
 	var CAM_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-1V7a3 3 0 0 0-3-3H9zm0 2h6a1 1 0 0 1 1 1v1H8V7a1 1 0 0 1 1-1zm-2 5h10l-4.5 5.4L11 13l-2 2.4L7 13z"/></svg>';
 	var PEN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
 
+	function renderHeroStatsRow(d, leagueDelta) {
+		var accVal = d.accuracyPct != null ? String(d.accuracyPct) : '—';
+		var accUnit = d.accuracyPct != null ? '<span class="unit">%</span>' : '';
+		return (
+			'<div class="hero-secondary">' +
+			'<div class="hero-secondary__spacer" aria-hidden="true"></div>' +
+			'<div class="sec-row" role="group" aria-label="Краткая статистика">' +
+			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
+			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига</div></div>' + leagueDelta + '</div>' +
+			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
+			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div></div>' +
+			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
+			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Пройдено курса</div></div></div>' +
+			'</div></div>'
+		);
+	}
+
 	function renderNameRow(d, isPublic) {
 		if (isPublic) {
 			return (
@@ -212,8 +229,6 @@
 		var streakUrg = streakDays > 0
 			? 'Закройте дневную цель, чтобы <b>сохранить серию</b>'
 			: '';
-		var accVal = d.accuracyPct != null ? String(d.accuracyPct) : '—';
-		var accUnit = d.accuracyPct != null ? '<span class="unit">%</span>' : '';
 		var leagueDelta = d.leagueDelta
 			? '<div class="q-delta">▲ ' + d.leagueDelta + '</div>'
 			: '';
@@ -222,7 +237,6 @@
 			'<section class="iqmo-hero">' +
 			'<div class="hero-deco"><span class="pp a"></span><span class="pp b"></span><span class="pp c"></span></div>' +
 			'<div class="hero-inner">' +
-			'<div class="hero-main">' +
 			avBlock +
 			'<div class="h-id">' +
 			renderNameRow(d, isPublic) +
@@ -238,15 +252,7 @@
 			'<div class="xp-fill" style="width:' + xpPct + '%"></div>' +
 			'<div class="xp-dot" style="left:' + xpPct + '%"></div></div>' +
 			'<div class="xp-foot"><span>' + xpFootLeft + '</span><span class="week">за неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b></span></div>' +
-			'</div>' +
-			'<div class="hero-stats" role="group" aria-label="Краткая статистика">' +
-			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига</div></div>' + leagueDelta + '</div>' +
-			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div></div>' +
-			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Пройдено курса</div></div></div>' +
-			'</div></div></div>' +
+			'</div></div>' +
 			'<div class="' + streakCardClass(streakDays) + '">' +
 			'<div class="atm-aura"></div><span class="atm-dot d1"></span><span class="atm-dot d2"></span><span class="atm-dot d3"></span>' +
 			'<div class="streak-top">' +
@@ -278,7 +284,9 @@
 			'<div class="vault-name">' + esc(vaultName) + '</div><div class="vault-xp">' + vaultXp + '</div></div>' +
 			'<span class="vault-tag">★ Rare</span></div>' +
 			(streakUrg ? '<div class="s-urg"><span class="pulse"></span><span>' + streakUrg + '</span></div>' : '') +
-			'</div></div></section>'
+			'</div></div>' +
+			renderHeroStatsRow(d, leagueDelta) +
+			'</section>'
 		);
 	}
 
