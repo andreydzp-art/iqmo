@@ -968,6 +968,28 @@ html.is--runner-v4 .qbody{
   margin: 0 0 24px;
   max-width: 70ch;
 }
+/* Иллюстрации: в раннере .qbody, в legacy — .q-body (те же лимиты, что в full-test-*) */
+html.is--runner-v4 .qbody .q-figure,
+html.is--runner-v4 .q-body .q-figure{
+  margin: 12px auto 14px;
+  max-width: min(100%, 380px);
+  width: 100%;
+}
+html.is--runner-v4 .qbody .q-figure--wide,
+html.is--runner-v4 .q-body .q-figure--wide{
+  max-width: min(100%, 520px);
+}
+html.is--runner-v4 .qbody .q-figure__img,
+html.is--runner-v4 .qbody img,
+html.is--runner-v4 .q-body .q-figure__img,
+html.is--runner-v4 .q-body img{
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  max-height: 360px;
+  height: auto;
+  object-fit: contain;
+}
 html.is--runner-v4 .qmeta-tag{
   font-size: 12px;
   padding: 7px 13px;
