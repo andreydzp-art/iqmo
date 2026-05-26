@@ -118,9 +118,7 @@
 
 		var examSub = document.getElementById('exam-subbar');
 		if (examSub) {
-			examSub.innerHTML =
-				stageHtml(opts) +
-				'<div class="runner-live-ticker" id="runner-live-ticker" aria-live="polite"></div>';
+			examSub.innerHTML = stageHtml(opts);
 			examSub.classList.add('runner-v4-exam-subbar');
 		}
 
