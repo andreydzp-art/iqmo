@@ -33,7 +33,7 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-		<link rel="stylesheet" href="/iqmo-base.css?v=8" />
+		<link rel="stylesheet" href="/iqmo-base.css?v=9" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
 		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=3" />
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
@@ -195,9 +195,19 @@
 			}
 			.nav-task:hover { background: #e2e7f0; }
 			.nav-task.is--answered { background: #e7f6ec; color: #2fa968; }
-			.nav-task.is--flagged::after {
-				content: ""; position: absolute; top: 3px; right: 3px;
-				width: 6px; height: 6px; border-radius: 50%; background: var(--amber);
+			.nav-task.is--flagged:not(.is--current) {
+				background: #fdecd6;
+				color: #8a5a1c;
+				border-color: #f0d59a;
+			}
+			.nav-task.is--flagged.is--answered:not(.is--current) {
+				background: #e7f6ec;
+				color: #2fa968;
+				border-color: #f59e0b;
+				box-shadow: inset 0 0 0 2px rgba(245, 158, 11, 0.45);
+			}
+			.nav-task.is--flagged.is--current {
+				box-shadow: 0 4px 10px -2px rgba(79,123,214,.5), inset 0 0 0 2px #f59e0b;
 			}
 			.nav-task.is--current { border-color: var(--accent); background: var(--accent); color: #fff; box-shadow: 0 4px 10px -2px rgba(79,123,214,.5); }
 
@@ -1660,6 +1670,7 @@
 									'at-' + Date.now().toString(36);
 							}
 							if (s.startEventSent == null) s.startEventSent = false;
+							if (!s.flagged || typeof s.flagged !== 'object') s.flagged = {};
 							return s;
 						}
 					}
@@ -1979,8 +1990,10 @@
 			function wireQuestion(q) {
 				// flag
 				document.getElementById('btn-flag').addEventListener('click', () => {
+					if (!state.flagged || typeof state.flagged !== 'object') state.flagged = {};
 					const wasFlagged = !!state.flagged[q.id];
-					state.flagged[q.id] = !wasFlagged;
+					if (wasFlagged) delete state.flagged[q.id];
+					else state.flagged[q.id] = true;
 					saveState();
 					if (!wasFlagged) { try { gmCompanionSay('flag', { force: true }); } catch(e) {} }
 					renderAll();
