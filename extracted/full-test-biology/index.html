@@ -33,6 +33,7 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="/iqmo-base.css?v=9" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
 		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=3" />
@@ -1402,6 +1403,10 @@
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/iqmo-avatar.js?v=1"></script>
 		<script src="/chem-progress.js?v=9"></script>
+		<link rel="stylesheet" href="/iqmo-test-runner.css?v=1" />
+		<script src="/iqmo-test-runner-layout.js?v=1"></script>
+		<script src="/iqmo-test-runner-rewards.js?v=1"></script>
+		<script src="/iqmo-test-runner-fx.js?v=1"></script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
@@ -1506,6 +1511,22 @@
 			const FULL_MIN = window.getExamTimerMinutes ? getExamTimerMinutes(EXAM_SUBJECT, 'full') : 180;
 			const TEST_SECONDS = FULL_MIN * 60;
 			const state = loadState();
+
+			var _runnerStreak = 0;
+			try {
+				var _st = JSON.parse(localStorage.getItem('iqmo-chem-streak') || 'null');
+				if (_st && _st.days) _runnerStreak = _st.days;
+			} catch (_eSt) {}
+
+			const _runnerRefs = (window.IqmoTestRunnerLayout && IqmoTestRunnerLayout.install({
+				subjectEyebrow: 'Биология · ОГЭ 2026',
+				variantTitle: 'Полный вариант',
+				variantId: activeVariant.id,
+				questionCount: QUESTIONS.length,
+				currentIndex: state.current,
+				streakDays: _runnerStreak
+			})) || {};
+			if (window.IqmoTestRunnerRewards) IqmoTestRunnerRewards.reset();
 
 			function loadState() {
 				try {
@@ -1643,11 +1664,11 @@
 			// ============================================================
 			// RENDER
 			// ============================================================
-			const elCard = document.getElementById('q-card');
-			const elNavGrid = document.getElementById('nav-grid');
-			const elPb = document.getElementById('pb-fill');
-			const elAnsweredCount = document.getElementById('answered-count');
-			const elTotalCount = document.getElementById('total-count');
+			const elCard = _runnerRefs.elCard || document.getElementById('q-card');
+			const elNavGrid = _runnerRefs.elNavGrid || document.getElementById('nav-grid');
+			const elPb = _runnerRefs.elPb || document.getElementById('pb-fill');
+			const elAnsweredCount = _runnerRefs.elAnsweredCount || document.getElementById('answered-count');
+			const elTotalCount = _runnerRefs.elTotalCount || document.getElementById('total-count');
 			elTotalCount.textContent = String(QUESTIONS.length);
 
 			// Сколько из QUESTIONS — письменные (часть 2)
@@ -1677,15 +1698,19 @@
 				for (let i = 0; i < total; i++) {
 					const q = QUESTIONS[i];
 					const btn = document.createElement('button');
-					btn.className = 'nav-task';
+					btn.type = 'button';
+					btn.className = 'qchip';
 					btn.textContent = i + 1;
-					if (i === state.current) btn.classList.add('is--current');
-					if (q && isAnswered(q.id)) btn.classList.add('is--answered');
-					if (q && state.flagged[q.id]) btn.classList.add('is--flagged');
+					btn.setAttribute('aria-label', 'Задание ' + (i + 1));
+					if (i === state.current) btn.classList.add('is-current');
+					else if (q && isAnswered(q.id)) btn.classList.add('is-answered');
+					else if (q && state.flagged[q.id]) btn.classList.add('is-postponed');
+					else btn.classList.add('is-pending');
 					if (q && q.type === 'written') btn.classList.add('is--written');
 					if (!q) { btn.disabled = true; btn.style.opacity = '.35'; btn.style.cursor = 'not-allowed'; btn.title = 'Задание будет добавлено'; }
 					btn.addEventListener('click', () => {
 						if (!q) return;
+						try { if (window.IqmoTestRunnerRewards) IqmoTestRunnerRewards.maybeMilestone(i + 1); } catch (_eM) {}
 						markReturnLaterIfUnanswered(QUESTIONS[state.current]);
 						state.current = i;
 						saveState();
@@ -1695,7 +1720,7 @@
 				}
 				const answered = QUESTIONS.filter(q => isAnswered(q.id)).length;
 				elAnsweredCount.textContent = answered;
-				elPb.style.width = (answered / total * 100) + '%';
+				elPb.style.width = Math.max(5, (answered / total * 100)) + '%';
 			}
 
 			function formatBody(html) {
@@ -1848,6 +1873,13 @@
 				return '';
 			}
 
+			function rewardAfterAnswer(q, el) {
+				try {
+					if (!window.IqmoTestRunnerRewards) return;
+					if (isAnswered(q.id)) IqmoTestRunnerRewards.onFirstAnswer(q, el);
+				} catch (_eRw) {}
+			}
+
 			function wireQuestion(q) {
 				// flag
 				document.getElementById('btn-flag').addEventListener('click', () => {
@@ -1878,6 +1910,7 @@
 					const isMulti = q.type === 'multi';
 					elCard.querySelectorAll('.option').forEach(el => {
 						el.addEventListener('click', () => {
+							const was = isAnswered(q.id);
 							const id = el.dataset.id;
 							if (!isMulti) {
 								state.answers[q.id] = id;
@@ -1894,6 +1927,8 @@
 								state.answers[q.id] = Array.from(cur);
 							}
 							saveState();
+							if (!was && isAnswered(q.id)) rewardAfterAnswer(q, el);
+							else if (was && window.IqmoTestRunnerRewards) IqmoTestRunnerRewards.onAnswerChanged(q);
 							renderAll();
 						});
 					});
@@ -1901,8 +1936,10 @@
 				else if (q.type === 'input') {
 					const input = document.getElementById('ans-input');
 					input.addEventListener('input', () => {
+						const was = isAnswered(q.id);
 						state.answers[q.id] = input.value.trim();
 						saveState();
+						if (!was && isAnswered(q.id)) rewardAfterAnswer(q, input);
 						renderNav();
 					});
 				}
@@ -1935,8 +1972,8 @@
 			// ============================================================
 			// TIMER
 			// ============================================================
-			const elTimer = document.getElementById('timer');
-			const elTimerVal = document.getElementById('timer-val');
+			const elTimer = _runnerRefs.elTimer || document.getElementById('timer');
+			const elTimerVal = _runnerRefs.elTimerVal || document.getElementById('timer-val');
 			function tickTimer() {
 				if (state.finished) return;
 				const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
@@ -1945,10 +1982,11 @@
 				const m = Math.floor((left % 3600) / 60);
 				const s = left % 60;
 				elTimerVal.textContent = [h, m, s].map(x => String(x).padStart(2,'0')).join(':');
-				const wasWarn = elTimer.classList.contains('is--warning');
-				const wasDanger = elTimer.classList.contains('is--danger');
-				elTimer.classList.toggle('is--warning', left < 20*60 && left >= 5*60);
-				elTimer.classList.toggle('is--danger', left < 5*60);
+				const wasWarn = elTimer.classList.contains('warn') || elTimer.classList.contains('is--warning');
+				const wasDanger = elTimer.classList.contains('danger') || elTimer.classList.contains('is--danger');
+				elTimer.classList.remove('warn', 'danger', 'is--warning', 'is--danger');
+				elTimer.classList.toggle('warn', left < 20*60 && left >= 5*60);
+				elTimer.classList.toggle('danger', left < 5*60);
 				try {
 					if (!wasWarn && left < 20*60 && left >= 5*60) gmCompanionSay('timer20');
 					if (!wasDanger && left < 5*60 && left > 0) gmCompanionSay('timer5');
@@ -2453,7 +2491,13 @@
 			});
 
 			// init
-			function renderAll() { renderNav(); renderQuestion(); }
+			function renderAll() {
+				try {
+					if (window.IqmoTestRunnerLayout) IqmoTestRunnerLayout.updateStageIndex(state.current, QCOUNT);
+				} catch (_eIx) {}
+				renderNav();
+				renderQuestion();
+			}
 			if (state.finished) renderResult();
 			else renderAll();
 			})(); // end runApp
