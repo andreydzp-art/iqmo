@@ -47,6 +47,19 @@
 		}, 3500);
 	}
 
+	/** Незавершённый вариант (?v=N): не удалять при pull, пока сервер ещё не получил ключ. */
+	function isInProgressTestVariantKey(k) {
+		if (typeof k !== 'string' || !/^iqmo-(chem|bio)-v-\d+$/.test(k)) return false;
+		try {
+			var raw = localStorage.getItem(k);
+			if (!raw) return false;
+			var s = JSON.parse(raw);
+			return !!(s && typeof s === 'object' && !s.finished);
+		} catch (e) {
+			return true;
+		}
+	}
+
 	// Перехватываем мутации только у window.localStorage (instance-shadowing),
 	// а не у Storage.prototype: иначе любой sessionStorage.clear()/setItem()
 	// тоже будет триггерить markDirty() через общий прототип. Sync-у нужно
@@ -59,7 +72,13 @@
 		const origClear = ls.clear.bind(ls);
 		ls.setItem = function (key, val) {
 			origSet(key, val);
-			if (hasSyncPrefix(key)) markDirty();
+			if (!hasSyncPrefix(key)) return;
+			if (isInProgressTestVariantKey(key)) {
+				clearTimeout(dirtyTimer);
+				dirtyTimer = setTimeout(function () {
+					pushState(false);
+				}, 800);
+			} else markDirty();
 		};
 		ls.removeItem = function (key) {
 			origRemove(key);
@@ -181,6 +200,7 @@
 				for (let j = 0; j < localStorage.length; j++) {
 					var k = localStorage.key(j);
 					if (k && k.indexOf(prefix) === 0 && !Object.prototype.hasOwnProperty.call(obj, k)) {
+						if (isInProgressTestVariantKey(k)) continue;
 						toRemove.push(k);
 					}
 				}
