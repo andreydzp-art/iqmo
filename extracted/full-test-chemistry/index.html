@@ -40,12 +40,13 @@
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
-		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=6">');}</script>
+		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=7">');}</script>
 		<style>
 			html.is--hub #test-root { display: none !important; }
 			html.is--hub #exam-subbar { display: none !important; }
 			html.is--hub #page-main { display: none !important; }
-			html:not(.is--hub) #hub-shell { padding-bottom: 24px; }
+			html:not(.is--hub):not(.is--runner-v4) #hub-shell { padding-bottom: 24px; }
+			html.is--runner-v4 #page-main { padding: 0 !important; }
 
 
 			/* ---- top bar ---- (стиль навбара из референса _tmp_ft6/level-map.html) */
