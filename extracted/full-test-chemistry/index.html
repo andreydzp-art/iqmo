@@ -40,7 +40,7 @@
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
-		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=3">');}</script>
+		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=4">');}</script>
 		<style>
 			html.is--hub #test-root { display: none !important; }
 			html.is--hub #exam-subbar { display: none !important; }
@@ -1555,7 +1555,7 @@
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/iqmo-avatar.js?v=1"></script>
 		<script src="/chem-progress.js?v=9"></script>
-		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-test-runner-layout.js?v=3"><\/script><script src="/iqmo-test-runner-rewards.js?v=2"><\/script><script src="/iqmo-test-runner-fx.js?v=2"><\/script>');}</script>
+		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-live-activity.js?v=2"><\/script><script src="/iqmo-test-runner-layout.js?v=4"><\/script><script src="/iqmo-test-runner-render.js?v=1"><\/script><script src="/iqmo-test-runner-presence.js?v=1"><\/script><script src="/iqmo-test-runner-rewards.js?v=3"><\/script><script src="/iqmo-test-runner-fx.js?v=2"><\/script>');}</script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
@@ -1675,6 +1675,15 @@
 				streakDays: _runnerStreak
 			})) || {};
 			if (window.IqmoTestRunnerRewards) IqmoTestRunnerRewards.reset();
+			try {
+				if (window.IqmoTestRunnerPresence) {
+					IqmoTestRunnerPresence.mount({
+						subject: EXAM_SUBJECT,
+						variantId: activeVariant.id,
+						getQuestion: function () { return state.current + 1; }
+					});
+				}
+			} catch (_ePr) {}
 
 			function loadState() {
 				try {
@@ -1921,12 +1930,11 @@
 				if (q.type === 'single' || q.type === 'multi') {
 					const picked = state.answers[q.id];
 					const pickedSet = new Set(Array.isArray(picked) ? picked : (picked ? [picked] : []));
-					// Раньше при повторах шаффлили варианты (anti-cheat по позиции), но цифры
-					// слева — это исходные id (1..6 из банка), и шаффл выдавал «5,1,4,2,3»,
-					// что путает: и подсказки вида «верны 2 и 3» ссылаются именно на эти id.
-					// Возвращаем фиксированный порядок: ОГЭ-задания так и устроены.
 					const opts = q.options;
-					inputHtml = `<div class="options" data-role="options" data-multi="${q.type === 'multi' ? '1' : '0'}">
+					if (window.IqmoTestRunnerRender && IqmoTestRunnerRender.isActive()) {
+						inputHtml = IqmoTestRunnerRender.optionsHtml(q, pickedSet);
+					} else {
+						inputHtml = `<div class="options" data-role="options" data-multi="${q.type === 'multi' ? '1' : '0'}">
 						${opts.map(o => `
 							<label class="option ${pickedSet.has(o.id) ? 'is--checked' : ''}" data-id="${o.id}">
 								<span class="option__marker">${o.id}</span>
@@ -1934,7 +1942,7 @@
 							</label>
 						`).join('')}
 					</div>`;
-					// подсказка (q.hint) скрыта во время теста и будет показана на странице результатов
+					}
 				}
 				else if (q.type === 'input') {
 					const v = state.answers[q.id] || '';
@@ -1983,7 +1991,19 @@
 					`;
 				}
 
-				elCard.innerHTML = `
+				if (window.IqmoTestRunnerRender && IqmoTestRunnerRender.isActive()) {
+					elCard.setAttribute('data-no', IqmoTestRunnerRender.padNo(state.current + 1));
+					elCard.innerHTML = IqmoTestRunnerRender.questionCardHtml({
+						q: q,
+						current: state.current,
+						total: QCOUNT,
+						flagged: flagged,
+						kindLabel: taskTypeLabel(q),
+						inputHtml: inputHtml,
+						bodyHtml: formatBody(q.body)
+					});
+				} else {
+					elCard.innerHTML = `
 					<div class="q-head">
 						<div class="q-head__left">
 							<div class="q-tag">${q.type === 'written' ? '<span class="part-banner">Часть 2</span>' : ''}Задание <b>${state.current + 1}</b> / ${QCOUNT} · ${taskTypeLabel(q)}</div>
@@ -2005,6 +2025,12 @@
 						</div>
 					</div>
 				`;
+				}
+				try {
+					if (window.IqmoTestRunnerRender && IqmoTestRunnerRender.isActive() && window.IqmoTestRunnerRewards) {
+						IqmoTestRunnerRewards.maybeMilestone(state.current + 1);
+					}
+				} catch (_eMs) {}
 				wireQuestion(q);
 			}
 
@@ -2055,10 +2081,11 @@
 				});
 				if (q.type === 'single' || q.type === 'multi') {
 					const isMulti = q.type === 'multi';
-					elCard.querySelectorAll('.option').forEach(el => {
+					const optSel = (window.IqmoTestRunnerRender && IqmoTestRunnerRender.isActive()) ? '.opt' : '.option';
+					elCard.querySelectorAll(optSel).forEach(el => {
 						el.addEventListener('click', () => {
 							const was = isAnswered(q.id);
-							const id = el.dataset.id;
+							const id = el.dataset.opt || el.dataset.id;
 							if (!isMulti) {
 								state.answers[q.id] = id;
 							} else {

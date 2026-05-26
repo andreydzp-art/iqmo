@@ -8,6 +8,7 @@
 	var _sessionXp = 0;
 	var _combo = 0;
 	var _firstRewarded = {};
+	var _milestonesShown = {};
 
 	var XP = {
 		single: 12,
@@ -132,6 +133,8 @@
 		var marks = [5, 10, 15, 20];
 		if (marks.indexOf(taskNum) === -1) return;
 		if (total && taskNum > total) return;
+		if (_milestonesShown[taskNum]) return;
+		_milestonesShown[taskNum] = true;
 		try {
 			if (typeof global.fireMilestone === 'function') global.fireMilestone(taskNum);
 		} catch (e) {}
