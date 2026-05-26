@@ -6,27 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected $connection = 'iqmo';
+
     public function up(): void
     {
-        $schema = Schema::connection('iqmo');
+        $schema = Schema::connection($this->connection);
 
-        $schema->table('users', function (Blueprint $table) {
-            if (! $schema->hasColumn('users', 'last_activity_at')) {
-                $table->unsignedBigInteger('last_activity_at')->default(0)->after('created_at');
-            }
-            if (! $schema->hasColumn('users', 'activity_subject')) {
-                $table->string('activity_subject', 32)->nullable()->after('last_activity_at');
-            }
-            if (! $schema->hasColumn('users', 'activity_chapter')) {
-                $table->string('activity_chapter', 64)->nullable()->after('activity_subject');
-            }
-            if (! $schema->hasColumn('users', 'live_activity_public')) {
-                $table->unsignedTinyInteger('live_activity_public')->default(0)->after('activity_chapter');
-            }
-        });
+        if ($schema->hasTable('users')) {
+            $schema->table('users', function (Blueprint $table) use ($schema): void {
+                if (! $schema->hasColumn('users', 'last_activity_at')) {
+                    $table->unsignedBigInteger('last_activity_at')->default(0)->after('created_at');
+                }
+                if (! $schema->hasColumn('users', 'activity_subject')) {
+                    $table->string('activity_subject', 32)->nullable()->after('last_activity_at');
+                }
+                if (! $schema->hasColumn('users', 'activity_chapter')) {
+                    $table->string('activity_chapter', 64)->nullable()->after('activity_subject');
+                }
+                if (! $schema->hasColumn('users', 'live_activity_public')) {
+                    $table->unsignedTinyInteger('live_activity_public')->default(0)->after('activity_chapter');
+                }
+            });
+        }
 
         if (! $schema->hasTable('live_activity_events')) {
-            $schema->create('live_activity_events', function (Blueprint $table) {
+            $schema->create('live_activity_events', function (Blueprint $table): void {
                 $table->unsignedBigInteger('id')->autoIncrement();
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->string('type', 48);
@@ -52,14 +56,16 @@ return new class extends Migration
 
     public function down(): void
     {
-        $schema = Schema::connection('iqmo');
+        $schema = Schema::connection($this->connection);
         $schema->dropIfExists('live_activity_events');
-        $schema->table('users', function (Blueprint $table) use ($schema) {
-            foreach (['live_activity_public', 'activity_chapter', 'activity_subject', 'last_activity_at'] as $col) {
-                if ($schema->hasColumn('users', $col)) {
-                    $table->dropColumn($col);
+        if ($schema->hasTable('users')) {
+            $schema->table('users', function (Blueprint $table) use ($schema): void {
+                foreach (['live_activity_public', 'activity_chapter', 'activity_subject', 'last_activity_at'] as $col) {
+                    if ($schema->hasColumn('users', $col)) {
+                        $table->dropColumn($col);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 };
