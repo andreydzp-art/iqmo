@@ -186,9 +186,39 @@
 		return String(Math.max(0, Math.round(Number(n) || 0))).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 	}
 
+	/** После finishTest: убрать «Прервать» и счётчик задания, оставить короткий заголовок */
+	function showResultBar(opts) {
+		opts = opts || {};
+		var examSub = document.getElementById('exam-subbar');
+		if (!examSub) return;
+		examSub.classList.add('runner-v4-exam-subbar', 'runner-v4-result');
+		examSub.innerHTML =
+			'<section class="stage runner-v4-stage runner-v4-stage--result">' +
+			'<div class="stage-title">' +
+			'<div class="stage-eyebrow">' +
+			esc(opts.subjectEyebrow || '') +
+			'</div>' +
+			'<div class="stage-h">' +
+			esc(opts.variantTitle || 'Полный вариант') +
+			' <span class="v">№ ' +
+			esc(String(opts.variantId || '')) +
+			'</span> · <span style="color:var(--green);font-weight:700">тест завершён</span></div>' +
+			'</div></section>';
+		hideRunnerFx();
+	}
+
+	function hideRunnerFx() {
+		['toast', 'combo-flash', 'fx-canvas', 'milestone'].forEach(function (id) {
+			var el = document.getElementById(id);
+			if (el) el.style.display = 'none';
+		});
+	}
+
 	global.IqmoTestRunnerLayout = {
 		install: install,
 		syncPlayer: syncPlayer,
-		updateStageIndex: updateStageIndex
+		updateStageIndex: updateStageIndex,
+		showResultBar: showResultBar,
+		hideRunnerFx: hideRunnerFx
 	};
 })(typeof window !== 'undefined' ? window : global);

@@ -913,3 +913,9 @@ html.is--runner-v4 #q-card.qcard .q-flag.is--on{
   background: var(--gold-50); border-color: var(--gold-100); color: var(--gold);
 }
 html.is--runner-v4 .qchip.is--written{ opacity: .85; }
+
+.runner-v4-stage--result .stage-spacer,
+.runner-v4-stage--result .timer-pill,
+.runner-v4-stage--result .abort-btn,
+.runner-v4-stage--result .live-pill{ display: none !important; }
+.runner-v4-result{ margin-bottom: 8px; }

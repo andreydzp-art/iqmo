@@ -40,7 +40,7 @@
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
-		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=2">');}</script>
+		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=3">');}</script>
 		<style>
 			html.is--hub #test-root { display: none !important; }
 			html.is--hub #exam-subbar { display: none !important; }
@@ -1555,7 +1555,7 @@
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/iqmo-avatar.js?v=1"></script>
 		<script src="/chem-progress.js?v=9"></script>
-		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-test-runner-layout.js?v=2"><\/script><script src="/iqmo-test-runner-rewards.js?v=2"><\/script><script src="/iqmo-test-runner-fx.js?v=2"><\/script>');}</script>
+		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-test-runner-layout.js?v=3"><\/script><script src="/iqmo-test-runner-rewards.js?v=2"><\/script><script src="/iqmo-test-runner-fx.js?v=2"><\/script>');}</script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
@@ -2229,8 +2229,18 @@
 			}
 
 			function renderResult() {
-				const elTimerEl = document.getElementById('timer');
-				if (elTimerEl) elTimerEl.style.display = 'none';
+				try {
+					if (window.IqmoTestRunnerLayout && IqmoTestRunnerLayout.showResultBar) {
+						IqmoTestRunnerLayout.showResultBar({
+							subjectEyebrow: 'Химия · ОГЭ 2026',
+							variantTitle: 'Полный вариант',
+							variantId: activeVariant && activeVariant.id
+						});
+					} else {
+						const elTimerEl = document.getElementById('timer');
+						if (elTimerEl) elTimerEl.style.display = 'none';
+					}
+				} catch (_eBar) {}
 				try { gmCompanionHide(true); } catch (e) {}
 				const s = computeScoring();
 				const hasSelf = s.selfTotal > 0;
