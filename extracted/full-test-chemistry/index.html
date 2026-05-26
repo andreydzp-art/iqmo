@@ -33,7 +33,7 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-		<link rel="stylesheet" href="/iqmo-base.css?v=7" />
+		<link rel="stylesheet" href="/iqmo-base.css?v=8" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=4" />
 		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=3" />
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
@@ -1957,7 +1957,6 @@
 							${state.current > 0 ? `<button type="button" class="btn btn--ghost" id="btn-prev" title="Перейти к предыдущему заданию">← Назад</button>` : ''}
 						</div>
 						<div class="q-foot__right">
-							<button type="button" class="btn btn--ghost" id="btn-clear">Очистить</button>
 							<button type="button" class="btn btn--blue" id="btn-next">${state.current===QCOUNT-1?'К завершению →':'Следующее →'}</button>
 						</div>
 					</div>
@@ -1997,12 +1996,6 @@
 					if (state.current < QCOUNT - 1) { state.current++; saveState(); renderAll(); }
 					else { finishTest(); }
 				});
-				document.getElementById('btn-clear').addEventListener('click', () => {
-					delete state.answers[q.id];
-					saveState();
-					renderAll();
-				});
-
 				if (q.type === 'single' || q.type === 'multi') {
 					const isMulti = q.type === 'multi';
 					elCard.querySelectorAll('.option').forEach(el => {
