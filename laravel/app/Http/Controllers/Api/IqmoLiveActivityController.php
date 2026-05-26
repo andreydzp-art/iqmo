@@ -25,19 +25,6 @@ final class IqmoLiveActivityController extends Controller
             $chapter = null;
         }
 
-        if ($scope === 'test') {
-            $variant = $request->query('variant');
-            $question = $request->query('question');
-            $qNum = is_numeric($question) ? (int) $question : null;
-
-            return response()->json($this->activity->getTestFeed(
-                is_string($subject) && $subject !== '' ? $subject : null,
-                is_string($variant) || is_numeric($variant) ? (string) $variant : null,
-                $qNum && $qNum > 0 ? $qNum : null,
-                $limit
-            ));
-        }
-
         $feed = $this->activity->getFeed(
             $scope !== '' ? $scope : null,
             is_string($subject) && $subject !== '' ? $subject : null,

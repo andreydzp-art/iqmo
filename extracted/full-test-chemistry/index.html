@@ -42,7 +42,6 @@
 		<style>
 			html.is--hub #test-root { display: none !important; }
 			html.is--hub #exam-subbar { display: none !important; }
-			html.is--hub #test-presence-wrap { display: none !important; }
 			html.is--hub .page__main { padding-top: 0; }
 			html.is--hub #hub-shell { padding-bottom: 56px; }
 			html:not(.is--hub) #hub-shell { padding-bottom: 24px; }
@@ -1509,8 +1508,6 @@
 			<div class="progressbar"><div class="progressbar__fill" id="pb-fill"></div></div>
 		</header>
 
-		<div class="test-presence-wrap" id="test-presence-wrap" hidden aria-live="polite"></div>
-
 		<main class="page__main" id="page-main">
 			<div id="test-root">
 				<div class="grid">
@@ -1554,11 +1551,7 @@
 		<script src="/level-map-xp.js?v=3"></script>
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/iqmo-avatar.js?v=1"></script>
-		<link rel="stylesheet" href="/iqmo-live-activity.css?v=1" />
-		<link rel="stylesheet" href="/iqmo-test-presence.css?v=1" />
 		<script src="/chem-progress.js?v=9"></script>
-		<script src="/iqmo-live-activity.js?v=1"></script>
-		<script src="/iqmo-test-presence.js?v=1"></script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
@@ -1662,17 +1655,6 @@
 			const FULL_MIN = window.getExamTimerMinutes ? getExamTimerMinutes(EXAM_SUBJECT, 'full') : 180;
 			const TEST_SECONDS = FULL_MIN * 60;
 			const state = loadState();
-
-			(function initTestPresence() {
-				var wrap = document.getElementById('test-presence-wrap');
-				if (!wrap || !window.IqmoTestPresence) return;
-				IqmoTestPresence.mount(wrap, {
-					subject: EXAM_SUBJECT,
-					variantId: activeVariant.id,
-					subjectLabel: 'химию',
-					getQuestion: function () { return state.current + 1; }
-				});
-			})();
 
 			function loadState() {
 				try {
@@ -2332,8 +2314,6 @@
 
 								${progressBanner}
 
-								<div id="live-act-post-test" data-live-post-test style="margin-top:18px"></div>
-
 								<div class="gm-combo-row">
 									<span class="gm-stars-pill" title="Звёзды по этому варианту: 50/70/90% → 1/2/3★">
 										<span aria-hidden="true">${'★'.repeat(gmStarsThis)}${'☆'.repeat(3 - gmStarsThis)}</span>
@@ -2378,17 +2358,6 @@
 						ov.addEventListener('click', (e) => { if (e.target === ov) ov.remove(); });
 					}
 				} catch (_eL) {}
-				try {
-					if (window.IqmoLiveActivity) {
-						var postEl = document.getElementById('live-act-post-test');
-						if (postEl) {
-							IqmoLiveActivity.mountPostTestInsight(postEl, {
-								subject: EXAM_SUBJECT,
-								percent: s.part1Percent
-							});
-						}
-					}
-				} catch (_ePost) {}
 			}
 
 			function computeScoring() {
