@@ -421,6 +421,10 @@
 		var subject =
 			(body && (body.dataset.liveSubject || body.dataset.examSubject)) || null;
 		var chapter = (body && body.dataset.liveChapter) || null;
+		/* Full-test pages use IqmoTestPresence — avoid competing heartbeat */
+		if (body && body.dataset.examSubject && !ticker && !feed) {
+			return;
+		}
 		if (ticker || feed || subject) {
 			init({
 				tickerRoot: ticker,

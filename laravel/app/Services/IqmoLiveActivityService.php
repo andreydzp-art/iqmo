@@ -124,6 +124,54 @@ final class IqmoLiveActivityService
      *   aggregates: list<array<string, mixed>>
      * }
      */
+    /**
+     * Feed for full-test pages: variant / question presence + subject ticker.
+     *
+     * @return array{
+     *   onlineCount: int,
+     *   activeInSubject: int,
+     *   activeInVariant: int,
+     *   activeOnQuestion: int,
+     *   todayInSubject: int,
+     *   events: list<array<string, mixed>>,
+     *   aggregates: list<array<string, mixed>>
+     * }
+     */
+    public function getTestFeed(?string $subject, ?string $variant, ?int $question, int $limit = 10): array
+    {
+        $variantKey = $this->normalizeVariantChapter($variant);
+        $questionKey = ($variantKey && $question && $question > 0)
+            ? $variantKey.'/q'.$question
+            : null;
+
+        $activeSubject = $subject ? $this->countOnline($subject) : 0;
+        $activeVariant = ($subject && $variantKey) ? $this->countOnline($subject, $variantKey) : 0;
+        $activeQuestion = ($subject && $questionKey) ? $this->countOnline($subject, $questionKey) : 0;
+        $todayInSubject = $this->countTodaySubjectLearners($subject);
+
+        $feed = $this->getFeed('subject', $subject, $variantKey, $limit);
+        $aggregates = $this->buildTestAggregates(
+            $subject,
+            $variantKey,
+            $question,
+            $activeSubject,
+            $activeVariant,
+            $activeQuestion,
+            $todayInSubject
+        );
+
+        return [
+            'onlineCount' => $feed['onlineCount'],
+            'activeInSubject' => $activeSubject,
+            'activeInVariant' => $activeVariant,
+            'activeOnQuestion' => $activeQuestion,
+            'activeInChapter' => $activeVariant,
+            'todayInSubject' => $todayInSubject,
+            'events' => $feed['events'],
+            'aggregates' => $aggregates,
+        ];
+    }
+
     public function getFeed(?string $scope, ?string $subject, ?string $chapter, int $limit = 8): array
     {
         $now = $this->nowMs();
@@ -210,18 +258,118 @@ final class IqmoLiveActivityService
         }
         $real = (int) $q->count();
 
-        return max($real, $this->baselineOnline($subject));
+        return max($real, $this->baselineOnline($subject, $chapter));
     }
 
-    private function baselineOnline(?string $subject): int
+    private function baselineOnline(?string $subject, ?string $chapter = null): int
     {
         $hour = (int) gmdate('G');
         $base = 900 + (int) round(sin(($hour / 24) * 2 * M_PI) * 180);
+        if ($chapter !== null && $chapter !== '') {
+            $subjectBase = $subject ? (int) round($base * 0.35) + 8 : 40;
+            if (preg_match('#/q\d+#', $chapter)) {
+                return max(2, min(12, (int) round($subjectBase * 0.06) + ($hour % 4)));
+            }
+
+            return max(4, min(28, (int) round($subjectBase * 0.14) + ($hour % 6)));
+        }
         if ($subject) {
             $base = (int) round($base * 0.35) + 8;
         }
 
         return max(12, $base);
+    }
+
+    private function normalizeVariantChapter(?string $variant): ?string
+    {
+        if ($variant === null || $variant === '') {
+            return null;
+        }
+        $digits = preg_replace('/\D+/', '', (string) $variant) ?? '';
+
+        return $digits !== '' ? 'v'.$digits : null;
+    }
+
+    private function countTodaySubjectLearners(?string $subject): int
+    {
+        $todayStart = $this->dayStartMs();
+        $q = DB::connection('iqmo')->table('live_activity_events')->where('created_at', '>=', $todayStart);
+        if ($subject) {
+            $q->where('subject', $subject);
+        }
+        $learners = (int) (clone $q)->distinct()->count('user_id');
+        $events = (int) (clone $q)->count();
+        $estimate = max($learners, (int) round($events / 2.5));
+
+        if ($subject) {
+            return max($estimate, (int) round($this->countOnline($subject) * 2.8));
+        }
+
+        return max($estimate, 80);
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function buildTestAggregates(
+        ?string $subject,
+        ?string $variantKey,
+        ?int $question,
+        int $activeSubject,
+        int $activeVariant,
+        int $activeQuestion,
+        int $todayInSubject
+    ): array {
+        $out = [];
+        if ($activeVariant > 0) {
+            $out[] = [
+                'type' => 'test_variant',
+                'text' => $this->fmtNum($activeVariant).' '.self::pluralUchenik($activeVariant).' сейчас проходят этот вариант',
+                'icon' => '🟢',
+            ];
+        }
+        if ($question && $question > 0 && $activeQuestion > 0) {
+            $out[] = [
+                'type' => 'test_question',
+                'text' => $this->fmtNum($activeQuestion).' '.self::pluralUchenik($activeQuestion).' сейчас на вопросе №'.$question,
+                'icon' => '🟢',
+            ];
+        }
+        if ($subject && $activeSubject > 0) {
+            $label = self::SUBJECT_LABELS[$subject] ?? $subject;
+            $out[] = [
+                'type' => 'subject_active',
+                'text' => $this->fmtNum($activeSubject).' '.self::pluralUchenik($activeSubject).' сейчас проходят '.$label,
+                'icon' => '📘',
+            ];
+        }
+        if ($subject && $todayInSubject > 0) {
+            $label = self::SUBJECT_LABELS[$subject] ?? $subject;
+            $out[] = [
+                'type' => 'aggregate',
+                'text' => 'Сегодня '.$this->fmtNum($todayInSubject).' '.self::pluralUchenik($todayInSubject).' прошли '.$label,
+                'icon' => '📘',
+            ];
+        }
+
+        return $out;
+    }
+
+    private static function pluralUchenik(int $n): string
+    {
+        $n = abs($n) % 100;
+        $n1 = $n % 10;
+        if ($n > 10 && $n < 20) {
+            return 'учеников';
+        }
+        if ($n1 > 1 && $n1 < 5) {
+            return 'ученика';
+        }
+        if ($n1 === 1) {
+            return 'ученик';
+        }
+
+        return 'учеников';
     }
 
     /**

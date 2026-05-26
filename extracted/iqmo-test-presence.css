@@ -1,0 +1,146 @@
+/* IQMO — compact live presence on full-test pages (top area only) */
+
+.test-presence-wrap {
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0 14px 10px;
+}
+
+.test-presence-wrap[hidden] {
+	display: none !important;
+}
+
+html.is--hub .test-presence-wrap {
+	display: none !important;
+}
+
+.test-presence-bar {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 8px 14px;
+	min-height: 0;
+}
+
+.test-presence-bar__main {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #5c6188;
+	line-height: 1.3;
+}
+
+.test-presence-bar__dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #4ade80;
+	box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.16);
+	flex-shrink: 0;
+	animation: testPresencePulse 2.4s ease-in-out infinite;
+}
+
+.test-presence-bar__count {
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-weight: 700;
+	color: #2a2e4a;
+}
+
+.test-presence-bar__hint {
+	font-size: 11px;
+	font-weight: 500;
+	color: #8b90ad;
+}
+
+.test-presence-ticker {
+	margin-top: 6px;
+	min-height: 20px;
+	position: relative;
+	overflow: hidden;
+	border-radius: 14px;
+	padding: 6px 12px;
+	background: rgba(255, 255, 255, 0.72);
+	border: 1px solid rgba(99, 102, 241, 0.08);
+	box-shadow: 0 1px 2px rgba(15, 18, 38, 0.04);
+}
+
+.test-presence-ticker__line {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: #6b7094;
+	line-height: 1.35;
+	animation: testPresenceFade 0.5s ease-out both;
+}
+
+.test-presence-ticker__line b,
+.test-presence-ticker__text {
+	color: #3d4268;
+	font-weight: 700;
+}
+
+.test-presence-ticker__ico {
+	flex-shrink: 0;
+	font-size: 13px;
+	line-height: 1;
+	opacity: 0.92;
+}
+
+@keyframes testPresencePulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.72;
+		transform: scale(0.92);
+	}
+}
+
+@keyframes testPresenceFade {
+	from {
+		opacity: 0;
+		transform: translateY(3px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 720px) {
+	.test-presence-wrap {
+		padding: 0 10px 8px;
+	}
+
+	.test-presence-bar {
+		justify-content: flex-start;
+	}
+
+	.test-presence-bar__hint {
+		display: none;
+	}
+
+	.test-presence-ticker {
+		margin-top: 4px;
+		padding: 5px 10px;
+		border-radius: 12px;
+	}
+
+	.test-presence-wrap.is--ticker-hidden .test-presence-ticker {
+		display: none;
+	}
+}
+
+@media (min-width: 721px) {
+	.test-presence-wrap {
+		padding-left: max(14px, calc((100% - 1200px) / 2 + 14px));
+		padding-right: max(14px, calc((100% - 1200px) / 2 + 14px));
+	}
+}

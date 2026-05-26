@@ -7,7 +7,7 @@ alwaysApply: true
 
 Прод обновляется **только после `git push` в `main`**: workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (`Deploy to VPS`). Локальный коммит без push **не попадает на сервер**.
 
-После того как вы **сделали коммит**, который затрагивает публичный сайт (`extracted/`, `laravel/`, `scripts/`, workflow деплоя), выполните в корне репозитория **`npm run deploy:push`** или **`node scripts/git-push-main.mjs`** (допускается только на чистом рабочем дереве и в ветке `main`).
+После коммита, который затрагивает публичный сайт (`extracted/`, `laravel/`, `scripts/`, workflow деплоя), агент **сам** пушит в `main` без вопроса (см. `auto-commit-deploy.mdc`): **`git push origin main`** или **`npm run deploy:push`** / **`node scripts/git-push-main.mjs`** (чистое дерево, ветка `main`).
 
 Если по какой-то причине push вручную неуместен, сообщите пользователю, что для появления изменений на iqmoschool.ru нужен push в `main` или ручной запуск **Actions → Deploy to VPS → Run workflow**.
 
