@@ -1373,8 +1373,8 @@
 							<div class="nav-legend">
 								<div class="nav-legend__row"><span class="nav-legend__dot" style="background: var(--accent);"></span>текущее</div>
 								<div class="nav-legend__row"><span class="nav-legend__dot" style="background: #e7f6ec; border: 1px solid #bfe3cd;"></span>отвечено</div>
-								<div class="nav-legend__row"><span class="nav-legend__dot" style="background: #eef1f6;"></span>пропущено</div>
-								<div class="nav-legend__row"><span class="nav-legend__dot" style="background: var(--amber);"></span>вернуться позже</div>
+								<div class="nav-legend__row"><span class="nav-legend__dot" style="background: #eef1f6;"></span>ещё не открывали</div>
+								<div class="nav-legend__row"><span class="nav-legend__dot" style="background: #fdecd6; border: 1px solid #f0d59a;"></span>отложено — без ответа</div>
 							</div>
 						</nav>
 						<div class="quit">
@@ -1662,6 +1662,17 @@
 				return a !== undefined && a !== '';
 			}
 
+			function ensureFlagged() {
+				if (!state.flagged || typeof state.flagged !== 'object') state.flagged = {};
+			}
+
+			/** Отложить задание, если уходим без ответа (Следующее или клик по сетке). */
+			function markReturnLaterIfUnanswered(q) {
+				if (!q || isAnswered(q.id)) return;
+				ensureFlagged();
+				state.flagged[q.id] = true;
+			}
+
 			function renderNav() {
 				elNavGrid.innerHTML = '';
 				const total = QCOUNT;
@@ -1677,6 +1688,7 @@
 					if (!q) { btn.disabled = true; btn.style.opacity = '.35'; btn.style.cursor = 'not-allowed'; btn.title = 'Задание будет добавлено'; }
 					btn.addEventListener('click', () => {
 						if (!q) return;
+						markReturnLaterIfUnanswered(QUESTIONS[state.current]);
 						state.current = i;
 						saveState();
 						renderAll();
@@ -1809,7 +1821,7 @@
 						</div>
 						<button type="button" class="q-flag ${flagged?'is--on':''}" id="btn-flag">
 							<svg width="14" height="14" viewBox="0 0 24 24" fill="${flagged?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-							${flagged ? 'Отмечено' : 'Вернуться позже'}
+							${flagged ? 'Снять отметку' : 'Отложить задание'}
 						</button>
 					</div>
 					<div class="q-body">${formatBody(q.body)}</div>
@@ -1857,8 +1869,12 @@
 					});
 				}
 				document.getElementById('btn-next').addEventListener('click', () => {
-					if (state.current < QCOUNT - 1) { state.current++; saveState(); renderAll(); }
-					else { finishTest(); }
+					if (state.current < QCOUNT - 1) {
+						markReturnLaterIfUnanswered(q);
+						state.current++;
+						saveState();
+						renderAll();
+					} else { finishTest(); }
 				});
 				if (q.type === 'single' || q.type === 'multi') {
 					const isMulti = q.type === 'multi';
