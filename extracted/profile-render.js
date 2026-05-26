@@ -89,8 +89,41 @@
 	}
 
 	function avRingStyle(pct) {
+		return avHoloRingStyle(pct);
+	}
+
+	function avHoloRingStyle(pct) {
 		var p = Math.max(0, Math.min(100, parseInt(pct, 10) || 0));
-		return 'background:conic-gradient(from -90deg,#818cf8 0%,#6366f1 ' + (p * 0.46) + '%,#7c3aed ' + p + '%,rgba(15,18,38,.06) ' + p + '%,rgba(15,18,38,.06) 100%)';
+		var mid = Math.round(p * 0.49);
+		return (
+			'background:conic-gradient(from -90deg,#0ea5e9 0%,#7c3aed ' + mid + '%,#db2777 ' + p +
+			'%,rgba(15,18,38,.08) ' + p + '%,rgba(15,18,38,.08) 100%)'
+		);
+	}
+
+	function pad2(n) {
+		return String(Math.max(0, parseInt(n, 10) || 0)).padStart(2, '0');
+	}
+
+	function daysInIqmoShort(ts) {
+		if (!ts) return '';
+		var days = Math.max(1, Math.floor((Date.now() - ts * 1000) / 86400000));
+		return 'D+' + days + ' / IQMO';
+	}
+
+	function metaRankLineV3(signals, d) {
+		var rank = (signals || []).find(function (s) { return s.kind === 'rank'; });
+		if (rank) {
+			var t = String(rank.text || '');
+			return 'RANK · ' + esc(t.replace(/^Ранг\s*/i, ''));
+		}
+		return 'RANK · «' + esc(d.levelTitle || 'Старт') + '»';
+	}
+
+	function courseMetaLineV3(signals, d) {
+		var top = (signals || []).find(function (s) { return s.kind === 'top'; });
+		if (top) return esc(top.text).toUpperCase();
+		return 'TOP ' + esc(d.coursePct) + '%';
 	}
 
 	function renderStreakCaps(days) {
@@ -129,7 +162,7 @@
 	var CAM_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-1V7a3 3 0 0 0-3-3H9zm0 2h6a1 1 0 0 1 1 1v1H8V7a1 1 0 0 1 1-1zm-2 5h10l-4.5 5.4L11 13l-2 2.4L7 13z"/></svg>';
 	var PEN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
 
-	function renderHeroStatsRow(d, leagueDelta) {
+	function renderHeroStatsRow(d, leagueDelta, accDelta, courseDelta) {
 		var accVal = d.accuracyPct != null ? String(d.accuracyPct) : '—';
 		var accUnit = d.accuracyPct != null ? '<span class="unit">%</span>' : '';
 		return (
@@ -137,11 +170,11 @@
 			'<div class="hero-secondary__spacer" aria-hidden="true"></div>' +
 			'<div class="sec-row" role="group" aria-label="Краткая статистика">' +
 			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига</div></div>' + leagueDelta + '</div>' +
+			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">LEAGUE · WEEK</div></div>' + leagueDelta + '</div>' +
 			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div></div>' +
+			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">ACCURACY</div></div>' + accDelta + '</div>' +
 			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Пройдено курса</div></div></div>' +
+			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">COURSE · BIO</div></div>' + courseDelta + '</div>' +
 			'</div></div>'
 		);
 	}
@@ -187,13 +220,15 @@
 			: '<div class="av-initials" aria-hidden="true">' + esc(d.initials) + '</div>';
 		var canEdit = !isPublic && global.IqmoAvatar;
 		var hintCls = canEdit && IqmoAvatar.isPristine() ? ' is-hint' : '';
+		var holoRing = avHoloRingStyle(xpPct);
 		var avPctChip =
 			'<div class="av-pct">' + xpPct + '%</div>' +
 			'<div class="av-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>LVL ' + d.level + '</div>';
 		var avBlock = canEdit
 			? (
 				'<div class="av av--editable">' +
-				'<div class="av-ring" style="' + avRingStyle(xpPct) + '"></div>' +
+				'<div class="av-outer" style="' + holoRing + '"></div>' +
+				'<div class="av-ticks" aria-hidden="true"></div>' +
 				'<button type="button" class="av-hit" data-avatar-trigger aria-label="Сменить аватар">' +
 				'<div class="av-img">' + avatarInner + '</div>' +
 				'<span class="av-hover" aria-hidden="true"><span class="av-hover-txt">Сменить аватар</span></span>' +
@@ -202,90 +237,96 @@
 			)
 			: (
 				'<div class="av" aria-label="Уровень ' + d.level + '">' +
-				'<div class="av-ring" style="' + avRingStyle(xpPct) + '"></div>' +
+				'<div class="av-outer" style="' + holoRing + '"></div>' +
+				'<div class="av-ticks" aria-hidden="true"></div>' +
 				'<div class="av-img">' + avatarInner + '</div>' + avPctChip + '</div>'
 			);
 		var xpMax = d.nextLevel ? d.xpLevelMax : d.xpCurrent;
-		var xpRange = IqmoProfileData.fmtPts(d.xpCurrent) + ' / ' + IqmoProfileData.fmtPts(xpMax) + ' XP';
-		var lvlNow = d.nextLevel
-			? 'Уровень ' + d.level + ' → ' + d.nextLevel
-			: 'Уровень ' + d.level;
-		var lvlNext = d.nextLevel
-			? 'следующий: <b>' + d.nextLevel + ' · «' + esc(d.levelTitle || '') + '»</b>'
-			: 'максимальный уровень';
-		var xpFootLeft = '<span class="now">' + xpRange + '</span>';
-		if (d.nextLevel) {
-			xpFootLeft += ' · до уровня ' + d.nextLevel + ' — ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP';
-		}
+		var xpNums = IqmoProfileData.fmtPts(d.xpCurrent) + ' / ' + IqmoProfileData.fmtPts(xpMax);
+		var xpEye = d.nextLevel
+			? 'XP · LVL ' + d.level + ' → ' + d.nextLevel
+			: 'XP · LVL ' + d.level;
+		var xpNext = d.nextLevel
+			? 'next: <b>' + d.nextLevel + ' · «' + esc(d.levelTitle || '') + '»</b>'
+			: 'max level';
+		var xpUntil = d.nextLevel
+			? '▸ ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до LVL ' + d.nextLevel
+			: '';
+		var streakFill = Math.min(100, Math.round((Math.min(streakDays, 7) / 7) * 100));
 		var daysLeft = Math.max(0, 7 - streakDays);
-		var daysLeftWord = pluralRu(daysLeft, ['день', 'дня', 'дней']);
-		var vaultName = '«Неделя ритма»';
-		var vaultXp = '+200 XP';
+		var vaultTitle = 'IRON WILL';
 		if (global.IqmoProfileData && IqmoProfileData.ACHIEVEMENT_CATALOG) {
 			var ach = IqmoProfileData.ACHIEVEMENT_CATALOG.find(function (a) { return a.id === 'streak7'; });
-			if (ach) vaultName = '«' + ach.title + '»';
+			if (ach) vaultTitle = String(ach.title).replace(/[«»]/g, '').trim().toUpperCase();
 		}
-		var streakEye = streakDays > 0 ? 'Серия · активна' : 'Серия';
-		var streakUrg = streakDays > 0
-			? 'Закройте дневную цель, чтобы <b>сохранить серию</b>'
-			: '';
+		var streakWarn = streakDays > 0
+			? 'Серия заряжена — продли до конца дня <b>сегодня</b>'
+			: 'Начните серию — закройте дневную цель';
 		var leagueDelta = d.leagueDelta
 			? '<div class="q-delta">▲ ' + d.leagueDelta + '</div>'
 			: '';
+		var accDelta = '';
+		var courseDelta = '';
+		var orbGradId = 'iqmo-orb-grad-' + gid;
+		var reviewHref = '/full-test-chemistry/';
 
 		return (
-			'<section class="iqmo-hero">' +
-			'<div class="hero-deco"><span class="pp a"></span><span class="pp b"></span><span class="pp c"></span></div>' +
+			'<section class="iqmo-hero v3">' +
+			'<div class="v3-deco"><span class="pp a"></span><span class="pp b"></span><span class="pp c"></span><span class="pp d"></span></div>' +
 			'<div class="hero-inner">' +
 			avBlock +
 			'<div class="h-id">' +
 			renderNameRow(d, isPublic) +
 			'<div class="h-meta-row">' +
-			'<span class="rank">' + metaRankLine(sig, d) + '</span>' +
+			'<span class="rank">' + metaRankLineV3(sig, d) + '</span>' +
 			'<span class="dot" aria-hidden="true"></span>' +
-			'<span>' + courseMetaLine(sig, d) + '</span>' +
-			(d.memberSince ? '<span class="dot" aria-hidden="true"></span><span>' + esc(daysInIqmoLabel(d.memberSince)) + '</span>' : '') +
+			'<span>' + courseMetaLineV3(sig, d) + '</span>' +
+			(d.memberSince ? '<span class="dot" aria-hidden="true"></span><span>' + esc(daysInIqmoShort(d.memberSince)) + '</span>' : '') +
 			'</div>' +
 			'<div class="xp">' +
-			'<div class="xp-head"><span class="lvlnow">' + lvlNow + '</span><span class="lvlnext">' + lvlNext + '</span></div>' +
-			'<div class="xp-bar" style="--xp-pct:' + xpPct + '%" role="progressbar" aria-valuenow="' + xpPct + '" aria-valuemin="0" aria-valuemax="100">' +
-			'<div class="xp-fill" style="width:' + xpPct + '%"></div>' +
-			'<div class="xp-dot" style="left:' + xpPct + '%"></div></div>' +
-			'<div class="xp-foot"><span>' + xpFootLeft + '</span><span class="week">за неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b></span></div>' +
-			'</div></div>' +
-			'<div class="' + streakCardClass(streakDays) + '">' +
-			'<div class="atm-aura"></div><span class="atm-dot d1"></span><span class="atm-dot d2"></span><span class="atm-dot d3"></span>' +
+			'<div class="xp-head">' +
+			'<span class="xp-curr"><span class="eye">' + xpEye + '</span><span class="num">' + xpNums + '</span></span>' +
+			'<span class="xp-next">' + xpNext + '</span></div>' +
+			'<div class="xp-bar" role="progressbar" aria-valuenow="' + xpPct + '" aria-valuemin="0" aria-valuemax="100">' +
+			'<div class="xp-fill" style="width:' + xpPct + '%"></div></div>' +
+			'<div class="xp-foot">' +
+			'<span>WEEKLY <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b> · streak ' + streakMultLabel(streakDays) + '</span>' +
+			(xpUntil ? '<span class="untill">' + xpUntil + '</span>' : '<span class="untill"></span>') +
+			'</div></div></div>' +
+			'<div class="streak dark">' +
+			'<span class="holo-border" aria-hidden="true"></span>' +
 			'<div class="streak-top">' +
-			'<span class="s-eye"><span class="pulse"></span>' + streakEye + '</span>' +
-			(streakDays > 0 ? '<span class="s-today">' + streakMultLabel(streakDays) + '</span>' : '') +
+			'<span class="s-eye"><span class="pulse"></span>STREAK · ' + pad2(streakDays) + '</span>' +
+			(streakDays > 0
+				? '<span class="s-bonus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>BONUS ' + streakMultLabel(streakDays) + '</span>'
+				: '') +
 			'</div>' +
 			'<div class="s-hero">' +
-			'<div class="emblem"><div class="ring"></div><div class="ring-inner"></div><div class="disc">' +
-			'<svg class="glyph" viewBox="0 0 24 24" aria-hidden="true">' +
-			'<defs><linearGradient id="iqmo-violet-flame-' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
-			'<stop offset="0%" stop-color="#c4b5fd"/><stop offset="60%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/>' +
+			'<div class="orb">' +
+			'<span class="orb-shell" aria-hidden="true"></span>' +
+			'<span class="orb-orbit" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></span>' +
+			'<span class="orb-core">' +
+			'<svg viewBox="0 0 24 24" aria-hidden="true">' +
+			'<defs><linearGradient id="' + orbGradId + '" x1="0" y1="0" x2="0" y2="1">' +
+			'<stop offset="0%" stop-color="#86efac"/><stop offset="100%" stop-color="#0ea5e9"/>' +
 			'</linearGradient></defs>' +
-			'<path d="M13 2s4 5 4 9a4 4 0 0 1-8 0c0-2 1-3 1-3s-2 1-3 4a6 6 0 0 0 12 0c0-5-6-10-6-10z" fill="url(#iqmo-violet-flame-' + gid + ')"/></svg>' +
-			'</div><div class="aura"></div></div>' +
-			'<div class="s-counter">' +
-			'<span class="s-num">' + streakDays + '</span>' +
-			'<span class="s-lbl">' + streakLabel(streakDays) + '</span>' +
-			'<span class="s-meta">лига #' + esc(d.leagueRank) + ' · ' + esc(d.leagueSize) + ' учеников</span>' +
-			'</div></div>' +
-			'<div class="s-prog" style="--streak-fill:' + Math.min(100, Math.round((Math.min(streakDays, 7) / 7) * 100)) + '%">' +
-			'<div class="s-caps" aria-label="' + streakDays + ' из 7 дней до награды">' + renderStreakCaps(streakDays) + '</div>' +
+			'<path d="M13 2 5 14h6l-1 8 9-12h-6z" fill="none" stroke="url(#' + orbGradId + ')" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+			'</svg></span></div>' +
+			'<div class="s-big">' +
+			'<span class="num">' + streakDays + '</span>' +
+			'<span class="lbl">DAYS / СЕРИЯ</span></div></div>' +
+			'<div class="s-warn">' + streakWarn + '</div>' +
+			'<div class="s-prog">' +
+			'<div class="s-prog-bar" aria-label="' + streakDays + ' из 7 дней"><div class="s-prog-fill" style="width:' + streakFill + '%"></div></div>' +
 			'<div class="s-prog-foot">' +
-			'<span class="left"><b>' + daysLeft + ' ' + daysLeftWord + '</b> до награды</span>' +
-			'<span class="frac">' + String(Math.min(streakDays, 7)).padStart(2, '0') + ' / 07</span>' +
+			'<span>' + pad2(Math.min(streakDays, 7)) + ' / 07 → <b>+' + daysLeft + ' DAY</b></span>' +
+			'<span class="rew"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4z"/></svg>' +
+			esc(vaultTitle) + ' +200XP</span></div></div>' +
+			'<a class="s-cta" href="' + esc(reviewHref) + '">' +
+			'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>' +
+			'▸ QUICK REVIEW · 5 MIN</a>' +
 			'</div></div>' +
-			'<div class="s-vault">' +
-			'<div class="vault-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4z"/></svg></div>' +
-			'<div class="vault-info"><div class="vault-eye">Следующая награда</div>' +
-			'<div class="vault-name">' + esc(vaultName) + '</div><div class="vault-xp">' + vaultXp + '</div></div>' +
-			'<span class="vault-tag">★ Rare</span></div>' +
-			(streakUrg ? '<div class="s-urg"><span class="pulse"></span><span>' + streakUrg + '</span></div>' : '') +
-			'</div></div>' +
-			renderHeroStatsRow(d, leagueDelta) +
+			renderHeroStatsRow(d, leagueDelta, accDelta, courseDelta) +
 			'</section>'
 		);
 	}
