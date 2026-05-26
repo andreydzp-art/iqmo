@@ -166,8 +166,6 @@
 		var accVal = d.accuracyPct != null ? String(d.accuracyPct) : '—';
 		var accUnit = d.accuracyPct != null ? '<span class="unit">%</span>' : '';
 		return (
-			'<div class="hero-secondary">' +
-			'<div class="hero-secondary__spacer" aria-hidden="true"></div>' +
 			'<div class="sec-row" role="group" aria-label="Краткая статистика">' +
 			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
 			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">LEAGUE · WEEK</div></div>' + leagueDelta + '</div>' +
@@ -175,7 +173,7 @@
 			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">ACCURACY</div></div>' + accDelta + '</div>' +
 			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
 			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">COURSE · BIO</div></div>' + courseDelta + '</div>' +
-			'</div></div>'
+			'</div>'
 		);
 	}
 
@@ -292,7 +290,9 @@
 			'<div class="xp-foot">' +
 			'<span>WEEKLY <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b> · streak ' + streakMultLabel(streakDays) + '</span>' +
 			(xpUntil ? '<span class="untill">' + xpUntil + '</span>' : '<span class="untill"></span>') +
-			'</div></div></div>' +
+			'</div></div>' +
+			renderHeroStatsRow(d, leagueDelta, accDelta, courseDelta) +
+			'</div>' +
 			'<div class="streak dark">' +
 			'<span class="holo-border" aria-hidden="true"></span>' +
 			'<div class="streak-top">' +
@@ -325,9 +325,7 @@
 			'<a class="s-cta" href="' + esc(reviewHref) + '">' +
 			'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>' +
 			'▸ QUICK REVIEW · 5 MIN</a>' +
-			'</div></div>' +
-			renderHeroStatsRow(d, leagueDelta, accDelta, courseDelta) +
-			'</section>'
+			'</div></div></section>'
 		);
 	}
 

@@ -49,21 +49,11 @@
   display:grid;
   grid-template-columns:240px minmax(0, 1fr) minmax(280px, 360px);
   gap:28px;
-  align-items:stretch;
-  padding:28px 28px 14px;
+  align-items:start;
+  padding:28px 28px 22px;
 }
-.iqmo-hero.v3 .hero-secondary{
-  position:relative; z-index:2;
-  display:grid;
-  grid-template-columns:240px minmax(0, 1fr) minmax(280px, 360px);
-  gap:28px;
-  margin-top:-44px;
-  padding:0 28px 22px;
-  align-items:stretch;
-}
-.iqmo-hero.v3 .hero-secondary__spacer{display:block;}
-.iqmo-hero.v3 .hero-secondary .sec-row{
-  grid-column:2 / 3;
+.iqmo-hero.v3 .h-id .sec-row{
+  margin-top:12px;
   display:grid;
   grid-template-columns:repeat(3, minmax(0, 1fr));
   gap:10px;
@@ -747,8 +737,7 @@
   border:1px solid transparent;
 }
 @media (max-width:1180px){
-  .iqmo-hero.v3 .hero-inner,
-  .iqmo-hero.v3 .hero-secondary{
+  .iqmo-hero.v3 .hero-inner{
     grid-template-columns:200px minmax(0, 1fr);
     gap:20px;
     padding-left:20px;
@@ -756,20 +745,15 @@
   }
   .iqmo-hero.v3 .hero-inner{padding-top:22px;}
   .iqmo-hero.v3 .hero-inner .streak{grid-column:1 / -1;}
-  .iqmo-hero.v3 .hero-secondary{margin-top:-36px;}
-  .iqmo-hero.v3 .hero-secondary .sec-row{grid-column:1 / -1;}
-  .iqmo-hero.v3 .hero-secondary__spacer{display:none;}
 }
 @media (max-width:720px){
-  .iqmo-hero.v3 .hero-inner,
-  .iqmo-hero.v3 .hero-secondary{
+  .iqmo-hero.v3 .hero-inner{
     grid-template-columns:1fr;
     gap:16px;
     padding-left:14px;
     padding-right:14px;
   }
   .iqmo-hero.v3 .hero-inner{padding-top:16px;}
-  .iqmo-hero.v3 .hero-secondary{margin-top:0;padding-bottom:18px;}
   .iqmo-hero.v3 .av{justify-self:center;width:176px;height:176px;}
   .iqmo-hero.v3 .av-img{width:148px;height:148px;}
   .iqmo-hero.v3 .av-ticks{
@@ -780,7 +764,7 @@
   .iqmo-hero.v3 .h-name-row{justify-content:center;}
   .iqmo-hero.v3 .h-meta-row{justify-content:center;flex-wrap:wrap;}
   .iqmo-hero.v3 .xp-foot{flex-wrap:wrap;gap:6px;}
-  .iqmo-hero.v3 .hero-secondary .sec-row{grid-template-columns:1fr;}
+  .iqmo-hero.v3 .h-id .sec-row{grid-template-columns:1fr;}
 }
 @media (prefers-reduced-motion:reduce){
   .iqmo-hero.v3 *,
