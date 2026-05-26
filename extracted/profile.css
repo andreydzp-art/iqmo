@@ -472,22 +472,18 @@
     margin-bottom:10px;
     min-width:0;
   }
-  .ngoal.reward-shop .ng-ico.reward-shop__ico{
-    width:34px;
-    height:34px;
-    border-radius:9px;
-    flex-shrink:0;
+  .ngoal.reward-shop .ng-ico{
     background:rgba(124,58,237,.12);
     border:1px solid rgba(124,58,237,.14);
   }
-  .ngoal.reward-shop .reward-shop__bag{
-    width:24px;
-    height:24px;
-    display:block;
-    object-fit:contain;
-    filter:drop-shadow(0 2px 6px rgba(124,58,237,.2));
-    -webkit-user-drag:none;
-    user-select:none;
+  .ngoal.reward-shop .ng-ico svg{
+    width:14px;
+    height:14px;
+    fill:none;
+    stroke:#7c3aed;
+    stroke-width:1.75;
+    stroke-linecap:round;
+    stroke-linejoin:round;
   }
   .ngoal.reward-shop .reward-shop__title{
     margin:0;
@@ -501,6 +497,29 @@
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
+  }
+  .ngoal.reward-shop .reward-shop__body{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    min-width:0;
+  }
+  .ngoal.reward-shop .reward-shop__copy{
+    flex:1 1 auto;
+    min-width:0;
+  }
+  .ngoal.reward-shop .reward-shop__illus{
+    flex:0 0 56px;
+    width:56px;
+    height:56px;
+    margin-top:2px;
+    display:block;
+    object-fit:contain;
+    filter:drop-shadow(0 3px 8px rgba(124,58,237,.22));
+    -webkit-user-drag:none;
+    user-select:none;
+    pointer-events:none;
   }
   .ngoal.reward-shop .ng-text{
     margin:0;
@@ -593,14 +612,10 @@
     opacity:1;
     transform:translateX(-50%) translateY(0);
   }
-  .ngoal.reward-shop:hover .reward-shop__art img,
-  .ngoal.reward-shop:focus-visible .reward-shop__art img{
-    filter:drop-shadow(0 8px 20px rgba(124,58,237,.34));
-    transform:translateY(-2px) scale(1.02);
-  }
-  @keyframes rewardShopFloat{
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(-3px);}
+  .ngoal.reward-shop:hover .reward-shop__illus,
+  .ngoal.reward-shop:focus-visible .reward-shop__illus{
+    filter:drop-shadow(0 5px 12px rgba(124,58,237,.34));
+    transform:translateY(-1px);
   }
   @keyframes rewardShopBreathe{
     0%,100%{box-shadow:0 8px 24px -18px rgba(124,58,237,.28);}
@@ -612,8 +627,7 @@
   }
   @media (prefers-reduced-motion: reduce){
     .ngoal.reward-shop,
-    .reward-shop__shimmer,
-    .reward-shop__art{animation:none!important;}
+    .reward-shop__shimmer{animation:none!important;}
   }
 
   /* ════════ Section eyebrow ════════ */
@@ -1289,7 +1303,7 @@
 
 /* IQMO profile — mobile */
 @media (max-width:1180px){.hero .hero-inner{grid-template-columns:200px 1fr}.h-quick{grid-column:1/-1}.ach-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.rare-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.row-2{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.courses{grid-template-columns:1fr}.nextrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:720px){.shell{padding:16px 14px 48px;gap:18px}.hero .hero-inner{grid-template-columns:1fr;gap:20px;padding:24px 18px 22px;text-align:center}.av-wrap{margin:0 auto}.h-name-row{justify-content:center}.h-status{justify-content:center}.h-quick{grid-template-columns:1fr 1fr}.nextrow{grid-template-columns:1fr}.nextrow--with-reward{grid-template-columns:1fr}.reward-shop__inner{grid-template-columns:88px minmax(0,1fr);padding:14px 36px 14px 14px}.reward-shop__art{width:88px;height:88px}.reward-shop__art img{width:88px;height:88px;min-width:88px}.ach-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-grid{grid-template-columns:1fr}.h-name{font-size:28px}.sec-head{flex-direction:column;align-items:flex-start;gap:8px}}
+@media (max-width:720px){.shell{padding:16px 14px 48px;gap:18px}.hero .hero-inner{grid-template-columns:1fr;gap:20px;padding:24px 18px 22px;text-align:center}.av-wrap{margin:0 auto}.h-name-row{justify-content:center}.h-status{justify-content:center}.h-quick{grid-template-columns:1fr 1fr}.nextrow{grid-template-columns:1fr}.nextrow--with-reward{grid-template-columns:1fr}.ngoal.reward-shop .reward-shop__title{white-space:normal}.ach-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-grid{grid-template-columns:1fr}.h-name{font-size:28px}.sec-head{flex-direction:column;align-items:flex-start;gap:8px}}
 
 /* ── Settings / account (preserved from legacy profile) ── */
 .prof-settings{

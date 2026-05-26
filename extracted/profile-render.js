@@ -336,6 +336,15 @@
 		);
 	}
 
+	var GIFT_ICO_SVG =
+		'<svg viewBox="0 0 24 24" aria-hidden="true">' +
+		'<path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/>' +
+		'<path d="M4 7h16v5H4z"/>' +
+		'<path d="M12 22V7"/>' +
+		'<path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>' +
+		'<path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>' +
+		'</svg>';
+
 	function renderRewardShopCard() {
 		return (
 			'<article class="ngoal reward-shop" tabindex="0" role="note" aria-label="Лавка наград — откроется с 15 уровня">' +
@@ -343,14 +352,17 @@
 			'<span class="reward-shop__glow" aria-hidden="true"></span>' +
 			'<span class="reward-shop__lock" aria-hidden="true">' + LOCK_SVG + '</span>' +
 			'<div class="ng-top">' +
-			'<div class="ng-ico reward-shop__ico">' +
-			'<img class="reward-shop__bag" src="/site/assets/rewards-shop-bag.png" alt="" width="24" height="24" decoding="async" draggable="false" />' +
-			'</div>' +
+			'<div class="ng-ico">' + GIFT_ICO_SVG + '</div>' +
 			'<span class="reward-shop__title">Лавка наград</span>' +
 			'</div>' +
+			'<div class="reward-shop__body">' +
+			'<div class="reward-shop__copy">' +
 			'<div class="ng-text">Обменивайте XP на реальные подарки</div>' +
 			'<div class="ng-bar" aria-hidden="true"><i style="width:0"></i></div>' +
 			'<div class="ng-foot">Откроется с ' + REWARD_SHOP_UNLOCK + ' уровня</div>' +
+			'</div>' +
+			'<img class="reward-shop__illus" src="/site/assets/rewards-shop-bag.png" alt="" width="56" height="56" decoding="async" draggable="false" />' +
+			'</div>' +
 			'<div class="reward-shop__tip" role="tooltip">Достигните ' + REWARD_SHOP_UNLOCK + ' уровня, чтобы открыть магазин наград</div>' +
 			'</article>'
 		);
