@@ -244,12 +244,14 @@
     border-radius:999px;
     background:linear-gradient(90deg, #0ea5e9 0%, #7c3aed 60%, #db2777 100%);
     box-shadow:0 0 16px rgba(124,58,237,.55);
+    overflow:hidden;
   }
 .iqmo-hero.v3 .xp-fill::after{
-    content:""; position:absolute; inset:0;
+    content:""; display:block; position:absolute; inset:0;
     background:linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
     transform:translateX(-100%);
     animation:iqmoShimmer 2.2s ease-in-out infinite;
+    will-change:transform;
   }
   /* segment ticks overlay on xp */
 .iqmo-hero.v3 .xp-bar::after{
@@ -472,12 +474,14 @@
       0 0 28px rgba(74,222,128,.35),
       inset 0 1px 0 rgba(255,255,255,.6);
     position:relative;
+    overflow:hidden;
   }
 .iqmo-hero.v3 .s-prog-fill::after{
-    content:""; position:absolute; inset:0;
+    content:""; display:block; position:absolute; inset:0;
     background:linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
     transform:translateX(-100%);
     animation:iqmoShimmer 2.4s ease-in-out infinite;
+    will-change:transform;
   }
 .iqmo-hero.v3 .s-prog-bar::after{
     content:""; position:absolute; inset:0; pointer-events:none;

@@ -297,7 +297,7 @@
     background:linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%);
     box-shadow: 0 0 10px rgba(245,158,11,.20);
   }
-  .xp-fill::after{display:none;}
+  .xp-block .xp-fill::after{display:none;}
   .xp-head-dot{display:none;}
   .xp-ticks{display:none;}
   .xp-foot{
