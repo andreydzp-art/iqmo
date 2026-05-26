@@ -249,6 +249,37 @@
 		if (_combo > 0 && _combo % 5 === 0) flashCombo(_combo);
 	}
 
+	/**
+	 * Восстановить уже «вознаграждённые» задания после reload, чтобы не начислять XP повторно.
+	 * @param {object} answers — state.answers из localStorage
+	 * @param {Array} questions — массив вопросов (для определения типа match)
+	 */
+	function seedFromState(answers, questions) {
+		if (!answers || typeof answers !== 'object') return;
+		var byId = {};
+		if (Array.isArray(questions)) {
+			for (var i = 0; i < questions.length; i++) {
+				if (questions[i] && questions[i].id != null) byId[questions[i].id] = questions[i];
+			}
+		}
+		Object.keys(answers).forEach(function (qid) {
+			var v = answers[qid];
+			var q = byId[qid];
+			var has = false;
+			if (Array.isArray(v)) {
+				if (q && q.type === 'match' && Array.isArray(q.matchLeft)) {
+					has = v.length >= q.matchLeft.length &&
+						q.matchLeft.every(function (_, i) { return v[i] && String(v[i]).trim() !== ''; });
+				} else {
+					has = v.some(function (x) { return x !== undefined && x !== null && String(x).trim() !== ''; });
+				}
+			} else {
+				has = v !== undefined && v !== null && String(v).trim() !== '';
+			}
+			if (has) _firstRewarded[qid] = true;
+		});
+	}
+
 	function onFirstAnswer(q, anchor) {
 		if (!q || _firstRewarded[q.id]) return;
 		_firstRewarded[q.id] = true;
@@ -310,6 +341,7 @@
 		onAnswerChanged: onAnswerChanged,
 		maybeMilestone: maybeMilestone,
 		reset: reset,
+		seedFromState: seedFromState,
 		ripple: ripple,
 		refreshOptions: refreshOptions
 	};

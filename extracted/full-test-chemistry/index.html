@@ -40,7 +40,7 @@
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
-		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=9">');}</script>
+		<script>if(/[?&]v=/.test(location.search)){document.write('<link rel="stylesheet" href="/iqmo-test-runner.css?v=10">');}</script>
 		<style>
 			html.is--hub #test-root { display: none !important; }
 			html.is--hub #exam-subbar { display: none !important; }
@@ -1547,14 +1547,14 @@
 		<script src="/chemistry-bank.js?v=17"></script>
 		<script src="/chemistry-banks-bundle.js?v=9"></script>
 		<script src="/chemistry-variants.js?v=13"></script>
-		<script src="/iqmo-sync.js?v=5"></script>
+		<script src="/iqmo-sync.js?v=6"></script>
 		<script src="/iqmo-nav.js"></script>
 		<script src="/mistakes-store.js"></script>
 		<script src="/level-map-xp.js?v=3"></script>
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/iqmo-avatar.js?v=1"></script>
 		<script src="/chem-progress.js?v=9"></script>
-		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-live-activity.js?v=2"><\/script><script src="/iqmo-test-runner-layout.js?v=5"><\/script><script src="/iqmo-test-runner-render.js?v=1"><\/script><script src="/iqmo-test-runner-presence.js?v=2"><\/script><script src="/iqmo-test-runner-rewards.js?v=5"><\/script><script src="/iqmo-test-runner-fx.js?v=2"><\/script>');}</script>
+		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-live-activity.js?v=2"><\/script><script src="/iqmo-test-runner-layout.js?v=5"><\/script><script src="/iqmo-test-runner-render.js?v=1"><\/script><script src="/iqmo-test-runner-presence.js?v=3"><\/script><script src="/iqmo-test-runner-rewards.js?v=6"><\/script><script src="/iqmo-test-runner-fx.js?v=2"><\/script>');}</script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
@@ -1673,7 +1673,10 @@
 				currentIndex: state.current,
 				streakDays: _runnerStreak
 			})) || {};
-			if (window.IqmoTestRunnerRewards) IqmoTestRunnerRewards.reset();
+			if (window.IqmoTestRunnerRewards) {
+				IqmoTestRunnerRewards.reset();
+				try { IqmoTestRunnerRewards.seedFromState(state.answers, QUESTIONS); } catch (_eSeed) {}
+			}
 			try {
 				if (window.IqmoTestRunnerPresence) {
 					IqmoTestRunnerPresence.mount({
@@ -1834,6 +1837,11 @@
 			function isAnswered(id) {
 				const a = state.answers[id];
 				if (Array.isArray(a)) {
+					const q = QUESTIONS.find(x => x.id === id);
+					if (q && q.type === 'match' && Array.isArray(q.matchLeft)) {
+						if (a.length < q.matchLeft.length) return false;
+						return q.matchLeft.every((_, i) => a[i] !== undefined && a[i] !== null && String(a[i]).trim() !== '');
+					}
 					return a.some(v => v !== undefined && v !== null && String(v).trim() !== '');
 				}
 				return a !== undefined && a !== '';
@@ -2147,8 +2155,10 @@
 					const ta = document.getElementById('ans-written');
 					if (ta) {
 						ta.addEventListener('input', () => {
+							const was = isAnswered(q.id);
 							state.answers[q.id] = ta.value;
 							saveState();
+							if (!was && isAnswered(q.id)) rewardAfterAnswer(q, ta);
 							renderNav();
 						});
 					}
@@ -3383,8 +3393,8 @@
 									${heroCtaLabel}
 								</a>
 								<a href="/subject-chemistry/" class="lm-btn">
-									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-									Расписание
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+									К предмету
 								</a>
 							</div>
 						</div>
@@ -3404,7 +3414,7 @@
 								</div>
 								<div>
 									<div class="lm-stat-val"><span class="lm-num">${streakStatus.days || 0}</span></div>
-									<div class="lm-stat-lbl">Дней подряд</div>
+									<div class="lm-stat-lbl">${(streakStatus.days || 0) === 0 ? 'Начните серию · 10 заданий за день' : 'Дней подряд'}</div>
 								</div>
 							</div>
 							<div class="lm-stat">

@@ -56,7 +56,7 @@
 			var s = JSON.parse(raw);
 			return !!(s && typeof s === 'object' && !s.finished);
 		} catch (e) {
-			return true;
+			return false;
 		}
 	}
 

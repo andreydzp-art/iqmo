@@ -263,7 +263,18 @@
 		var accDelta = '';
 		var courseDelta = '';
 		var orbGradId = 'iqmo-orb-grad-' + gid;
+		// «Быстрое повторение» ведёт на предмет, в котором ученик активнее.
+		var subjects = p && p.subjectsProgressData ? p.subjectsProgressData : null;
 		var reviewHref = '/full-test-chemistry/';
+		try {
+			if (subjects && subjects.length) {
+				var chem = subjects.find(function (s) { return s && (s.subject === 'chemistry' || s.id === 'chemistry'); });
+				var bio = subjects.find(function (s) { return s && (s.subject === 'biology' || s.id === 'biology'); });
+				var chemP = chem ? Number(chem.percent || chem.progress || 0) : 0;
+				var bioP = bio ? Number(bio.percent || bio.progress || 0) : 0;
+				if (bioP > chemP) reviewHref = '/full-test-biology/';
+			}
+		} catch (eRev) {}
 
 		return (
 			'<section class="iqmo-hero v3">' +

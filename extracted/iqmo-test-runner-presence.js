@@ -29,11 +29,11 @@
 
 		function apply(data) {
 			if (!data) {
-				countEl.textContent = '12';
+				countEl.textContent = '—';
 				return;
 			}
 			var v = data.activeInVariant || data.activeInChapter || 0;
-			if (v > 0) countEl.textContent = fmtNum(v);
+			countEl.textContent = v > 0 ? fmtNum(v) : '—';
 		}
 
 		function poll() {
