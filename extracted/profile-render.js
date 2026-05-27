@@ -492,24 +492,21 @@
 		);
 	}
 
-	/* Иллюстрированная коллекционная карточка (full-bleed game-style).
-	   Используется для ачивок с iconUrl — рендер полностью отдельный,
-	   чтобы не наследовать layout мини-чипа (центр-сжатый art + рамка
-	   "карточка в карточке"). Картинка занимает ~50% высоты, тайтл —
-	   главный визуальный якорь, статы внизу в стеклянной полосе. */
+	/* Эпическая коллекционная карточка (full-bleed ref-card по прототипу
+	   "Card Lab" v15). Используется для ачивок с iconUrl и занимает в
+	   сетке 2×2 ячейки, чтобы прототип 340×510 поместился без сжатия.
+	   Внутренние размеры через container query units → масштабируется
+	   пропорционально на любом разрешении. */
 	function renderAchievementCardIllus(a, state) {
-		var rar = a.rarity || 'common';
-		var cls = ['ach', 'ach--illus', 'ach--' + rar];
+		var rar = a.rarity || 'epic';
+		var cls = ['ach', 'ach--illus', 'ach--ref', 'anim-shake'];
 		if (!a.unlocked) cls.push('locked');
 		if (a.inProgress) cls.push('is-progress');
 		if (a.unlocked) cls.push('is-earned');
 
 		var rarText = rarityLabel(rar);
-		var pctText = (a.pctRare != null) ? rarityPrefix(rar) + a.pctRare + '%' : '';
 
-		var progPct = 0;
-		var progCur = null;
-		var progTgt = null;
+		var progPct = 0, progCur = 0, progTgt = 1;
 		if (a.progress) {
 			progCur = a.progress.current;
 			progTgt = a.progress.target;
@@ -520,58 +517,113 @@
 			progTgt = 1;
 		}
 
-		var rightCell;
+		var dateVal, dateLbl;
 		if (a.unlocked && a.earnedAt) {
-			rightCell = '<b>' + esc(fmtDate(a.earnedAt)) + '</b><i>получено</i>';
-		} else if (a.inProgress && progCur != null) {
-			rightCell = '<b>' + progCur + ' / ' + progTgt + '</b><i>прогресс</i>';
+			dateVal = fmtDate(a.earnedAt);
+			dateLbl = 'Получено';
+		} else if (a.inProgress) {
+			dateVal = 'В процессе';
+			dateLbl = 'Статус';
 		} else {
-			rightCell = '<b>—</b><i>закрыто</i>';
-		}
-
-		var xpCell = '<b>+' + (a.xpReward || 0) + '</b><i>XP награда</i>';
-
-		var progBar = '';
-		if (progPct > 0 && progPct < 100) {
-			progBar =
-				'<div class="ach--illus__prog" aria-label="' + progCur + ' из ' + progTgt + '">' +
-					'<i style="width:' + progPct + '%"></i>' +
-				'</div>';
+			dateVal = '—';
+			dateLbl = 'Закрыто';
 		}
 
 		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
 			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
 
+		var hexSvg = '<svg viewBox="0 0 30 34" fill="none" stroke="#a78bfa" stroke-width="1.2"><polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/></svg>';
+
+		var flaskSvg =
+			'<svg class="ref-flask" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="iqRefGlassFill" x1="0" x2="0" y1="0" y2="1">' +
+						'<stop offset="0%"  stop-color="#c4b5fd" stop-opacity=".25"/>' +
+						'<stop offset="55%" stop-color="#a78bfa" stop-opacity=".9"/>' +
+						'<stop offset="100%" stop-color="#7c3aed"/>' +
+					'</linearGradient>' +
+					'<linearGradient id="iqRefGlassEdge" x1="0" x2="1" y1="0" y2="1">' +
+						'<stop offset="0%" stop-color="#ffffff"/>' +
+						'<stop offset="100%" stop-color="#c4b5fd"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<rect x="26" y="6" width="12" height="14" rx="2" fill="none" stroke="url(#iqRefGlassEdge)" stroke-width="2.2"/>' +
+				'<rect x="24" y="4" width="16" height="3" rx="1.5" fill="#fff" opacity=".9"/>' +
+				'<path d="M26 18 L26 26 L12 52 Q10 58 16 58 L48 58 Q54 58 52 52 L38 26 L38 18 Z" fill="url(#iqRefGlassFill)" stroke="url(#iqRefGlassEdge)" stroke-width="2.2" stroke-linejoin="round"/>' +
+				'<path d="M18 44 Q32 40 46 44" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".6"/>' +
+				'<circle cx="22" cy="50" r="1.8" fill="#ffffff" opacity=".9"/>' +
+				'<circle cx="30" cy="52" r="1.2" fill="#ffffff" opacity=".75"/>' +
+				'<circle cx="38" cy="49" r="1.5" fill="#ffffff" opacity=".85"/>' +
+				'<circle cx="42" cy="54" r="1" fill="#ffffff" opacity=".7"/>' +
+				'<path d="M30 22 L20 48" stroke="#ffffff" stroke-width="1.2" opacity=".55" stroke-linecap="round"/>' +
+			'</svg>';
+
+		var checkSvg =
+			'<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="iqRefHexFill" x1="0" x2="0" y1="0" y2="1">' +
+						'<stop offset="0%"  stop-color="#ffffff"/>' +
+						'<stop offset="100%" stop-color="#ede9fe"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#iqRefHexFill)" stroke="#c4b5fd" stroke-width="2"/>' +
+				'<path d="M20 32 L29 41 L46 24" fill="none" stroke="#7c3aed" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+			'</svg>';
+
+		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
+		var dateSvg = '<svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm0 6v12h10V8H7zm2 3h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg>';
+
 		return (
 			'<article class="' + cls.join(' ') + '" data-state="' + state + '" tabindex="0">' +
+				'<div class="ref-scene" aria-hidden="true"></div>' +
+				'<span class="c-rar">' + esc(rarText) + '</span>' +
+				'<div class="c-orb-stage">' +
+					'<div class="float-hex fh1" aria-hidden="true">' + hexSvg + '</div>' +
+					'<div class="float-hex fh2" aria-hidden="true">' + hexSvg + '</div>' +
+					'<div class="float-hex fh3" aria-hidden="true">' + hexSvg + '</div>' +
+					'<div class="ref-orb">' + flaskSvg + '</div>' +
+					checkSvg +
+					'<span class="float-ball fb1" aria-hidden="true"></span>' +
+					'<span class="float-ball fb2" aria-hidden="true"></span>' +
+					'<span class="float-ball fb3" aria-hidden="true"></span>' +
+					'<span class="float-ball fb4" aria-hidden="true"></span>' +
+				'</div>' +
+				'<div class="c-title-block">' +
+					'<h4 class="c-title">' + esc(a.title) + '</h4>' +
+					'<div class="c-sub">' + esc(a.desc) + '</div>' +
+				'</div>' +
+				'<div class="c-div" aria-hidden="true"><span></span></div>' +
+				'<div class="c-prog">' +
+					'<div class="c-prog-row">' +
+						'<span>Прогресс</span>' +
+						'<span class="pp"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
+					'</div>' +
+					'<div class="c-prog-line">' +
+						'<div class="c-prog-bar"><i style="width:' + progPct + '%"></i></div>' +
+					'</div>' +
+				'</div>' +
+				'<div class="c-reward">' +
+					'<div class="c-rwd-item">' +
+						'<div class="c-rwd-ico xp">' + xpSvg + '</div>' +
+						'<div class="c-rwd-text">' +
+							'<span class="c-rwd-val">+' + (a.xpReward || 0) + ' XP</span>' +
+							'<span class="c-rwd-lbl">Награда</span>' +
+						'</div>' +
+					'</div>' +
+					'<div class="c-rwd-sep"></div>' +
+					'<div class="c-rwd-item">' +
+						'<div class="c-rwd-ico date">' + dateSvg + '</div>' +
+						'<div class="c-rwd-text">' +
+							'<span class="c-rwd-val">' + esc(dateVal) + '</span>' +
+							'<span class="c-rwd-lbl">' + esc(dateLbl) + '</span>' +
+						'</div>' +
+					'</div>' +
+				'</div>' +
 				'<div class="a-tip">' +
 					'<div class="tt-name">' + esc(a.title) + '</div>' +
 					'<div class="tt-desc">' + esc(a.desc) + '</div>' +
 					'<div class="tt-meta">' + tipMeta + '</div>' +
 				'</div>' +
-				'<div class="ach--illus__bg" aria-hidden="true"></div>' +
-				'<header class="ach--illus__top">' +
-					'<span class="ach--illus__rarity">' +
-						'<span class="ach--illus__rarity-ico" aria-hidden="true">◆</span>' +
-						'<span class="ach--illus__rarity-txt">' + esc(rarText) + '</span>' +
-					'</span>' +
-					(pctText
-						? '<span class="ach--illus__pct" title="Получили ' + esc(String(a.pctRare)) + '% игроков">' + esc(pctText) + '</span>'
-						: '') +
-				'</header>' +
-				'<div class="ach--illus__stage">' +
-					'<img class="ach--illus__art" src="' + esc(a.iconUrl) + '" alt="" decoding="async" draggable="false" />' +
-				'</div>' +
-				'<div class="ach--illus__body">' +
-					'<h3 class="ach--illus__title">' + esc(a.title) + '</h3>' +
-					'<p class="ach--illus__sub">' + esc(a.desc) + '</p>' +
-					progBar +
-				'</div>' +
-				'<footer class="ach--illus__foot">' +
-					'<span class="ach--illus__cell">' + xpCell + '</span>' +
-					'<span class="ach--illus__sep" aria-hidden="true"></span>' +
-					'<span class="ach--illus__cell">' + rightCell + '</span>' +
-				'</footer>' +
 			'</article>'
 		);
 	}
