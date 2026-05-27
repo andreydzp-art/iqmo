@@ -740,8 +740,8 @@
 		var profileId = data.profileData && data.profileData.profileId;
 		var settingsBlock = isPublic ? '' : renderSettingsGuest() + renderSettingsAccount(profileId, data.profileData);
 		return (
-			renderGoals(data.nextGoalsData, isPublic) +
 			(isPublic ? '' : renderXpGuide()) +
+			renderGoals(data.nextGoalsData, isPublic) +
 			renderAchievements(data.achievementsData, data.profileData && data.profileData.avatarUrl) +
 			'<div class="row-2">' + renderActivity(data.activityData) + renderStats(data.statsData) + '</div>' +
 			renderSubjects(data.subjectsProgressData) +
