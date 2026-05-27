@@ -444,11 +444,10 @@
 	function renderAchievementCard(a) {
 		var state = achCardState(a);
 		var hasIllus = !!a.iconUrl;
-		var cls = (a.unlocked ? a.rarity : (a.rarity + ' locked')) + (hasIllus ? ' has-illus' : '');
+		if (hasIllus) return renderAchievementCardIllus(a, state);
+		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
 		var icon = ICONS[a.icon] || ICONS.star;
-		var artInner = hasIllus
-			? '<img src="' + esc(a.iconUrl) + '" alt="" class="a-art-img" decoding="async" draggable="false" />'
-			: '<svg viewBox="0 0 24 24">' + icon + '</svg>';
+		var artInner = '<svg viewBox="0 0 24 24">' + icon + '</svg>';
 		var pctText = (a.pctRare != null) ? rarityPrefix(a.rarity) + a.pctRare + '%' : '';
 		var rarText = rarityLabel(a.rarity);
 
@@ -489,6 +488,90 @@
 			'<div class="a-art">' + artInner + '</div>' +
 			bottomBlock +
 			'<div class="a-rar">' + esc(rarFootText) + '</div>' +
+			'</article>'
+		);
+	}
+
+	/* Иллюстрированная коллекционная карточка (full-bleed game-style).
+	   Используется для ачивок с iconUrl — рендер полностью отдельный,
+	   чтобы не наследовать layout мини-чипа (центр-сжатый art + рамка
+	   "карточка в карточке"). Картинка занимает ~50% высоты, тайтл —
+	   главный визуальный якорь, статы внизу в стеклянной полосе. */
+	function renderAchievementCardIllus(a, state) {
+		var rar = a.rarity || 'common';
+		var cls = ['ach', 'ach--illus', 'ach--' + rar];
+		if (!a.unlocked) cls.push('locked');
+		if (a.inProgress) cls.push('is-progress');
+		if (a.unlocked) cls.push('is-earned');
+
+		var rarText = rarityLabel(rar);
+		var pctText = (a.pctRare != null) ? rarityPrefix(rar) + a.pctRare + '%' : '';
+
+		var progPct = 0;
+		var progCur = null;
+		var progTgt = null;
+		if (a.progress) {
+			progCur = a.progress.current;
+			progTgt = a.progress.target;
+			progPct = Math.max(0, Math.min(100, Math.round((progCur / progTgt) * 100)));
+		} else if (a.unlocked) {
+			progPct = 100;
+			progCur = 1;
+			progTgt = 1;
+		}
+
+		var rightCell;
+		if (a.unlocked && a.earnedAt) {
+			rightCell = '<b>' + esc(fmtDate(a.earnedAt)) + '</b><i>получено</i>';
+		} else if (a.inProgress && progCur != null) {
+			rightCell = '<b>' + progCur + ' / ' + progTgt + '</b><i>прогресс</i>';
+		} else {
+			rightCell = '<b>—</b><i>закрыто</i>';
+		}
+
+		var xpCell = '<b>+' + (a.xpReward || 0) + '</b><i>XP награда</i>';
+
+		var progBar = '';
+		if (progPct > 0 && progPct < 100) {
+			progBar =
+				'<div class="ach--illus__prog" aria-label="' + progCur + ' из ' + progTgt + '">' +
+					'<i style="width:' + progPct + '%"></i>' +
+				'</div>';
+		}
+
+		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
+			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
+
+		return (
+			'<article class="' + cls.join(' ') + '" data-state="' + state + '" tabindex="0">' +
+				'<div class="a-tip">' +
+					'<div class="tt-name">' + esc(a.title) + '</div>' +
+					'<div class="tt-desc">' + esc(a.desc) + '</div>' +
+					'<div class="tt-meta">' + tipMeta + '</div>' +
+				'</div>' +
+				'<div class="ach--illus__bg" aria-hidden="true"></div>' +
+				'<header class="ach--illus__top">' +
+					'<span class="ach--illus__rarity">' +
+						'<span class="ach--illus__rarity-ico" aria-hidden="true">◆</span>' +
+						'<span class="ach--illus__rarity-txt">' + esc(rarText) + '</span>' +
+					'</span>' +
+					(pctText
+						? '<span class="ach--illus__pct" title="Получили ' + esc(String(a.pctRare)) + '% игроков">' + esc(pctText) + '</span>'
+						: '') +
+				'</header>' +
+				'<div class="ach--illus__stage">' +
+					'<img class="ach--illus__art" src="' + esc(a.iconUrl) + '" alt="" decoding="async" draggable="false" />' +
+				'</div>' +
+				'<div class="ach--illus__body">' +
+					'<h3 class="ach--illus__title">' + esc(a.title) + '</h3>' +
+					'<p class="ach--illus__sub">' + esc(a.desc) + '</p>' +
+					progBar +
+				'</div>' +
+				'<footer class="ach--illus__foot">' +
+					'<span class="ach--illus__cell">' + xpCell + '</span>' +
+					'<span class="ach--illus__sep" aria-hidden="true"></span>' +
+					'<span class="ach--illus__cell">' + rightCell + '</span>' +
+				'</footer>' +
 			'</article>'
 		);
 	}
