@@ -375,7 +375,10 @@
 			'<div class="ng-bar" aria-hidden="true"><i style="width:0"></i></div>' +
 			'<div class="ng-foot">Откроется с ' + REWARD_SHOP_UNLOCK + ' уровня</div>' +
 			'</div>' +
-			'<img class="reward-shop__illus" src="/site/assets/rewards-shop-bag.png" alt="" width="56" height="56" decoding="async" draggable="false" />' +
+			'<div class="reward-shop__illus-wrap" aria-hidden="true">' +
+			'<span class="reward-shop__illus-halo"></span>' +
+			'<img class="reward-shop__illus" src="/site/assets/rewards-shop-bag.png" alt="" width="96" height="96" decoding="async" draggable="false" />' +
+			'</div>' +
 			'</div>' +
 			'<div class="reward-shop__tip" role="tooltip">Достигните ' + REWARD_SHOP_UNLOCK + ' уровня, чтобы открыть магазин наград</div>' +
 			'</article>'
