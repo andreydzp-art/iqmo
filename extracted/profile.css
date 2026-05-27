@@ -757,6 +757,25 @@
   .ach-grid[data-ach-filter="earned"]     .ach:not([data-state="earned"])     { display:none; }
   .ach-grid[data-ach-filter="inprogress"] .ach:not([data-state="inprogress"]) { display:none; }
   .ach-grid[data-ach-filter="locked"]     .ach:not([data-state="locked"])     { display:none; }
+  /* Иллюстрированная награда — без градиентного бэйджа, картинка крупнее. */
+  .ach.has-illus .a-art{
+    width:84px; height:84px;
+    background:transparent !important;
+    box-shadow:none !important;
+    margin-top:2px;
+  }
+  .ach.has-illus .a-art-img{
+    width:100%; height:100%;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 6px 14px rgba(124,58,237,.30));
+    transition:transform .25s ease, filter .25s ease;
+    -webkit-user-drag:none; user-select:none;
+  }
+  .ach.has-illus:hover .a-art-img{
+    transform:translateY(-2px) scale(1.04);
+    filter:drop-shadow(0 10px 22px rgba(124,58,237,.42));
+  }
   .ach-filter button .cnt{
     margin-left:6px;
     font-family:'JetBrains Mono',monospace;

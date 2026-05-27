@@ -443,8 +443,12 @@
 
 	function renderAchievementCard(a) {
 		var state = achCardState(a);
-		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
+		var hasIllus = !!a.iconUrl;
+		var cls = (a.unlocked ? a.rarity : (a.rarity + ' locked')) + (hasIllus ? ' has-illus' : '');
 		var icon = ICONS[a.icon] || ICONS.star;
+		var artInner = hasIllus
+			? '<img src="' + esc(a.iconUrl) + '" alt="" class="a-art-img" decoding="async" draggable="false" />'
+			: '<svg viewBox="0 0 24 24">' + icon + '</svg>';
 		var pctText = (a.pctRare != null) ? rarityPrefix(a.rarity) + a.pctRare + '%' : '';
 		var rarText = rarityLabel(a.rarity);
 
@@ -482,7 +486,7 @@
 				'<div class="tt-desc">' + esc(a.desc) + '</div>' +
 				'<div class="tt-meta">' + tipMeta + '</div>' +
 			'</div>' +
-			'<div class="a-art"><svg viewBox="0 0 24 24">' + icon + '</svg></div>' +
+			'<div class="a-art">' + artInner + '</div>' +
 			bottomBlock +
 			'<div class="a-rar">' + esc(rarFootText) + '</div>' +
 			'</article>'
