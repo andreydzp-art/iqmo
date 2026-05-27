@@ -1665,7 +1665,22 @@
 				if (_st && _st.days) _runnerStreak = _st.days;
 			} catch (_eSt) {}
 
-			const _runnerRefs = (window.IqmoTestRunnerLayout && IqmoTestRunnerLayout.install({
+			// Для уже завершённых вариантов не активируем runner-v4 layout,
+			// иначе renderResult() пишет в .page__main, а пользователь видит
+			// пустую правую колонку runner-v4. Старый header + классический
+			// result card — корректный фолбэк.
+			const _isAlreadyFinished = !!state.finished;
+			if (_isAlreadyFinished) {
+				try {
+					var _tmEl = document.getElementById('timer');
+					if (_tmEl) _tmEl.style.display = 'none';
+					var _quitEl = document.getElementById('btn-quit-exam');
+					if (_quitEl) _quitEl.style.display = 'none';
+					var _crumb = document.getElementById('exam-breadcrumb');
+					if (_crumb) _crumb.innerHTML = 'Химия · ОГЭ 2026 — <b>Полный вариант ' + activeVariant.id + '</b> · тест завершён';
+				} catch (_eFin) {}
+			}
+			const _runnerRefs = (!_isAlreadyFinished && window.IqmoTestRunnerLayout && IqmoTestRunnerLayout.install({
 				subjectEyebrow: 'Химия · ОГЭ 2026',
 				variantTitle: 'Полный вариант',
 				variantId: activeVariant.id,
@@ -1673,12 +1688,12 @@
 				currentIndex: state.current,
 				streakDays: _runnerStreak
 			})) || {};
-			if (window.IqmoTestRunnerRewards) {
+			if (!_isAlreadyFinished && window.IqmoTestRunnerRewards) {
 				IqmoTestRunnerRewards.reset();
 				try { IqmoTestRunnerRewards.seedFromState(state.answers, QUESTIONS); } catch (_eSeed) {}
 			}
 			try {
-				if (window.IqmoTestRunnerPresence) {
+				if (!_isAlreadyFinished && window.IqmoTestRunnerPresence) {
 					IqmoTestRunnerPresence.mount({
 						subject: EXAM_SUBJECT,
 						variantId: activeVariant.id,
