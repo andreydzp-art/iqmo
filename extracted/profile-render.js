@@ -160,14 +160,17 @@
 		var accUnit = d.accuracyPct != null ? '<span class="unit">%</span>' : '';
 		// «Курс · биология» убран — метрика считалась только по вариантам
 		// главы 1 и для большинства пользователей всегда показывала 0%.
+		// Сетка осталась 3-колоночной, чтобы плитки сохранили исходный
+		// размер; третий слот пустой (slot--empty).
 		return (
-			'<div class="sec-row sec-row--2col" role="group" aria-label="Краткая статистика">' +
+			'<div class="sec-row" role="group" aria-label="Краткая статистика">' +
 			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
 			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига · неделя</div></div>' +
 			(leagueDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
 			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
 			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div>' +
 			(accDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
+			'<div class="qstat slot--empty" aria-hidden="true"></div>' +
 			'</div>'
 		);
 	}
@@ -302,6 +305,12 @@
 			'<span class="holo-border" aria-hidden="true"></span>' +
 			'<div class="streak-top">' +
 			'<span class="s-eye"><span class="pulse"></span>STREAK · ' + pad2(streakDays) + '</span>' +
+			(streakDays > 0
+				? '<span class="s-bonus" title="Декоративный бейдж серии">' +
+					'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>' +
+					'BONUS' +
+				'</span>'
+				: '') +
 			'</div>' +
 			'<div class="s-hero">' +
 			'<div class="orb">' +
@@ -682,9 +691,18 @@
 			if (eyeStreak) {
 				eyeStreak.innerHTML = '<span class="pulse"></span>STREAK · ' + pad2(streakDays);
 			}
-			// BONUS-плашка убрана: реального множителя XP нет.
+			// Бейдж BONUS — чисто визуальный, без множителя.
 			var bonus = streakTop.querySelector('.s-bonus');
-			if (bonus) bonus.remove();
+			if (streakDays > 0) {
+				var bonusHtml =
+					'<span class="s-bonus" title="Декоративный бейдж серии">' +
+					'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>' +
+					'BONUS</span>';
+				if (bonus) bonus.outerHTML = bonusHtml;
+				else if (eyeStreak) eyeStreak.insertAdjacentHTML('afterend', bonusHtml);
+			} else if (bonus) {
+				bonus.remove();
+			}
 		}
 		var sNum = hero.querySelector('.s-big .num');
 		if (sNum) sNum.textContent = String(streakDays);

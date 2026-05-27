@@ -104,9 +104,17 @@
   grid-template-columns:repeat(3, minmax(0, 1fr));
   gap:10px;
 }
-.iqmo-hero.v3 .h-id .sec-row.sec-row--2col{
-  grid-template-columns:repeat(2, minmax(0, 1fr));
-  max-width:480px;
+/* Пустой третий слот сетки: место зарезервировано, чип не виден. */
+.iqmo-hero.v3 .h-id .sec-row .qstat.slot--empty{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  pointer-events:none;
+  padding:0;
+}
+.iqmo-hero.v3 .h-id .sec-row .qstat.slot--empty:hover{
+  transform:none;
+  box-shadow:none;
 }
 
   /* avatar — concentric segmented neon ring */
