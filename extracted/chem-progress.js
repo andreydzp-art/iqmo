@@ -1189,6 +1189,15 @@
 			return computeLevelDetail(totalXp);
 		},
 		getLevelTitle: levelTitleRu,
+		/**
+		 * Сколько суммарного XP нужно набрать, чтобы достичь начала уровня L.
+		 * L=1 → 0; L=10 → ~2120; L=50 → конец прогрессии. Используется
+		 * для построения teaser-модалок и таргетных прогресс-баров.
+		 */
+		getLevelXp: function (level) {
+			const L = Math.max(1, Math.min(MAX_LEVEL, Number(level) || 1));
+			return LEVEL_MIN_XP[L - 1] || 0;
+		},
 		MAX_LEVEL,
 		startActivityTracking
 	};

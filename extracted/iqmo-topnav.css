@@ -89,6 +89,17 @@
 	background: transparent;
 	color: var(--muted, #6b7094);
 }
+/* Кнопка «Рейтинг» (.rb-rating, см. rating-button.css) внутри топ-меню:
+   общие правила .topnav .nav-mid a выигрывают по специфичности и сбивают
+   золотой фон/цвет/font-size, поэтому возвращаем их обратно. Сам hover
+   и halo управляются исходными стилями модуля. */
+.topnav .nav-mid a.rb-rating,
+.topnav .nav-mid a.rb-rating:hover {
+	background: linear-gradient(180deg, #fffaed 0%, #fff5da 100%);
+	color: #0f1226;
+	font-size: 14px;
+	font-weight: 700;
+}
 .topnav .nav-right {
 	display: flex;
 	gap: 8px;
