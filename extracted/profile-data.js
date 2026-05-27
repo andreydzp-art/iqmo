@@ -21,15 +21,15 @@
 	var CH1_VARIANT_IDS = [1, 2, 3, 4, 5, 6, 7];
 
 	var ACHIEVEMENT_CATALOG = [
-		{ id: 'welcome', title: 'Старт', desc: 'Первый визит в IQMO.', rarity: 'common', icon: 'star' },
-		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', icon: 'book' },
-		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame' },
-		{ id: 'chem_stage1', title: 'Этап 1 · Химия', desc: 'Все 7 вариантов главы 1 по химии.', rarity: 'epic', icon: 'trophy' },
-		{ id: 'bio_stage1', title: 'Этап 1 · Биология', desc: 'Все 7 вариантов главы 1 по биологии.', rarity: 'epic', icon: 'trophy' },
-		{ id: 'ten_tests', title: 'Десятка', desc: '10 завершённых попыток.', rarity: 'rare', icon: 'medal' },
-		{ id: 'perfect_run', title: 'Без ошибок', desc: '100% при ≥5 вопросах в зачёте.', rarity: 'rare', icon: 'target' },
-		{ id: 'topic_star', title: 'Мастер темы', desc: 'Полностью освоена хотя бы одна тема.', rarity: 'rare', icon: 'spark' },
-		{ id: 'final_sprint', title: 'Финишный рывок', desc: 'Максимальный уровень (50).', rarity: 'legend', icon: 'crown' }
+		{ id: 'welcome', title: 'Старт', desc: 'Первый визит в IQMO.', rarity: 'common', icon: 'star', pctRare: 62, xpReward: 25 },
+		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', icon: 'book', pctRare: 38, xpReward: 50 },
+		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame', pctRare: 6.2, xpReward: 200 },
+		{ id: 'chem_stage1', title: 'Этап 1 · Химия', desc: 'Все 7 вариантов главы 1 по химии со средним 50%+.', rarity: 'epic', icon: 'trophy', pctRare: 2.4, xpReward: 500 },
+		{ id: 'bio_stage1', title: 'Этап 1 · Биология', desc: 'Все 7 вариантов главы 1 по биологии со средним 50%+.', rarity: 'epic', icon: 'trophy', pctRare: 1.8, xpReward: 500 },
+		{ id: 'ten_tests', title: 'Десятка', desc: '10 завершённых попыток.', rarity: 'rare', icon: 'medal', pctRare: 18, xpReward: 150 },
+		{ id: 'perfect_run', title: 'Без ошибок', desc: '100% при ≥5 вопросах в зачёте.', rarity: 'rare', icon: 'target', pctRare: 4.1, xpReward: 250 },
+		{ id: 'topic_star', title: 'Мастер темы', desc: 'Полностью освоена хотя бы одна тема.', rarity: 'rare', icon: 'spark', pctRare: 22, xpReward: 100 },
+		{ id: 'final_sprint', title: 'Финишный рывок', desc: 'Максимальный уровень (50) в IQMO.', rarity: 'legend', icon: 'crown', pctRare: 0.1, xpReward: 2000 }
 	];
 
 	var COLLECTIBLES_CATALOG = [
@@ -281,16 +281,47 @@
 
 	function buildAchievements(snap) {
 		var earned = (snap && snap.badges) || {};
+		var lv = (snap && snap.level) || { current: 1 };
+		var streakDays = 0;
+		try { streakDays = (lsGet('iqmo-chem-streak', {}) || {}).days || 0; } catch (e1) {}
+		var bioV = summarizeVariants('iqmo-bio-v-', CH1_VARIANT_IDS);
+		var chemV = summarizeVariants('iqmo-chem-v-', CH1_VARIANT_IDS);
+		var totalTasks = 0;
+		try { totalTasks = Number(lsGet('iqmo-chem-points-total-tasks', 0)) || 0; } catch (e2) {}
+
+		function progressFor(catId) {
+			switch (catId) {
+				case 'streak7':
+					return { current: Math.min(streakDays, 7), target: 7 };
+				case 'chem_stage1':
+					return { current: Math.min(chemV.passed, CH1_VARIANT_IDS.length), target: CH1_VARIANT_IDS.length };
+				case 'bio_stage1':
+					return { current: Math.min(bioV.passed, CH1_VARIANT_IDS.length), target: CH1_VARIANT_IDS.length };
+				case 'ten_tests':
+					return { current: Math.min(totalTasks, 10), target: 10 };
+				case 'final_sprint':
+					return { current: Math.min(lv.current || 1, 50), target: 50 };
+				default:
+					return null;
+			}
+		}
+
 		return ACHIEVEMENT_CATALOG.map(function (cat) {
 			var ts = earned[cat.id];
 			var unlocked = !!ts;
+			var prog = unlocked ? null : progressFor(cat.id);
+			var inProgress = !unlocked && prog && prog.current > 0 && prog.current < prog.target;
 			return {
 				id: cat.id,
 				title: cat.title,
 				desc: cat.desc,
 				rarity: cat.rarity,
 				icon: cat.icon,
-				pctEarned: unlocked ? null : null,
+				pctRare: cat.pctRare,
+				xpReward: cat.xpReward,
+				progress: prog,
+				inProgress: !!inProgress,
+				pctEarned: null,
 				unlocked: unlocked,
 				earnedAt: unlocked ? ts : null,
 				locked: !unlocked

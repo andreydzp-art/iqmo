@@ -253,6 +253,9 @@
 		if (global.IqmoProfileRender && IqmoProfileRender.bindNameEdit) {
 			IqmoProfileRender.bindNameEdit();
 		}
+		if (global.IqmoProfileRender && IqmoProfileRender.bindAchievementsFilter) {
+			IqmoProfileRender.bindAchievementsFilter();
+		}
 		publicProfileId = parsePublicProfileId();
 		meUser = await fetchMe();
 		bindAccountHandlers();

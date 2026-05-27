@@ -408,40 +408,141 @@
 	}
 
 	function rarityLabel(r) {
-		if (r === 'legend') return '★ Легендарная';
-		if (r === 'epic') return '◆ Эпическая';
-		if (r === 'rare') return '◇ Редкая';
+		if (r === 'legend') return 'Легендарная';
+		if (r === 'epic') return 'Эпическая';
+		if (r === 'rare') return 'Редкая';
+		if (r === 'myth') return 'Мифическая';
 		return 'Обычная';
+	}
+
+	function rarityPrefix(r) {
+		if (r === 'legend') return '★ ';
+		if (r === 'epic') return '◆ ';
+		if (r === 'rare') return '◇ ';
+		if (r === 'myth') return '▲ ';
+		return '';
+	}
+
+	function collectionGrade(earnedCount, total, legendRareCount) {
+		if (!total) return '—';
+		var pct = earnedCount / total;
+		if (pct >= 0.9 || legendRareCount >= 4) return 'S';
+		if (pct >= 0.7 || legendRareCount >= 3) return 'A+';
+		if (pct >= 0.5 || legendRareCount >= 2) return 'A';
+		if (pct >= 0.35) return 'B+';
+		if (pct >= 0.2) return 'B';
+		if (pct >= 0.1) return 'C';
+		return 'D';
+	}
+
+	function achCardState(a) {
+		if (a.unlocked) return 'earned';
+		if (a.inProgress) return 'inprogress';
+		return 'locked';
+	}
+
+	function renderAchievementCard(a) {
+		var state = achCardState(a);
+		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
+		var icon = ICONS[a.icon] || ICONS.star;
+		var pctText = (a.pctRare != null) ? rarityPrefix(a.rarity) + a.pctRare + '%' : '';
+		var rarText = rarityLabel(a.rarity);
+
+		var bottomBlock;
+		if (a.unlocked && a.earnedAt) {
+			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div>' +
+				'<div class="a-meta">' + esc(fmtDate(a.earnedAt)) + '</div></div>';
+		} else if (a.inProgress && a.progress) {
+			var pct = Math.max(0, Math.min(100, Math.round((a.progress.current / a.progress.target) * 100)));
+			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div>' +
+				'<div class="a-prog" aria-label="' + a.progress.current + ' из ' + a.progress.target + '">' +
+				'<i style="width:' + pct + '%"></i></div></div>';
+		} else {
+			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div>' +
+				'<div class="a-meta">закрыто</div></div>';
+		}
+
+		var rarFootText;
+		if (a.inProgress && a.progress) {
+			rarFootText = a.progress.current + ' / ' + a.progress.target;
+		} else if (a.unlocked) {
+			rarFootText = rarText;
+		} else {
+			rarFootText = 'Закрыто';
+		}
+
+		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
+			'<span>' + (a.inProgress && a.progress ? (a.progress.current + ' / ' + a.progress.target) : rarText) + '</span>';
+
+		return (
+			'<article class="ach ' + cls + '" data-state="' + state + '" tabindex="0">' +
+			(pctText ? '<span class="a-pct">' + esc(pctText) + '</span>' : '') +
+			'<div class="a-tip">' +
+				'<div class="tt-name">' + esc(a.title) + '</div>' +
+				'<div class="tt-desc">' + esc(a.desc) + '</div>' +
+				'<div class="tt-meta">' + tipMeta + '</div>' +
+			'</div>' +
+			'<div class="a-art"><svg viewBox="0 0 24 24">' + icon + '</svg></div>' +
+			bottomBlock +
+			'<div class="a-rar">' + esc(rarFootText) + '</div>' +
+			'</article>'
+		);
 	}
 
 	function renderAchievements(list, avatarUrl) {
 		var earned = list.filter(function (a) { return a.unlocked; }).length;
+		var legendRare = list.filter(function (a) {
+			return a.unlocked && (a.rarity === 'legend' || a.rarity === 'epic');
+		}).length;
+		var grade = collectionGrade(earned, list.length, legendRare);
+		var inProgressCount = list.filter(function (a) { return a.inProgress; }).length;
+		var lockedCount = list.filter(function (a) { return !a.unlocked && !a.inProgress; }).length;
 		var avChip = avatarUrl
 			? '<img class="prof-ach-avatar" src="' + esc(avatarUrl) + '" alt="" width="40" height="40" />'
 			: '';
-		var cards = list.map(function (a) {
-			var cls = a.locked ? 'locked' : a.rarity;
-			var icon = ICONS[a.icon] || ICONS.star;
-			var date = a.earnedAt ? fmtDate(a.earnedAt) : 'закрыто';
-			return (
-				'<article class="ach ' + cls + '" tabindex="0">' +
-				(a.pctEarned != null ? '<span class="a-pct">' + a.pctEarned + '%</span>' : '') +
-				'<div class="a-art"><svg viewBox="0 0 24 24">' + icon + '</svg></div>' +
-				'<div class="a-name">' + esc(a.title) + '</div>' +
-				'<div class="a-rar">' + rarityLabel(a.rarity) + '</div>' +
-				'<div class="a-meta">' + esc(date) + '</div>' +
-				'<div class="a-tip"><div class="tt-name">' + esc(a.title) + '</div><div class="tt-desc">' + esc(a.desc) + '</div>' +
-				'<div class="tt-meta"><span>' + rarityLabel(a.rarity) + '</span><span>' + (a.pctEarned != null ? a.pctEarned + '% игроков' : '') + '</span></div></div>' +
-				'</article>'
-			);
-		}).join('');
+		var cards = list.map(renderAchievementCard).join('');
+
 		return (
 			'<section><div class="sec-head"><div class="sec-head-with-av">' + avChip +
-			'<div><div class="sec-eye">Коллекция</div><h2 class="sec-title">Награды и достижения</h2></div></div></div>' +
-			'<div class="panel ach-panel"><div class="ach-toolbar"><div class="ach-counter">' +
-			'<span><span class="cnt-big">' + earned + '</span> / ' + list.length + ' получено</span></div></div>' +
-			'<div class="ach-grid">' + cards + '</div></div></section>'
+			'<div><div class="sec-eye">Коллекция</div><h2 class="sec-title">Награды и достижения</h2></div></div>' +
+			'<span class="sec-link" aria-hidden="true">Всего ' + list.length + ' достижений</span></div>' +
+			'<div class="panel ach-panel">' +
+				'<div class="ach-toolbar">' +
+					'<div class="ach-counter">' +
+						'<span><span class="cnt-big">' + earned + '</span> / ' + list.length + ' получено</span>' +
+						'<span style="color:var(--muted-2);">·</span>' +
+						'<span>редкость коллекции <span class="grade">' + esc(grade) + '</span></span>' +
+					'</div>' +
+					'<div class="ach-filter" role="tablist" data-ach-filter-bar>' +
+						'<button type="button" class="is-on" data-filter="all" role="tab" aria-selected="true">Все <span class="cnt">' + list.length + '</span></button>' +
+						'<button type="button" data-filter="earned" role="tab" aria-selected="false">Получено <span class="cnt">' + earned + '</span></button>' +
+						'<button type="button" data-filter="inprogress" role="tab" aria-selected="false">В процессе <span class="cnt">' + inProgressCount + '</span></button>' +
+						'<button type="button" data-filter="locked" role="tab" aria-selected="false">Закрыто <span class="cnt">' + lockedCount + '</span></button>' +
+					'</div>' +
+				'</div>' +
+				'<div class="ach-grid" data-ach-filter="all">' + cards + '</div>' +
+			'</div></section>'
 		);
+	}
+
+	function bindAchievementsFilter() {
+		var root = document.getElementById('prof-root');
+		if (!root || root.__achFilterBound) return;
+		root.__achFilterBound = true;
+		root.addEventListener('click', function (ev) {
+			var btn = ev.target && ev.target.closest && ev.target.closest('[data-ach-filter-bar] button[data-filter]');
+			if (!btn) return;
+			var bar = btn.closest('[data-ach-filter-bar]');
+			var grid = bar && bar.parentNode && bar.parentNode.parentNode &&
+				bar.parentNode.parentNode.querySelector('.ach-grid');
+			if (!grid) return;
+			bar.querySelectorAll('button[data-filter]').forEach(function (b) {
+				var on = b === btn;
+				b.classList.toggle('is-on', on);
+				b.setAttribute('aria-selected', on ? 'true' : 'false');
+			});
+			grid.setAttribute('data-ach-filter', btn.getAttribute('data-filter') || 'all');
+		});
 	}
 
 	function renderActivity(events) {
@@ -977,6 +1078,7 @@
 		renderError: renderError,
 		bindCollectibles: bindCollectibles,
 		bindAvatarPicker: bindAvatarPicker,
-		bindNameEdit: bindNameEdit
+		bindNameEdit: bindNameEdit,
+		bindAchievementsFilter: bindAchievementsFilter
 	};
 })(typeof window !== 'undefined' ? window : global);

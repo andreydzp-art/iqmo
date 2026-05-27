@@ -753,6 +753,17 @@
     grid-template-columns:repeat(6, minmax(0,1fr));
     gap:12px;
   }
+  /* Фильтр коллекции — скрываем карточки, не подходящие под выбранный таб. */
+  .ach-grid[data-ach-filter="earned"]     .ach:not([data-state="earned"])     { display:none; }
+  .ach-grid[data-ach-filter="inprogress"] .ach:not([data-state="inprogress"]) { display:none; }
+  .ach-grid[data-ach-filter="locked"]     .ach:not([data-state="locked"])     { display:none; }
+  .ach-filter button .cnt{
+    margin-left:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    color:var(--muted-2);
+  }
+  .ach-filter button.is-on .cnt{ color:var(--muted); }
   .ach{
     position:relative;
     aspect-ratio: 1 / 1.28;
