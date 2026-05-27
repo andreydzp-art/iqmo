@@ -45,7 +45,7 @@
 			'<div class="stage-spacer"></div>' +
 			'<div class="live-pill" id="runner-live-pill">' +
 			'<span class="live-badge"><span class="live-dot" aria-hidden="true"></span>Онлайн</span>' +
-			'<span><span class="live-count num" id="runner-live-count">—</span> ' +
+			'<span><span class="live-count num" id="runner-live-count">72</span> ' +
 			'<span class="live-label">учеников в этом варианте</span></span></div>' +
 			'<div class="timer-pill" id="timer">' +
 			'<span class="timer-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5"/><path d="M9 2h6"/></svg>Осталось</span>' +

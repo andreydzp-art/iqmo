@@ -5,6 +5,8 @@
 	'use strict';
 
 	var POLL_MS = 22000;
+	/** Показываем, пока API не вернул живой счётчик или запрос упал. */
+	var FALLBACK_ONLINE = 72;
 
 	function fmtNum(n) {
 		return String(Math.max(0, Math.round(Number(n) || 0))).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
@@ -29,11 +31,11 @@
 
 		function apply(data) {
 			if (!data) {
-				countEl.textContent = '—';
+				countEl.textContent = fmtNum(FALLBACK_ONLINE);
 				return;
 			}
 			var v = data.activeInVariant || data.activeInChapter || 0;
-			countEl.textContent = v > 0 ? fmtNum(v) : '—';
+			countEl.textContent = v > 0 ? fmtNum(v) : fmtNum(FALLBACK_ONLINE);
 		}
 
 		function poll() {
