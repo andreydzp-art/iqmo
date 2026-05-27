@@ -2,26 +2,39 @@
  * Срабатывает на каждое 5-е задание (5, 10, 15, 20).
  * Экспортирует window.fireMilestone(n).
  */
-(function(){
+(function(global){
   'use strict';
 
-  // ---------- Canvas ----------
-  var cv = document.getElementById('fx-canvas');
-  if (!cv) return;
-  var ctx = cv.getContext('2d');
-  var dpr = window.devicePixelRatio || 1;
-  function resize(){
-    cv.width = innerWidth * dpr;
-    cv.height = innerHeight * dpr;
-    cv.style.width = innerWidth + 'px';
-    cv.style.height = innerHeight + 'px';
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  resize();
-  addEventListener('resize', resize);
+  // Canvas/monument создаются в layout.install() ПОСЛЕ загрузки этого файла —
+  // нельзя выходить из IIFE, если #fx-canvas ещё нет.
+  var cv, ctx, dpr, particles, raf;
+  var milestone, milestoneH, milestoneSub;
+  var inited = false;
 
-  var particles = [];
-  var raf = null;
+  function bindCanvas() {
+    if (inited) return true;
+    cv = document.getElementById('fx-canvas');
+    if (!cv) return false;
+    ctx = cv.getContext('2d');
+    dpr = window.devicePixelRatio || 1;
+    function resize(){
+      cv.width = innerWidth * dpr;
+      cv.height = innerHeight * dpr;
+      cv.style.width = innerWidth + 'px';
+      cv.style.height = innerHeight + 'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    resize();
+    addEventListener('resize', resize);
+    milestone = document.getElementById('milestone');
+    milestoneH = document.getElementById('milestone-h');
+    milestoneSub = document.getElementById('milestone-sub');
+    inited = true;
+    return true;
+  }
+
+  particles = [];
+  raf = null;
   function loop(){
     ctx.clearRect(0,0,innerWidth,innerHeight);
     for (var i = particles.length - 1; i >= 0; i--){
@@ -36,10 +49,8 @@
   function start(){ if (!raf) raf = requestAnimationFrame(loop); }
 
   // ---------- Milestone caption ----------
-  var milestone = document.getElementById('milestone');
-  var milestoneH = document.getElementById('milestone-h');
-  var milestoneSub = document.getElementById('milestone-sub');
   function showMilestone(n){
+    if (!bindCanvas()) return;
     var total = window.IQMO_RUNNER_TOTAL || 21;
     var meta = {
       5:  { h: 'Задание 5 из ' + total, sub: 'Пройдена <b>четверть варианта</b> — отличный темп!' },
@@ -288,12 +299,15 @@
   }
 
   // ---------- PUBLIC ----------
-  // 5 → конфетти, 10 → лучи, 15 → звёзды, 20 → салют
+  // 5 → конфетти, 10 → лучи, 15 → звёзды, 20 → салют (как в архиве)
   var FX_MAP = { 5: fxConfetti, 10: fxRays, 15: fxStars, 20: fxBursts };
-  window.fireMilestone = function(n){
+  function fireMilestone(n) {
+    if (!bindCanvas()) return;
     var fn = FX_MAP[n];
     if (!fn) return;
     fn();
     showMilestone(n);
-  };
-})();
+  }
+  global.fireMilestone = fireMilestone;
+  global.IqmoTestRunnerFx = { init: bindCanvas, fire: fireMilestone };
+})(typeof window !== 'undefined' ? window : global);

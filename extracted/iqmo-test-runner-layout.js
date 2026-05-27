@@ -128,6 +128,9 @@
 		}
 
 		ensureOverlays();
+		try {
+			if (global.IqmoTestRunnerFx && IqmoTestRunnerFx.init) IqmoTestRunnerFx.init();
+		} catch (_eFx) {}
 
 		var total = opts.questionCount || 0;
 		var psTotal = document.getElementById('ps-total');

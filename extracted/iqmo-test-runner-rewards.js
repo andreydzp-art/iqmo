@@ -314,7 +314,17 @@
 		if (marks.indexOf(taskNum) === -1) return;
 		if (total && taskNum > total) return;
 		if (_milestonesShown[taskNum]) return;
-		_milestonesShown[taskNum] = true;
+		try {
+			if (typeof global.fireMilestone === 'function') {
+				global.fireMilestone(taskNum);
+				_milestonesShown[taskNum] = true;
+			}
+		} catch (e) {}
+	}
+
+	/** Рубеж 5/10/15/20 при клике на чип (как test-runner-v4.js в архиве). */
+	function fireMilestoneOnChip(taskNum) {
+		if ([5, 10, 15, 20].indexOf(taskNum) === -1) return;
 		try {
 			if (typeof global.fireMilestone === 'function') global.fireMilestone(taskNum);
 		} catch (e) {}
@@ -340,6 +350,7 @@
 		onFirstAnswer: onFirstAnswer,
 		onAnswerChanged: onAnswerChanged,
 		maybeMilestone: maybeMilestone,
+		fireMilestoneOnChip: fireMilestoneOnChip,
 		reset: reset,
 		seedFromState: seedFromState,
 		ripple: ripple,
