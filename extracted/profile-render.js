@@ -155,20 +155,19 @@
 	var CAM_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4a3 3 0 0 0-3 3v1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-1V7a3 3 0 0 0-3-3H9zm0 2h6a1 1 0 0 1 1 1v1H8V7a1 1 0 0 1 1-1zm-2 5h10l-4.5 5.4L11 13l-2 2.4L7 13z"/></svg>';
 	var PEN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
 
-	function renderHeroStatsRow(d, leagueDelta, accDelta, courseDelta) {
+	function renderHeroStatsRow(d, leagueDelta, accDelta, _courseDelta) {
 		var accVal = d.accuracyPct != null ? String(d.accuracyPct) : '—';
 		var accUnit = d.accuracyPct != null ? '<span class="unit">%</span>' : '';
+		// «Курс · биология» убран — метрика считалась только по вариантам
+		// главы 1 и для большинства пользователей всегда показывала 0%.
 		return (
-			'<div class="sec-row" role="group" aria-label="Краткая статистика">' +
+			'<div class="sec-row sec-row--2col" role="group" aria-label="Краткая статистика">' +
 			'<div class="qstat league"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>' +
 			'<div class="q-body"><div class="q-val">#' + esc(d.leagueRank) + '</div><div class="q-lbl">Лига · неделя</div></div>' +
 			(leagueDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
 			'<div class="qstat acc"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>' +
 			'<div class="q-body"><div class="q-val">' + accVal + accUnit + '</div><div class="q-lbl">Точность</div></div>' +
 			(accDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
-			'<div class="qstat course"><div class="q-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>' +
-			'<div class="q-body"><div class="q-val">' + esc(d.coursePct) + '<span class="unit">%</span></div><div class="q-lbl">Курс · биология</div></div>' +
-			(courseDelta || '<div class="q-delta" aria-hidden="true"></div>') + '</div>' +
 			'</div>'
 		);
 	}
@@ -285,8 +284,6 @@
 			renderNameRow(d, isPublic) +
 			'<div class="h-meta-row">' +
 			'<span class="rank">' + metaRankLineV3(sig, d) + '</span>' +
-			'<span class="dot" aria-hidden="true"></span>' +
-			'<span>' + courseMetaLineV3(sig, d) + '</span>' +
 			(d.memberSince ? '<span class="dot" aria-hidden="true"></span><span>' + esc(daysInIqmoShort(d.memberSince)) + '</span>' : '') +
 			'</div>' +
 			'<div class="xp">' +
@@ -296,7 +293,7 @@
 			'<div class="xp-bar" role="progressbar" aria-valuenow="' + xpPct + '" aria-valuemin="0" aria-valuemax="100">' +
 			'<div class="xp-fill" style="width:' + xpPct + '%"></div></div>' +
 			'<div class="xp-foot">' +
-			'<span>За неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b> · серия ' + streakMultLabel(streakDays) + '</span>' +
+			'<span>За неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b></span>' +
 			(xpUntil ? '<span class="untill">' + xpUntil + '</span>' : '<span class="untill"></span>') +
 			'</div></div>' +
 			renderHeroStatsRow(d, leagueDelta, accDelta, courseDelta) +
@@ -305,9 +302,6 @@
 			'<span class="holo-border" aria-hidden="true"></span>' +
 			'<div class="streak-top">' +
 			'<span class="s-eye"><span class="pulse"></span>STREAK · ' + pad2(streakDays) + '</span>' +
-			(streakDays > 0
-				? '<span class="s-bonus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>BONUS ' + streakMultLabel(streakDays) + '</span>'
-				: '') +
 			'</div>' +
 			'<div class="s-hero">' +
 			'<div class="orb">' +
@@ -647,8 +641,7 @@
 		if (handleEl) handleEl.textContent = d.profileId;
 		var rankEl = hero.querySelector('.h-meta-row .rank');
 		if (rankEl) rankEl.innerHTML = metaRankLineV3(sig, d);
-		var metaSpans = hero.querySelectorAll('.h-meta-row > span:not(.rank):not(.dot)');
-		if (metaSpans[0]) metaSpans[0].innerHTML = courseMetaLineV3(sig, d);
+		// «Курс» убран из meta-row — patch только rank.
 		var xpMax = d.nextLevel ? d.xpLevelMax : d.xpCurrent;
 		var xpNums = IqmoProfileData.fmtPts(d.xpCurrent) + ' / ' + IqmoProfileData.fmtPts(xpMax);
 		var xpEye = d.nextLevel
@@ -675,7 +668,7 @@
 		var xpFoot = hero.querySelector('.xp-foot');
 		if (xpFoot) {
 			xpFoot.innerHTML =
-				'<span>За неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b> · серия ' + streakMultLabel(streakDays) + '</span>' +
+				'<span>За неделю <b>+' + IqmoProfileData.fmtPts(d.weekXp) + ' XP</b></span>' +
 				(xpUntil ? '<span class="untill">' + xpUntil + '</span>' : '<span class="untill"></span>');
 		}
 		var secRow = hero.querySelector('.h-id .sec-row');
@@ -689,16 +682,9 @@
 			if (eyeStreak) {
 				eyeStreak.innerHTML = '<span class="pulse"></span>STREAK · ' + pad2(streakDays);
 			}
+			// BONUS-плашка убрана: реального множителя XP нет.
 			var bonus = streakTop.querySelector('.s-bonus');
-			if (streakDays > 0) {
-				var bonusHtml =
-					'<span class="s-bonus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>BONUS ' +
-					streakMultLabel(streakDays) + '</span>';
-				if (bonus) bonus.outerHTML = bonusHtml;
-				else if (eyeStreak) eyeStreak.insertAdjacentHTML('afterend', bonusHtml);
-			} else if (bonus) {
-				bonus.remove();
-			}
+			if (bonus) bonus.remove();
 		}
 		var sNum = hero.querySelector('.s-big .num');
 		if (sNum) sNum.textContent = String(streakDays);

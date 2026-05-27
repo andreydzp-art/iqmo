@@ -104,6 +104,10 @@
   grid-template-columns:repeat(3, minmax(0, 1fr));
   gap:10px;
 }
+.iqmo-hero.v3 .h-id .sec-row.sec-row--2col{
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  max-width:480px;
+}
 
   /* avatar — concentric segmented neon ring */
 .iqmo-hero.v3 .av{

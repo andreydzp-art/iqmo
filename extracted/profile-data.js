@@ -527,7 +527,16 @@
 				xpToNext: lv.xpToNext || 0,
 				xpPct: Math.round((lv.progressFrac || 0) * 100),
 				weekXp: snap.week ? snap.week.points : 0,
-				streakDays: (lsGet('iqmo-chem-streak', {}) || {}).days || 0,
+				streakDays: (function () {
+					// Streak не может быть больше срока регистрации:
+					// раньше анонимный счётчик переезжал на свежий аккаунт
+					// и показывал серию из 2–3 дней при «1 день в IQMO».
+					var raw = (lsGet('iqmo-chem-streak', {}) || {}).days || 0;
+					var createdAt = meUser && meUser.created_at;
+					if (!createdAt) return raw;
+					var days = Math.max(1, Math.floor((Date.now() - createdAt * 1000) / 86400000));
+					return Math.min(raw, days);
+				})(),
 				leagueRank: snap.league ? snap.league.rank : 1,
 				leagueSize: snap.league ? snap.league.size : 1,
 				leagueDelta: snap.league && snap.league.rank > 1 ? 1 : 0,
