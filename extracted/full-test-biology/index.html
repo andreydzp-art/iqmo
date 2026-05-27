@@ -1742,13 +1742,9 @@
 					if (!q) { btn.disabled = true; btn.style.opacity = '.35'; btn.style.cursor = 'not-allowed'; btn.title = 'Задание будет добавлено'; }
 					btn.addEventListener('click', () => {
 						if (!q) return;
-						try {
-							if (window.IqmoTestRunnerRewards && IqmoTestRunnerRewards.fireMilestoneOnChip) {
-								IqmoTestRunnerRewards.fireMilestoneOnChip(i + 1);
-							} else if (typeof window.fireMilestone === 'function' && [5, 10, 15, 20].indexOf(i + 1) !== -1) {
-								window.fireMilestone(i + 1);
-							}
-						} catch (_eM) {}
+						// Рубежи 5/10/15/20 показываем один раз за сессию
+						// (maybeMilestone сам дедуплицирует через _milestonesShown).
+						try { if (window.IqmoTestRunnerRewards) IqmoTestRunnerRewards.maybeMilestone(i + 1); } catch (_eM) {}
 						markReturnLaterIfUnanswered(QUESTIONS[state.current]);
 						state.current = i;
 						saveState();
