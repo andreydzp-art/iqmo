@@ -34,8 +34,10 @@
 
 	function memberSinceLabel(ts) {
 		if (!ts) return 'в IQMO';
-		var days = Math.max(1, Math.floor((Date.now() - ts * 1000) / 86400000));
-		return 'с ' + fmtDate(ts * 1000) + ' · ' + days + ' ' + (days === 1 ? 'день' : days < 5 ? 'дня' : 'дней') + ' в IQMO';
+		// users.created_at в БД уже в МИЛЛИСЕКУНДАХ (microtime(true) * 1000
+		// в IqmoAuthController::register). Никакого * 1000 на фронте.
+		var days = Math.max(1, Math.floor((Date.now() - ts) / 86400000));
+		return 'с ' + fmtDate(ts) + ' · ' + days + ' ' + (days === 1 ? 'день' : days < 5 ? 'дня' : 'дней') + ' в IQMO';
 	}
 
 	function displayNameFromEmailPlaceholder(d) {
@@ -78,7 +80,8 @@
 
 	function daysInIqmoLabel(ts) {
 		if (!ts) return '';
-		var days = Math.max(1, Math.floor((Date.now() - ts * 1000) / 86400000));
+		// ts уже в миллисекундах (БД-конвенция IQMO), см. memberSinceLabel().
+		var days = Math.max(1, Math.floor((Date.now() - ts) / 86400000));
 		return days + ' ' + pluralRu(days, ['день', 'дня', 'дней']) + ' в IQMO';
 	}
 
@@ -107,7 +110,8 @@
 
 	function daysInIqmoShort(ts) {
 		if (!ts) return '';
-		var days = Math.max(1, Math.floor((Date.now() - ts * 1000) / 86400000));
+		// ts уже в миллисекундах (БД-конвенция IQMO), см. memberSinceLabel().
+		var days = Math.max(1, Math.floor((Date.now() - ts) / 86400000));
 		return days + ' ' + pluralRu(days, ['день', 'дня', 'дней']) + ' в IQMO';
 	}
 

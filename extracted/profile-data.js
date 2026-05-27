@@ -560,13 +560,19 @@
 				xpPct: Math.round((lv.progressFrac || 0) * 100),
 				weekXp: snap.week ? snap.week.points : 0,
 				streakDays: (function () {
-					// Streak не может быть больше срока регистрации:
-					// раньше анонимный счётчик переезжал на свежий аккаунт
-					// и показывал серию из 2–3 дней при «1 день в IQMO».
+					// Streak не может быть больше срока регистрации: раньше
+					// анонимный счётчик переезжал на свежий аккаунт и показывал
+					// серию из 2–3 дней при «1 день в IQMO».
+					//
+					// БАГ-ФИКС: users.created_at в БД лежит в МИЛЛИСЕКУНДАХ
+					// (microtime(true) * 1000 в IqmoAuthController). Раньше тут
+					// был лишний * 1000 → Date.now() - createdAt*1000 уходило в
+					// большой минус, Math.max(1, …) всегда давало 1, и реальная
+					// серия 5 дней резалась до 1 у любого живого пользователя.
 					var raw = (lsGet('iqmo-chem-streak', {}) || {}).days || 0;
 					var createdAt = meUser && meUser.created_at;
 					if (!createdAt) return raw;
-					var days = Math.max(1, Math.floor((Date.now() - createdAt * 1000) / 86400000));
+					var days = Math.max(1, Math.floor((Date.now() - createdAt) / 86400000));
 					return Math.min(raw, days);
 				})(),
 				leagueRank: snap.league ? snap.league.rank : 1,
