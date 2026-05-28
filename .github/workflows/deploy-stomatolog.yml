@@ -42,6 +42,8 @@ jobs:
           echo "=== DEPLOY STOMA: discover docroot on VPS ==="
           DEST=$("${SSH_BASE[@]}" "$DEPLOY_HOST" 'set -e
             for c in \
+              /var/www/nkolesnik_co_usr/data/www/nkolesnik.com/public_html \
+              /var/www/nkolesnik_co_usr/data/www/nkolesnik.com \
               /var/www/nkolesnik_com_usr/data/www/nkolesnik.com/public_html \
               /var/www/nkolesnik_com_usr/data/www/nkolesnik.com \
               /var/www/nkolesnik_r_usr/data/www/nkolesnik.com/public_html \
