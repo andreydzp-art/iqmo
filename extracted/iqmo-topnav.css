@@ -61,8 +61,14 @@
 	flex: 1;
 	justify-content: center;
 }
-.topnav .nav-mid a,
-.topnav .nav-mid span {
+/* ВАЖНО: селекторы для пунктов меню используют дочерний комбинатор «>».
+   Раньше тут было `.topnav .nav-mid a, .topnav .nav-mid span`, и общие
+   стили подхватывали вложенные спаны внутри .rb-rating
+   (__ico/__text/__badge) — у бейджа «NEW» слетало абсолютное
+   позиционирование, и он раздувался в большое оранжевое пятно. Дочерний
+   комбинатор оставляет правила только для прямых детей .nav-mid. */
+.topnav .nav-mid > a,
+.topnav .nav-mid > span {
 	padding: 8px 14px;
 	border-radius: 10px;
 	color: var(--muted, #6b7094);
@@ -72,33 +78,35 @@
 	transition: background 0.15s, color 0.15s;
 	cursor: pointer;
 }
-.topnav .nav-mid a:hover {
+.topnav .nav-mid > a:hover {
 	background: var(--bg, #f6f7fb);
 	color: var(--ink-2, #2a2e4a);
 }
-.topnav .nav-mid a.is-active {
+.topnav .nav-mid > a.is-active {
 	color: var(--ink, #0f1226);
 	background: var(--primary-50, #eef0ff);
 }
-.topnav .nav-mid .is--disabled {
+.topnav .nav-mid > .is--disabled {
 	cursor: default;
 	opacity: 0.5;
 	pointer-events: none;
 }
-.topnav .nav-mid .is--disabled:hover {
+.topnav .nav-mid > .is--disabled:hover {
 	background: transparent;
 	color: var(--muted, #6b7094);
 }
 /* Кнопка «Рейтинг» (.rb-rating, см. rating-button.css) внутри топ-меню:
-   общие правила .topnav .nav-mid a выигрывают по специфичности и сбивают
-   золотой фон/цвет/font-size, поэтому возвращаем их обратно. Сам hover
-   и halo управляются исходными стилями модуля. */
-.topnav .nav-mid a.rb-rating,
-.topnav .nav-mid a.rb-rating:hover {
+   общие правила .topnav .nav-mid > a выигрывают по специфичности и сбивают
+   золотой фон/цвет/font-size/padding/transition, поэтому возвращаем их
+   обратно. Сам hover/halo управляются исходными стилями модуля. */
+.topnav .nav-mid > a.rb-rating,
+.topnav .nav-mid > a.rb-rating:hover {
+	padding: 9px 14px 9px 12px;
 	background: linear-gradient(180deg, #fffaed 0%, #fff5da 100%);
 	color: #0f1226;
 	font-size: 14px;
 	font-weight: 700;
+	transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 .topnav .nav-right {
 	display: flex;
