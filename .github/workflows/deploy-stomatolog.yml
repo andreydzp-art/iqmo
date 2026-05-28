@@ -1,5 +1,5 @@
 # Деплой статики stomatolog → nkolesnik.com на том же VPS (FastPanel), что iqmoschool / epizodes.
-# Секреты: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY (как в deploy.yml).
+# Секреты: DEPLOY_HOST (как у IQMO), DEPLOY_STOMA_SSH_KEY (отдельный ключ → nkolesnik_co_usr).
 name: Deploy stomatolog (nkolesnik.com)
 
 on:
@@ -22,7 +22,7 @@ jobs:
 
       - name: Rsync → nkolesnik.com docroot
         env:
-          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SSH_KEY: ${{ secrets.DEPLOY_STOMA_SSH_KEY }}
           DEPLOY_USER_IN: nkolesnik_co_usr
           DEPLOY_HOST_IN: ${{ secrets.DEPLOY_HOST }}
         run: |
