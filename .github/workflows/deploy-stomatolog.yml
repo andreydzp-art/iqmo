@@ -1,0 +1,84 @@
+# Деплой статики stomatolog → nkolesnik.com на том же VPS (FastPanel), что iqmoschool / epizodes.
+# Секреты: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY (как в deploy.yml).
+name: Deploy stomatolog (nkolesnik.com)
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-stomatolog
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout stomatolog
+        uses: actions/checkout@v4
+        with:
+          repository: andreydzp-art/stomatolog
+          ref: main
+          path: stoma-src
+
+      - name: Rsync → nkolesnik.com docroot
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_USER_IN: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST_IN: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          set -euo pipefail
+          trim() { printf '%s' "$1" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'; }
+          DEPLOY_USER=$(trim "${DEPLOY_USER_IN:-}")
+          DEPLOY_HOST=$(trim "${DEPLOY_HOST_IN:-}")
+          if [ -z "$DEPLOY_USER" ] || [ -z "$DEPLOY_HOST" ]; then
+            echo "DEPLOY_USER или DEPLOY_HOST пустые — проверьте Secrets репозитория."
+            exit 1
+          fi
+          install -d -m 700 ~/.ssh
+          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/iqmo_deploy
+          chmod 600 ~/.ssh/iqmo_deploy
+          SSH_BASE=(ssh -i "${HOME}/.ssh/iqmo_deploy" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l "$DEPLOY_USER")
+
+          echo "=== DEPLOY STOMA: discover docroot on VPS ==="
+          DEST=$("${SSH_BASE[@]}" "$DEPLOY_HOST" 'set -e
+            for c in \
+              /var/www/nkolesnik_com_usr/data/www/nkolesnik.com/public_html \
+              /var/www/nkolesnik_com_usr/data/www/nkolesnik.com \
+              /var/www/nkolesnik_r_usr/data/www/nkolesnik.com/public_html \
+              /var/www/nkolesnik_r_usr/data/www/nkolesnik.com; do
+              if [ -d "$c" ]; then echo "$c"; exit 0; fi
+            done
+            found=$(find /var/www -maxdepth 6 -type d -name nkolesnik.com 2>/dev/null | head -1 || true)
+            if [ -n "$found" ]; then echo "$found"; exit 0; fi
+            echo "ERROR: nkolesnik.com directory not found under /var/www" >&2
+            ls -la /var/www/ >&2 || true
+            exit 1')
+          echo "=== DEPLOY STOMA: docroot=$DEST ==="
+
+          echo "=== DEPLOY STOMA: rsync static files ==="
+          rsync -az --delete \
+            -e "ssh -i ${HOME}/.ssh/iqmo_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l \"$DEPLOY_USER\"" \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'docs/' \
+            --exclude 'README.md' \
+            --exclude 'CURSOR.md' \
+            --exclude 'CNAME' \
+            stoma-src/ \
+            "${DEPLOY_HOST}:${DEST}/"
+          echo "=== DEPLOY STOMA: rsync OK ==="
+
+      - name: Smoke nkolesnik.com
+        run: |
+          set -euo pipefail
+          for i in 1 2 3 4 5; do
+            html=$(curl -fsSL --max-time 25 "https://nkolesnik.com/" || true)
+            if echo "$html" | grep -q 'Композитные виниры'; then
+              echo "=== DEPLOY STOMA: smoke OK (landing title found) ==="
+              exit 0
+            fi
+            echo "attempt $i: still placeholder or unreachable, retry in 5s..."
+            sleep 5
+          done
+          echo "=== DEPLOY STOMA: smoke FAILED — open https://nkolesnik.com/ manually ==="
+          exit 1
