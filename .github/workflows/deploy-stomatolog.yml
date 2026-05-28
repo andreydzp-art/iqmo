@@ -39,37 +39,30 @@ jobs:
           chmod 600 ~/.ssh/iqmo_deploy
           SSH_BASE=(ssh -i "${HOME}/.ssh/iqmo_deploy" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l "$DEPLOY_USER")
 
-          echo "=== DEPLOY STOMA: discover docroot on VPS ==="
+          echo "=== DEPLOY STOMA: discover docroot on VPS (sudo) ==="
           DEST=$("${SSH_BASE[@]}" "$DEPLOY_HOST" 'set -e
-            # iqmoschool_r_usr видит /var/www/nkolesnik_co_usr, но не всегда проходит test -d без traverse.
             for c in \
               /var/www/nkolesnik_co_usr/data/www/nkolesnik.com/public_html \
-              /var/www/nkolesnik_co_usr/data/www/nkolesnik.com \
-              /var/www/nkolesnik_com_usr/data/www/nkolesnik.com/public_html \
-              /var/www/nkolesnik_com_usr/data/www/nkolesnik.com; do
-              if [ -e "$c" ] || [ -f "$c/index.html" ] 2>/dev/null; then echo "$c"; exit 0; fi
+              /var/www/nkolesnik_co_usr/data/www/nkolesnik.com; do
+              if sudo test -d "$c"; then echo "$c"; exit 0; fi
             done
-            if [ -d /var/www/nkolesnik_co_usr/data/www ]; then
-              site=$(ls -1 /var/www/nkolesnik_co_usr/data/www 2>/dev/null | head -1 || true)
+            if sudo test -d /var/www/nkolesnik_co_usr/data/www; then
+              site=$(sudo ls -1 /var/www/nkolesnik_co_usr/data/www 2>/dev/null | head -1 || true)
               if [ -n "$site" ]; then
-                base="/var/www/nkolesnik_co_usr/data/www/$site"
-                for sub in "" public_html; do
-                  p="${base}${sub:+/$sub}"
-                  if [ -f "$p/index.html" ] || [ -d "$p" ]; then echo "$p"; exit 0; fi
-                done
+                echo "/var/www/nkolesnik_co_usr/data/www/$site"
+                exit 0
               fi
             fi
-            found=$(find /var/www/nkolesnik_co_usr -maxdepth 5 \( -name nkolesnik.com -o -name public_html \) -type d 2>/dev/null | head -1 || true)
-            if [ -n "$found" ]; then echo "$found"; exit 0; fi
             echo "ERROR: nkolesnik docroot not found" >&2
-            ls -la /var/www/nkolesnik_co_usr/data/www/ >&2 || ls -la /var/www/nkolesnik_co_usr/ >&2 || true
+            sudo ls -la /var/www/nkolesnik_co_usr/data/www/ >&2 || true
             exit 1')
           echo "=== DEPLOY STOMA: docroot=$DEST ==="
 
-          echo "=== DEPLOY STOMA: rsync static files ==="
+          echo "=== DEPLOY STOMA: rsync static files (sudo on remote) ==="
           RSYNC_SSH="ssh -i ${HOME}/.ssh/iqmo_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l \"$DEPLOY_USER\""
-          if ! rsync -az --delete \
+          rsync -az --delete \
             -e "$RSYNC_SSH" \
+            --rsync-path="sudo rsync" \
             --exclude '.git/' \
             --exclude '.github/' \
             --exclude 'docs/' \
@@ -77,21 +70,8 @@ jobs:
             --exclude 'CURSOR.md' \
             --exclude 'CNAME' \
             stoma-src/ \
-            "${DEPLOY_HOST}:${DEST}/" 2>/tmp/rsync-stoma.err; then
-            echo "direct rsync failed, retry with sudo on remote:"
-            cat /tmp/rsync-stoma.err || true
-            rsync -az --delete \
-              -e "$RSYNC_SSH" \
-              --rsync-path="sudo rsync" \
-              --exclude '.git/' \
-              --exclude '.github/' \
-              --exclude 'docs/' \
-              --exclude 'README.md' \
-              --exclude 'CURSOR.md' \
-              --exclude 'CNAME' \
-              stoma-src/ \
-              "${DEPLOY_HOST}:${DEST}/"
-          fi
+            "${DEPLOY_HOST}:${DEST}/"
+          "${SSH_BASE[@]}" "$DEPLOY_HOST" "sudo chown -R nkolesnik_co_usr:nkolesnik_co_usr '${DEST}'"
           echo "=== DEPLOY STOMA: rsync OK ==="
 
       - name: Smoke nkolesnik.com
