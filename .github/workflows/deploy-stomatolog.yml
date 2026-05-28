@@ -23,7 +23,7 @@ jobs:
       - name: Rsync → nkolesnik.com docroot
         env:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          DEPLOY_USER_IN: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_USER_IN: nkolesnik_co_usr
           DEPLOY_HOST_IN: ${{ secrets.DEPLOY_HOST }}
         run: |
           set -euo pipefail
@@ -31,38 +31,40 @@ jobs:
           DEPLOY_USER=$(trim "${DEPLOY_USER_IN:-}")
           DEPLOY_HOST=$(trim "${DEPLOY_HOST_IN:-}")
           if [ -z "$DEPLOY_USER" ] || [ -z "$DEPLOY_HOST" ]; then
-            echo "DEPLOY_USER или DEPLOY_HOST пустые — проверьте Secrets репозитория."
+            echo "DEPLOY_STOMA_USER / DEPLOY_HOST пустые — проверьте Secrets."
             exit 1
           fi
           install -d -m 700 ~/.ssh
-          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/iqmo_deploy
-          chmod 600 ~/.ssh/iqmo_deploy
-          SSH_BASE=(ssh -i "${HOME}/.ssh/iqmo_deploy" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l "$DEPLOY_USER")
+          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/stoma_deploy
+          chmod 600 ~/.ssh/stoma_deploy
+          SSH_BASE=(ssh -i "${HOME}/.ssh/stoma_deploy" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l "$DEPLOY_USER")
 
-          echo "=== DEPLOY STOMA: discover docroot on VPS (sudo) ==="
+          echo "=== DEPLOY STOMA: SSH as ${DEPLOY_USER} ==="
+          echo "=== DEPLOY STOMA: discover docroot ==="
           DEST=$("${SSH_BASE[@]}" "$DEPLOY_HOST" 'set -e
             for c in \
+              "$HOME/data/www/nkolesnik.com/public_html" \
+              "$HOME/data/www/nkolesnik.com" \
               /var/www/nkolesnik_co_usr/data/www/nkolesnik.com/public_html \
               /var/www/nkolesnik_co_usr/data/www/nkolesnik.com; do
-              if sudo test -d "$c"; then echo "$c"; exit 0; fi
+              if [ -d "$c" ]; then echo "$c"; exit 0; fi
             done
-            if sudo test -d /var/www/nkolesnik_co_usr/data/www; then
-              site=$(sudo ls -1 /var/www/nkolesnik_co_usr/data/www 2>/dev/null | head -1 || true)
-              if [ -n "$site" ]; then
-                echo "/var/www/nkolesnik_co_usr/data/www/$site"
+            if [ -d "$HOME/data/www" ]; then
+              site=$(ls -1 "$HOME/data/www" 2>/dev/null | head -1 || true)
+              if [ -n "$site" ] && [ -d "$HOME/data/www/$site" ]; then
+                echo "$HOME/data/www/$site"
                 exit 0
               fi
             fi
-            echo "ERROR: nkolesnik docroot not found" >&2
-            sudo ls -la /var/www/nkolesnik_co_usr/data/www/ >&2 || true
+            echo "ERROR: docroot not found for user=$(whoami)" >&2
+            ls -la "$HOME/data/www/" >&2 || ls -la "$HOME/" >&2 || true
             exit 1')
           echo "=== DEPLOY STOMA: docroot=$DEST ==="
 
-          echo "=== DEPLOY STOMA: rsync static files (sudo on remote) ==="
-          RSYNC_SSH="ssh -i ${HOME}/.ssh/iqmo_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l \"$DEPLOY_USER\""
+          echo "=== DEPLOY STOMA: rsync static files ==="
+          RSYNC_SSH="ssh -i ${HOME}/.ssh/stoma_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -l \"$DEPLOY_USER\""
           rsync -az --delete \
             -e "$RSYNC_SSH" \
-            --rsync-path="sudo rsync" \
             --exclude '.git/' \
             --exclude '.github/' \
             --exclude 'docs/' \
@@ -71,7 +73,6 @@ jobs:
             --exclude 'CNAME' \
             stoma-src/ \
             "${DEPLOY_HOST}:${DEST}/"
-          "${SSH_BASE[@]}" "$DEPLOY_HOST" "sudo chown -R nkolesnik_co_usr:nkolesnik_co_usr '${DEST}'"
           echo "=== DEPLOY STOMA: rsync OK ==="
 
       - name: Smoke nkolesnik.com
