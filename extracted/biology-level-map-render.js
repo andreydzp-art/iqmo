@@ -305,9 +305,9 @@
 		} else {
 			body = '<div class="pd-state locked">Заблокирован</div>';
 		}
-		const dataAttrs = pdState !== 'locked'
+		const dataAttrs = pdState === 'active'
 			? ` data-v="${v.id}" data-state="${state}" role="button" tabindex="0"`
-			: ` data-v="${v.id}" data-state="locked"`;
+			: ` data-v="${v.id}" data-state="${state}"`;
 		return `
 			<div class="pd-node ${pdState}"${dataAttrs}>
 		${kicker}
@@ -328,7 +328,7 @@
 				? IqmoLevelMapXp.xpForPassedNode(0, true, bossInfo.best.percent)
 				: (_mapCfg.xpForVariant ? _mapCfg.xpForVariant(bossInfo.best.percent) : 550);
 			return `
-		<div class="pd-node boss passed" data-v="${v.id}" data-state="done" role="button" tabindex="0">
+		<div class="pd-node boss passed" data-v="${v.id}" data-state="done">
 			<div class="pd-kicker boss" style="color:#0f9c5d">${PD_CHECK_SVG} Глава завершена</div>
 			<div class="pd-bossCard">
 				<span class="pe-shimmer" aria-hidden="true"></span>
@@ -479,10 +479,13 @@
 				alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
 				return;
 			}
+			if (st === 'done' || st === 'passed') return;
 			if (cfg.baseUrl) global.location.href = cfg.baseUrl + v;
 		};
 		host.querySelectorAll('.pd-node[data-v]').forEach(function (el) {
-			if (el.dataset.state === 'locked') return;
+			// Пройденные/locked варианты не кликаются — см. chemistry-level-map-render.js.
+			var st = el.dataset.state;
+			if (st === 'locked' || st === 'done' || st === 'passed') return;
 			el.addEventListener('click', function (e) {
 				if (e.target.closest('.pd-cta')) return;
 				onGo(el.dataset.v, el.dataset.state);

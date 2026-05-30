@@ -1565,7 +1565,7 @@
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
 		<script src="/iqmo-chapter-discussion.js?v=11"></script>
-		<script src="/chemistry-level-map-render.js?v=6"></script>
+		<script src="/chemistry-level-map-render.js?v=7"></script>
 		<script>
 			// ============================================================
 			// QUESTION BANK (loaded from chemistry-bank.js)
@@ -3221,6 +3221,7 @@
 								alert('Чтобы открыть этот узел, пройдите предыдущие с результатом ≥ 50% в части 1.');
 								return;
 							}
+							if (st === 'done' || st === 'passed') return;
 							window.location.search = '?v=' + v;
 						}
 					});
