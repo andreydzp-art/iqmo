@@ -790,7 +790,8 @@
       linear-gradient(180deg, #f6f1ff 0%, #ffffff 48%, #f6f1ff 100%);
     overflow:hidden;
     cursor:pointer;
-    display:block;
+    display:flex;
+    flex-direction:column;
     isolation:isolate;
     transition: transform .26s cubic-bezier(.2,.7,.2,1), box-shadow .26s ease, border-color .26s ease;
     /* Многослойная мягкая тень — карточка чуть отрывается от фона,
@@ -1055,11 +1056,16 @@
     overflow:hidden;
   }
 
-  /* Декоративный диаг с ромбом. */
+  /* Декоративный диаг с ромбом. Это начало «нижнего footer'а»
+     (диаг → прогресс → XP-награда). margin-top:auto прижимает весь
+     этот блок к низу карточки — XP-чип встаёт на ту же полку, что и
+     .a-xp у обычных карточек. Карточка теперь flex-column, поэтому
+     центр (орб + тайтл) держится сверху, footer — внизу. */
   .ach.ach--illus .c-div{
     position:relative; z-index:2;
     display:flex; align-items:center;
     margin:2.4cqi 6cqi;
+    margin-top:auto;
   }
   .ach.ach--illus .c-div::before,
   .ach.ach--illus .c-div::after{
