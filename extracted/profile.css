@@ -1066,6 +1066,18 @@
     margin-top:auto;
     display:flex;
     flex-direction:column;
+    align-items:stretch;
+  }
+  /* Прогресс и reward-чип ОБЯЗАНЫ занимать всю ширину карточки (как в
+     эталоне: блок растянут, поля 26/22px, контент центрирован внутри).
+     align-self:stretch гарантирует это даже если flex-stretch где-то
+     перебивается. Полоска прогресса и капсула XP не сужаются до
+     ширины контента. */
+  .ach.ach--illus .c-div,
+  .ach.ach--illus .c-prog,
+  .ach.ach--illus .c-reward{
+    align-self:stretch;
+    width:auto;
   }
   /* Декоративный диаг с ромбом — визуальный разделитель перед footer'ом.
      Геометрия 1:1 с эталоном rhythm-card (14px 26px ÷3.4 → cqi). */
