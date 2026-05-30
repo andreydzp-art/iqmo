@@ -943,12 +943,15 @@
 					'<div class="c-sub">' + esc(a.desc) + '</div>' +
 				'</div>' +
 				// FOOTER — буквально тот же компонент, что у обычной карты
-				// «Неделя ритма»: тонкий .a-prog (только в процессе) + компактный
-				// XP-чип .a-xp снизу. Те же HTML-теги и CSS-классы → идентичные
-				// computed-размеры (ширина/высота/padding чипа, длина полосы).
-				// Отличие только в теме (фиолет=epic / синий=bio) — задаётся
-				// правилами .ach--illus .a-xp в profile.css.
-				((a.inProgress && a.progress)
+				// «Неделя ритма»: тонкий .a-prog + компактный XP-чип .a-xp снизу.
+				// Те же HTML-теги и CSS-классы → идентичные computed-размеры
+				// (ширина/высота/padding чипа, длина полосы). Отличие только в
+				// теме (фиолет=epic / синий=bio) — задаётся правилами
+				// .ach--illus .a-xp в profile.css.
+				// На illus-картах полосу показываем всегда, пока есть
+				// a.progress и карта не unlocked — даже при current=0
+				// (как было в старом .c-prog: пустая полоска = «ещё в начале»).
+				((!a.unlocked && a.progress)
 					? '<div class="a-prog" aria-label="' + progCur + ' из ' + progTgt + '"><i style="width:' + progPct + '%"></i></div>'
 					: '') +
 				'<div class="a-xp' + ((a.unlocked || a.inProgress) ? '' : ' a-xp--locked') + '">' +
