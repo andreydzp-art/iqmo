@@ -447,6 +447,7 @@
 
 	function renderAchievementCard(a) {
 		var state = achCardState(a);
+		if (a.cardStyle === 'start') return renderAchievementCardStart(a, state);
 		var hasIllus = !!a.iconUrl;
 		if (hasIllus) return renderAchievementCardIllus(a, state);
 		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
@@ -620,6 +621,108 @@
 						'<div class="c-rwd-text">' +
 							'<span class="c-rwd-val">' + esc(dateVal) + '</span>' +
 							'<span class="c-rwd-lbl">' + esc(dateLbl) + '</span>' +
+						'</div>' +
+					'</div>' +
+				'</div>' +
+				'<div class="a-tip">' +
+					'<div class="tt-name">' + esc(a.title) + '</div>' +
+					'<div class="tt-desc">' + esc(a.desc) + '</div>' +
+					'<div class="tt-meta">' + tipMeta + '</div>' +
+				'</div>' +
+			'</article>'
+		);
+	}
+
+	/* Карточка «Старт на портале» — обычная редкость, по прототипу
+	   start-card. Рюкзак-арт + орбита + искры, прогресс 1/1, награда +XP.
+	   Внутренние размеры через container query units (cqi), так что
+	   прототип 340×510 ужимается под стандартную 1×1 ячейку коллекции. */
+	function renderAchievementCardStart(a, state) {
+		var rar = a.rarity || 'common';
+		var cls = ['ach', 'ach--start'];
+		if (!a.unlocked) cls.push('locked');
+		if (a.inProgress) cls.push('is-progress');
+		if (a.unlocked) cls.push('is-earned');
+
+		var rarText = rarityLabel(rar);
+
+		var progPct = 0, progCur = 0, progTgt = 1;
+		if (a.progress) {
+			progCur = a.progress.current;
+			progTgt = a.progress.target;
+			progPct = Math.max(0, Math.min(100, Math.round((progCur / progTgt) * 100)));
+		} else if (a.unlocked) {
+			progPct = 100;
+			progCur = 1;
+			progTgt = 1;
+		}
+
+		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
+			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
+
+		// SVG рюкзака с градиентами; id'шники градиентов уникальны (sb-<ach.id>),
+		// чтобы не схлопывались, если на странице несколько таких карточек.
+		var gid = 'sb-' + (a.id || 'start');
+		var bagSvg =
+			'<svg class="sc-bag" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="' + gid + '-body" x1="32" y1="12" x2="32" y2="58" gradientUnits="userSpaceOnUse">' +
+						'<stop offset="0%" stop-color="#ffffff"/>' +
+						'<stop offset="100%" stop-color="#e6eaf2"/>' +
+					'</linearGradient>' +
+					'<linearGradient id="' + gid + '-pocket" x1="32" y1="34" x2="32" y2="56" gradientUnits="userSpaceOnUse">' +
+						'<stop offset="0%" stop-color="#b3bace"/>' +
+						'<stop offset="100%" stop-color="#8d96b2"/>' +
+					'</linearGradient>' +
+					'<linearGradient id="' + gid + '-strap" x1="0" y1="0" x2="0" y2="1">' +
+						'<stop offset="0%" stop-color="#c7cddb"/>' +
+						'<stop offset="100%" stop-color="#9aa2bd"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<path d="M25 16 Q25 7 32 7 Q39 7 39 16" stroke="#c7cddb" stroke-width="3.4" stroke-linecap="round"/>' +
+				'<path d="M22 18 Q14 22 15 36 L16 50" stroke="url(#' + gid + '-strap)" stroke-width="3.4" stroke-linecap="round"/>' +
+				'<path d="M42 18 Q50 22 49 36 L48 50" stroke="url(#' + gid + '-strap)" stroke-width="3.4" stroke-linecap="round"/>' +
+				'<rect x="14" y="15" width="36" height="43" rx="14" fill="url(#' + gid + '-body)" stroke="#d6dbe7" stroke-width="1.4"/>' +
+				'<path d="M20 22 Q32 18 44 22" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".7"/>' +
+				'<text x="32" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#aeb6cc" letter-spacing=".5">IQ</text>' +
+				'<path d="M21 41 Q21 35 27 35 L37 35 Q43 35 43 41 L43 51 Q43 56 37 56 L27 56 Q21 56 21 51 Z" fill="url(#' + gid + '-pocket)"/>' +
+				'<rect x="26" y="44" width="12" height="3.2" rx="1.6" fill="#eef0f6" opacity=".85"/>' +
+				'<path d="M25 39.5 Q32 37.5 39 39.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>' +
+			'</svg>';
+
+		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
+
+		return (
+			'<article class="' + cls.join(' ') + '" data-state="' + state + '" tabindex="0">' +
+				'<div class="sc-scene" aria-hidden="true"></div>' +
+				'<span class="sc-rarity">' + esc(rarText) + '</span>' +
+				'<div class="sc-orb-stage">' +
+					'<div class="sc-orb">' +
+						'<span class="sc-orbit"></span>' +
+						bagSvg +
+					'</div>' +
+					'<span class="sc-spark s1" aria-hidden="true"></span>' +
+					'<span class="sc-spark s2" aria-hidden="true"></span>' +
+					'<span class="sc-spark s3" aria-hidden="true"></span>' +
+				'</div>' +
+				'<div class="sc-title-block">' +
+					'<h4 class="sc-title">' + esc(a.title) + '</h4>' +
+					'<div class="sc-sub">' + esc(a.desc) + '</div>' +
+				'</div>' +
+				'<div class="sc-divider" aria-hidden="true"><span></span></div>' +
+				'<div class="sc-prog">' +
+					'<div class="sc-prog-row">' +
+						'<span class="sc-label">Прогресс</span>' +
+						'<span class="sc-count"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
+					'</div>' +
+					'<div class="sc-prog-bar"><i style="width:' + progPct + '%"></i></div>' +
+				'</div>' +
+				'<div class="sc-reward">' +
+					'<div class="sc-rwd-item">' +
+						'<div class="sc-rwd-ico">' + xpSvg + '</div>' +
+						'<div class="sc-rwd-text">' +
+							'<span class="sc-rwd-val">+' + (a.xpReward || 0) + ' XP</span>' +
+							'<span class="sc-rwd-lbl">Награда</span>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
