@@ -792,7 +792,11 @@
 	   собственного card-style. */
 	function renderAchievementCardIllus(a, state) {
 		var rar = a.rarity || 'epic';
+		var isBio = (a.id === 'bio_stage1');
+		// .ach--bio — модификатор поверх .ach--illus в profile.css
+		// (та же 1×1 ячейка, та же cqi-разметка, перекраска под биологию).
 		var cls = ['ach', 'ach--illus', 'ach--ref', 'anim-shake'];
+		if (isBio) cls.push('ach--bio');
 		if (!a.unlocked) cls.push('locked');
 		if (a.inProgress) cls.push('is-progress');
 		if (a.unlocked) cls.push('is-earned');
@@ -813,8 +817,13 @@
 		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
 			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
 
-		var hexSvg = '<svg viewBox="0 0 30 34" fill="none" stroke="#a78bfa" stroke-width="1.2"><polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/></svg>';
+		// Хексы рамки сцены — синие для био, фиолетовые для химии.
+		var hexStroke = isBio ? '#60a5fa' : '#a78bfa';
+		var hexSvg = '<svg viewBox="0 0 30 34" fill="none" stroke="' + hexStroke + '" stroke-width="1.2"><polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/></svg>';
 
+		// Центральный арт: химия → колба, биология → лист.
+		// id градиентов уникальны для bio (bioRefLeaf), чтобы не перетереть
+		// fill химической колбы (iqRefGlassFill) на одной странице.
 		var flaskSvg =
 			'<svg class="ref-flask" viewBox="0 0 64 64" aria-hidden="true">' +
 				'<defs>' +
@@ -839,8 +848,37 @@
 				'<path d="M30 22 L20 48" stroke="#ffffff" stroke-width="1.2" opacity=".55" stroke-linecap="round"/>' +
 			'</svg>';
 
-		var checkSvg =
-			'<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
+		var leafSvg =
+			'<svg class="ref-flask ref-leaf" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="bioRefLeaf" x1="20" y1="8" x2="44" y2="56" gradientUnits="userSpaceOnUse">' +
+						'<stop offset="0%"  stop-color="#bbf7d0"/>' +
+						'<stop offset="50%" stop-color="#4ade80"/>' +
+						'<stop offset="100%" stop-color="#16a34a"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<path d="M32 7 C19 19 17 41 32 57 C47 41 45 19 32 7 Z" fill="url(#bioRefLeaf)" stroke="#15803d" stroke-width="1.6" stroke-linejoin="round"/>' +
+				'<path d="M32 12 L32 54" stroke="#15803d" stroke-width="2" opacity=".55" stroke-linecap="round"/>' +
+				'<path d="M32 24 L23 19 M32 24 L41 19 M32 34 L22 30 M32 34 L42 30 M32 43 L25 40 M32 43 L39 40" stroke="#15803d" stroke-width="1.2" opacity=".4" stroke-linecap="round"/>' +
+				'<path d="M27 16 C22 24 21 34 24 44" stroke="#ffffff" stroke-width="1.5" opacity=".45" stroke-linecap="round" fill="none"/>' +
+			'</svg>';
+
+		var orbInner = isBio ? leafSvg : flaskSvg;
+
+		// Мини-чек в шестиграннике рядом с орбом — синий для био,
+		// фиолетовый для химии. id градиента тоже уникальны.
+		var checkSvg = isBio
+			? '<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="bioRefHexFill" x1="0" x2="0" y1="0" y2="1">' +
+						'<stop offset="0%"  stop-color="#60a5fa"/>' +
+						'<stop offset="100%" stop-color="#2563eb"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#bioRefHexFill)" stroke="#93c5fd" stroke-width="2"/>' +
+				'<path d="M20 32 L29 41 L46 24" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+			'</svg>'
+			: '<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
 				'<defs>' +
 					'<linearGradient id="iqRefHexFill" x1="0" x2="0" y1="0" y2="1">' +
 						'<stop offset="0%"  stop-color="#ffffff"/>' +
@@ -861,7 +899,7 @@
 					'<div class="float-hex fh1" aria-hidden="true">' + hexSvg + '</div>' +
 					'<div class="float-hex fh2" aria-hidden="true">' + hexSvg + '</div>' +
 					'<div class="float-hex fh3" aria-hidden="true">' + hexSvg + '</div>' +
-					'<div class="ref-orb">' + flaskSvg + '</div>' +
+					'<div class="ref-orb">' + orbInner + '</div>' +
 					checkSvg +
 					'<span class="float-ball fb1" aria-hidden="true"></span>' +
 					'<span class="float-ball fb2" aria-hidden="true"></span>' +
