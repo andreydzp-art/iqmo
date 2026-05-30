@@ -321,3 +321,416 @@ a.lm-btn-ch2-cta {
 a.lm-btn-ch2-cta:hover {
 	filter: brightness(1.05);
 }
+
+/* ════════════════════════════════════════════════════════════
+   ИГРОВОЙ HERO (.lm-hero--player) — компактная версия Profile-hero
+   на странице Full Test. Высота ~240px, glass-градиент, 3 колонки:
+   аватар + ID слева, XP-прогресс + 3 чипса по центру, мотиватор
+   справа. Старые .lm-hero / .lm-stat-* правила выше остаются для
+   chapter-2 hub, а тут переопределяем то, что нужно.
+   ════════════════════════════════════════════════════════════ */
+.lm-hero.lm-hero--player {
+	margin-top: 18px;
+	padding: 22px 26px;
+	min-height: 240px;
+	border-radius: 24px;
+	border: 1px solid rgba(124, 58, 237, 0.12);
+	background:
+		radial-gradient(520px 320px at 90% -20%, rgba(245, 158, 11, 0.10), transparent 60%),
+		radial-gradient(420px 320px at 0% 100%, rgba(124, 58, 237, 0.10), transparent 65%),
+		linear-gradient(135deg, #f5f3ff 0%, #faf5ff 50%, #fef9c3 100%);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.85),
+		0 1px 2px rgba(15, 18, 38, 0.04),
+		0 22px 50px -28px rgba(124, 58, 237, 0.30);
+	display: grid;
+	grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(240px, 300px);
+	gap: 20px;
+	align-items: stretch;
+	overflow: hidden;
+}
+
+/* Перебиваем декор-glow от старого .lm-hero, чтобы не наслаивался */
+.lm-hero.lm-hero--player::before { content: none; }
+
+/* ── LEFT: avatar + level chip + rank ── */
+.lm-hero--player .lhp-left {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	min-width: 0;
+}
+.lm-hero--player .lhp-av {
+	position: relative;
+	width: 96px;
+	height: 96px;
+	flex-shrink: 0;
+}
+.lm-hero--player .lhp-av__ring {
+	position: absolute;
+	inset: -3px;
+	border-radius: 50%;
+	z-index: 0;
+	mask: radial-gradient(circle, transparent 47%, #000 49%);
+	-webkit-mask: radial-gradient(circle, transparent 47%, #000 49%);
+}
+.lm-hero--player .lhp-av__img {
+	position: absolute;
+	inset: 4px;
+	width: calc(100% - 8px);
+	height: calc(100% - 8px);
+	border-radius: 50%;
+	object-fit: cover;
+	background: #fff;
+	box-shadow:
+		inset 0 0 0 2px #fff,
+		0 6px 16px -8px rgba(15, 18, 38, 0.30);
+	z-index: 1;
+}
+.lm-hero--player .lhp-av__lvl {
+	position: absolute;
+	left: 50%;
+	bottom: -8px;
+	transform: translateX(-50%);
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	color: #fff;
+	background: linear-gradient(180deg, #6366f1, #4f46e5);
+	box-shadow:
+		0 6px 14px -4px rgba(79, 70, 229, 0.55),
+		inset 0 1px 0 rgba(255, 255, 255, 0.30);
+	white-space: nowrap;
+	z-index: 2;
+}
+.lm-hero--player .lhp-av__lvl svg {
+	width: 10px;
+	height: 10px;
+	fill: currentColor;
+}
+
+.lm-hero--player .lhp-id {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+.lm-hero--player .lhp-id__eye {
+	font-size: 10.5px;
+	font-weight: 800;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: #6b7094;
+}
+.lm-hero--player .lhp-id__rank {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	line-height: 1.05;
+	color: #0f1226;
+	background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #ec4899 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.lm-hero--player .lhp-id__sub {
+	font-size: 12px;
+	color: #6b7094;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+.lm-hero--player .lhp-id__sub b {
+	color: #2a2e4a;
+	font-weight: 700;
+}
+.lm-hero--player .lhp-id__league {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 800;
+	color: #b45309;
+	background: linear-gradient(180deg, #fff7d6 0%, #fde68a 100%);
+	border: 1px solid #fcd34d;
+}
+.lm-hero--player .lhp-id__league svg {
+	width: 11px;
+	height: 11px;
+	fill: currentColor;
+}
+
+/* ── CENTER: XP progress + 3 chips ── */
+.lm-hero--player .lhp-mid {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 14px;
+	min-width: 0;
+}
+.lm-hero--player .lhp-xp {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.lm-hero--player .lhp-xp__row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+.lm-hero--player .lhp-xp__eye {
+	font-size: 11px;
+	font-weight: 800;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: #6b7094;
+}
+.lm-hero--player .lhp-xp__nums {
+	font-family: "JetBrains Mono", ui-monospace, monospace;
+	font-size: 14px;
+	font-weight: 800;
+	color: #0f1226;
+	font-variant-numeric: tabular-nums;
+}
+.lm-hero--player .lhp-xp__nums b {
+	background: linear-gradient(135deg, #4f46e5, #7c3aed);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-weight: 800;
+}
+.lm-hero--player .lhp-xp__bar {
+	height: 12px;
+	border-radius: 999px;
+	background: rgba(15, 18, 38, 0.06);
+	overflow: hidden;
+	box-shadow: inset 0 1px 2px rgba(15, 18, 38, 0.06);
+}
+.lm-hero--player .lhp-xp__bar i {
+	display: block;
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #6366f1 0%, #7c3aed 50%, #ec4899 100%);
+	box-shadow:
+		0 0 14px rgba(124, 58, 237, 0.45),
+		inset 0 1px 0 rgba(255, 255, 255, 0.45);
+	transition: width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.lm-hero--player .lhp-xp__until {
+	font-size: 12px;
+	color: #6b7094;
+	font-weight: 600;
+}
+.lm-hero--player .lhp-xp__until b {
+	color: #2a2e4a;
+	font-weight: 800;
+}
+
+.lm-hero--player .lhp-chips {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
+}
+.lm-hero--player .lhp-chip {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border-radius: 14px;
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(15, 18, 38, 0.06);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.9),
+		0 4px 12px -8px rgba(15, 18, 38, 0.20);
+	min-width: 0;
+}
+.lm-hero--player .lhp-chip__ico {
+	width: 32px;
+	height: 32px;
+	border-radius: 9px;
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+}
+.lm-hero--player .lhp-chip__ico svg { width: 16px; height: 16px; }
+.lm-hero--player .lhp-chip--fire .lhp-chip__ico {
+	background: linear-gradient(135deg, #fee2e2, #fecaca);
+	color: #dc2626;
+}
+.lm-hero--player .lhp-chip--target .lhp-chip__ico {
+	background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+	color: #059669;
+}
+.lm-hero--player .lhp-chip--star .lhp-chip__ico {
+	background: linear-gradient(135deg, #fef3c7, #fde68a);
+	color: #b45309;
+}
+.lm-hero--player .lhp-chip__body {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+.lm-hero--player .lhp-chip__val {
+	font-size: 16px;
+	font-weight: 800;
+	color: #0f1226;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+}
+.lm-hero--player .lhp-chip__val .small {
+	color: #6b7094;
+	font-size: 12px;
+	font-weight: 600;
+}
+.lm-hero--player .lhp-chip__lbl {
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: #6b7094;
+	text-transform: uppercase;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ── RIGHT: motivational goal block ── */
+.lm-hero--player .lhp-goal {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 14px 16px;
+	border-radius: 18px;
+	background:
+		radial-gradient(180px 120px at 100% 0%, rgba(245, 158, 11, 0.18), transparent 60%),
+		linear-gradient(180deg, #ffffff 0%, #fefce8 100%);
+	border: 1px solid rgba(245, 158, 11, 0.22);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.9),
+		0 8px 22px -10px rgba(245, 158, 11, 0.30);
+	overflow: hidden;
+}
+.lm-hero--player .lhp-goal__eye {
+	font-size: 10.5px;
+	font-weight: 800;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: #b45309;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.lm-hero--player .lhp-goal__big {
+	font-family: "JetBrains Mono", ui-monospace, monospace;
+	font-size: 26px;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	line-height: 1;
+	background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-variant-numeric: tabular-nums;
+}
+.lm-hero--player .lhp-goal__sub {
+	font-size: 12px;
+	color: #6b7094;
+	line-height: 1.4;
+}
+.lm-hero--player .lhp-goal__sub b {
+	color: #2a2e4a;
+	font-weight: 700;
+}
+.lm-hero--player .lhp-goal__bar {
+	margin-top: 4px;
+	height: 8px;
+	border-radius: 999px;
+	background: rgba(245, 158, 11, 0.12);
+	overflow: hidden;
+}
+.lm-hero--player .lhp-goal__bar i {
+	display: block;
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+	box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+	transition: width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.lm-hero--player .lhp-goal__cta {
+	margin-top: auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 10px 14px;
+	border-radius: 12px;
+	font-size: 13px;
+	font-weight: 800;
+	color: #fff;
+	text-decoration: none;
+	background: linear-gradient(180deg, #f59e0b, #d97706);
+	box-shadow:
+		0 8px 18px -6px rgba(217, 119, 6, 0.55),
+		inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	transition: transform 0.12s ease, box-shadow 0.18s ease, filter 0.15s;
+}
+.lm-hero--player .lhp-goal__cta:hover {
+	transform: translateY(-1px);
+	filter: brightness(1.05);
+	box-shadow:
+		0 12px 22px -6px rgba(217, 119, 6, 0.65),
+		inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.lm-hero--player .lhp-goal__cta svg { width: 13px; height: 13px; }
+.lm-hero--player .lhp-goal__cta.is-disabled {
+	background: linear-gradient(180deg, #cbd5e1, #94a3b8);
+	box-shadow: none;
+	pointer-events: none;
+	opacity: 0.7;
+}
+
+/* ── responsive breakpoints (player hero) ── */
+@media (max-width: 1080px) {
+	.lm-hero.lm-hero--player {
+		grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+	}
+	.lm-hero--player .lhp-left {
+		grid-column: 1 / -1;
+		padding-bottom: 4px;
+		border-bottom: 1px dashed rgba(15, 18, 38, 0.08);
+	}
+}
+@media (max-width: 760px) {
+	.lm-hero.lm-hero--player {
+		grid-template-columns: 1fr;
+		padding: 18px;
+		min-height: 0;
+	}
+	.lm-hero--player .lhp-left {
+		grid-column: auto;
+		border-bottom: 1px dashed rgba(15, 18, 38, 0.08);
+		padding-bottom: 14px;
+	}
+	.lm-hero--player .lhp-av { width: 80px; height: 80px; }
+	.lm-hero--player .lhp-id__rank { font-size: 20px; }
+	.lm-hero--player .lhp-chips { grid-template-columns: repeat(3, 1fr); }
+	.lm-hero--player .lhp-chip { padding: 8px 10px; gap: 8px; }
+	.lm-hero--player .lhp-chip__ico { width: 28px; height: 28px; }
+	.lm-hero--player .lhp-chip__val { font-size: 14px; }
+	.lm-hero--player .lhp-goal__big { font-size: 22px; }
+}
