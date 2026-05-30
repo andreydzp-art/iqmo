@@ -1646,8 +1646,13 @@
     aspect-ratio: 1 / 1.45;
     width:100%;
     border-radius:14px;
-    padding:14px 12px 12px;
-    display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+    padding:14px 12px 14px;
+    /* Контент собран в центре карточки одной группой: иконка → название →
+       описание/прогресс → чип редкости. Раньше тут было
+       justify-content:space-between, и чип улетал к нижней границе,
+       оставляя пустую полосу между описанием и чипом. */
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px;
     text-align:center;
     background:#fff;
     border:1px solid var(--line);
@@ -1660,7 +1665,6 @@
     width:56px; height:56px;
     border-radius:50%;
     display:grid; place-items:center;
-    margin-top:6px;
     flex-shrink:0;
     position:relative;
     z-index:2;
@@ -1679,6 +1683,10 @@
     letter-spacing:.02em;
   }
   .ach .a-rar{
+    /* Чип редкости теперь часть центральной группы; небольшой
+       доп. зазор сверху чтобы он визуально отделялся от текста,
+       а не сливался в один блок. */
+    margin-top:4px;
     font-size:9.5px; font-weight:800;
     letter-spacing:.12em; text-transform:uppercase;
     padding:3px 7px; border-radius:5px;
