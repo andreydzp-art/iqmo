@@ -474,9 +474,12 @@
 
 	function renderAchievementCard(a) {
 		var state = achCardState(a);
-		if (a.cardStyle === 'start') return renderAchievementCardStart(a, state);
-		if (a.cardStyle === 'shake') return renderAchievementCardShake(a, state);
-		if (a.cardStyle === 'bio') return renderAchievementCardBio(a, state);
+		// Иллюстрированные cardStyle (start/shake/bio) с фикс. layout
+		// 340×510 + transform:scale были откачены: при пересчёте сетки
+		// они вылезали за ячейку и обрезали соседей. Возвращаемся к
+		// стандартной .ach-сетке: ачивки с iconUrl идут через
+		// .ach--illus (cqi-юниты, корректно вписывается в 1/1.45),
+		// без iconUrl — базовая .ach-карточка.
 		var hasIllus = !!a.iconUrl;
 		if (hasIllus) return renderAchievementCardIllus(a, state);
 		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');

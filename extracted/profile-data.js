@@ -21,11 +21,11 @@
 	var CH1_VARIANT_IDS = [1, 2, 3, 4, 5, 6, 7];
 
 	var ACHIEVEMENT_CATALOG = [
-		{ id: 'welcome', title: 'Старт на портале', desc: 'Начни свой путь в IQMO', rarity: 'common', icon: 'star', cardStyle: 'start', pctRare: 62, xpReward: 50 },
+		{ id: 'welcome', title: 'Старт на портале', desc: 'Начни свой путь в IQMO', rarity: 'common', icon: 'star', pctRare: 62, xpReward: 50 },
 		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', icon: 'book', pctRare: 38, xpReward: 50 },
 		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame', pctRare: 6.2, xpReward: 200 },
-		{ id: 'chem_stage1', title: 'Первый этап по химии', desc: 'Успешно пройди 1 этап по химии', rarity: 'epic', icon: 'trophy', iconUrl: '/site/assets/achievement-chem-stage1.png', cardStyle: 'shake', pctRare: 2.4, xpReward: 250 },
-		{ id: 'bio_stage1', title: 'Первый этап по биологии', desc: 'Успешно пройди 1 этап по биологии', rarity: 'rare', icon: 'trophy', iconUrl: '/site/assets/achievement-bio-stage1.png', cardStyle: 'bio', pctRare: 1.8, xpReward: 500 },
+		{ id: 'chem_stage1', title: 'Первый этап по химии', desc: 'Успешно пройди 1 этап по химии', rarity: 'epic', icon: 'trophy', iconUrl: '/site/assets/achievement-chem-stage1.png', pctRare: 2.4, xpReward: 250 },
+		{ id: 'bio_stage1', title: 'Первый этап по биологии', desc: 'Успешно пройди 1 этап по биологии', rarity: 'rare', icon: 'trophy', pctRare: 1.8, xpReward: 500 },
 		{ id: 'ten_tests', title: 'Десятка', desc: '10 завершённых попыток.', rarity: 'rare', icon: 'medal', pctRare: 18, xpReward: 150 },
 		{ id: 'perfect_run', title: 'Без ошибок', desc: '100% при ≥5 вопросах в зачёте.', rarity: 'rare', icon: 'target', pctRare: 4.1, xpReward: 250 },
 		{ id: 'topic_star', title: 'Мастер темы', desc: 'Полностью освоена хотя бы одна тема.', rarity: 'rare', icon: 'spark', pctRare: 22, xpReward: 100 },
