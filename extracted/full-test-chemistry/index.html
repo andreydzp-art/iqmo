@@ -36,7 +36,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="/iqmo-base.css?v=10" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=6" />
-		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=4" />
+		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=5" />
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
@@ -1554,6 +1554,7 @@
 		<script src="/level-map-state.js?v=2"></script>
 		<script src="/iqmo-avatar.js?v=1"></script>
 		<script src="/chem-progress.js?v=10"></script>
+		<script src="/iqmo-orbit-dots.js?v=1"></script>
 		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-live-activity.js?v=2"><\/script><script src="/iqmo-test-runner-layout.js?v=7"><\/script><script src="/iqmo-test-runner-render.js?v=1"><\/script><script src="/iqmo-test-runner-presence.js?v=4"><\/script><script src="/iqmo-test-runner-rewards.js?v=7"><\/script><script src="/iqmo-test-runner-fx.js?v=3"><\/script>');}</script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
@@ -3192,6 +3193,7 @@
 						${lmTipHtml(stats, bossInfo)}
 					</div>
 				`;
+				paintCompactHeroStreakOrb(picker);
 
 				const mapHost = document.getElementById('chem-map-host');
 				if (mapHost && window.IqmoChemLevelMap) {
@@ -3571,12 +3573,17 @@
 								</div>
 							</div>
 							<div class="lhp-chips">
-								<div class="lhp-chip lhp-chip--fire">
-									<div class="lhp-chip__ico">${FIRE_SVG}</div>
+								<div class="lhp-chip lhp-chip--fire" tabindex="0" aria-label="Серия дней в IQMO" data-streak-orb-host="1">
+									<div class="lhp-chip__ico lhp-chip__ico--orb">
+										<span class="lhp-orb-shell" aria-hidden="true"></span>
+										<span class="lhp-orb-orbit" aria-hidden="true" data-orbit-tier="big" data-orbit-days="-1"></span>
+										<span class="lhp-orb-core">${FIRE_SVG}</span>
+									</div>
 									<div class="lhp-chip__body">
 										<div class="lhp-chip__val">${streakStatus.days || 0}</div>
 										<div class="lhp-chip__lbl">Серия дней</div>
 									</div>
+									<span class="lhp-chip-tip" role="tooltip" data-streak-orb-tip>Загружаем дни в IQMO…</span>
 								</div>
 								<div class="lhp-chip lhp-chip--target">
 									<div class="lhp-chip__ico">${TARGET_SVG}</div>
@@ -3606,6 +3613,45 @@
 						</aside>
 					</section>
 				`;
+			}
+
+			/**
+			 * Заполняет streak-orb в compact hero орбитальными точками после
+			 * того, как /api/me ответит. Дни на платформе = дни в IQMO; точки
+			 * рисует общий компонент IqmoOrbitDots (см. /iqmo-orbit-dots.js).
+			 * Делаем «patch DOM», чтобы при ре-рендере hero (после level-up)
+			 * не сбрасывать CSS-анимацию вращения — обновляем точки только если
+			 * число дней действительно поменялось (data-orbit-days сравнение).
+			 */
+			function paintCompactHeroStreakOrb(host) {
+				if (!host || !window.IqmoOrbitDots) return;
+				var orbit = host.querySelector('.lhp-orb-orbit');
+				var chip  = host.querySelector('.lhp-chip--fire[data-streak-orb-host]');
+				var tipEl = host.querySelector('[data-streak-orb-tip]');
+				if (!orbit || !chip) return;
+
+				function applyDays(memberSinceMs) {
+					var days = window.IqmoOrbitDots.daysSince(memberSinceMs);
+					var prev = Number(orbit.getAttribute('data-orbit-days'));
+					if (!Number.isFinite(prev) || prev !== days) {
+						orbit.innerHTML = window.IqmoOrbitDots.build(days);
+						orbit.setAttribute('data-orbit-tier', window.IqmoOrbitDots.tierFor(days));
+						orbit.setAttribute('data-orbit-days', String(days));
+					}
+					var tipText = window.IqmoOrbitDots.tooltipText(days);
+					if (tipEl) tipEl.textContent = tipText;
+					if (tipText) chip.setAttribute('aria-label', tipText);
+				}
+
+				try {
+					if (window.__iqmoMe && typeof window.__iqmoMe.then === 'function') {
+						window.__iqmoMe.then(function (me) {
+							applyDays(me && me.created_at);
+						}).catch(function () { applyDays(null); });
+					} else {
+						applyDays(null);
+					}
+				} catch (e) { applyDays(null); }
 			}
 
 			function lmGrid4Html({ stats, globalStats, streakStatus }) {

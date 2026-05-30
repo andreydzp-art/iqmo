@@ -269,6 +269,14 @@
 		var accDelta = '';
 		var courseDelta = '';
 		var orbGradId = 'iqmo-orb-grad-' + gid;
+		// Дни в IQMO → точки на орбе (1 точка = 1 день, max 30, потом «30+»).
+		// Чем больше дней — тем компактнее точки (см. data-orbit-tier).
+		var orbitDays = global.IqmoOrbitDots
+			? IqmoOrbitDots.daysSince(d.memberSince)
+			: 0;
+		var orbitDotsHtml = global.IqmoOrbitDots ? IqmoOrbitDots.build(orbitDays) : '';
+		var orbitTier = global.IqmoOrbitDots ? IqmoOrbitDots.tierFor(orbitDays) : 'big';
+		var orbitTip = global.IqmoOrbitDots ? IqmoOrbitDots.tooltipText(orbitDays) : '';
 		// «Быстрое повторение» ведёт на предмет, в котором ученик активнее.
 		var subjects = p && p.subjectsProgressData ? p.subjectsProgressData : null;
 		var reviewHref = '/full-test-chemistry/';
@@ -317,9 +325,10 @@
 				: '') +
 			'</div>' +
 			'<div class="s-hero">' +
-			'<div class="orb">' +
+			'<div class="orb"' + (orbitTip ? ' tabindex="0" aria-label="' + esc(orbitTip) + '"' : '') + '>' +
 			'<span class="orb-shell" aria-hidden="true"></span>' +
-			'<span class="orb-orbit" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></span>' +
+			'<span class="orb-orbit" aria-hidden="true" data-orbit-tier="' + orbitTier + '" data-orbit-days="' + orbitDays + '">' + orbitDotsHtml + '</span>' +
+			(orbitTip ? '<span class="orb-tip" role="tooltip">' + esc(orbitTip) + '</span>' : '') +
 			'<span class="orb-core">' +
 			'<svg viewBox="0 0 24 24" aria-hidden="true">' +
 			'<defs><linearGradient id="' + orbGradId + '" x1="0" y1="0" x2="0" y2="1">' +
@@ -1031,6 +1040,34 @@
 		}
 		var sNum = hero.querySelector('.s-big .num');
 		if (sNum) sNum.textContent = String(streakDays);
+		// OrbitDots: пересоздаём содержимое .orb-orbit ТОЛЬКО если число дней
+		// изменилось (data-orbit-days). Иначе CSS-анимация вращения сбросится
+		// на каждом patchHero (а они идут по iqmo-sync довольно часто).
+		var orbit = hero.querySelector('.orb-orbit');
+		var orbEl = hero.querySelector('.orb');
+		if (orbit && global.IqmoOrbitDots) {
+			var newDays = IqmoOrbitDots.daysSince(d.memberSince);
+			var prevDays = Number(orbit.getAttribute('data-orbit-days'));
+			if (!Number.isFinite(prevDays) || newDays !== prevDays) {
+				orbit.innerHTML = IqmoOrbitDots.build(newDays);
+				orbit.setAttribute('data-orbit-tier', IqmoOrbitDots.tierFor(newDays));
+				orbit.setAttribute('data-orbit-days', String(newDays));
+			}
+			if (orbEl) {
+				var tipText = IqmoOrbitDots.tooltipText(newDays);
+				var tipEl = orbEl.querySelector('.orb-tip');
+				if (tipEl) {
+					tipEl.textContent = tipText;
+				} else if (tipText) {
+					var span = document.createElement('span');
+					span.className = 'orb-tip';
+					span.setAttribute('role', 'tooltip');
+					span.textContent = tipText;
+					orbEl.appendChild(span);
+				}
+				if (tipText) orbEl.setAttribute('aria-label', tipText);
+			}
+		}
 		var sLbl = hero.querySelector('.s-big .lbl');
 		if (sLbl) sLbl.textContent = streakLabel(streakDays);
 		var sWarn = hero.querySelector('.s-warn');

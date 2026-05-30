@@ -20,17 +20,18 @@
 @keyframes iqmoOrbSpin{
   to{transform:rotate(360deg);}
 }
-@keyframes iqmoOrbitA{
-  0%{transform:rotate(0deg) translateX(var(--orbit-r, 48px)) rotate(0deg);}
-  100%{transform:rotate(360deg) translateX(var(--orbit-r, 48px)) rotate(-360deg);}
+/* Старые keyframes iqmoOrbitA/B/C удалены — теперь точки позиционируются
+   через --angle на конкретной точке, а вращается контейнер .orb-orbit
+   (см. iqmoOrbitGroupSpin ниже). Это позволяет рендерить произвольное
+   количество точек (1..30) равномерно по окружности и менять их размер
+   через data-orbit-tier на контейнере. */
+@keyframes iqmoOrbitGroupSpin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
 }
-@keyframes iqmoOrbitB{
-  0%{transform:rotate(120deg) translateX(var(--orbit-r, 48px)) rotate(-120deg);}
-  100%{transform:rotate(480deg) translateX(var(--orbit-r, 48px)) rotate(-480deg);}
-}
-@keyframes iqmoOrbitC{
-  0%{transform:rotate(240deg) translateX(var(--orbit-r, 48px)) rotate(-240deg);}
-  100%{transform:rotate(600deg) translateX(var(--orbit-r, 48px)) rotate(-600deg);}
+@keyframes iqmoOrbitDotPulse{
+  0%,100%{opacity:.85;}
+  50%{opacity:1;}
 }
 @keyframes iqmoCoreShine{
   0%,100%{opacity:.5;}
@@ -418,33 +419,79 @@
     stroke-linejoin:round;
     filter:drop-shadow(0 0 6px rgba(34,197,94,.55));
   }
-  /* orbiting particles */
+  /* orbiting particles — динамические точки. Количество = дням в IQMO,
+     максимум 30. Каждая точка имеет свой --angle (равномерно по окружности).
+     Контейнер .orb-orbit вращается целиком через iqmoOrbitGroupSpin —
+     это даёт ощущение, что точки кружат вокруг ядра. Радиус задаём
+     через --orbit-r (по умолчанию 48px для большого Profile-orb 96px). */
 .iqmo-hero.v3 .orb-orbit{
     position:absolute; inset:0; z-index:4;
     pointer-events:none;
+    /* умеренная скорость, без раздражения; reduced-motion отключит ниже */
+    animation:iqmoOrbitGroupSpin var(--orbit-duration, 26s) linear infinite;
+    transform-origin:50% 50%;
   }
 .iqmo-hero.v3 .orb-orbit i{
     position:absolute; top:50%; left:50%;
-    width:7px; height:7px; margin:-3.5px 0 0 -3.5px;
+    /* размер задаётся data-orbit-tier (см. ниже), здесь fallback */
+    width:var(--dot-size, 6px); height:var(--dot-size, 6px);
+    margin: calc(var(--dot-size, 6px) / -2) 0 0 calc(var(--dot-size, 6px) / -2);
     border-radius:50%;
     display:block;
     will-change:transform;
     backface-visibility:hidden;
+    /* точка стоит на радиусе var(--orbit-r) под углом --angle.
+       Никакого «обратного» rotate не нужно: точка симметрична. */
+    transform:rotate(var(--angle, 0deg)) translateX(var(--orbit-r, 48px));
+    background:linear-gradient(135deg, #22c55e 0%, #0ea5e9 60%, #a78bfa 100%);
+    box-shadow:0 0 8px rgba(34,197,94,.55), 0 0 3px rgba(255,255,255,.9) inset;
+    animation:iqmoOrbitDotPulse 2.4s ease-in-out infinite;
+    animation-delay:calc(var(--angle, 0deg) / 360deg * -2.4s);
   }
-.iqmo-hero.v3 .orb-orbit i.a{
-    background:#22c55e;
-    box-shadow:0 0 10px #22c55e, 0 0 4px #fff inset;
-    animation:iqmoOrbitA 7s linear infinite;
+  /* Тиры размеров точек — чем больше дней, тем компактнее точки,
+     иначе при 30 точках они визуально сольются и забьют центральную иконку. */
+.iqmo-hero.v3 .orb-orbit[data-orbit-tier="big"]{ --dot-size:7px; }
+.iqmo-hero.v3 .orb-orbit[data-orbit-tier="mid"]{ --dot-size:5.5px; }
+.iqmo-hero.v3 .orb-orbit[data-orbit-tier="small"]{ --dot-size:4px; }
+.iqmo-hero.v3 .orb-orbit[data-orbit-tier="big"] i{
+    box-shadow:0 0 12px rgba(34,197,94,.8), 0 0 4px rgba(255,255,255,.95) inset;
   }
-.iqmo-hero.v3 .orb-orbit i.b{
-    background:#0ea5e9;
-    box-shadow:0 0 10px #0ea5e9, 0 0 4px #fff inset;
-    animation:iqmoOrbitB 9s linear infinite;
+.iqmo-hero.v3 .orb-orbit[data-orbit-tier="small"] i{
+    box-shadow:0 0 5px rgba(34,197,94,.45);
   }
-.iqmo-hero.v3 .orb-orbit i.c{
-    background:#a78bfa;
-    box-shadow:0 0 10px #a78bfa, 0 0 4px #fff inset;
-    animation:iqmoOrbitC 11s linear infinite;
+@media (prefers-reduced-motion: reduce){
+.iqmo-hero.v3 .orb-orbit{ animation:none; }
+.iqmo-hero.v3 .orb-orbit i{ animation:none; }
+  }
+  /* Hover-tooltip: при наведении на .orb показываем .orb-tip.
+     Текст рендерит JS (см. profile-render.js → IqmoOrbitDots.tooltipText). */
+.iqmo-hero.v3 .orb{ cursor:help; }
+.iqmo-hero.v3 .orb-tip{
+    position:absolute; left:50%; bottom:calc(100% + 10px);
+    transform:translateX(-50%) translateY(4px);
+    background:linear-gradient(180deg, rgba(15,18,38,.96), rgba(15,18,38,.92));
+    color:#e7eaf6;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+    padding:8px 12px;
+    font-size:12px; font-weight:500; line-height:1.4;
+    width:max-content; max-width:240px;
+    text-align:center;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,.55);
+    opacity:0; pointer-events:none;
+    transition:opacity .18s ease, transform .18s ease;
+    z-index:50;
+  }
+.iqmo-hero.v3 .orb-tip::after{
+    content:""; position:absolute; left:50%; top:100%;
+    transform:translateX(-50%);
+    border:6px solid transparent;
+    border-top-color:rgba(15,18,38,.96);
+  }
+.iqmo-hero.v3 .orb:hover .orb-tip,
+.iqmo-hero.v3 .orb:focus-within .orb-tip{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
   }
 
 .iqmo-hero.v3 .s-big .num{
