@@ -2463,18 +2463,191 @@
   border-radius:20px;
   border:1px solid var(--line);
   background:#fff;
-  padding:22px 24px;
+  padding:20px 22px;
   box-shadow:var(--shadow-sm);
 }
-.prof-settings h2{margin:0 0 8px;font-size:16px;font-weight:800}
+.prof-settings__head{ margin:0 0 14px; }
+.prof-settings h2{margin:0 0 4px;font-size:16px;font-weight:800}
+.prof-settings__head p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
 .prof-settings p{margin:0 0 12px;font-size:13px;color:var(--muted);line-height:1.55;max-width:72ch}
+/* ════════════════════════════════════════════════════════════
+   Сетка карточек 2×2 (десктоп) → 1 колонка (≤640px).
+   Все карточки одинаковой высоты через grid-auto-rows: 1fr.
+   ════════════════════════════════════════════════════════════ */
 .prof-settings .prof-settings__grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:16px;
-  margin-top:16px;
+  grid-template-columns:repeat(2, 1fr);
+  grid-auto-rows:1fr;
+  gap:12px;
+  margin-top:0;
+}
+@media (max-width: 640px){
+  .prof-settings .prof-settings__grid{ grid-template-columns:1fr; }
 }
 .prof-settings .prof-settings__box--wide{grid-column:1/-1}
+/* Старые ".prof-settings__box" стили оставлены для обратной
+   совместимости (если кто-то ещё рендерит legacy-разметку).
+   Новый компактный 2×2 layout — см. .prof-card-acc ниже. */
+.prof-settings .prof-settings__box{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px 18px;
+  background:#fafbff;
+}
+
+/* ────────── .prof-card-acc — компактная карточка-настройка ──────── */
+.prof-card-acc{
+  position:relative;
+  display:flex; flex-direction:column;
+  gap:8px;
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.prof-card-acc:hover{
+  border-color:rgba(99,102,241,.22);
+  box-shadow:0 6px 16px -10px rgba(99,102,241,.18);
+}
+.prof-card-acc__head{
+  display:flex; align-items:center; gap:10px;
+}
+.prof-card-acc__ico{
+  display:inline-grid; place-items:center;
+  width:34px; height:34px;
+  border-radius:10px;
+  flex-shrink:0;
+  color:var(--ink-2);
+  background:rgba(15,18,38,.04);
+}
+.prof-card-acc__ico svg{ width:18px; height:18px; }
+.prof-card-acc__title{
+  margin:0;
+  font-size:13.5px; font-weight:800;
+  color:var(--ink); letter-spacing:-.005em;
+}
+.prof-card-acc__desc{
+  margin:0;
+  font-size:12px; color:var(--muted);
+  line-height:1.5;
+}
+.prof-card-acc__hint{
+  margin:auto 0 0;
+  font-size:11px; color:var(--muted-2);
+  line-height:1.4;
+}
+
+/* tinted icon by card-kind — у каждой карточки своя «тема» */
+.prof-card-acc--name .prof-card-acc__ico{ background:rgba(99,102,241,.10); color:#4338ca; }
+.prof-card-acc--lock .prof-card-acc__ico{ background:rgba(239,68,68,.08);  color:#b91c1c; }
+.prof-card-acc--live .prof-card-acc__ico{ background:rgba(16,185,129,.10); color:#047857; }
+.prof-card-acc--link .prof-card-acc__ico{ background:rgba(124,58,237,.10); color:#6d28d9; }
+
+/* кнопка-чип внутри карточки (Редактировать / Копировать / Выйти) */
+.prof-card-acc__btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:32px; padding:0 12px;
+  border-radius:999px;
+  font-size:12px; font-weight:700;
+  letter-spacing:.01em;
+  border:1px solid var(--line);
+  background:#fff; color:var(--ink-2);
+  cursor:pointer; flex-shrink:0;
+  transition:background .15s ease, border-color .15s ease, color .15s ease;
+}
+.prof-card-acc__btn:hover{ background:var(--bg); border-color:rgba(99,102,241,.28); }
+.prof-card-acc__btn--primary{
+  background:linear-gradient(135deg, #6366f1, #4f46e5);
+  border-color:transparent;
+  color:#fff;
+}
+.prof-card-acc__btn--primary:hover{ background:linear-gradient(135deg, #4f46e5, #4338ca); color:#fff; }
+
+/* ── имя профиля: display ↔ edit toggle ── */
+.prof-card-acc__view{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-top:auto;
+  padding:8px 12px;
+  border-radius:10px;
+  background:rgba(15,18,38,.03);
+  border:1px solid var(--line-2);
+}
+.prof-card-acc__name{
+  font-size:13.5px; font-weight:700;
+  color:var(--ink);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  min-width:0;
+}
+.prof-card-acc__edit{
+  display:none;
+  flex-direction:column;
+  gap:8px;
+  margin-top:auto;
+}
+.prof-card-acc__edit-actions{
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.prof-card-acc--name[data-mode="edit"] .prof-card-acc__view{ display:none; }
+.prof-card-acc--name[data-mode="edit"] .prof-card-acc__edit{ display:flex; }
+.prof-card-acc--name[data-mode="edit"] .prof-card-acc__hint{ display:none; }
+
+/* ── живая активность: компактный switch ── */
+.prof-card-acc__toggle{
+  display:flex; align-items:center; gap:10px;
+  margin-top:auto;
+  font-size:12.5px; color:var(--ink-2); line-height:1.35;
+  cursor:pointer; user-select:none;
+}
+.prof-card-acc__toggle input{
+  position:absolute; opacity:0; pointer-events:none;
+  width:0; height:0;
+}
+.prof-card-acc__toggle-track{
+  position:relative; flex-shrink:0;
+  width:34px; height:20px;
+  border-radius:999px;
+  background:rgba(15,18,38,.12);
+  transition:background .2s ease;
+}
+.prof-card-acc__toggle-track::after{
+  content:""; position:absolute;
+  top:2px; left:2px;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(15,18,38,.18);
+  transition:transform .2s cubic-bezier(.4,.1,.2,1);
+}
+.prof-card-acc__toggle input:checked + .prof-card-acc__toggle-track{
+  background:linear-gradient(135deg, #10b981, #047857);
+}
+.prof-card-acc__toggle input:checked + .prof-card-acc__toggle-track::after{
+  transform:translateX(14px);
+}
+.prof-card-acc__toggle input:focus-visible + .prof-card-acc__toggle-track{
+  outline:2px solid rgba(99,102,241,.45); outline-offset:2px;
+}
+.prof-card-acc__toggle-text{ flex:1; }
+
+/* ── публичная ссылка: ID + кнопка копирования в одну строку ── */
+.prof-card-acc__row{
+  display:flex; align-items:center; gap:10px;
+  margin-top:auto;
+  padding:6px 6px 6px 12px;
+  border-radius:10px;
+  background:rgba(15,18,38,.03);
+  border:1px solid var(--line-2);
+}
+.prof-card-acc__id{
+  flex:1; min-width:0;
+  font-family:'JetBrains Mono', ui-monospace, monospace;
+  font-size:12px; font-weight:700;
+  color:#4338ca;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  text-decoration:none;
+}
+.prof-card-acc__id:hover{ text-decoration:underline; }
+
 .prof-live-opt{
   display:flex;align-items:flex-start;gap:10px;
   font-size:13px;color:var(--ink-2);line-height:1.45;cursor:pointer;
@@ -2483,11 +2656,17 @@
 .prof-live-act{margin:0 0 20px}
 .prof-live-act .live-act-card{margin:0}
 .prof-name-form{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+/* Внутри новой .prof-card-acc--name форма имени имеет свой
+   layout (input → actions row). column не схлопывает actions-кнопки
+   в одну строку — они идут под input. */
+.prof-card-acc__edit.prof-name-form{ display:none; flex-direction:column; align-items:stretch; }
+.prof-card-acc--name[data-mode="edit"] .prof-card-acc__edit.prof-name-form{ display:flex; }
 .prof-name-input{
-  flex:1 1 180px;min-width:0;height:38px;padding:0 12px;
-  border:1px solid var(--line);border-radius:10px;font-size:14px;
+  flex:1 1 180px;min-width:0;height:36px;padding:0 12px;
+  border:1px solid var(--line);border-radius:10px;font-size:13px;
   background:#fff;color:var(--ink-2);
 }
+.prof-card-acc__edit .prof-name-input{ width:100%; }
 .prof-name-input:focus{outline:2px solid rgba(99,102,241,.35);border-color:rgba(99,102,241,.45)}
 .prof-xp-guide__panel{
   border:1px solid var(--line);border-radius:18px;background:#fff;
@@ -2504,12 +2683,6 @@
 .prof-xp-guide__list{margin:14px 0 0;padding-left:18px;color:var(--ink-2);font-size:13px;line-height:1.55}
 .prof-xp-guide__list li+li{margin-top:8px}
 .prof-xp-guide__note{margin:12px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
-.prof-settings .prof-settings__box{
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:16px 18px;
-  background:#fafbff;
-}
 .prof-settings .btn{
   display:inline-flex;align-items:center;justify-content:center;
   height:38px;padding:0 16px;border-radius:999px;

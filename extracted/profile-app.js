@@ -143,6 +143,26 @@
 		});
 
 		document.addEventListener('click', async function (e) {
+			// Toggle inline-edit для имени в карточке «Имя в профиле».
+			// Карточка имеет data-mode="display"|"edit"; кнопка
+			// «Редактировать» переводит в edit, кнопка «Отмена» — обратно.
+			var nameEditBtn = e.target.closest('#prof-name-edit-toggle');
+			if (nameEditBtn) {
+				var card = nameEditBtn.closest('.prof-card-acc--name');
+				if (card) {
+					card.setAttribute('data-mode', 'edit');
+					var inp = card.querySelector('#prof-display-name');
+					if (inp) { try { inp.focus(); inp.select(); } catch (e0) {} }
+				}
+				return;
+			}
+			var nameCancelBtn = e.target.closest('#prof-name-edit-cancel');
+			if (nameCancelBtn) {
+				var cardC = nameCancelBtn.closest('.prof-card-acc--name');
+				if (cardC) cardC.setAttribute('data-mode', 'display');
+				return;
+			}
+
 			var copyBtn = e.target.closest('#prof-copy-link');
 			if (copyBtn) {
 				var href = copyBtn.getAttribute('data-copy-href') || '';
@@ -154,7 +174,7 @@
 						prompt('Скопируйте ссылку:', url);
 					}
 					copyBtn.textContent = 'Скопировано';
-					setTimeout(function () { copyBtn.textContent = 'Копировать ссылку'; }, 1800);
+					setTimeout(function () { copyBtn.textContent = 'Копировать'; }, 1800);
 				} catch (errCopy) {}
 				return;
 			}

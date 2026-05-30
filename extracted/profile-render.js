@@ -1222,40 +1222,89 @@
 			? IqmoProfileData.readStoredDisplayName()
 			: null;
 		var nameInputVal = storedName || '';
+		var nameDisplay = storedName || (d.isAuthed ? d.name : 'Ученик IQMO');
 		var nameHint = storedName
-			? 'Сохранено в этом браузере' + (d.isAuthed ? ' и синхронизируется после входа' : '')
-			: (d.isAuthed ? 'По умолчанию — из e-mail. Можно задать своё.' : 'По умолчанию — «Ученик IQMO». Можно задать своё.');
+			? 'Сохранено в этом браузере'
+			: (d.isAuthed ? 'По умолчанию — из e-mail' : 'По умолчанию — «Ученик IQMO»');
+		// SVG-иконки 24×24 для шапок карточек — стиль 1.6-stroke,
+		// monoline, в цвет text-color (currentColor) чтобы совпадало
+		// с .prof-card-acc--{kind} палитрой.
+		var icoUser = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+			'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>';
+		var icoLock = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+			'<rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor"/></svg>';
+		var icoGlobe = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+			'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>';
+		var icoLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+			'<path d="M9.5 14.5a4 4 0 0 0 5.7 0l3.3-3.3a4 4 0 0 0-5.7-5.7l-1 1"/>' +
+			'<path d="M14.5 9.5a4 4 0 0 0-5.7 0l-3.3 3.3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
+
 		var pubLink = profileId
-			? '<div class="prof-settings__box iqmo-only-authed"><h3 style="margin:0 0 8px;font-size:14px">Публичная ссылка</h3>' +
-			  '<p style="font-size:12px;color:var(--muted);margin:0 0 10px">Можно отправить друзьям — e-mail и настройки не показываются.</p>' +
-			  '<p style="margin:0 0 10px;font-family:\'JetBrains Mono\',monospace;font-size:12px">' +
-			  '<a href="/profile/' + esc(profileId) + '" id="prof-public-link">/profile/' + esc(profileId) + '</a></p>' +
-			  '<button type="button" class="btn btn--ghost" id="prof-copy-link" data-copy-href="/profile/' + esc(profileId) + '">Копировать ссылку</button></div>'
+			? '<article class="prof-card-acc prof-card-acc--link iqmo-only-authed">' +
+			  '<div class="prof-card-acc__head">' +
+			  '<span class="prof-card-acc__ico">' + icoLink + '</span>' +
+			  '<h3 class="prof-card-acc__title">Публичная ссылка</h3>' +
+			  '</div>' +
+			  '<p class="prof-card-acc__desc">Можно отправить друзьям — без e-mail и настроек.</p>' +
+			  '<div class="prof-card-acc__row">' +
+			  '<a href="/profile/' + esc(profileId) + '" id="prof-public-link" class="prof-card-acc__id">/profile/' + esc(profileId) + '</a>' +
+			  '<button type="button" class="prof-card-acc__btn" id="prof-copy-link" data-copy-href="/profile/' + esc(profileId) + '">Копировать</button>' +
+			  '</div>' +
+			  '</article>'
 			: '';
 		return (
-			'<section class="prof-settings" id="prof-account">' +
+			'<section class="prof-settings prof-settings--cards" id="prof-account">' +
+			'<header class="prof-settings__head">' +
 			'<h2>Аккаунт и данные</h2>' +
 			'<p>Управление сессией и именем в профиле.</p>' +
+			'</header>' +
 			'<div class="prof-settings__grid">' +
-			'<div class="prof-settings__box prof-settings__box--wide">' +
-			'<h3 style="margin:0 0 8px;font-size:14px">Имя в профиле</h3>' +
-			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">' + esc(nameHint) + '</p>' +
-			'<form class="prof-name-form" id="prof-name-form">' +
+			// 1) Имя в профиле — display + edit-mode (toggle через data-mode)
+			'<article class="prof-card-acc prof-card-acc--name" data-mode="display">' +
+			'<div class="prof-card-acc__head">' +
+			'<span class="prof-card-acc__ico">' + icoUser + '</span>' +
+			'<h3 class="prof-card-acc__title">Имя в профиле</h3>' +
+			'</div>' +
+			'<div class="prof-card-acc__view">' +
+			'<span class="prof-card-acc__name" id="prof-display-name-view">' + esc(nameDisplay) + '</span>' +
+			'<button type="button" class="prof-card-acc__btn" id="prof-name-edit-toggle" aria-label="Редактировать имя">Редактировать</button>' +
+			'</div>' +
+			'<form class="prof-card-acc__edit prof-name-form" id="prof-name-form">' +
 			'<input type="text" class="prof-name-input" id="prof-display-name" maxlength="32" ' +
 			'placeholder="' + esc(d.isAuthed ? displayNameFromEmailPlaceholder(d) : 'Ученик IQMO') + '" ' +
 			'value="' + esc(nameInputVal) + '" autocomplete="nickname" />' +
-			'<button type="submit" class="btn btn--ghost" id="prof-save-name">Сохранить</button>' +
+			'<div class="prof-card-acc__edit-actions">' +
+			'<button type="submit" class="prof-card-acc__btn prof-card-acc__btn--primary" id="prof-save-name">Сохранить</button>' +
+			'<button type="button" class="prof-card-acc__btn" id="prof-name-edit-cancel">Отмена</button>' +
+			'</div>' +
 			'</form>' +
-			'<p id="prof-name-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
-			'<div class="prof-settings__box iqmo-only-authed"><h3 style="margin:0 0 8px;font-size:14px">Сессии</h3>' +
-			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Завершить вход на всех устройствах.</p>' +
-			'<button type="button" class="btn btn--ghost" id="prof-logout-everywhere">Выйти на всех устройствах</button>' +
-			'<p id="prof-logout-everywhere-status" class="stat-label" style="margin-top:8px" hidden></p></div>' +
-			'<div class="prof-settings__box prof-settings__box--wide">' +
-			'<h3 style="margin:0 0 8px;font-size:14px">Живая активность</h3>' +
-			'<p style="font-size:12px;color:var(--muted);margin:0 0 12px">Имя в ленте достижений (без фамилии и школы). Если выключено — «Ученик прошёл тему…».</p>' +
-			'<label class="prof-live-opt"><input type="checkbox" id="prof-live-activity-public" /> ' +
-			'Показывать мои достижения в общей активности</label></div>' +
+			'<p class="prof-card-acc__hint">' + esc(nameHint) + '</p>' +
+			'<p id="prof-name-status" class="stat-label" style="margin-top:8px" hidden></p>' +
+			'</article>' +
+			// 2) Сессии
+			'<article class="prof-card-acc prof-card-acc--lock iqmo-only-authed">' +
+			'<div class="prof-card-acc__head">' +
+			'<span class="prof-card-acc__ico">' + icoLock + '</span>' +
+			'<h3 class="prof-card-acc__title">Сессии</h3>' +
+			'</div>' +
+			'<p class="prof-card-acc__desc">Завершить вход на всех устройствах.</p>' +
+			'<button type="button" class="prof-card-acc__btn" id="prof-logout-everywhere">Выйти на всех устройствах</button>' +
+			'<p id="prof-logout-everywhere-status" class="stat-label" style="margin-top:8px" hidden></p>' +
+			'</article>' +
+			// 3) Живая активность
+			'<article class="prof-card-acc prof-card-acc--live">' +
+			'<div class="prof-card-acc__head">' +
+			'<span class="prof-card-acc__ico">' + icoGlobe + '</span>' +
+			'<h3 class="prof-card-acc__title">Живая активность</h3>' +
+			'</div>' +
+			'<p class="prof-card-acc__desc">Имя в ленте достижений (без фамилии и школы).</p>' +
+			'<label class="prof-card-acc__toggle prof-live-opt">' +
+			'<input type="checkbox" id="prof-live-activity-public" />' +
+			'<span class="prof-card-acc__toggle-track" aria-hidden="true"></span>' +
+			'<span class="prof-card-acc__toggle-text">Показывать в общей активности</span>' +
+			'</label>' +
+			'</article>' +
+			// 4) Публичная ссылка (только для авторизованных)
 			pubLink +
 			'</div></section>'
 		);
