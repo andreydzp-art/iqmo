@@ -3189,6 +3189,11 @@
 					: (currentIdx >= 0 && variantInfos[currentIdx].v.id !== seen.lastUnlockedId
 						? variantInfos[currentIdx].v.id : null);
 
+				// Сохраняем уже смонтированный профильный hero перед innerHTML —
+				// иначе CSS-анимации сбрасываются на каждом iqmo-sync. См.
+				// эквивалентный комментарий в /full-test-biology/index.html.
+				var savedHero = picker.querySelector('.iqmo-hero.v3');
+
 				picker.innerHTML = `
 					<div class="lm lm-shell">
 						<div data-iqmo-profile-hero-mount class="iqmo-profile-hero-mount" aria-busy="true"></div>
@@ -3199,7 +3204,12 @@
 						${lmTipHtml(stats, bossInfo)}
 					</div>
 				`;
-				mountIqmoProfileHero(picker);
+				if (savedHero) {
+					var heroMount = picker.querySelector('[data-iqmo-profile-hero-mount]');
+					if (heroMount) heroMount.replaceWith(savedHero);
+				} else {
+					mountIqmoProfileHero(picker);
+				}
 
 				const mapHost = document.getElementById('chem-map-host');
 				if (mapHost && window.IqmoChemLevelMap) {

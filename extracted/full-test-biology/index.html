@@ -3044,6 +3044,14 @@
 
 				// для перепрохождения, если пройдено всё, включая босса.
 
+				// Сохраняем уже смонтированный профильный hero перед innerHTML —
+				// иначе CSS-анимации орбитальных точек, holo-ring и пульсации
+				// streak-блока сбрасываются на каждом iqmo-sync (rerender →
+				// renderVariantPicker → picker.innerHTML стирает DOM).
+				// patchHero (подписан внутри mountIqmoProfileHero на iqmo-sync)
+				// обновит данные на месте — пересобирать DOM не нужно.
+				var savedHero = picker.querySelector('.iqmo-hero.v3');
+
 				picker.innerHTML = `
 					<div class="lm lm-shell">
 						<div data-iqmo-profile-hero-mount class="iqmo-profile-hero-mount" aria-busy="true"></div>
@@ -3054,7 +3062,12 @@
 						${lmTipHtml(stats, bossInfo)}
 					</div>
 				`;
-				mountIqmoProfileHero(picker);
+				if (savedHero) {
+					var heroMount = picker.querySelector('[data-iqmo-profile-hero-mount]');
+					if (heroMount) heroMount.replaceWith(savedHero);
+				} else {
+					mountIqmoProfileHero(picker);
+				}
 
 				const mapHost = document.getElementById('bio-map-host');
 				if (mapHost && window.IqmoChemLevelMap) {
