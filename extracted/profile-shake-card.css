@@ -6,16 +6,13 @@
    Стили внутри блока .shake-card повторяют исходник один-в-один,
    чтобы итоговая карточка совпадала с прототипом до пикселя.
 
-   Обёртка .ach--shake-host вписывает фиксированную карточку
-   340×510px в стандартную ячейку сетки достижений: контейнер
-   занимает 100% по ширине и сохраняет пропорцию 1/1.5, а внутри
-   .shake-scale через transform:scale(...) даунскейлит карточку
-   ровно до ширины ячейки. На широких экранах (cell ≥ 340px)
-   масштаб не превышает 1, карточка остаётся в исходном размере
-   и центрируется — тогда не «расплывается» на больших мониторах.
-
-   Hover-tooltip (.a-tip) висит на host'е, поэтому не скейлится
-   и читается одинаково на любом масштабе.
+   Обёртка .ach--shake-host занимает РОВНО 1 ячейку коллекции
+   (как обычная .ach), а внутренний .shake-scale зашейливает
+   фиксированную 340×510 карточку через transform:scale, чтобы
+   она поместилась без расширения сетки. По требованию
+   пользователя «Размер карточки профиля должен остаться
+   прежним. Все карточки достижений в сетке профиля должны быть
+   одинакового размера».
    ============================================================ */
 
 /* ── Host: ячейка сетки .ach-grid ───────────────────────────── */
@@ -23,32 +20,26 @@
   position:relative;
   display:block;
   width:100%;
-  /* Карточка-награда занимает 2×2 ячейки коллекции, как и обычный
-     start — в 1×1 ячейке прототип 340×510 ужимается до 0.45 scale
-     и теряет читаемость деталей (колбу, гексы, прогресс-бар). */
-  grid-column: span 2;
-  grid-row:    span 2;
-  aspect-ratio: 1 / 1.5;
-  /* container query — основа scale, см. .shake-scale ниже. */
-  container-type: inline-size;
+  /* Совпадает с базовой .ach (1/1.45) — все карты в строке одного размера. */
+  aspect-ratio: 1 / 1.45;
+  /* container-type: size — даёт нам и cqw, и cqh для расчёта scale. */
+  container-type: size;
   background:transparent;
   border:0;
   padding:0;
   cursor:pointer;
-  /* Tooltip-у нужно «вылетать» — overflow тут не режем. */
-  overflow:visible;
+  /* Тень/контент 340×510 за пределами ячейки нам не нужны — обрезаем
+     (как и у обычной .ach с overflow:hidden). */
+  overflow:hidden;
+  border-radius:14px;
   outline:none;
-  /* Состояния (locked/inProgress/earned) фильтруют видимость
-     через data-state в .ach-grid[data-ach-filter=...]. */
 }
 .ach.ach--shake-host:focus-visible{
   outline:2px solid rgba(124,58,237,.55);
-  outline-offset:4px;
-  border-radius:22px;
+  outline-offset:2px;
 }
 
-/* Locked → desaturated. Прогресс-бар при этом 0%/inProgress
-   значения уже подставляет рендер. */
+/* Locked → desaturated. */
 .ach.ach--shake-host[data-state="locked"] .shake-card{
   filter:grayscale(.85) brightness(.96);
   opacity:.78;
@@ -59,26 +50,16 @@
 }
 
 /* Wrapper, который скейлится. Карточка внутри — фиксированных
-   340×510px (как в прототипе), наружу мы её ужимаем через scale.
-   transform-origin: top-left + позиционирование top:0/left:0
-   гарантируют, что после scale карточка прижата к началу host'а
-   и заполняет ячейку без «прыжков». */
+   340×510px (как в прототипе). Скейл = min(W/340, H/510), где W/H
+   берём из container query units cqw/cqh (доступны при container-type:size). */
 .ach.ach--shake-host > .shake-scale{
   position:absolute;
-  top:0; left:0;
+  top:50%;
+  left:50%;
   width:340px;
   height:510px;
-  transform-origin: 0 0;
-  /* min(1, ...) — не растягиваем выше натурального размера. */
-  transform: scale(min(1, calc(100cqw / 340)));
-  /* На случаях когда cqw больше 340 — выравниваем по центру. */
-}
-@container (min-width: 340px){
-  .ach.ach--shake-host > .shake-scale{
-    left:50%;
-    transform: translateX(-50%) scale(1);
-    transform-origin: top center;
-  }
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(min(100cqw / 340, 100cqh / 510));
 }
 
 /* ── Сама карточка (1:1 с прототипом shake-card.css) ──────── */

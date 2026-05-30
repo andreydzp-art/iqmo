@@ -4,33 +4,34 @@
    Самодостаточный компонент на основе референса из Cloud Design
    (см. /extracted/_ach-bio-card-import/bio-card/bio-card.css).
    Стили внутри блока .bio-card повторяют исходник один-в-один.
-   Обёртка .ach.ach--bio-host вписывает фиксированную карточку
-   340×510 в 2×2 ячейки коллекции через transform:scale, как
-   сделано для shake/start. Без 2×2 в одной ячейке (~155px) орб
-   ужимается до 0.45× и теряет читаемость деталей (лист, капли,
-   гексы, прогресс-бар).
+   Обёртка .ach.ach--bio-host занимает РОВНО 1 ячейку коллекции
+   (как обычная .ach), а внутренний .bio-scale зашейливает
+   фиксированную 340×510 карточку через transform:scale, чтобы она
+   поместилась без расширения сетки. По требованию пользователя
+   («Размер карточки профиля должен остаться прежним. Все карточки
+   достижений в сетке профиля должны быть одинакового размера»).
    ============================================================ */
 
 .ach.ach--bio-host{
   position:relative;
   display:block;
   width:100%;
-  /* Карточка-награда занимает 2×2 ячейки коллекции, как и shake/start. */
-  grid-column: span 2;
-  grid-row:    span 2;
-  aspect-ratio: 1 / 1.5;
-  container-type: inline-size;
+  /* Совпадает с базовой .ach (1/1.45) — все карты в строке одного размера. */
+  aspect-ratio: 1 / 1.45;
+  /* container-type: size — даёт нам и cqw, и cqh для расчёта scale. */
+  container-type: size;
   background:transparent;
   border:0;
   padding:0;
   cursor:pointer;
-  overflow:visible;
+  /* Тень/контент 340×510 за пределами ячейки нам не нужны — обрезаем. */
+  overflow:hidden;
+  border-radius:14px;
   outline:none;
 }
 .ach.ach--bio-host:focus-visible{
   outline:2px solid rgba(59,130,246,.55);
-  outline-offset:4px;
-  border-radius:22px;
+  outline-offset:2px;
 }
 
 /* Locked → desaturated. Симметрично shake/start-host. */
@@ -43,23 +44,17 @@
   opacity:.92;
 }
 
-/* Wrapper, который скейлится. Карточка внутри — фиксированных
-   340×510. На широких ячейках (>=340px) остаётся в нативе и
-   центрируется. */
+/* Wrapper, который скейлится. Карточка внутри — фиксированных 340×510.
+   Скейл = min(W/340, H/510), где W/H — размеры ячейки. Используем
+   container query units cqw/cqh — оба доступны при container-type:size. */
 .ach.ach--bio-host > .bio-scale{
   position:absolute;
-  top:0; left:0;
+  top:50%;
+  left:50%;
   width:340px;
   height:510px;
-  transform-origin: 0 0;
-  transform: scale(min(1, calc(100cqw / 340)));
-}
-@container (min-width: 340px){
-  .ach.ach--bio-host > .bio-scale{
-    left:50%;
-    transform: translateX(-50%) scale(1);
-    transform-origin: top center;
-  }
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(min(100cqw / 340, 100cqh / 510));
 }
 
 /* ── Сама карточка (1:1 с прототипом bio-card.css) ──────── */

@@ -3,40 +3,40 @@
    --------------------------------------------------------------
    Самодостаточный компонент на основе референса из Cloud Design
    (см. /extracted/_ach-start-card-import/start-card/start-card.css).
-   Стили внутри блока .start-card повторяют исходник один-в-один;
-   обёртка .ach.ach--start-host вписывает фиксированную карточку
-   340×510 в стандартную ячейку коллекции через transform:scale —
-   точно так же, как сделано для эпической shake-card в
-   /profile-shake-card.css. Иначе при scale 0.5 на 1×1 ячейке вся
-   полигра «рюкзак / орб / искры» становится нечитаемой мелочью.
+   Стили внутри блока .start-card повторяют исходник один-в-один.
+
+   Обёртка .ach.ach--start-host занимает РОВНО 1 ячейку коллекции
+   (как обычная .ach), а внутренний .start-scale зашейливает
+   фиксированную 340×510 карточку через transform:scale, чтобы она
+   поместилась без расширения сетки. По требованию пользователя
+   «Размер карточки профиля должен остаться прежним. Все карточки
+   достижений в сетке профиля должны быть одинакового размера».
    ============================================================ */
 
 .ach.ach--start-host{
   position:relative;
   display:block;
   width:100%;
-  /* Карточка-награда занимает 2×2 ячейки коллекции, как и эпический
-     shake — в 1×1 ячейке прототип 340×510 ужимается до 0.45 scale
-     и теряет читаемость деталей. */
-  grid-column: span 2;
-  grid-row:    span 2;
-  aspect-ratio: 1 / 1.5;
-  container-type: inline-size;
+  /* Совпадает с базовой .ach (1/1.45) — все карты в строке одного размера. */
+  aspect-ratio: 1 / 1.45;
+  /* container-type: size — даёт нам и cqw, и cqh для расчёта scale. */
+  container-type: size;
   background:transparent;
   border:0;
   padding:0;
   cursor:pointer;
-  overflow:visible;
+  /* Тень/контент 340×510 за пределами ячейки нам не нужны — обрезаем
+     (как и у обычной .ach с overflow:hidden). */
+  overflow:hidden;
+  border-radius:14px;
   outline:none;
 }
 .ach.ach--start-host:focus-visible{
   outline:2px solid rgba(124,58,237,.55);
-  outline-offset:4px;
-  border-radius:22px;
+  outline-offset:2px;
 }
 
-/* Locked → desaturated. inProgress оставляет нативный цвет, но
-   с приглушённой подсветкой; стили сделаны симметрично shake-host. */
+/* Locked → desaturated. */
 .ach.ach--start-host[data-state="locked"] .start-card{
   filter:grayscale(.85) brightness(.96);
   opacity:.78;
@@ -46,22 +46,17 @@
   opacity:.92;
 }
 
-/* Wrapper, который скейлится. Пропорции прототипа — 340×510. На
-   узких ячейках scale<1, на широких остаётся 1 и центрируется. */
+/* Wrapper, который скейлится. Карточка внутри — фиксированных
+   340×510px (как в прототипе). Скейл = min(W/340, H/510), где W/H
+   берём из container query units cqw/cqh (доступны при container-type:size). */
 .ach.ach--start-host > .start-scale{
   position:absolute;
-  top:0; left:0;
+  top:50%;
+  left:50%;
   width:340px;
   height:510px;
-  transform-origin: 0 0;
-  transform: scale(min(1, calc(100cqw / 340)));
-}
-@container (min-width: 340px){
-  .ach.ach--start-host > .start-scale{
-    left:50%;
-    transform: translateX(-50%) scale(1);
-    transform-origin: top center;
-  }
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(min(100cqw / 340, 100cqh / 510));
 }
 
 /* ── Сама карточка (1:1 с прототипом start-card.css) ──────── */
