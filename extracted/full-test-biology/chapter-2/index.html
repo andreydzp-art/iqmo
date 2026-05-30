@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/iqmo-base.css?v=5" />
 <link rel="stylesheet" href="/iqmo-topnav.css?v=6" />
+<link rel="stylesheet" href="/rating-button.css?v=1" />
 <link rel="stylesheet" href="/iqmo-hub-hero.css?v=5" />
 <link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 <style>
@@ -300,7 +301,7 @@
     <a href="/">Мои предметы</a>
     <span class="is--disabled" title="Раздел «Расписание» появится позже" aria-disabled="true">Расписание</span>
     <span class="is--disabled" title="Раздел «Достижения» появится позже" aria-disabled="true">Достижения</span>
-    <span class="is--disabled" title="Раздел «Рейтинг» появится позже" aria-disabled="true">Рейтинг</span>
+    <a href="#" class="rb-rating" data-rating-open aria-haspopup="dialog" aria-controls="ratingModal"><span class="rb-rating__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M17 5h2a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4M7 5H5a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4"/></svg></span><span class="rb-rating__text">Рейтинг</span><span class="rb-rating__badge">NEW</span></a>
   </div>
   <div class="nav-right">
     <a href="/profile/" class="pill-btn" id="iqmo-nav-profile">
@@ -1000,5 +1001,127 @@
 })();
 </script>
 
+<!-- Модалка-тизер «Рейтинг откроется с 10 уровня». Лежит один раз на странице,
+     открывается по любому [data-rating-open] / .rb-rating (см. rating-button.js). -->
+<div class="rb-scrim" id="ratingModal"
+     role="dialog" aria-modal="true" aria-hidden="true"
+     aria-labelledby="rbTitle" aria-describedby="rbDesc"
+     data-progress="0">
+	<div class="rb-modal">
+		<button class="rb-close" type="button" data-rating-close aria-label="Закрыть">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+		</button>
+		<div class="rb-modal__hero">
+			<div class="rb-trophy" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/>
+					<path d="M17 5h2a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4M7 5H5a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4"/>
+				</svg>
+			</div>
+			<h2 class="rb-modal__title" id="rbTitle">Рейтинг откроется с 10 уровня</h2>
+			<p class="rb-modal__sub" id="rbDesc">
+				Прокачивай XP, проходи варианты и сохраняй серию дней подряд. На 10 уровне ты сможешь попасть в рейтинг, сравнить себя с другими учениками и бороться за место в топе.
+			</p>
+		</div>
+		<div class="rb-modal__body">
+			<div class="rb-lvl-row">
+				<div class="rb-lvl-chip" title="Текущий уровень">
+					<span class="rb-lvl-chip__ico">1</span>
+					<span class="rb-lvl-chip__label">сейчас</span>
+					<span class="rb-lvl-chip__val">· Новик</span>
+				</div>
+				<div class="rb-lvl-target">
+					до 10 уровня
+					<b>2 120 XP</b>
+				</div>
+			</div>
+			<div class="rb-progress" aria-label="Прогресс до 10 уровня">
+				<div class="rb-progress__fill"></div>
+			</div>
+			<div class="rb-progress-ticks">
+				<span>Уровень 1</span>
+				<span>Уровень 10 · Рейтинг 🏆</span>
+			</div>
+			<div class="rb-perks">
+				<div class="rb-perk">
+					<div class="rb-perk__ico rb-perk__ico--a">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+					</div>
+					<div class="rb-perk__text">Проходи <b>варианты и тесты</b> — это самый быстрый источник XP.</div>
+				</div>
+				<div class="rb-perk">
+					<div class="rb-perk__ico rb-perk__ico--c">
+						<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2s4 4 4 8a4 4 0 0 1-8 0c0-1 .3-2 .8-2.8C8 9 6 11 6 14a6 6 0 0 0 12 0c0-5-5-8-5-12z"/></svg>
+					</div>
+					<div class="rb-perk__text">Держи <b>серию дней</b> — стрик даёт множитель к XP, до +18%.</div>
+				</div>
+				<div class="rb-perk">
+					<div class="rb-perk__ico rb-perk__ico--b">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+					</div>
+					<div class="rb-perk__text">На <b>10 уровне</b> откроется рейтинг — лиги, топ недели и место среди учеников.</div>
+				</div>
+			</div>
+		</div>
+		<div class="rb-modal__foot">
+			<button class="rb-cta" type="button" data-rating-close>
+				Продолжить учиться
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+			</button>
+			<button class="rb-cta-sub" type="button" data-rating-close>Напомнить, когда откроется</button>
+		</div>
+	</div>
+</div>
+
+<script src="/rating-button.js?v=1" defer></script>
+<script>
+/* Тизер «Рейтинг откроется с 10 уровня» — обвязка реальными данными
+ * ученика. ChemProgress.computeLevelDetail() даёт текущий уровень и
+ * прогресс, getLevelXp(10) — суммарный XP до 10 уровня. Если ученик
+ * уже ≥ 10 — кнопку рейтинга прячем (модалка остаётся в DOM, но
+ * открыть её нечем). Перерисовываем на iqmo-sync / iqmo-xp-updated. */
+(function () {
+	function fmtRu(n) {
+		try { return Number(n).toLocaleString('ru-RU'); } catch (e) { return String(n); }
+	}
+	function syncRatingTeaser() {
+		if (!window.ChemProgress) return;
+		var btn = document.querySelector('.rb-rating');
+		var modal = document.getElementById('ratingModal');
+		if (!btn || !modal) return;
+		var snap = ChemProgress.snapshot ? ChemProgress.snapshot() : null;
+		var totalXp = snap && snap.totalPoints ? snap.totalPoints : 0;
+		var lv = ChemProgress.computeLevelDetail(totalXp);
+		var lvlNum = lv.current || 1;
+		var lvlTitle = (ChemProgress.getLevelTitle && ChemProgress.getLevelTitle(lvlNum)) || '';
+		var threshold10 = ChemProgress.getLevelXp ? ChemProgress.getLevelXp(10) : 2120;
+		if (lvlNum >= 10) {
+			btn.style.display = 'none';
+			return;
+		}
+		btn.style.display = '';
+		var xpToTen = Math.max(0, threshold10 - totalXp);
+		var pct = threshold10 > 0 ? Math.round(Math.min(100, (totalXp / threshold10) * 100)) : 0;
+		modal.dataset.progress = String(pct);
+		var ico = modal.querySelector('.rb-lvl-chip__ico');
+		if (ico) ico.textContent = String(lvlNum);
+		var val = modal.querySelector('.rb-lvl-chip__val');
+		if (val) val.textContent = '· ' + lvlTitle;
+		var tgt = modal.querySelector('.rb-lvl-target b');
+		if (tgt) tgt.textContent = fmtRu(xpToTen) + ' XP';
+		if (window.RatingTeaser && window.RatingTeaser.setProgress) {
+			window.RatingTeaser.setProgress(pct);
+		}
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', syncRatingTeaser);
+	} else {
+		syncRatingTeaser();
+	}
+	window.addEventListener('iqmo-sync', syncRatingTeaser);
+	window.addEventListener('iqmo-sync-ready', syncRatingTeaser);
+	window.addEventListener('iqmo-xp-updated', syncRatingTeaser);
+})();
+</script>
 </body>
 </html>
