@@ -1772,11 +1772,14 @@
     aspect-ratio: 1 / 1.45;
     width:100%;
     border-radius:14px;
-    padding:14px 12px 14px;
-    /* Контент собран в центре карточки одной группой: иконка → название →
-       описание/прогресс → чип редкости. Раньше тут было
-       justify-content:space-between, и чип улетал к нижней границе,
-       оставляя пустую полосу между описанием и чипом. */
+    /* padding-bottom увеличен — снизу карточки зарезервирована полоса
+       под .a-xp (XP-чип награды). Чип позиционируется absolute и
+       стоит на одной высоте у всех ачивок (см. .a-xp ниже). */
+    padding:14px 12px 44px;
+    /* Контент в центре (иконка → название → прогресс). XP-чип внизу
+       и rarity-pill сверху-справа — оба absolute, чтобы у всех
+       карточек оставаться на одной высоте независимо от центрального
+       контента. */
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:10px;
     text-align:center;
@@ -1808,14 +1811,67 @@
     font-family:'JetBrains Mono',monospace;
     letter-spacing:.02em;
   }
-  .ach .a-rar{
-    /* Чип редкости теперь часть центральной группы; небольшой
-       доп. зазор сверху чтобы он визуально отделялся от текста,
-       а не сливался в один блок. */
-    margin-top:4px;
+  /* RARITY pill — сверху-справа, absolute. Не входит в flex-flow,
+     поэтому центральная группа (art+name) визуально остаётся в
+     центре свободного пространства. */
+  .ach .a-rar.a-rar--top{
+    position:absolute;
+    top:9px; right:9px;
+    z-index:3;
+    margin:0;
     font-size:9.5px; font-weight:800;
     letter-spacing:.12em; text-transform:uppercase;
     padding:3px 7px; border-radius:5px;
+    line-height:1;
+  }
+  /* XP-CHIP внизу — закреплён через absolute, у всех ачивок стоит
+     на одной высоте (bottom:10px). Compound: иконка молнии +
+     значение + лейбл «награда». Не показывается на .ach--illus —
+     там свой внутренний reward-блок. */
+  .ach .a-xp{
+    position:absolute;
+    left:50%; bottom:10px;
+    transform:translateX(-50%);
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    max-width:calc(100% - 18px);
+    padding:4px 9px;
+    border-radius:999px;
+    font-size:10px; font-weight:800;
+    letter-spacing:.02em;
+    line-height:1;
+    z-index:3;
+    background:rgba(15,18,38,.04);
+    border:1px solid var(--line-2);
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .ach .a-xp .a-xp-ico{
+    display:inline-grid; place-items:center;
+    width:14px; height:14px;
+    border-radius:4px;
+    background:rgba(168,85,247,.10);
+    flex-shrink:0;
+  }
+  .ach .a-xp .a-xp-ico svg{
+    width:9px; height:9px;
+    fill:#7c3aed;
+  }
+  .ach .a-xp .a-xp-val{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:.01em;
+  }
+  .ach .a-xp .a-xp-lbl{
+    font-size:8.5px; font-weight:800;
+    letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted-2);
+  }
+  .ach .a-xp.a-xp--locked{
+    opacity:.55;
+    background:rgba(15,18,38,.03);
   }
 
   /* ─── rarity styles, restrained ─── */
@@ -1823,7 +1879,13 @@
   .ach.common .a-art{
     background:linear-gradient(135deg,#cbd5e1,#94a3b8);
   }
-  .ach.common .a-rar{color:#64748b; background:#f1f5f9;}
+  .ach.common .a-rar.a-rar--top{color:#64748b; background:#f1f5f9;}
+  .ach.common .a-xp{
+    background:rgba(100,116,139,.08);
+    border-color:rgba(100,116,139,.18);
+  }
+  .ach.common .a-xp .a-xp-ico{ background:rgba(100,116,139,.14); }
+  .ach.common .a-xp .a-xp-ico svg{ fill:#475569; }
 
   /* RARE — cool blue */
   .ach.rare{
@@ -1834,7 +1896,16 @@
   .ach.rare .a-art{
     background:linear-gradient(135deg,#60a5fa,#3b82f6);
   }
-  .ach.rare .a-rar{color:#1d4ed8; background:rgba(59,130,246,.08);}
+  .ach.rare .a-rar.a-rar--top{color:#1d4ed8; background:rgba(59,130,246,.08);}
+  .ach.rare .a-xp{
+    background:rgba(59,130,246,.06);
+    border-color:rgba(59,130,246,.22);
+    color:#1e3a8a;
+  }
+  .ach.rare .a-xp .a-xp-ico{ background:rgba(59,130,246,.14); }
+  .ach.rare .a-xp .a-xp-ico svg{ fill:#2563eb; }
+  .ach.rare .a-xp .a-xp-val{ color:#1e3a8a; }
+  .ach.rare .a-xp .a-xp-lbl{ color:#2563eb; }
 
   /* EPIC — violet */
   .ach.epic{
@@ -1845,7 +1916,16 @@
   .ach.epic .a-art{
     background:linear-gradient(135deg,#c084fc,#9333ea);
   }
-  .ach.epic .a-rar{color:#9333ea; background:rgba(168,85,247,.08);}
+  .ach.epic .a-rar.a-rar--top{color:#9333ea; background:rgba(168,85,247,.08);}
+  .ach.epic .a-xp{
+    background:rgba(168,85,247,.06);
+    border-color:rgba(168,85,247,.22);
+    color:#5b21b6;
+  }
+  .ach.epic .a-xp .a-xp-ico{ background:rgba(168,85,247,.14); }
+  .ach.epic .a-xp .a-xp-ico svg{ fill:#7c3aed; }
+  .ach.epic .a-xp .a-xp-val{ color:#5b21b6; }
+  .ach.epic .a-xp .a-xp-lbl{ color:#7c3aed; }
 
   /* LEGENDARY — calm gold accent */
   .ach.legend{
@@ -1861,7 +1941,16 @@
   }
   .ach.legend .a-art::after{display:none;}
   .ach.legend .a-name{color:var(--ink);}
-  .ach.legend .a-rar{color:#b45309; background:rgba(245,158,11,.10);}
+  .ach.legend .a-rar.a-rar--top{color:#b45309; background:rgba(245,158,11,.10);}
+  .ach.legend .a-xp{
+    background:rgba(245,158,11,.08);
+    border-color:rgba(245,158,11,.28);
+    color:#92400e;
+  }
+  .ach.legend .a-xp .a-xp-ico{ background:rgba(245,158,11,.18); }
+  .ach.legend .a-xp .a-xp-ico svg{ fill:#b45309; }
+  .ach.legend .a-xp .a-xp-val{ color:#92400e; }
+  .ach.legend .a-xp .a-xp-lbl{ color:#b45309; }
 
   /* MYTHIC */
   .ach.myth{
@@ -1871,7 +1960,16 @@
   .ach.myth .a-art{
     background:linear-gradient(135deg,#f87171,#dc2626);
   }
-  .ach.myth .a-rar{color:#b91c1c; background:rgba(239,68,68,.08);}
+  .ach.myth .a-rar.a-rar--top{color:#b91c1c; background:rgba(239,68,68,.08);}
+  .ach.myth .a-xp{
+    background:rgba(239,68,68,.06);
+    border-color:rgba(239,68,68,.22);
+    color:#7f1d1d;
+  }
+  .ach.myth .a-xp .a-xp-ico{ background:rgba(239,68,68,.14); }
+  .ach.myth .a-xp .a-xp-ico svg{ fill:#dc2626; }
+  .ach.myth .a-xp .a-xp-val{ color:#7f1d1d; }
+  .ach.myth .a-xp .a-xp-lbl{ color:#b91c1c; }
 
   /* LOCKED */
   .ach.locked{
@@ -1887,7 +1985,7 @@
   }
   .ach.locked .a-art svg{fill:#9aa0bf; opacity:.7;}
   .ach.locked .a-name{color:var(--muted);}
-  .ach.locked .a-rar{color:var(--muted-2); background:rgba(15,18,38,.03);}
+  .ach.locked .a-rar.a-rar--top{color:var(--muted-2); background:rgba(15,18,38,.03);}
 
   /* in-progress mini bar */
   .ach .a-prog{

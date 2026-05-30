@@ -488,42 +488,58 @@
 		var pctText = (a.pctRare != null) ? rarityPrefix(a.rarity) + a.pctRare + '%' : '';
 		var rarText = rarityLabel(a.rarity);
 
-		var bottomBlock;
+		// Центральный блок: иконка стоит отдельно, тут — название
+		// и контекст (прогресс / closed-метка). Для unlocked карточки
+		// показываем только название.
+		var centerBlock;
 		if (a.unlocked) {
-			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div></div>';
+			centerBlock = '<div class="a-name">' + esc(a.title) + '</div>';
 		} else if (a.inProgress && a.progress) {
 			var pct = Math.max(0, Math.min(100, Math.round((a.progress.current / a.progress.target) * 100)));
-			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div>' +
+			centerBlock = '<div class="a-name">' + esc(a.title) + '</div>' +
 				'<div class="a-prog" aria-label="' + a.progress.current + ' из ' + a.progress.target + '">' +
-				'<i style="width:' + pct + '%"></i></div></div>';
+				'<i style="width:' + pct + '%"></i></div>';
 		} else {
-			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div>' +
-				'<div class="a-meta">закрыто</div></div>';
-		}
-
-		var rarFootText;
-		if (a.inProgress && a.progress) {
-			rarFootText = a.progress.current + ' / ' + a.progress.target;
-		} else if (a.unlocked) {
-			rarFootText = rarText;
-		} else {
-			rarFootText = 'Закрыто';
+			centerBlock = '<div class="a-name">' + esc(a.title) + '</div>' +
+				'<div class="a-meta">закрыто</div>';
 		}
 
 		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
 			'<span>' + (a.inProgress && a.progress ? (a.progress.current + ' / ' + a.progress.target) : rarText) + '</span>';
 
+		// XP-чип внизу карточки. Логика «у всех на одном уровне» —
+		// .a-xp position:absolute; bottom:12px (см. profile.css).
+		// Для locked показываем дисклеймер «получите чтобы узнать»,
+		// чтобы XP-секрет не раскрывался прежде времени, но место
+		// под чип сохраняется (общий ритм коллекции).
+		var xpBoltSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
+		var xpChipHtml;
+		if (a.unlocked || a.inProgress) {
+			xpChipHtml = '<div class="a-xp">' +
+				'<span class="a-xp-ico">' + xpBoltSvg + '</span>' +
+				'<span class="a-xp-val">+' + (a.xpReward || 0) + ' XP</span>' +
+				'<span class="a-xp-lbl">награда</span>' +
+			'</div>';
+		} else {
+			xpChipHtml = '<div class="a-xp a-xp--locked">' +
+				'<span class="a-xp-ico">' + xpBoltSvg + '</span>' +
+				'<span class="a-xp-val">+' + (a.xpReward || 0) + ' XP</span>' +
+				'<span class="a-xp-lbl">награда</span>' +
+			'</div>';
+		}
+
 		return (
 			'<article class="ach ' + cls + '" data-state="' + state + '" tabindex="0">' +
 			(pctText ? '<span class="a-pct">' + esc(pctText) + '</span>' : '') +
+			'<span class="a-rar a-rar--top">' + esc(rarText) + '</span>' +
 			'<div class="a-tip">' +
 				'<div class="tt-name">' + esc(a.title) + '</div>' +
 				'<div class="tt-desc">' + esc(a.desc) + '</div>' +
 				'<div class="tt-meta">' + tipMeta + '</div>' +
 			'</div>' +
 			'<div class="a-art">' + artInner + '</div>' +
-			bottomBlock +
-			'<div class="a-rar">' + esc(rarFootText) + '</div>' +
+			centerBlock +
+			xpChipHtml +
 			'</article>'
 		);
 	}
