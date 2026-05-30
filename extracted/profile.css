@@ -1450,312 +1450,131 @@
   .ach.ach--illus.ach--bio .c-prog-row .pp .sep{ color:rgba(37,99,235,.3); }
 
   /* ════════════════════════════════════════════════════════════
-       КАРТА «СТАРТ НА ПОРТАЛЕ» — common rarity, по прототипу
-       start-card.html / start-card.css. Так же как .ach--illus,
-       занимает стандартную 1×1 ячейку (aspect 1/1.45) и масштабирует
-       внутреннюю композицию через container query units (cqi).
-       Исходный прототип проектировался на 340×510, тут он ужимается
-       до ~178×258 без потери деталей.
+       РЕФ-КАРТА · START — модификатор поверх .ach--illus.
+       Карточка «Старт на портале» (welcome). Геометрия и cqi-разметка
+       идентичны фиолетовой эпической и .ach--bio: та же 1×1 ячейка,
+       тот же aspect 1/1.45, та же внутренняя композиция (orb + float
+       balls + reward chip + прогресс). Меняем только палитру —
+       emerald, по прототипу start-card-emerald-standalone.html.
+       Внутри орба вместо колбы/листа — рюкзак (svg .ref-bag),
+       рендерится через renderAchievementCardIllus.
        ════════════════════════════════════════════════════════════ */
-  .ach.ach--start{
-    grid-column: auto;
-    grid-row:    auto;
-    width:100%; height:100%;
-    aspect-ratio: 1 / 1.45;
-    container-type: inline-size;
-    container-name: startcard;
-
-    position:relative;
-    padding:0;
-    border-radius:22px;
-    overflow:hidden;
-    isolation:isolate;
-    cursor:pointer;
-    display:block;
-    color:var(--ink);
-    font-family:'Inter', system-ui, sans-serif;
+  .ach.ach--illus.ach--start{
+    border:1px solid rgba(16,185,129,.24);
     background:
-      radial-gradient(700px 400px at 50% -10%, rgba(148,163,184,.10), transparent 60%),
-      linear-gradient(180deg, #fbfcfe 0%, #fff 60%, #fbfcfe 100%);
-    border:1px solid rgba(148,163,184,.20);
+      radial-gradient(900px 520px at 50% -8%, rgba(16,185,129,.20), transparent 62%),
+      radial-gradient(420px 320px at 12% 102%, rgba(16,185,129,.10), transparent 68%),
+      linear-gradient(180deg, #f1fdf7 0%, #ffffff 48%, #f1fdf7 100%);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.9),
-      0 1px 2px rgba(15,18,38,.04),
-      0 22px 50px -28px rgba(100,116,139,.30);
-    transition:transform .26s cubic-bezier(.2,.7,.2,1), box-shadow .26s ease, border-color .26s ease;
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 0 0 1px rgba(255,255,255,.55),
+      0 1px 2px rgba(15,18,38,.05),
+      0 6px 14px -8px rgba(5,150,105,.30),
+      0 22px 48px -22px rgba(5,150,105,.46);
   }
-  .ach.ach--start:hover{
-    transform:translateY(-4px);
-    border-color:rgba(148,163,184,.42);
+  .ach.ach--illus.ach--start:hover{
+    border-color:rgba(16,185,129,.5);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.9),
-      0 1px 2px rgba(15,18,38,.04),
-      0 30px 60px -24px rgba(100,116,139,.40);
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 1px 2px rgba(15,18,38,.05),
+      0 12px 24px -10px rgba(5,150,105,.42),
+      0 34px 60px -22px rgba(5,150,105,.55);
   }
-
-  /* faint top scene с точками и мягким glow — ровно как в прототипе */
-  .ach.ach--start .sc-scene{
-    position:absolute; top:0; left:0; right:0;
-    height:62%;
-    z-index:1; pointer-events:none; overflow:hidden;
-    background:radial-gradient(420px 320px at 50% 26%, rgba(148,163,184,.10), transparent 70%);
-    -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
-            mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+  /* Светящийся обод по контуру — emerald conic. */
+  .ach.ach--illus.ach--start::after{
+    background:conic-gradient(from 0deg,
+      rgba(16,185,129,0),
+      rgba(110,231,183,.55) 25%,
+      rgba(16,185,129,.85) 50%,
+      rgba(110,231,183,.55) 75%,
+      rgba(16,185,129,0));
   }
-  .ach.ach--start .sc-scene::after{
-    content:""; position:absolute; inset:0;
+  /* Сцена под орбом — изумрудные haloes, зелёная hex-сетка. */
+  .ach.ach--illus.ach--start .ref-scene{
+    background:
+      radial-gradient(circle at 14% 18%, rgba(16,185,129,.22), transparent 16%),
+      radial-gradient(circle at 86% 14%, rgba(16,185,129,.18), transparent 16%),
+      radial-gradient(520px 420px at 50% 30%, rgba(16,185,129,.18), transparent 70%);
+  }
+  .ach.ach--illus.ach--start .ref-scene::before{
     background-image:
-      radial-gradient(circle at 22% 30%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
-      radial-gradient(circle at 78% 24%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
-      radial-gradient(circle at 20% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px),
-      radial-gradient(circle at 82% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px);
-    opacity:.55;
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'><g fill='none' stroke='%2334d399' stroke-width='1.1' opacity='.7'><polygon points='30,4 56,18 56,46 30,60 4,46 4,18'/><polygon points='90,44 116,58 116,86 90,100 64,86 64,58'/></g></svg>");
   }
-
-  /* RARITY pill — слева сверху */
-  .ach.ach--start .sc-rarity{
-    position:absolute;
-    top:4cqi; left:4cqi; z-index:4;
-    display:inline-flex; align-items:center; gap:1.6cqi;
-    height:auto; padding:1.4cqi 3.5cqi;
-    min-height:18px;
-    border-radius:999px;
-    font-size:clamp(8.5px, 3cqi, 11px);
-    font-weight:800; letter-spacing:.16em; text-transform:uppercase;
-    color:#5b6480;
-    background:rgba(255,255,255,.85);
-    border:1px solid rgba(148,163,184,.35);
-    box-shadow:0 1px 2px rgba(15,18,38,.05), inset 0 1px 0 rgba(255,255,255,.6);
-    -webkit-backdrop-filter:blur(8px);
-            backdrop-filter:blur(8px);
-  }
-  .ach.ach--start .sc-rarity::before{
-    content:""; width:clamp(5px, 1.8cqi, 7px); height:clamp(5px, 1.8cqi, 7px);
-    border-radius:50%; background:#aeb6cc;
-  }
-
-  /* ORB STAGE — рюкзак внутри круга */
-  .ach.ach--start .sc-orb-stage{
-    position:relative;
-    width:70cqi; height:70cqi;
-    margin:11cqi auto 1.5cqi;
-    display:grid; place-items:center;
-    z-index:3;
-  }
-  .ach.ach--start .sc-orb{
-    position:relative;
-    width:58cqi; height:58cqi;
-    border-radius:50%;
-    overflow:hidden;
-    background:radial-gradient(circle at 50% 36%, #ffffff 0%, #f1f3f9 58%, #e5e9f2 100%);
-    box-shadow:
-      0 0 0 1.4cqi #fff,
-      0 0 0 1.7cqi rgba(148,163,184,.30),
-      0 4.5cqi 9cqi -3.5cqi rgba(100,116,139,.35),
-      inset 0 -2.8cqi 7.5cqi rgba(148,163,184,.18),
-      inset 0 .55cqi 0 rgba(255,255,255,.95);
-  }
-  .ach.ach--start .sc-orb::before{
-    content:""; position:absolute;
-    top:8%; left:18%; width:55%; height:30%;
-    border-radius:50%;
-    background:radial-gradient(ellipse at center, rgba(255,255,255,.6), transparent 70%);
-    filter:blur(2px); pointer-events:none;
-  }
-
-  .ach.ach--start .sc-bag{
-    position:absolute; top:50%; left:50%;
-    transform:translate(-50%, -50%);
-    width:36cqi; height:36cqi;
-    z-index:3;
-    filter:drop-shadow(0 2.4cqi 4.7cqi rgba(100,116,139,.30));
-    transform-origin:50% 70%;
-  }
-
-  .ach.ach--start .sc-orbit{
-    position:absolute; inset:-1.2cqi;
-    border-radius:50%;
-    border:.6cqi solid transparent;
-    border-top-color:rgba(148,163,184,.5);
-    border-right-color:rgba(148,163,184,.22);
-    transform:rotate(-32deg);
-    pointer-events:none; z-index:1;
-  }
-
-  .ach.ach--start .sc-spark{
-    position:absolute;
+  /* Rarity-пилюля «Обычная» — emerald-градиент, по прототипу. */
+  .ach.ach--illus.ach--start .c-rar{
     background:
-      linear-gradient(90deg, transparent 45%, #c2c8d8 50%, transparent 55%) center/100% .4cqi no-repeat,
-      linear-gradient(0deg, transparent 45%, #c2c8d8 50%, transparent 55%) center/.4cqi 100% no-repeat;
-    filter:drop-shadow(0 0 .9cqi #e2e6f0);
-    pointer-events:none; z-index:4;
-    animation:start-card-twinkle 3s ease-in-out infinite;
-  }
-  .ach.ach--start .sc-spark.s1{ width:3.8cqi; height:3.8cqi; top:18%; right:14%; }
-  .ach.ach--start .sc-spark.s2{ width:2.4cqi; height:2.4cqi; bottom:30%; left:12%; animation-delay:.7s; }
-  .ach.ach--start .sc-spark.s3{ width:2cqi;   height:2cqi;   top:54%;    right:8%;  animation-delay:1.5s; }
-  @keyframes start-card-twinkle{
-    0%,100%{ transform:scale(.7); opacity:.3; }
-    50%    { transform:scale(1.2); opacity:.9; }
-  }
-
-  /* TITLE / SUBTITLE */
-  .ach.ach--start .sc-title-block{
-    position:relative; z-index:2;
-    text-align:center;
-    padding:5cqi 6.5cqi 0;
-  }
-  .ach.ach--start .sc-title{
-    margin:0;
-    font-size:clamp(13px, 7cqi, 24px);
-    font-weight:800; letter-spacing:-.02em;
-    line-height:1.15; color:var(--ink);
-  }
-  .ach.ach--start .sc-sub{
-    margin-top:2.3cqi;
-    font-size:clamp(8.5px, 3.8cqi, 13px);
-    color:#6b7392; line-height:1.4;
-  }
-
-  /* DIVIDER */
-  .ach.ach--start .sc-divider{
-    position:relative; z-index:2;
-    display:flex; align-items:center;
-    margin:4cqi 7.5cqi;
-  }
-  .ach.ach--start .sc-divider::before,
-  .ach.ach--start .sc-divider::after{
-    content:""; flex:1; height:1px; background:rgba(148,163,184,.22);
-  }
-  .ach.ach--start .sc-divider span{
-    width:clamp(4px, 2cqi, 7px); height:clamp(4px, 2cqi, 7px);
-    margin:0 2.6cqi;
-    background:#aeb6cc; transform:rotate(45deg);
-  }
-
-  /* PROGRESS */
-  .ach.ach--start .sc-prog{
-    position:relative; z-index:2;
-    margin:0 7.5cqi;
-  }
-  .ach.ach--start .sc-prog-row{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:2.3cqi;
-  }
-  .ach.ach--start .sc-label{
-    font-size:clamp(7.5px, 3cqi, 10.5px); font-weight:800;
-    letter-spacing:.22em; text-transform:uppercase;
-    color:#6b7094;
-  }
-  .ach.ach--start .sc-count{
-    font-family:'JetBrains Mono', ui-monospace, monospace;
-    font-size:clamp(8px, 3.8cqi, 13px);
-    font-weight:800;
-    color:var(--ink); letter-spacing:.02em;
-  }
-  .ach.ach--start .sc-count b{
-    font-size:clamp(9px, 4.4cqi, 15px);
-    background:linear-gradient(135deg, #5b6480, #939bb6);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .ach.ach--start .sc-count .sep{
-    color:rgba(100,116,139,.4); margin:0 .3cqi;
-  }
-  .ach.ach--start .sc-prog-bar{
-    height:clamp(6px, 3.5cqi, 12px);
-    border-radius:999px;
-    background:linear-gradient(180deg, rgba(148,163,184,.07), rgba(148,163,184,.14));
-    border:1px solid rgba(148,163,184,.20);
+      linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0)),
+      linear-gradient(135deg, #6ee7b7 0%, #10b981 55%, #047857 100%);
+    color:#fff;
+    text-shadow:0 1px 0 rgba(4,120,87,.45);
     box-shadow:
-      inset 0 1.5px 3px rgba(71,85,105,.10),
-      inset 0 -1px 0 rgba(255,255,255,.6),
-      0 1px 0 rgba(255,255,255,.6);
-    overflow:hidden; position:relative;
-  }
-  .ach.ach--start .sc-prog-bar i{
-    display:block; height:100%; border-radius:999px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 50%),
-      linear-gradient(90deg, #8d96b2 0%, #aeb6cc 50%, #7e88a6 100%);
-    box-shadow:
-      0 0 8px rgba(148,163,184,.4),
+      0 0 0 1px rgba(16,185,129,.25),
+      0 4px 14px -2px rgba(5,150,105,.55),
+      0 0 18px -4px rgba(110,231,183,.65),
       inset 0 1px 0 rgba(255,255,255,.55),
-      inset 0 -1px 1px rgba(71,85,105,.30);
+      inset 0 -1px 0 rgba(4,120,87,.30);
   }
-
-  /* REWARD chip — одна центральная плитка */
-  .ach.ach--start .sc-reward{
-    position:relative; z-index:2;
-    margin:4cqi 6.5cqi 6.5cqi;
-    padding:3.2cqi 4cqi;
-    display:grid; grid-template-columns:auto;
-    justify-items:center; align-items:center;
-    border-radius:16px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.7), rgba(246,248,251,.7)),
-      radial-gradient(120% 100% at 0% 0%, rgba(148,163,184,.08), transparent 60%);
-    border:1px solid rgba(148,163,184,.22);
+  /* Орб — глянцевый изумрудный, тот же размер и cqi-логика, что у фиолетового. */
+  .ach.ach--illus.ach--start .ref-orb{
+    background:radial-gradient(circle at 50% 36%, #ecfdf5 0%, #6ee7b7 44%, #10b981 78%, #047857 100%);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.9),
-      inset 0 0 0 1px rgba(255,255,255,.35),
-      0 6px 16px -10px rgba(100,116,139,.25);
+      0 0 0 4px #fff,
+      0 0 0 6px rgba(255,255,255,.35),
+      0 0 18px 4px rgba(16,185,129,.55),
+      0 0 36px 8px rgba(16,185,129,.30),
+      inset 0 -8px 22px rgba(4,120,87,.32),
+      inset 0 1.5px 0 rgba(255,255,255,.45);
   }
-  .ach.ach--start .sc-rwd-item{
-    display:flex; align-items:center; gap:2.9cqi; padding:.6cqi 1.2cqi;
+  /* Рюкзак (.ref-bag) — drop-shadow подсветка как у листа. */
+  .ach.ach--illus.ach--start .ref-flask.ref-bag{
+    filter:
+      drop-shadow(0 0.6cqi 1.2cqi rgba(4,120,87,.40))
+      drop-shadow(0 0 2cqi rgba(110,231,183,.5));
   }
-  .ach.ach--start .sc-rwd-ico{
-    width:clamp(20px, 10cqi, 34px); height:clamp(20px, 10cqi, 34px);
-    border-radius:10px;
-    display:grid; place-items:center; flex-shrink:0;
-    background:linear-gradient(135deg, #ede9fe, #ddd6fe);
+  /* Hex-обводка фоновых гексагонов сцены — зелёная. */
+  .ach.ach--illus.ach--start .float-hex svg{ stroke:#34d399; }
+  /* Floating balls — emerald. */
+  .ach.ach--illus.ach--start .float-ball{
+    background:radial-gradient(circle at 30% 28%, #ecfdf5 0%, #34d399 55%, #047857 95%);
+    box-shadow:
+      0 0 8px rgba(16,185,129,.55),
+      inset 0 -2px 4px rgba(0,0,0,.18),
+      inset 0 1px 2px rgba(255,255,255,.65);
+  }
+  /* Прогресс-бар — emerald fill. */
+  .ach.ach--illus.ach--start .c-prog-bar{
+    background:linear-gradient(180deg, rgba(16,185,129,.06), rgba(16,185,129,.12));
+    border:1px solid rgba(16,185,129,.18);
+  }
+  .ach.ach--illus.ach--start .c-prog-bar i{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 50%),
+      linear-gradient(90deg, #10b981 0%, #34d399 50%, #059669 100%);
+    box-shadow:
+      0 0 12px rgba(16,185,129,.55),
+      0 0 24px rgba(16,185,129,.30),
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -1px 1px rgba(4,120,87,.35);
+  }
+  /* Reward-чип — emerald капсула. */
+  .ach.ach--illus.ach--start .c-rwd-ico{
+    background:linear-gradient(135deg, #d1fae5, #a7f3d0);
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,.9),
       inset 0 0 0 1px rgba(255,255,255,.6),
-      0 4px 10px -4px rgba(124,58,237,.35);
+      0 4px 10px -4px rgba(5,150,105,.35);
   }
-  .ach.ach--start .sc-rwd-ico svg{
-    width:clamp(11px, 5.3cqi, 18px); height:clamp(11px, 5.3cqi, 18px);
-    fill:#7c3aed;
+  .ach.ach--illus.ach--start .c-rwd-ico svg{ fill:#059669; }
+  .ach.ach--illus.ach--start .c-rwd-val{ color:#065f46; }
+  .ach.ach--illus.ach--start .c-rwd-lbl{ color:#059669; }
+  /* divider/sep — изумрудный ромб. */
+  .ach.ach--illus.ach--start .c-div span{ background:#34d399; }
+  .ach.ach--illus.ach--start .c-prog-row > span:first-child{ color:#059669; }
+  .ach.ach--illus.ach--start .c-prog-row .pp b{
+    background:linear-gradient(135deg, #047857, #34d399);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .ach.ach--start .sc-rwd-text{
-    display:flex; flex-direction:column; gap:.85cqi; line-height:1.1;
-  }
-  .ach.ach--start .sc-rwd-val{
-    font-size:clamp(8.5px, 3.95cqi, 13.5px);
-    font-weight:800; color:#2a2e4a;
-    font-variant-numeric:tabular-nums;
-  }
-  .ach.ach--start .sc-rwd-lbl{
-    font-size:clamp(6px, 2.65cqi, 9px);
-    font-weight:800; letter-spacing:.18em; text-transform:uppercase;
-    color:#8d96b2; opacity:.9;
-  }
-
-  /* hover-анимация: рюкзак мягко «дышит», орбита крутится, искры чаще */
-  @keyframes start-card-bag-bob{
-    0%,100%{ transform:translate(-50%, -50%); }
-    50%    { transform:translate(-50%, -56%); }
-  }
-  @keyframes start-card-orbit-spin{ to{ transform:rotate(328deg); } }
-  .ach.ach--start:hover .sc-bag{ animation:start-card-bag-bob 2.4s ease-in-out infinite; }
-  .ach.ach--start:hover .sc-orbit{ animation:start-card-orbit-spin 9s linear infinite; }
-  .ach.ach--start:hover .sc-spark{ animation-duration:1.4s; opacity:.9; }
-
-  @media (prefers-reduced-motion: reduce){
-    .ach.ach--start, .ach.ach--start *{ animation:none !important; transition:none !important; }
-  }
-
-  /* LOCKED state — на «welcome» практически не встречается, но
-     добавляем для полноты, чтобы карточка не выделялась в массе */
-  .ach.ach--start.locked .sc-orb{ filter:grayscale(.85); }
-  .ach.ach--start.locked .sc-bag{ filter:grayscale(.7) drop-shadow(0 1cqi 2cqi rgba(15,18,38,.2)); }
-  .ach.ach--start.locked .sc-rarity{ color:var(--muted-2); }
-  .ach.ach--start.locked .sc-title{ color:var(--muted); }
-  .ach.ach--start.locked .sc-sub{ color:var(--muted-2); }
-  .ach.ach--start.locked .sc-prog-bar i{
-    background:linear-gradient(90deg, #cbd5e1, #94a3b8);
-    box-shadow:none;
-  }
+  .ach.ach--illus.ach--start .c-prog-row .pp .sep{ color:rgba(5,150,105,.35); }
 
   .ach-filter button .cnt{
     margin-left:6px;
