@@ -296,6 +296,10 @@
       radial-gradient(circle at 62% 88%, rgba(255,255,255,.14) 0 1.5px, transparent 2.5px);
     pointer-events:none;
   }
+  /* Оптический сдвиг карточки «Супер Босс» вниз — см. chemistry-level-map.css */
+  .pd-node.boss .pd-bossCard{
+    transform: translateY(10px);
+  }
   .pd-bossTop{
     display:flex; align-items:center; justify-content:space-between;
     font-size:10px; letter-spacing:.18em; font-weight:800; text-transform:uppercase;

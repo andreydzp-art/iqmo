@@ -296,6 +296,15 @@
       radial-gradient(circle at 62% 88%, rgba(255,255,255,.14) 0 1.5px, transparent 2.5px);
     pointer-events:none;
   }
+  /* Оптический сдвиг вниз: карточка «Супер Босс» из-за внутренней
+     композиции (kicker сверху + объёмный круг с медалью) визуально
+     «висит» выше круглых узлов вариантов 1–6. Дёргаем translateY,
+     а не margin-top, чтобы не увеличивать высоту строки .pd-nodes
+     и не сдвинуть .pd-foot ниже. Линия маршрута и так заходит в
+     карточку через ::before, перекрывает зазор естественно. */
+  .pd-node.boss .pd-bossCard{
+    transform: translateY(10px);
+  }
   .pd-bossTop{
     display:flex; align-items:center; justify-content:space-between;
     font-size:10px; letter-spacing:.18em; font-weight:800; text-transform:uppercase;
