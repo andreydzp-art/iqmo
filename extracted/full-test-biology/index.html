@@ -3488,19 +3488,38 @@
 				if (!mount) return;
 				if (!window.IqmoProfileData || !window.IqmoProfileRender || !window.__iqmoMe) return;
 
+				// Текущий пользователь (если уже резолвили). Нужен и для
+				// initial inject, и для последующих patchHero после
+				// iqmo-sync — иначе patchHero запускается с пустым me и
+				// поля профиля «гаснут» обратно в дефолты.
+				var lastMe = null;
+				var heroEl = null;
+
+				function buildPayload(meUser) {
+					var built = window.IqmoProfileData.build(meUser || {});
+					// renderHero/patchHero ожидают распакованный профиль:
+					// p.profileData — это поля { name, level, xpCurrent, ... },
+					// а не корневой объект build(). Передавать сюда `built`
+					// напрямую — тот самый баг, из-за которого hero на
+					// full-test показывал «Ранг Старт · ур. undefined · 0/0».
+					return {
+						profileData: built.profileData,
+						isPublic: false,
+						socialSignals: built.socialSignals || []
+					};
+				}
+
 				function inject(meUser) {
 					try {
-						var data = window.IqmoProfileData.build(meUser || {});
-						var html = window.IqmoProfileRender.renderHero({
-							profileData: data,
-							isPublic: false,
-							socialSignals: []
-						});
+						lastMe = meUser || null;
+						var payload = buildPayload(lastMe);
+						var html = window.IqmoProfileRender.renderHero(payload);
 						var wrap = document.createElement('div');
 						wrap.innerHTML = html;
 						var hero = wrap.firstElementChild;
 						if (!hero) return;
 						mount.replaceWith(hero);
+						heroEl = hero;
 						if (window.IqmoProfileRender.bindAvatarPicker) {
 							try { window.IqmoProfileRender.bindAvatarPicker(); } catch (e) {}
 						}
@@ -3516,14 +3535,39 @@
 					}
 				}
 
+				// При каждом iqmo-sync / iqmo-xp-updated патчим уже
+				// смонтированный hero значениями свежего snap'а — XP-бар,
+				// streak, точность и т.д. PatchHero обновляет ноды на
+				// месте, не пересоздавая корневой .iqmo-hero, чтобы
+				// CSS-анимации (orbit-dots, holo-ring) не сбрасывались.
+				function patch() {
+					if (!heroEl) return;
+					var fresh = heroEl.parentNode && heroEl.parentNode.contains(heroEl)
+						? heroEl
+						: document.querySelector('.iqmo-hero.v3');
+					if (!fresh) return;
+					try {
+						var payload = buildPayload(lastMe);
+						window.IqmoProfileRender.patchHero(fresh, payload);
+					} catch (eP) {
+						if (window.console && console.warn) {
+							console.warn('[full-test-biology] patchHero failed:', eP);
+						}
+					}
+				}
+
 				try {
 					if (window.__iqmoMe && typeof window.__iqmoMe.then === 'function') {
-						window.__iqmoMe.then(function (me) { inject(me); })
+						window.__iqmoMe.then(function (me) { inject(me); patch(); })
 							.catch(function () { inject(null); });
 					} else {
 						inject(null);
 					}
 				} catch (e) { inject(null); }
+
+				window.addEventListener('iqmo-sync', patch);
+				window.addEventListener('iqmo-sync-ready', patch);
+				window.addEventListener('iqmo-xp-updated', patch);
 			}
 
 			/**
