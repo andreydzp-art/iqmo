@@ -491,8 +491,10 @@
 		//     hex-сцена, орбит-сфера с колбой/листом, золотой ободок
 		//     при hover) и собственным reward-блоком .c-reward,
 		//     который уже стоит внизу карточки в flex-flow.
-		// Триггер — поле iconUrl в каталоге (см. profile-data.js).
-		var hasIllus = !!a.iconUrl;
+		// Триггер — поле iconUrl или illus:true в каталоге
+		// (см. profile-data.js). «Старт на портале» использует illus,
+		// без iconUrl: art (рюкзак/орбита/искры) рисуется инлайн.
+		var hasIllus = !!a.iconUrl || a.illus === true;
 		if (hasIllus) return renderAchievementCardIllus(a, state);
 		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
 		var icon = ICONS[a.icon] || ICONS.star;
@@ -821,10 +823,13 @@
 	function renderAchievementCardIllus(a, state) {
 		var rar = a.rarity || 'epic';
 		var isBio = (a.id === 'bio_stage1');
-		// .ach--bio — модификатор поверх .ach--illus в profile.css
-		// (та же 1×1 ячейка, та же cqi-разметка, перекраска под биологию).
+		var isStart = (a.id === 'welcome');
+		// .ach--bio / .ach--start — модификаторы поверх .ach--illus
+		// (та же 1×1 ячейка, та же cqi-разметка, перекраска и подмена
+		// центрального art-блока).
 		var cls = ['ach', 'ach--illus', 'ach--ref', 'anim-shake'];
-		if (isBio) cls.push('ach--bio');
+		if (isBio)   cls.push('ach--bio');
+		if (isStart) cls.push('ach--start');
 		if (!a.unlocked) cls.push('locked');
 		if (a.inProgress) cls.push('is-progress');
 		if (a.unlocked) cls.push('is-earned');
@@ -894,7 +899,37 @@
 				'<path d="M27 16 C22 24 21 34 24 44" stroke="#ffffff" stroke-width="1.5" opacity=".45" stroke-linecap="round" fill="none"/>' +
 			'</svg>';
 
-		var orbInner = isBio ? leafSvg : flaskSvg;
+		// Портфель для start-карточки: emerald, IQ-лого на корпусе.
+		// id градиентов уникальны (sb-welcome) на случай нескольких
+		// карт с одинаковой защитой на одной странице.
+		var bagSvg =
+			'<svg class="start-bag" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="sbWelBody" x1="32" y1="12" x2="32" y2="58" gradientUnits="userSpaceOnUse">' +
+						'<stop offset="0%"  stop-color="#ffffff"/>' +
+						'<stop offset="100%" stop-color="#d7f7e8"/>' +
+					'</linearGradient>' +
+					'<linearGradient id="sbWelPocket" x1="32" y1="34" x2="32" y2="56" gradientUnits="userSpaceOnUse">' +
+						'<stop offset="0%"  stop-color="#34d399"/>' +
+						'<stop offset="100%" stop-color="#059669"/>' +
+					'</linearGradient>' +
+					'<linearGradient id="sbWelStrap" x1="0" y1="0" x2="0" y2="1">' +
+						'<stop offset="0%"  stop-color="#34d399"/>' +
+						'<stop offset="100%" stop-color="#10b981"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<path d="M25 16 Q25 7 32 7 Q39 7 39 16" stroke="#34d399" stroke-width="3.4" stroke-linecap="round"/>' +
+				'<path d="M22 18 Q14 22 15 36 L16 50" stroke="url(#sbWelStrap)" stroke-width="3.4" stroke-linecap="round"/>' +
+				'<path d="M42 18 Q50 22 49 36 L48 50" stroke="url(#sbWelStrap)" stroke-width="3.4" stroke-linecap="round"/>' +
+				'<rect x="14" y="15" width="36" height="43" rx="14" fill="url(#sbWelBody)" stroke="#9ce8c8" stroke-width="1.4"/>' +
+				'<path d="M20 22 Q32 18 44 22" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".7"/>' +
+				'<text x="32" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#10b981" letter-spacing=".5">IQ</text>' +
+				'<path d="M21 41 Q21 35 27 35 L37 35 Q43 35 43 41 L43 51 Q43 56 37 56 L27 56 Q21 56 21 51 Z" fill="url(#sbWelPocket)"/>' +
+				'<rect x="26" y="44" width="12" height="3.2" rx="1.6" fill="#eafff5" opacity=".9"/>' +
+				'<path d="M25 39.5 Q32 37.5 39 39.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>' +
+			'</svg>';
+
+		var orbInner = isStart ? bagSvg : (isBio ? leafSvg : flaskSvg);
 
 		// Мини-чек в шестиграннике рядом с орбом — синий для био,
 		// фиолетовый для химии. id градиента тоже уникальны.
@@ -922,22 +957,39 @@
 
 		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
 
+		// Сцена орба зависит от типа карточки:
+		//   • start (welcome) → орбита внутри орба + 3 искры по бокам;
+		//     никаких hex/чек-бейджей/floating ball — это другой
+		//     визуальный язык (эмеральд, чистая иллюстрация).
+		//   • bio/chem → 3 hex + .ref-orb + checkSvg + 4 float-ball.
+		var orbStageInner = isStart
+			? (
+				'<div class="ref-orb">' +
+					'<span class="start-orbit" aria-hidden="true"></span>' +
+					orbInner +
+				'</div>' +
+				'<span class="start-spark ss1" aria-hidden="true"></span>' +
+				'<span class="start-spark ss2" aria-hidden="true"></span>' +
+				'<span class="start-spark ss3" aria-hidden="true"></span>'
+			)
+			: (
+				'<div class="float-hex fh1" aria-hidden="true">' + hexSvg + '</div>' +
+				'<div class="float-hex fh2" aria-hidden="true">' + hexSvg + '</div>' +
+				'<div class="float-hex fh3" aria-hidden="true">' + hexSvg + '</div>' +
+				'<div class="ref-orb">' + orbInner + '</div>' +
+				checkSvg +
+				'<span class="float-ball fb1" aria-hidden="true"></span>' +
+				'<span class="float-ball fb2" aria-hidden="true"></span>' +
+				'<span class="float-ball fb3" aria-hidden="true"></span>' +
+				'<span class="float-ball fb4" aria-hidden="true"></span>'
+			);
+
 		return (
 			'<article class="' + cls.join(' ') + '" data-state="' + state + '" tabindex="0">' +
 				'<div class="ref-scene" aria-hidden="true"></div>' +
 				(pctText ? '<span class="a-pct">' + esc(pctText) + '</span>' : '') +
 				'<span class="c-rar">' + esc(rarText) + '</span>' +
-				'<div class="c-orb-stage">' +
-					'<div class="float-hex fh1" aria-hidden="true">' + hexSvg + '</div>' +
-					'<div class="float-hex fh2" aria-hidden="true">' + hexSvg + '</div>' +
-					'<div class="float-hex fh3" aria-hidden="true">' + hexSvg + '</div>' +
-					'<div class="ref-orb">' + orbInner + '</div>' +
-					checkSvg +
-					'<span class="float-ball fb1" aria-hidden="true"></span>' +
-					'<span class="float-ball fb2" aria-hidden="true"></span>' +
-					'<span class="float-ball fb3" aria-hidden="true"></span>' +
-					'<span class="float-ball fb4" aria-hidden="true"></span>' +
-				'</div>' +
+				'<div class="c-orb-stage">' + orbStageInner + '</div>' +
 				'<div class="c-title-block">' +
 					'<h4 class="c-title">' + esc(a.title) + '</h4>' +
 					'<div class="c-sub">' + esc(a.desc) + '</div>' +
@@ -958,115 +1010,6 @@
 					'<span class="a-xp-ico">' + xpSvg + '</span>' +
 					'<span class="a-xp-val">+' + (a.xpReward || 0) + ' XP</span>' +
 					'<span class="a-xp-lbl">награда</span>' +
-				'</div>' +
-				'<div class="a-tip">' +
-					'<div class="tt-name">' + esc(a.title) + '</div>' +
-					'<div class="tt-desc">' + esc(a.desc) + '</div>' +
-					'<div class="tt-meta">' + tipMeta + '</div>' +
-				'</div>' +
-			'</article>'
-		);
-	}
-
-	/* Карточка «Старт на портале» — 1:1 с прототипом из Cloud Design
-	   (см. /extracted/_ach-start-card-import/start-card/). Разметка
-	   повторяет start-card.html символ-в-символ; стили лежат в
-	   /profile-start-card.css. Карточка фиксированных 340×510 px и
-	   вписывается в 2×2 ячейки коллекции через CSS-обёртку
-	   .ach--start-host > .start-scale (transform:scale, см. модуль).
-	   В 1×1 ячейке (как было раньше) backpack/орб/искры ужимались
-	   до 0.45× и теряли читаемость деталей. */
-	function renderAchievementCardStart(a, state) {
-		var rar = a.rarity || 'common';
-		var rarText = rarityLabel(rar);
-
-		var progPct = 0, progCur = 0, progTgt = 1;
-		if (a.progress) {
-			progCur = a.progress.current;
-			progTgt = a.progress.target;
-			progPct = Math.max(0, Math.min(100, Math.round((progCur / progTgt) * 100)));
-		} else if (a.unlocked) {
-			progPct = 100;
-			progCur = 1;
-			progTgt = 1;
-		}
-
-		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
-			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
-
-		// SVG рюкзака с уникальными id градиентов (sb-<ach.id>) — иначе
-		// при двух start-card на странице первая «забирает» defs второй
-		// и пейнт ломается. На профиле такой кейс не встречается, но
-		// привычка дешевле дебага.
-		var gid = 'sb-' + (a.id || 'start');
-		var bagSvg =
-			'<svg class="bag" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
-				'<defs>' +
-					'<linearGradient id="' + gid + '-body" x1="32" y1="12" x2="32" y2="58" gradientUnits="userSpaceOnUse">' +
-						'<stop offset="0%" stop-color="#ffffff"/>' +
-						'<stop offset="100%" stop-color="#e6eaf2"/>' +
-					'</linearGradient>' +
-					'<linearGradient id="' + gid + '-pocket" x1="32" y1="34" x2="32" y2="56" gradientUnits="userSpaceOnUse">' +
-						'<stop offset="0%" stop-color="#b3bace"/>' +
-						'<stop offset="100%" stop-color="#8d96b2"/>' +
-					'</linearGradient>' +
-					'<linearGradient id="' + gid + '-strap" x1="0" y1="0" x2="0" y2="1">' +
-						'<stop offset="0%" stop-color="#c7cddb"/>' +
-						'<stop offset="100%" stop-color="#9aa2bd"/>' +
-					'</linearGradient>' +
-				'</defs>' +
-				'<path d="M25 16 Q25 7 32 7 Q39 7 39 16" stroke="#c7cddb" stroke-width="3.4" stroke-linecap="round"/>' +
-				'<path d="M22 18 Q14 22 15 36 L16 50" stroke="url(#' + gid + '-strap)" stroke-width="3.4" stroke-linecap="round"/>' +
-				'<path d="M42 18 Q50 22 49 36 L48 50" stroke="url(#' + gid + '-strap)" stroke-width="3.4" stroke-linecap="round"/>' +
-				'<rect x="14" y="15" width="36" height="43" rx="14" fill="url(#' + gid + '-body)" stroke="#d6dbe7" stroke-width="1.4"/>' +
-				'<path d="M20 22 Q32 18 44 22" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".7"/>' +
-				'<text x="32" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#aeb6cc" letter-spacing=".5">IQ</text>' +
-				'<path d="M21 41 Q21 35 27 35 L37 35 Q43 35 43 41 L43 51 Q43 56 37 56 L27 56 Q21 56 21 51 Z" fill="url(#' + gid + '-pocket)"/>' +
-				'<rect x="26" y="44" width="12" height="3.2" rx="1.6" fill="#eef0f6" opacity=".85"/>' +
-				'<path d="M25 39.5 Q32 37.5 39 39.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>' +
-			'</svg>';
-
-		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
-
-		// Tooltip висит на host'е (а не на .start-card), чтобы после
-		// CSS scale не сжимался и читался одинаково на любой ширине.
-		return (
-			'<article class="ach ach--start-host" data-state="' + state + '" tabindex="0">' +
-				'<div class="start-scale">' +
-					'<div class="start-card">' +
-						'<div class="scene"></div>' +
-						'<span class="rarity">' + esc(rarText) + '</span>' +
-						'<div class="orb-stage">' +
-							'<div class="orb">' +
-								'<span class="orbit"></span>' +
-								bagSvg +
-							'</div>' +
-							'<span class="spark s1" aria-hidden="true"></span>' +
-							'<span class="spark s2" aria-hidden="true"></span>' +
-							'<span class="spark s3" aria-hidden="true"></span>' +
-						'</div>' +
-						'<div class="title-block">' +
-							'<h4 class="title">' + esc(a.title) + '</h4>' +
-							'<div class="subtitle">' + esc(a.desc) + '</div>' +
-						'</div>' +
-						'<div class="divider"><span></span></div>' +
-						'<div class="prog">' +
-							'<div class="prog-row">' +
-								'<span class="label">Прогресс</span>' +
-								'<span class="count"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
-							'</div>' +
-							'<div class="prog-bar"><i style="width:' + progPct + '%"></i></div>' +
-						'</div>' +
-						'<div class="reward">' +
-							'<div class="reward-item">' +
-								'<div class="reward-ico">' + xpSvg + '</div>' +
-								'<div class="reward-text">' +
-									'<span class="reward-val">+' + (a.xpReward || 0) + ' XP</span>' +
-									'<span class="reward-lbl">Награда</span>' +
-								'</div>' +
-							'</div>' +
-						'</div>' +
-					'</div>' +
 				'</div>' +
 				'<div class="a-tip">' +
 					'<div class="tt-name">' + esc(a.title) + '</div>' +
