@@ -476,6 +476,7 @@
 		var state = achCardState(a);
 		if (a.cardStyle === 'start') return renderAchievementCardStart(a, state);
 		if (a.cardStyle === 'shake') return renderAchievementCardShake(a, state);
+		if (a.cardStyle === 'bio') return renderAchievementCardBio(a, state);
 		var hasIllus = !!a.iconUrl;
 		if (hasIllus) return renderAchievementCardIllus(a, state);
 		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
@@ -656,9 +657,126 @@
 		);
 	}
 
-	/* Эпическая коллекционная карточка (full-bleed ref-card по прототипу
-	   "Card Lab" v15). Используется для ачивок с iconUrl и занимает в
-	   сетке 2×2 ячейки, чтобы прототип 340×510 поместился без сжатия.
+	/* Карточка «Первый этап по биологии» (редкая, левитация).
+	   Разметка повторяет /extracted/_ach-bio-card-import/bio-card/
+	   bio-card.html символ-в-символ; стили — /profile-bio-card.css.
+	   Вписываем фиксированные 340×510 в 2×2 ячейки коллекции через
+	   transform:scale (как у shake/start). */
+	function renderAchievementCardBio(a, state) {
+		var rar = a.rarity || 'rare';
+		var rarText = rarityLabel(rar);
+
+		var progPct = 0, progCur = 0, progTgt = 1;
+		if (a.progress) {
+			progCur = a.progress.current;
+			progTgt = a.progress.target;
+			progPct = Math.max(0, Math.min(100, Math.round((progCur / progTgt) * 100)));
+		} else if (a.unlocked) {
+			progPct = 100;
+			progCur = 1;
+			progTgt = 1;
+		}
+
+		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
+			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
+
+		// SVG-блоки взяты из bio-card.html. id градиентов уникальны для
+		// карточки (bioLeaf/bioHexFill — на странице такая одна).
+		var hexSvg =
+			'<svg viewBox="0 0 30 34" fill="none" stroke="#60a5fa" stroke-width="1.2">' +
+				'<polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/>' +
+			'</svg>';
+
+		var leafSvg =
+			'<svg class="leaf" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="bioLeaf" x1="20" y1="8" x2="44" y2="56" gradientUnits="userSpaceOnUse">' +
+						'<stop offset="0%"  stop-color="#bbf7d0"/>' +
+						'<stop offset="50%" stop-color="#4ade80"/>' +
+						'<stop offset="100%" stop-color="#16a34a"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<path d="M32 7 C19 19 17 41 32 57 C47 41 45 19 32 7 Z" fill="url(#bioLeaf)" stroke="#15803d" stroke-width="1.6" stroke-linejoin="round"/>' +
+				'<path d="M32 12 L32 54" stroke="#15803d" stroke-width="2" opacity=".55" stroke-linecap="round"/>' +
+				'<path d="M32 24 L23 19 M32 24 L41 19 M32 34 L22 30 M32 34 L42 30 M32 43 L25 40 M32 43 L39 40" stroke="#15803d" stroke-width="1.2" opacity=".4" stroke-linecap="round"/>' +
+				'<path d="M27 16 C22 24 21 34 24 44" stroke="#ffffff" stroke-width="1.5" opacity=".45" stroke-linecap="round" fill="none"/>' +
+			'</svg>';
+
+		var checkSvg =
+			'<svg class="check" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="bioHexFill" x1="0" x2="0" y1="0" y2="1">' +
+						'<stop offset="0%"  stop-color="#60a5fa"/>' +
+						'<stop offset="100%" stop-color="#2563eb"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#bioHexFill)" stroke="#93c5fd" stroke-width="2"/>' +
+				'<path d="M20 32 L29 41 L46 24" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+			'</svg>';
+
+		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
+
+		// Заголовок в две строки, как в прототипе. Если ачивка из data
+		// имеет ровно эти слова — рендерим с <br/> между «Первый этап» и
+		// «по биологии». Иначе подаём как есть.
+		var titleHtml = esc(a.title);
+		if (a.id === 'bio_stage1') {
+			titleHtml = 'Первый этап<br/>по биологии';
+		}
+
+		return (
+			'<article class="ach ach--bio-host" data-state="' + state + '" tabindex="0">' +
+				'<div class="bio-scale">' +
+					'<div class="bio-card">' +
+						'<div class="scene"></div>' +
+						'<span class="rarity">' + esc(rarText) + '</span>' +
+						'<div class="orb-stage">' +
+							'<div class="hex h1" aria-hidden="true">' + hexSvg + '</div>' +
+							'<div class="hex h2" aria-hidden="true">' + hexSvg + '</div>' +
+							'<div class="hex h3" aria-hidden="true">' + hexSvg + '</div>' +
+							'<div class="orb">' +
+								leafSvg +
+								'<span class="drop d1" aria-hidden="true"></span>' +
+								'<span class="drop d2" aria-hidden="true"></span>' +
+								'<span class="drop d3" aria-hidden="true"></span>' +
+							'</div>' +
+							checkSvg +
+							'<span class="ball b1" aria-hidden="true"></span>' +
+							'<span class="ball b2" aria-hidden="true"></span>' +
+							'<span class="ball b3" aria-hidden="true"></span>' +
+							'<span class="ball b4" aria-hidden="true"></span>' +
+						'</div>' +
+						'<div class="title-block">' +
+							'<h4 class="title">' + titleHtml + '</h4>' +
+							'<div class="subtitle">' + esc(a.desc) + '</div>' +
+						'</div>' +
+						'<div class="divider"><span></span></div>' +
+						'<div class="prog">' +
+							'<div class="prog-row">' +
+								'<span class="label">Прогресс</span>' +
+								'<span class="count"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
+							'</div>' +
+							'<div class="prog-bar"><i style="width:' + progPct + '%"></i></div>' +
+						'</div>' +
+						'<div class="reward">' +
+							'<div class="reward-item">' +
+								'<div class="reward-ico">' + xpSvg + '</div>' +
+								'<div class="reward-text">' +
+									'<span class="reward-val">+' + (a.xpReward || 0) + ' XP</span>' +
+									'<span class="reward-lbl">Награда</span>' +
+								'</div>' +
+							'</div>' +
+						'</div>' +
+					'</div>' +
+				'</div>' +
+				'<div class="a-tip">' +
+					'<div class="tt-name">' + esc(a.title) + '</div>' +
+					'<div class="tt-desc">' + esc(a.desc) + '</div>' +
+					'<div class="tt-meta">' + tipMeta + '</div>' +
+				'</div>' +
+			'</article>'
+		);
+	}
 	   Внутренние размеры через container query units → масштабируется
 	   пропорционально на любом разрешении.
 	   ВНИМАНИЕ: на текущий момент сюда не попадает ни одна ачивка из
