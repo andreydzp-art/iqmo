@@ -24,7 +24,7 @@
 		{ id: 'welcome', title: 'Старт на портале', desc: 'Начни свой путь в IQMO', rarity: 'common', icon: 'star', cardStyle: 'start', pctRare: 62, xpReward: 50 },
 		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', icon: 'book', pctRare: 38, xpReward: 50 },
 		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame', pctRare: 6.2, xpReward: 200 },
-		{ id: 'chem_stage1', title: 'Первый этап по химии', desc: 'Успешно пройди 1 этап по химии', rarity: 'epic', icon: 'trophy', iconUrl: '/site/assets/achievement-chem-stage1.png', pctRare: 2.4, xpReward: 250 },
+		{ id: 'chem_stage1', title: 'Первый этап по химии', desc: 'Успешно пройди 1 этап по химии', rarity: 'epic', icon: 'trophy', iconUrl: '/site/assets/achievement-chem-stage1.png', cardStyle: 'shake', pctRare: 2.4, xpReward: 250 },
 		{ id: 'bio_stage1', title: 'Этап 1 · Биология', desc: 'Все 7 вариантов главы 1 по биологии со средним 50%+.', rarity: 'epic', icon: 'trophy', pctRare: 1.8, xpReward: 500 },
 		{ id: 'ten_tests', title: 'Десятка', desc: '10 завершённых попыток.', rarity: 'rare', icon: 'medal', pctRare: 18, xpReward: 150 },
 		{ id: 'perfect_run', title: 'Без ошибок', desc: '100% при ≥5 вопросах в зачёте.', rarity: 'rare', icon: 'target', pctRare: 4.1, xpReward: 250 },

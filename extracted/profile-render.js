@@ -475,6 +475,7 @@
 	function renderAchievementCard(a) {
 		var state = achCardState(a);
 		if (a.cardStyle === 'start') return renderAchievementCardStart(a, state);
+		if (a.cardStyle === 'shake') return renderAchievementCardShake(a, state);
 		var hasIllus = !!a.iconUrl;
 		if (hasIllus) return renderAchievementCardIllus(a, state);
 		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
@@ -523,11 +524,147 @@
 		);
 	}
 
+	/* Эпическая карточка «Первый этап по химии» — 1:1 с прототипом из
+	   Cloud Design (см. /extracted/_ach-card-v3-import/shake-card/).
+	   Разметка повторяет shake-card.html символ-в-символ; стили лежат
+	   в /profile-shake-card.css. Карточка фиксированных 340×510 px,
+	   а в нашу 1×1 ячейку коллекции она вписывается через CSS-обёртку
+	   .ach--shake-host > .shake-scale (transform:scale, см. модуль).
+	   Состояние (locked/inProgress/earned) тащим на host через
+	   data-state — фильтр коллекции уже это понимает. */
+	function renderAchievementCardShake(a, state) {
+		var rar = a.rarity || 'epic';
+		var rarText = rarityLabel(rar);
+
+		var progPct = 0, progCur = 0, progTgt = 1;
+		if (a.progress) {
+			progCur = a.progress.current;
+			progTgt = a.progress.target;
+			progPct = Math.max(0, Math.min(100, Math.round((progCur / progTgt) * 100)));
+		} else if (a.unlocked) {
+			progPct = 100;
+			progCur = 1;
+			progTgt = 1;
+		}
+
+		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
+			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
+
+		// SVG-блоки взяты из shake-card.html. id градиентов уникальны,
+		// чтобы не конфликтовать с другими SVG-defs на странице — наш
+		// единственный экземпляр на профиль, так что хватает префикса
+		// iqShake*.
+		var hexSvg =
+			'<svg viewBox="0 0 30 34" fill="none" stroke="#a78bfa" stroke-width="1.2">' +
+				'<polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/>' +
+			'</svg>';
+
+		var flaskSvg =
+			'<svg class="flask" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="iqShakeGlassFill" x1="0" x2="0" y1="0" y2="1">' +
+						'<stop offset="0%"  stop-color="#c4b5fd" stop-opacity=".25"/>' +
+						'<stop offset="55%" stop-color="#a78bfa" stop-opacity=".9"/>' +
+						'<stop offset="100%" stop-color="#7c3aed"/>' +
+					'</linearGradient>' +
+					'<linearGradient id="iqShakeGlassEdge" x1="0" x2="1" y1="0" y2="1">' +
+						'<stop offset="0%" stop-color="#ffffff"/>' +
+						'<stop offset="100%" stop-color="#c4b5fd"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<rect x="26" y="6" width="12" height="14" rx="2" fill="none" stroke="url(#iqShakeGlassEdge)" stroke-width="2.2"/>' +
+				'<rect x="24" y="4" width="16" height="3" rx="1.5" fill="#fff" opacity=".9"/>' +
+				'<path d="M26 18 L26 26 L12 52 Q10 58 16 58 L48 58 Q54 58 52 52 L38 26 L38 18 Z" fill="url(#iqShakeGlassFill)" stroke="url(#iqShakeGlassEdge)" stroke-width="2.2" stroke-linejoin="round"/>' +
+				'<path d="M18 44 Q32 40 46 44" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".6"/>' +
+				'<circle cx="22" cy="50" r="1.8" fill="#ffffff" opacity=".9"/>' +
+				'<circle cx="30" cy="52" r="1.2" fill="#ffffff" opacity=".75"/>' +
+				'<circle cx="38" cy="49" r="1.5" fill="#ffffff" opacity=".85"/>' +
+				'<circle cx="42" cy="54" r="1" fill="#ffffff" opacity=".7"/>' +
+				'<path d="M30 22 L20 48" stroke="#ffffff" stroke-width="1.2" opacity=".55" stroke-linecap="round"/>' +
+			'</svg>';
+
+		var checkSvg =
+			'<svg class="check" viewBox="0 0 64 64" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="iqShakeHexFill" x1="0" x2="0" y1="0" y2="1">' +
+						'<stop offset="0%"  stop-color="#ffffff"/>' +
+						'<stop offset="100%" stop-color="#ede9fe"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#iqShakeHexFill)" stroke="#c4b5fd" stroke-width="2"/>' +
+				'<path d="M20 32 L29 41 L46 24" fill="none" stroke="#7c3aed" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+			'</svg>';
+
+		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
+
+		// Заголовок «Первый этап по химии» — переносим как в прототипе,
+		// если в data есть точный заголовок-два-слова. Для других title
+		// просто подаём как есть, без принудительного <br>.
+		var titleHtml = esc(a.title);
+		if (a.id === 'chem_stage1') {
+			titleHtml = 'Первый этап<br/>по химии';
+		}
+
+		// Tooltip висит на host'е, не на .shake-card — иначе после CSS
+		// scale он бы тоже сжался и стал нечитабелен.
+		return (
+			'<article class="ach ach--shake-host" data-state="' + state + '" tabindex="0">' +
+				'<div class="shake-scale">' +
+					'<div class="shake-card">' +
+						'<div class="scene"></div>' +
+						'<span class="rarity">' + esc(rarText) + '</span>' +
+						'<div class="orb-stage">' +
+							'<div class="hex h1" aria-hidden="true">' + hexSvg + '</div>' +
+							'<div class="hex h2" aria-hidden="true">' + hexSvg + '</div>' +
+							'<div class="hex h3" aria-hidden="true">' + hexSvg + '</div>' +
+							'<div class="orb">' + flaskSvg + '</div>' +
+							checkSvg +
+							'<span class="ball b1" aria-hidden="true"></span>' +
+							'<span class="ball b2" aria-hidden="true"></span>' +
+							'<span class="ball b3" aria-hidden="true"></span>' +
+							'<span class="ball b4" aria-hidden="true"></span>' +
+						'</div>' +
+						'<div class="title-block">' +
+							'<h4 class="title">' + titleHtml + '</h4>' +
+							'<div class="subtitle">' + esc(a.desc) + '</div>' +
+						'</div>' +
+						'<div class="divider"><span></span></div>' +
+						'<div class="prog">' +
+							'<div class="prog-row">' +
+								'<span class="label">Прогресс</span>' +
+								'<span class="count"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
+							'</div>' +
+							'<div class="prog-bar"><i style="width:' + progPct + '%"></i></div>' +
+						'</div>' +
+						'<div class="reward">' +
+							'<div class="reward-item">' +
+								'<div class="reward-ico">' + xpSvg + '</div>' +
+								'<div class="reward-text">' +
+									'<span class="reward-val">+' + (a.xpReward || 0) + ' XP</span>' +
+									'<span class="reward-lbl">Награда</span>' +
+								'</div>' +
+							'</div>' +
+						'</div>' +
+					'</div>' +
+				'</div>' +
+				'<div class="a-tip">' +
+					'<div class="tt-name">' + esc(a.title) + '</div>' +
+					'<div class="tt-desc">' + esc(a.desc) + '</div>' +
+					'<div class="tt-meta">' + tipMeta + '</div>' +
+				'</div>' +
+			'</article>'
+		);
+	}
+
 	/* Эпическая коллекционная карточка (full-bleed ref-card по прототипу
 	   "Card Lab" v15). Используется для ачивок с iconUrl и занимает в
 	   сетке 2×2 ячейки, чтобы прототип 340×510 поместился без сжатия.
 	   Внутренние размеры через container query units → масштабируется
-	   пропорционально на любом разрешении. */
+	   пропорционально на любом разрешении.
+	   ВНИМАНИЕ: на текущий момент сюда не попадает ни одна ачивка из
+	   каталога — chem_stage1 переехал в renderAchievementCardShake.
+	   Оставляем как fallback для будущих illustrated-ачивок без
+	   собственного card-style. */
 	function renderAchievementCardIllus(a, state) {
 		var rar = a.rarity || 'epic';
 		var cls = ['ach', 'ach--illus', 'ach--ref', 'anim-shake'];
