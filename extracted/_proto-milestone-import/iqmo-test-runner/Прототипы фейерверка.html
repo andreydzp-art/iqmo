@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1320" />
+<title>IQMO · Прототипы фейерверка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#f6f6f9; --surface:#fff; --surface-2:#fafafd; --surface-3:#f1f2f7;
+    --line:#e9eaf2; --line-strong:#dcdee9;
+    --ink:#0e1226; --ink-2:#1f2440; --ink-3:#4a4f70; --muted:#7a7e9c;
+    --primary:#2f6bff; --primary-600:#2358dc; --primary-50:#eef3ff; --primary-100:#dbe5ff;
+    --gold:#c79330; --gold-2:#e1a93f; --gold-50:#fbf4e3; --gold-100:#f4e6c4;
+    --green:#1f9c6e; --green-50:#e7f6ef; --green-100:#cde9da;
+    --rose:#c0364c;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:'Inter', system-ui, sans-serif; color: var(--ink); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .shell{ max-width: 1200px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  /* Header */
+  .top{ display:flex; align-items:center; gap:16px; margin-bottom: 8px; }
+  .brand-mark{
+    width:36px; height:36px; border-radius:11px;
+    background: linear-gradient(135deg, #4f8aff, #2358dc);
+    position:relative; box-shadow: 0 6px 14px -4px rgba(47,107,255,.4);
+  }
+  .brand-mark::after{ content:""; position:absolute; inset:8.5px; border-radius:50%; border:2.5px solid rgba(255,255,255,.95); border-right-color:transparent; }
+  .brand-name{ font-weight:900; font-size:18px; letter-spacing:-.02em; }
+  .crumb{ font-size:14px; color: var(--muted); padding-left:14px; border-left:1px solid var(--line); height:30px; display:flex; align-items:center; }
+  .crumb b{ color: var(--ink); font-weight:700; margin-left: 6px; }
+
+  h1{ font-family:'Space Grotesk', system-ui; font-size: 36px; font-weight: 700; letter-spacing:-.025em; margin: 28px 0 8px; }
+  .sub{ font-size: 16px; color: var(--ink-3); line-height: 1.55; margin: 0 0 36px; max-width: 56ch; }
+  .sub b{ color: var(--ink); font-weight: 700; }
+
+  /* Tiles */
+  .tiles{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .tile{
+    position:relative;
+    background: var(--surface); border:1px solid var(--line); border-radius: 22px;
+    padding: 24px; cursor:pointer; text-align:left;
+    transition: all .2s cubic-bezier(.22,1,.36,1); overflow:hidden;
+    font-family: inherit; color: inherit;
+    box-shadow: 0 1px 2px rgba(15,18,38,.03), 0 12px 28px -16px rgba(15,18,38,.10);
+  }
+  .tile:hover{ transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 1px 2px rgba(15,18,38,.04), 0 18px 36px -16px rgba(47,107,255,.25); }
+  .tile-preview{
+    aspect-ratio: 16/9; border-radius: 14px;
+    background: var(--surface-3); margin-bottom: 16px; position:relative; overflow:hidden;
+  }
+  .tile-num{
+    position:absolute; top:10px; left:14px;
+    font-family:'JetBrains Mono', monospace; font-size: 11px; font-weight: 800;
+    color: var(--muted); letter-spacing: .12em;
+  }
+  .tile h3{ margin: 0 0 4px; font-family:'Space Grotesk', system-ui; font-size: 22px; font-weight: 700; letter-spacing:-.015em; }
+  .tile p{ margin: 0 0 12px; font-size: 14px; color: var(--ink-3); line-height: 1.5; }
+  .tile-cta{
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 9px 16px; border-radius: 999px;
+    background: var(--primary-50); color: var(--primary-600);
+    border:1px solid var(--primary-100);
+    font-size: 12.5px; font-weight: 800; letter-spacing: .04em;
+  }
+  .tile-cta svg{ width: 13px; height: 13px; }
+
+  /* Tile previews — static visual hint per variant */
+  .preview-confetti{
+    background: linear-gradient(180deg, #fafafd, #f1f2f7);
+  }
+  .preview-confetti::before, .preview-confetti::after{
+    content:""; position:absolute; left:0; right:0; top:0; bottom:0;
+    background-image:
+      radial-gradient(circle at 18% 30%, var(--gold-2) 1.5px, transparent 2px),
+      radial-gradient(circle at 42% 18%, var(--primary) 1.5px, transparent 2px),
+      radial-gradient(circle at 65% 40%, var(--green) 1.5px, transparent 2px),
+      radial-gradient(circle at 80% 22%, var(--gold) 1.5px, transparent 2px),
+      radial-gradient(circle at 30% 60%, var(--gold-2) 2px, transparent 2.5px),
+      radial-gradient(circle at 72% 70%, var(--primary) 2px, transparent 2.5px);
+  }
+  .preview-rays{
+    background:
+      repeating-conic-gradient(from -10deg at 50% 50%, transparent 0deg, rgba(225,169,63,.22) 4deg, transparent 14deg, rgba(47,107,255,.14) 20deg, transparent 32deg),
+      radial-gradient(circle at center, #fff8e2 0%, #fafafd 45%, #f1f2f7 100%);
+  }
+  .preview-rays::before{
+    content:""; position:absolute; top:50%; left:50%;
+    width: 22px; height: 22px; margin: -11px;
+    border-radius:50%;
+    background: radial-gradient(circle, #fff7d4 0%, #e1a93f 70%);
+    box-shadow: 0 0 16px rgba(225,169,63,.55);
+  }
+  .preview-stars{
+    background: linear-gradient(180deg, #fafafd, #f1f2f7);
+  }
+  .preview-stars i{
+    position:absolute; width: 12px; height: 12px; color: var(--gold-2);
+  }
+  .preview-stars i:nth-child(1){ top:30%; left:25%; transform: rotate(15deg); color: var(--gold);}
+  .preview-stars i:nth-child(2){ top:55%; left:60%; transform: rotate(-20deg); color: var(--primary);}
+  .preview-stars i:nth-child(3){ top:25%; left:75%; transform: rotate(40deg); color: var(--gold-2);}
+  .preview-stars i:nth-child(4){ top:65%; left:35%; transform: rotate(-10deg); color: var(--green);}
+  .preview-stars i:nth-child(5){ top:40%; left:50%; transform: rotate(0deg); color: var(--gold); width:16px; height:16px; }
+  .star-svg{ width:100%; height:100%; }
+
+  .preview-bursts{
+    background: linear-gradient(180deg, #0f1226, #1a1d3a); /* мини намёк на ночное небо */
+  }
+  .preview-bursts::before, .preview-bursts::after, .preview-bursts i{
+    content:""; position:absolute; border-radius:50%;
+  }
+  .preview-bursts::before{
+    top:35%; left:28%; width:36px; height:36px;
+    background: radial-gradient(circle, transparent 35%, var(--gold-2) 38%, transparent 60%);
+  }
+  .preview-bursts::after{
+    top:55%; left:62%; width:50px; height:50px;
+    background: radial-gradient(circle, transparent 35%, var(--primary) 38%, transparent 60%);
+  }
+  .preview-bursts i{
+    top: 28%; left: 68%; width: 28px; height: 28px;
+    background: radial-gradient(circle, transparent 35%, var(--green) 38%, transparent 60%);
+  }
+
+  /* Trigger label hint */
+  .trigger-hint{
+    margin: 24px 0 0; padding: 18px 22px;
+    background: var(--surface); border:1px solid var(--line); border-radius: 18px;
+    display:flex; align-items:center; gap:14px;
+    font-size: 14px; color: var(--ink-3);
+  }
+  .trigger-hint b{ color: var(--ink); font-weight:700; }
+  .trigger-hint .chips{ display:inline-flex; gap:6px; }
+  .trigger-hint .chip{
+    display:inline-flex; align-items:center; justify-content:center;
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--primary); color: #fff;
+    font-family:'JetBrains Mono', monospace; font-weight:800; font-size: 13px;
+  }
+
+  /* Full-screen overlay where effects live */
+  #fx-overlay{
+    position: fixed; inset: 0; pointer-events: none; z-index: 100;
+  }
+  #fx-canvas{
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 100;
+  }
+  /* Milestone caption that appears on every effect */
+  .milestone-card{
+    position: fixed; top: 30%; left: 50%; transform: translate(-50%, -10px);
+    pointer-events: none; z-index: 101; opacity: 0;
+    background: var(--surface); border:1px solid var(--line);
+    border-radius: 22px;
+    padding: 22px 30px 24px;
+    box-shadow: 0 30px 60px -20px rgba(15,18,38,.30);
+    text-align: center;
+    min-width: 320px;
+    transition: opacity .3s, transform .3s cubic-bezier(.22,1.5,.36,1);
+  }
+  .milestone-card.is-on{ opacity:1; transform: translate(-50%, 0); }
+  .milestone-eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 6px 14px; border-radius: 999px;
+    background: var(--gold-50); border:1px solid var(--gold-100); color: var(--gold);
+    font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  }
+  .milestone-h{
+    font-family:'Space Grotesk', system-ui;
+    font-size: 28px; font-weight: 700; letter-spacing:-.02em;
+    margin: 14px 0 6px; color: var(--ink);
+  }
+  .milestone-sub{
+    font-size: 14.5px; color: var(--ink-3); margin: 0;
+  }
+  .milestone-sub b{ color: var(--ink); font-weight:700; }
+
+  /* Ring overlay (variant 2) — pure DOM/CSS */
+  .ring-burst{
+    position: fixed; top:50%; left:50%; pointer-events:none; z-index: 100;
+  }
+  .ring-burst .ring{
+    position: absolute; top:0; left:0;
+    width: 60px; height: 60px; margin: -30px;
+    border-radius: 50%;
+    border: 3px solid var(--c, var(--gold-2));
+    opacity: 0;
+    animation: ringExpand 1.8s cubic-bezier(.22,.6,.36,1) var(--d,0s) forwards;
+  }
+  @keyframes ringExpand {
+    0%{ transform: scale(.2); opacity: 1; }
+    100%{ transform: scale(38); opacity: 0; }
+  }
+
+  @media (max-width: 980px){
+    .tiles{ grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="top">
+    <div class="brand-mark"></div>
+    <div class="brand-name">IQMO</div>
+    <div class="crumb">Прототипы · <b>Анимация достижения 5/10/15/20</b></div>
+  </div>
+
+  <h1>Награда за каждый 5-й рубеж</h1>
+  <p class="sub">
+    Когда ученик открывает задание <b>5, 10, 15 или 20</b>, IQMO празднует достижение.
+    Ниже 4 варианта анимации в премиальном ключе — кликни плитку, чтобы увидеть на весь экран.
+  </p>
+
+  <div class="tiles">
+    <button class="tile" data-fx="confetti">
+      <div class="tile-preview preview-confetti">
+        <span class="tile-num">01</span>
+      </div>
+      <h3>Конфетти</h3>
+      <p>Бумажки золотого, синего, зелёного цветов плавно осыпаются сверху и оседают на 3 секунды.</p>
+      <span class="tile-cta">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5Z"/></svg>
+        Запустить
+      </span>
+    </button>
+
+    <button class="tile" data-fx="rays">
+      <div class="tile-preview preview-rays">
+        <span class="tile-num">02</span>
+      </div>
+      <h3>Лучи света</h3>
+      <p>14 золотых лучей расходятся из центра, как на keynote-слайде. Премиально и сдержанно.</p>
+      <span class="tile-cta">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5Z"/></svg>
+        Запустить
+      </span>
+    </button>
+
+    <button class="tile" data-fx="stars">
+      <div class="tile-preview preview-stars">
+        <span class="tile-num">03</span>
+        <i><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 7.6L22 10l-6 5 2 8-6-4-6 4 2-8-6-5 7.4-.4L12 2z"/></svg></i>
+        <i><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 7.6L22 10l-6 5 2 8-6-4-6 4 2-8-6-5 7.4-.4L12 2z"/></svg></i>
+        <i><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 7.6L22 10l-6 5 2 8-6-4-6 4 2-8-6-5 7.4-.4L12 2z"/></svg></i>
+        <i><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 7.6L22 10l-6 5 2 8-6-4-6 4 2-8-6-5 7.4-.4L12 2z"/></svg></i>
+        <i><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 7.6L22 10l-6 5 2 8-6-4-6 4 2-8-6-5 7.4-.4L12 2z"/></svg></i>
+      </div>
+      <h3>Звёздная россыпь</h3>
+      <p>Маленькие 5-конечные звёзды вылетают из центра, поворачиваются и таят. Самый аккуратный.</p>
+      <span class="tile-cta">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5Z"/></svg>
+        Запустить
+      </span>
+    </button>
+
+    <button class="tile" data-fx="bursts">
+      <div class="tile-preview preview-bursts">
+        <span class="tile-num" style="color: rgba(255,255,255,.55);">04</span>
+        <i></i>
+      </div>
+      <h3>Салют</h3>
+      <p>3–4 классических салюта вспыхивают в разных точках экрана. Самый «фестивальный».</p>
+      <span class="tile-cta">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5Z"/></svg>
+        Запустить
+      </span>
+    </button>
+  </div>
+
+  <div class="trigger-hint">
+    <span>В тесте срабатывает при клике на задания</span>
+    <span class="chips">
+      <span class="chip">5</span>
+      <span class="chip">10</span>
+      <span class="chip">15</span>
+      <span class="chip">20</span>
+    </span>
+    <span style="margin-left:auto;"><b>Совет:</b> запускайте по нескольку раз — длительность подобрана, чтобы не отвлекать.</span>
+  </div>
+</div>
+
+<canvas id="fx-canvas"></canvas>
+<div id="fx-overlay"></div>
+<div class="milestone-card" id="milestone">
+  <span class="milestone-eyebrow">★ Рубеж пройден</span>
+  <div class="milestone-h" id="milestone-h">Задание 5 из 21</div>
+  <p class="milestone-sub">Вы прошли <b>четверть варианта</b>. Так держать!</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  // ============== CANVAS SETUP ==============
+  var cv = document.getElementById('fx-canvas');
+  var ctx = cv.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  function resize(){
+    cv.width = innerWidth * dpr;
+    cv.height = innerHeight * dpr;
+    cv.style.width = innerWidth + 'px';
+    cv.style.height = innerHeight + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  var particles = [];
+  var raf = null;
+  function loop(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for (var i = particles.length - 1; i >= 0; i--){
+      var p = particles[i];
+      p.update();
+      p.draw(ctx);
+      if (!p.alive) particles.splice(i, 1);
+    }
+    if (particles.length){
+      raf = requestAnimationFrame(loop);
+    } else {
+      raf = null;
+    }
+  }
+  function start(){ if (!raf) raf = requestAnimationFrame(loop); }
+
+  // ============== HELPER: MILESTONE CAPTION ==============
+  var milestone = document.getElementById('milestone');
+  var milestoneH = document.getElementById('milestone-h');
+  function showMilestone(n){
+    var labels = {
+      5:  'Задание 5 из 21 · четверть',
+      10: 'Задание 10 из 21 · половина',
+      15: 'Задание 15 из 21 · три четверти',
+      20: 'Задание 20 из 21 · финиш близко'
+    };
+    milestoneH.textContent = labels[n] || ('Задание ' + n + ' из 21');
+    milestone.classList.add('is-on');
+    clearTimeout(showMilestone._t);
+    showMilestone._t = setTimeout(function(){ milestone.classList.remove('is-on'); }, 2400);
+  }
+
+  // ============== VARIANT 1: CONFETTI ==============
+  function fxConfetti(){
+    var COLORS = ['#c79330','#2f6bff','#1f9c6e','#f5cf6c','#e1a93f','#dbe5ff','#cde9da'];
+    var count = 160;
+    for (var i = 0; i < count; i++){
+      particles.push({
+        x: Math.random() * innerWidth,
+        y: -20 - Math.random() * 220,
+        vx: (Math.random() - .5) * 2.5,
+        vy: 2 + Math.random() * 3.5,
+        angle: Math.random() * Math.PI * 2,
+        vAngle: (Math.random() - .5) * .3,
+        w: 7 + Math.random() * 7,
+        h: 3 + Math.random() * 4,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        life: 1, alive: true,
+        update: function(){
+          this.x += this.vx; this.y += this.vy;
+          this.vy += 0.05; this.vx *= 0.995;
+          this.angle += this.vAngle;
+          if (this.y > innerHeight + 50){ this.alive = false; }
+          this.life -= 0.0015;
+          if (this.life < 0) this.alive = false;
+        },
+        draw: function(c){
+          c.save();
+          c.translate(this.x, this.y);
+          c.rotate(this.angle);
+          c.globalAlpha = Math.max(0, Math.min(1, this.life));
+          c.fillStyle = this.color;
+          c.fillRect(-this.w/2, -this.h/2, this.w, this.h);
+          c.restore();
+        }
+      });
+    }
+    start();
+    showMilestone(5);
+  }
+
+  // ============== VARIANT 2: LIGHT RAYS ==============
+  function fxRays(){
+    var cx = innerWidth / 2, cy = innerHeight / 2;
+    var COLORS = ['#e1a93f', '#f5cf6c', '#c79330', '#fff8e2', '#2f6bff'];
+    var rayCount = 14;
+    var maxLen = Math.max(innerWidth, innerHeight) * 0.75;
+
+    // central golden pulse
+    particles.push({
+      x: cx, y: cy, r0: 0,
+      life: 1, alive: true,
+      update: function(){
+        this.r0 += 3;
+        this.life -= 0.013;
+        if (this.life < 0) this.alive = false;
+      },
+      draw: function(c){
+        var R = 70 + this.r0 * 0.6;
+        var grd = c.createRadialGradient(this.x, this.y, 0, this.x, this.y, R);
+        grd.addColorStop(0,   'rgba(255, 247, 212, ' + (this.life * .95) + ')');
+        grd.addColorStop(.35, 'rgba(245, 207, 108, ' + (this.life * .55) + ')');
+        grd.addColorStop(1,   'rgba(225, 169, 63, 0)');
+        c.fillStyle = grd;
+        c.beginPath(); c.arc(this.x, this.y, R, 0, Math.PI*2); c.fill();
+      }
+    });
+
+    // light rays (wedges)
+    for (var i = 0; i < rayCount; i++){
+      var ang = (Math.PI * 2 * i / rayCount) + (Math.random() - .5) * 0.06;
+      particles.push({
+        x: cx, y: cy,
+        ang: ang,
+        len: 0,
+        maxLen: maxLen * (.7 + Math.random() * .4),
+        width: 22 + Math.random() * 18,
+        speed: maxLen / (28 + Math.random() * 8),
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        life: 1, alive: true, phase: 0,
+        update: function(){
+          this.len += this.speed;
+          if (this.len > this.maxLen) this.life -= 0.025;
+          else this.life -= 0.005;
+          if (this.life < 0) this.alive = false;
+        },
+        draw: function(c){
+          c.save();
+          c.globalAlpha = Math.max(0, this.life) * .85;
+          c.translate(this.x, this.y);
+          c.rotate(this.ang);
+          var grd = c.createLinearGradient(0, 0, this.len, 0);
+          grd.addColorStop(0, this.color);
+          grd.addColorStop(.5, this.color);
+          grd.addColorStop(1, 'rgba(255,255,255,0)');
+          c.fillStyle = grd;
+          c.beginPath();
+          c.moveTo(0, 0);
+          c.lineTo(this.len, -this.width / 2);
+          c.lineTo(this.len, this.width / 2);
+          c.closePath();
+          c.fill();
+          c.restore();
+        }
+      });
+    }
+
+    // sparkles around the core
+    for (var k = 0; k < 16; k++){
+      var sang = Math.random() * Math.PI * 2;
+      var ssp  = 2.5 + Math.random() * 3.5;
+      particles.push({
+        x: cx + (Math.random() - .5) * 30,
+        y: cy + (Math.random() - .5) * 30,
+        vx: Math.cos(sang) * ssp,
+        vy: Math.sin(sang) * ssp,
+        r: 1.6 + Math.random() * 1.6,
+        color: ['#fff7d4', '#f5cf6c', '#e1a93f'][k % 3],
+        life: 1, alive: true,
+        update: function(){
+          this.x += this.vx; this.y += this.vy;
+          this.vx *= 0.96; this.vy *= 0.96;
+          this.life -= 0.018;
+          if (this.life < 0) this.alive = false;
+        },
+        draw: function(c){
+          c.save();
+          c.globalAlpha = Math.max(0, this.life);
+          c.fillStyle = this.color;
+          c.shadowColor = this.color; c.shadowBlur = 10;
+          c.beginPath(); c.arc(this.x, this.y, this.r, 0, Math.PI*2); c.fill();
+          c.restore();
+        }
+      });
+    }
+
+    start();
+    showMilestone(10);
+  }
+
+  // ============== VARIANT 3: STARS ==============
+  function fxStars(){
+    var cx = innerWidth / 2, cy = innerHeight / 2;
+    var COLORS = ['#e1a93f','#c79330','#f5cf6c','#2f6bff','#1f9c6e'];
+    for (var i = 0; i < 32; i++){
+      var ang = Math.random() * Math.PI * 2;
+      var sp  = 4 + Math.random() * 7;
+      particles.push({
+        type: 'star',
+        x: cx + (Math.random() - .5) * 30,
+        y: cy + (Math.random() - .5) * 30,
+        vx: Math.cos(ang) * sp,
+        vy: Math.sin(ang) * sp - 1.5,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - .5) * .15,
+        size: 7 + Math.random() * 10,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        life: 1, alive: true,
+        update: function(){
+          this.x += this.vx; this.y += this.vy;
+          this.vy += 0.08; // gravity
+          this.vx *= 0.99;
+          this.rot += this.vRot;
+          this.life -= 0.012;
+          if (this.life < 0) this.alive = false;
+        },
+        draw: function(c){
+          c.save();
+          c.translate(this.x, this.y);
+          c.rotate(this.rot);
+          c.globalAlpha = Math.max(0, this.life);
+          c.fillStyle = this.color;
+          c.shadowColor = this.color; c.shadowBlur = 6;
+          drawStar(c, 0, 0, 5, this.size, this.size/2.4);
+          c.restore();
+        }
+      });
+    }
+    start();
+    showMilestone(15);
+  }
+  function drawStar(c, cx, cy, spikes, outer, inner){
+    var rot = Math.PI / 2 * 3;
+    var step = Math.PI / spikes;
+    c.beginPath();
+    c.moveTo(cx, cy - outer);
+    for (var i = 0; i < spikes; i++){
+      c.lineTo(cx + Math.cos(rot) * outer, cy + Math.sin(rot) * outer);
+      rot += step;
+      c.lineTo(cx + Math.cos(rot) * inner, cy + Math.sin(rot) * inner);
+      rot += step;
+    }
+    c.lineTo(cx, cy - outer);
+    c.closePath();
+    c.fill();
+  }
+
+  // ============== VARIANT 4: FIREWORK BURSTS ==============
+  function fxBursts(){
+    var positions = [
+      { x: innerWidth * .25, y: innerHeight * .35, d: 0,    color: '#e1a93f' },
+      { x: innerWidth * .70, y: innerHeight * .30, d: 280,  color: '#2f6bff' },
+      { x: innerWidth * .45, y: innerHeight * .55, d: 520,  color: '#1f9c6e' },
+      { x: innerWidth * .82, y: innerHeight * .60, d: 800,  color: '#c79330' }
+    ];
+    positions.forEach(function(pos){
+      setTimeout(function(){ spawnFirework(pos.x, pos.y, pos.color); }, pos.d);
+    });
+    showMilestone(20);
+  }
+  function spawnFirework(cx, cy, mainColor){
+    var n = 40;
+    var hueShift = ['#e1a93f','#f5cf6c','#fff','#dbe5ff'];
+    for (var i = 0; i < n; i++){
+      var ang = (Math.PI * 2 * i) / n + Math.random() * .1;
+      var sp = 3 + Math.random() * 4;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(ang) * sp,
+        vy: Math.sin(ang) * sp,
+        r: 1.6 + Math.random() * 1.6,
+        color: Math.random() < .4 ? hueShift[Math.floor(Math.random()*hueShift.length)] : mainColor,
+        trail: [],
+        life: 1, alive: true,
+        update: function(){
+          this.trail.push({x: this.x, y: this.y});
+          if (this.trail.length > 7) this.trail.shift();
+          this.x += this.vx; this.y += this.vy;
+          this.vx *= 0.97; this.vy *= 0.97;
+          this.vy += 0.08;
+          this.life -= 0.018;
+          if (this.life < 0) this.alive = false;
+        },
+        draw: function(c){
+          c.save();
+          // trail
+          for (var t = 0; t < this.trail.length; t++){
+            c.globalAlpha = (t / this.trail.length) * this.life * .35;
+            c.fillStyle = this.color;
+            c.beginPath(); c.arc(this.trail[t].x, this.trail[t].y, this.r * .6, 0, Math.PI*2); c.fill();
+          }
+          c.globalAlpha = Math.max(0, this.life);
+          c.fillStyle = this.color;
+          c.shadowColor = this.color; c.shadowBlur = 10;
+          c.beginPath(); c.arc(this.x, this.y, this.r, 0, Math.PI*2); c.fill();
+          c.restore();
+        }
+      });
+    }
+    start();
+  }
+
+  // ============== WIRE TILES ==============
+  document.querySelectorAll('.tile').forEach(function(t){
+    t.addEventListener('click', function(){
+      var fx = t.getAttribute('data-fx');
+      if (fx === 'confetti') fxConfetti();
+      else if (fx === 'rays') fxRays();
+      else if (fx === 'stars') fxStars();
+      else if (fx === 'bursts') fxBursts();
+    });
+  });
+
+  // Keyboard 1-4
+  addEventListener('keydown', function(e){
+    if (e.key === '1') fxConfetti();
+    else if (e.key === '2') fxRays();
+    else if (e.key === '3') fxStars();
+    else if (e.key === '4') fxBursts();
+  });
+
+})();
+</script>
+</body>
+</html>

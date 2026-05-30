@@ -942,26 +942,19 @@
 					'<h4 class="c-title">' + esc(a.title) + '</h4>' +
 					'<div class="c-sub">' + esc(a.desc) + '</div>' +
 				'</div>' +
-				'<div class="c-footer">' +
-				'<div class="c-div" aria-hidden="true"><span></span></div>' +
-				'<div class="c-prog">' +
-					'<div class="c-prog-row">' +
-						'<span>Прогресс</span>' +
-						'<span class="pp"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
-					'</div>' +
-					'<div class="c-prog-line">' +
-						'<div class="c-prog-bar"><i style="width:' + progPct + '%"></i></div>' +
-					'</div>' +
-				'</div>' +
-				'<div class="c-reward">' +
-					'<div class="c-rwd-item">' +
-						'<div class="c-rwd-ico xp">' + xpSvg + '</div>' +
-						'<div class="c-rwd-text">' +
-							'<span class="c-rwd-val">+' + (a.xpReward || 0) + ' XP</span>' +
-							'<span class="c-rwd-lbl">Награда</span>' +
-						'</div>' +
-					'</div>' +
-				'</div>' +
+				// FOOTER — буквально тот же компонент, что у обычной карты
+				// «Неделя ритма»: тонкий .a-prog (только в процессе) + компактный
+				// XP-чип .a-xp снизу. Те же HTML-теги и CSS-классы → идентичные
+				// computed-размеры (ширина/высота/padding чипа, длина полосы).
+				// Отличие только в теме (фиолет=epic / синий=bio) — задаётся
+				// правилами .ach--illus .a-xp в profile.css.
+				((a.inProgress && a.progress)
+					? '<div class="a-prog" aria-label="' + progCur + ' из ' + progTgt + '"><i style="width:' + progPct + '%"></i></div>'
+					: '') +
+				'<div class="a-xp' + ((a.unlocked || a.inProgress) ? '' : ' a-xp--locked') + '">' +
+					'<span class="a-xp-ico">' + xpSvg + '</span>' +
+					'<span class="a-xp-val">+' + (a.xpReward || 0) + ' XP</span>' +
+					'<span class="a-xp-lbl">награда</span>' +
 				'</div>' +
 				'<div class="a-tip">' +
 					'<div class="tt-name">' + esc(a.title) + '</div>' +

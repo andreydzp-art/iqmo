@@ -1,0 +1,78 @@
+<!-- ============================================================
+     IQMO · Карточка «Старт на портале»
+     Подключи start-card.css. Меняй текст/цифры прямо в разметке.
+     ============================================================ -->
+<article class="start-card">
+  <div class="scene"></div>
+  <span class="rarity">Обычная</span>
+
+  <div class="orb-stage">
+    <div class="orb">
+      <span class="orbit"></span>
+      <svg class="bag" viewBox="0 0 64 64" fill="none">
+        <defs>
+          <linearGradient id="sbBody" x1="32" y1="12" x2="32" y2="58" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#e6eaf2"/>
+          </linearGradient>
+          <linearGradient id="sbPocket" x1="32" y1="34" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#b3bace"/>
+            <stop offset="100%" stop-color="#8d96b2"/>
+          </linearGradient>
+          <linearGradient id="sbStrap" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#c7cddb"/>
+            <stop offset="100%" stop-color="#9aa2bd"/>
+          </linearGradient>
+        </defs>
+        <!-- top handle -->
+        <path d="M25 16 Q25 7 32 7 Q39 7 39 16" stroke="#c7cddb" stroke-width="3.4" stroke-linecap="round"/>
+        <!-- shoulder straps -->
+        <path d="M22 18 Q14 22 15 36 L16 50" stroke="url(#sbStrap)" stroke-width="3.4" stroke-linecap="round"/>
+        <path d="M42 18 Q50 22 49 36 L48 50" stroke="url(#sbStrap)" stroke-width="3.4" stroke-linecap="round"/>
+        <!-- body -->
+        <rect x="14" y="15" width="36" height="43" rx="14" fill="url(#sbBody)" stroke="#d6dbe7" stroke-width="1.4"/>
+        <!-- top sheen -->
+        <path d="M20 22 Q32 18 44 22" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+        <!-- IQ label -->
+        <text x="32" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#aeb6cc" letter-spacing=".5">IQ</text>
+        <!-- front pocket -->
+        <path d="M21 41 Q21 35 27 35 L37 35 Q43 35 43 41 L43 51 Q43 56 37 56 L27 56 Q21 56 21 51 Z" fill="url(#sbPocket)"/>
+        <!-- zip -->
+        <rect x="26" y="44" width="12" height="3.2" rx="1.6" fill="#eef0f6" opacity=".85"/>
+        <!-- pocket sheen -->
+        <path d="M25 39.5 Q32 37.5 39 39.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>
+      </svg>
+    </div>
+
+    <span class="spark s1"></span>
+    <span class="spark s2"></span>
+    <span class="spark s3"></span>
+  </div>
+
+  <div class="title-block">
+    <h4 class="title">Старт на портале</h4>
+    <div class="subtitle">Начни свой путь в IQMO</div>
+  </div>
+
+  <div class="divider"><span></span></div>
+
+  <div class="prog">
+    <div class="prog-row">
+      <span class="label">Прогресс</span>
+      <span class="count"><b>1</b><span class="sep">/</span>1</span>
+    </div>
+    <div class="prog-bar"><i style="width:100%"></i></div>
+  </div>
+
+  <div class="reward">
+    <div class="reward-item">
+      <div class="reward-ico">
+        <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>
+      </div>
+      <div class="reward-text">
+        <span class="reward-val">+50 XP</span>
+        <span class="reward-lbl">Награда</span>
+      </div>
+    </div>
+  </div>
+</article>

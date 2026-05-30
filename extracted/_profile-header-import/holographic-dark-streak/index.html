@@ -1,0 +1,1001 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1320" />
+<title>IQMO · Holographic prestige UI · Dark-glass streak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#eef1f9;
+    --bg-2:#e5e9f4;
+    --surface:#fff;
+    --line:#e3e6f0;
+    --line-2:#eef0f7;
+    --ink:#0f1226;
+    --ink-2:#2a2e4a;
+    --muted:#6b7094;
+    --muted-2:#9aa0bf;
+
+    /* holographic palette (slightly desaturated for light bg) */
+    --holo-cyan:#0ea5e9;
+    --holo-violet:#7c3aed;
+    --holo-pink:#db2777;
+    --holo-orange:#f97316;
+
+    --primary:#4f46e5;
+    --violet:#7c3aed;
+
+    --shadow-sm:0 1px 2px rgba(15,18,38,.04),0 1px 1px rgba(15,18,38,.03);
+    --shadow:0 1px 2px rgba(15,18,38,.05),0 12px 30px -10px rgba(56,90,200,.15);
+    --shadow-lg:0 1px 2px rgba(15,18,38,.04),0 30px 60px -20px rgba(99,102,241,.28);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:
+      radial-gradient(900px 600px at 50% -10%, rgba(124,58,237,.08), transparent 70%),
+      radial-gradient(700px 500px at 100% 110%, rgba(14,165,233,.07), transparent 70%),
+      var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"ss01","cv11";
+    min-height:100vh;
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer; border:0; background:transparent;}
+
+  .shell{
+    max-width:1280px; margin:0 auto; padding:22px 28px 80px;
+    display:flex; flex-direction:column; gap:40px;
+  }
+
+  /* TOP NAV */
+  .top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 18px;
+    background:rgba(255,255,255,.78);
+    backdrop-filter:saturate(140%) blur(10px);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:var(--shadow-sm), 0 0 0 1px var(--line) inset;
+    border-radius:16px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:30px; height:30px; border-radius:9px;
+    background:conic-gradient(from -90deg, #0ea5e9, #7c3aed, #db2777, #0ea5e9);
+  }
+  .brand-name{font-weight:800; font-size:15px;}
+  .brand-sep{color:var(--line); margin:0 14px;}
+  .breadcrumbs{color:var(--muted); font-size:13.5px;}
+  .breadcrumbs b{color:var(--ink-2); font-weight:600;}
+  .nav-right{display:flex; align-items:center; gap:8px;}
+  .pill{
+    height:36px; padding:0 14px; border-radius:999px;
+    border:1px solid var(--line); background:#fff; color:var(--ink-2);
+    font-size:13px; font-weight:500;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .pill:hover{background:var(--bg);}
+  .pill.is--ghost{background:transparent;}
+  .avatar-mini{
+    width:30px; height:30px; border-radius:999px;
+    background:#c7d2fe center/cover no-repeat url('iqmo/avatar-dasha.png');
+    background-position:center 18%;
+  }
+
+  /* Variant label */
+  .vlabel{
+    display:flex; align-items:flex-end; gap:14px; padding:0 4px; flex-wrap:wrap;
+    margin-bottom:-16px;
+  }
+  .vlabel .v-num{
+    font-family:'JetBrains Mono',monospace; font-weight:800;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:#fff;
+    background:linear-gradient(135deg, var(--holo-cyan), var(--holo-violet) 60%, var(--holo-pink));
+    padding:5px 9px; border-radius:6px;
+    box-shadow:0 6px 14px -8px rgba(124,58,237,.55);
+  }
+  .vlabel .v-title{font-size:20px; font-weight:800; letter-spacing:-.02em; margin:0;}
+  .vlabel .v-sub{
+    color:var(--muted); font-size:12.5px;
+    border-left:1px solid var(--line); padding-left:14px;
+    line-height:1.45; margin:0;
+  }
+  .vlabel .v-sub b{color:var(--ink-2); font-weight:700;}
+
+  /* ── HERO base ── */
+  .hero{position:relative; border-radius:24px; overflow:hidden;}
+  .hero-inner{
+    position:relative; z-index:2;
+    display:grid;
+    grid-template-columns: 240px 1fr 360px;
+    gap:28px;
+    align-items:stretch;
+    padding:28px 28px 14px;
+  }
+  .hero-secondary{
+    position:relative; z-index:2;
+    display:grid;
+    grid-template-columns: 240px 1fr 360px;
+    gap:28px;
+    margin-top:-44px;
+    padding:0 28px 22px;
+    align-items:stretch;
+  }
+  .hero-secondary .sec-row{
+    grid-column: 2 / 3;
+    display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:10px;
+  }
+
+  /* identity shared */
+  .h-id{display:flex; flex-direction:column; justify-content:center; min-width:0;}
+  .h-name-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .h-name{margin:0; font-size:34px; font-weight:800; letter-spacing:-.025em; line-height:1.05;}
+  .h-handle{font-size:13px; font-family:'JetBrains Mono',monospace;}
+
+  /* keyframes */
+  @keyframes shimmer{
+    0%{transform:translateX(-100%);}
+    60%{transform:translateX(100%);}
+    100%{transform:translateX(100%);}
+  }
+  @keyframes livePulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5), 0 0 14px rgba(34,197,94,.7);}
+    50%{box-shadow:0 0 0 8px rgba(34,197,94,0), 0 0 14px rgba(34,197,94,.9);}
+  }
+  @keyframes orbBreathe{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.035);}
+  }
+  @keyframes orbPulse{
+    0%,100%{opacity:.55; transform:scale(1);}
+    50%{opacity:.9; transform:scale(1.08);}
+  }
+  @keyframes orbSpin{
+    to{transform:rotate(360deg);}
+  }
+  @keyframes orbitA{
+    0%{transform:rotate(0deg) translateX(56px) rotate(0deg);}
+    100%{transform:rotate(360deg) translateX(56px) rotate(-360deg);}
+  }
+  @keyframes orbitB{
+    0%{transform:rotate(120deg) translateX(56px) rotate(-120deg);}
+    100%{transform:rotate(480deg) translateX(56px) rotate(-480deg);}
+  }
+  @keyframes orbitC{
+    0%{transform:rotate(240deg) translateX(56px) rotate(-240deg);}
+    100%{transform:rotate(600deg) translateX(56px) rotate(-600deg);}
+  }
+  @keyframes coreShine{
+    0%,100%{opacity:.5;}
+    50%{opacity:.9;}
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0) translateX(0);}
+    50%{transform:translateY(-12px) translateX(6px);}
+  }
+  @keyframes scanBeam{
+    0%{transform:translateX(-30%) rotate(-8deg);}
+    100%{transform:translateX(30%) rotate(-8deg);}
+  }
+
+  /* ════════════════════════════════════════════════
+     VARIANT 3 LIGHT — Holographic prestige UI
+     Glass on cool white · iridescent accents
+     ════════════════════════════════════════════════ */
+  .v3{
+    border:1px solid rgba(124,58,237,.18);
+    background:
+      radial-gradient(700px 380px at 100% -10%, rgba(14,165,233,.18), transparent 60%),
+      radial-gradient(640px 360px at 0% 110%, rgba(219,39,119,.13), transparent 60%),
+      radial-gradient(900px 600px at 50% 50%, rgba(167,139,250,.16), transparent 70%),
+      linear-gradient(180deg, #ffffff 0%, #f5f6ff 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.9) inset,
+      0 30px 70px -34px rgba(56,90,200,.28);
+    color:var(--ink);
+  }
+  /* grid backdrop */
+  .v3::before{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background-image:
+      linear-gradient(rgba(15,18,38,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15,18,38,.06) 1px, transparent 1px);
+    background-size: 36px 36px;
+    background-position:-1px -1px;
+    -webkit-mask: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 80%);
+            mask: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 80%);
+    opacity:.45;
+  }
+  /* holographic streaks */
+  .v3::after{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background:
+      linear-gradient(115deg, transparent 30%, rgba(14,165,233,.10) 50%, transparent 70%),
+      linear-gradient(115deg, transparent 60%, rgba(219,39,119,.08) 80%, transparent 100%);
+    mix-blend-mode:multiply;
+  }
+
+  /* avatar — concentric segmented neon ring */
+  .v3 .av{
+    position:relative;
+    width:210px; height:210px;
+    align-self:center; justify-self:center;
+    display:grid; place-items:center;
+  }
+  .v3 .av-outer{
+    position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(
+      from -90deg,
+      #0ea5e9 0%, #7c3aed 30%, #db2777 61%,
+      rgba(15,18,38,.08) 61%, rgba(15,18,38,.08) 100%
+    );
+    filter:drop-shadow(0 0 18px rgba(124,58,237,.35));
+  }
+  .v3 .av-outer::after{
+    content:""; position:absolute; inset:5px; border-radius:50%;
+    background:radial-gradient(circle at 50% 30%, #ffffff, #eef1ff 80%);
+    box-shadow: inset 0 0 0 1px rgba(124,58,237,.10);
+  }
+  /* tick marks */
+  .v3 .av-ticks{
+    position:absolute; inset:0; border-radius:50%;
+    z-index:2;
+    background:repeating-conic-gradient(
+      from -90deg,
+      rgba(15,18,38,.55) 0deg .8deg,
+      transparent .8deg 9deg
+    );
+    -webkit-mask: radial-gradient(circle, transparent 0 96px, #000 96px 102px, transparent 102px);
+            mask: radial-gradient(circle, transparent 0 96px, #000 96px 102px, transparent 102px);
+    opacity:.5;
+  }
+  .v3 .av-img{
+    position:relative; z-index:3;
+    width:172px; height:172px;
+    border-radius:50%; overflow:hidden;
+    background:#eef1ff;
+    box-shadow: inset 0 -3px 12px rgba(15,18,38,.08), 0 0 0 1px rgba(124,58,237,.18);
+  }
+  .v3 .av-img img{width:100%; height:100%; object-fit:cover; object-position:center 18%; display:block;}
+  .v3 .av-chip{
+    position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+    z-index:4;
+    display:inline-flex; align-items:center; gap:7px;
+    padding:7px 13px; border-radius:999px;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(124,58,237,.4);
+    color:#5b21b6;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:800; font-size:12.5px;
+    letter-spacing:.05em;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.6) inset,
+      0 8px 22px -6px rgba(124,58,237,.4);
+  }
+  .v3 .av-chip svg{width:11px; height:11px; fill:#7c3aed;}
+  .v3 .av-pct{
+    position:absolute; top:-2px; right:-12px;
+    z-index:5;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(14,165,233,.55);
+    color:#0369a1;
+    border-radius:999px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; font-weight:800;
+    padding:4px 9px;
+    box-shadow:0 0 14px rgba(14,165,233,.25);
+  }
+
+  /* identity */
+  .v3 .h-name{color:var(--ink);}
+  .v3 .h-handle{color:var(--muted);}
+  .v3 .h-pro{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 9px; border-radius:999px;
+    background:rgba(14,165,233,.10);
+    border:1px solid rgba(14,165,233,.35);
+    color:#0369a1;
+    font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.1em;
+  }
+  .v3 .h-pro svg{width:10px; height:10px; fill:#0369a1;}
+  .v3 .h-meta-row{
+    margin-top:6px;
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .h-meta-row .rank{
+    color:#a21caf;
+    font-weight:800;
+    letter-spacing:.02em;
+    text-shadow:0 0 12px rgba(219,39,119,.25);
+  }
+  .v3 .h-meta-row .dot{width:3px; height:3px; border-radius:50%; background:var(--muted-2); display:inline-block;}
+
+  /* XP glass block */
+  .v3 .xp{
+    margin-top:14px;
+    padding:14px 16px 13px;
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(124,58,237,.12);
+    border-radius:14px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 8px 20px -12px rgba(56,90,200,.18);
+  }
+  .v3 .xp-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:10px;
+    font-size:12px;
+  }
+  .v3 .xp-head .xp-curr{display:inline-flex; gap:8px; align-items:baseline;}
+  .v3 .xp-head .eye{font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0369a1; font-family:'JetBrains Mono',monospace;}
+  .v3 .xp-head .num{font-family:'JetBrains Mono',monospace; font-weight:800; color:var(--ink); font-size:14px; letter-spacing:.02em;}
+  .v3 .xp-head .xp-next{color:var(--muted); font-family:'JetBrains Mono',monospace;}
+  .v3 .xp-head .xp-next b{color:var(--ink-2); font-weight:800;}
+  .v3 .xp-bar{
+    position:relative;
+    height:12px;
+    border-radius:999px;
+    background:rgba(15,18,38,.06);
+    border:1px solid rgba(15,18,38,.05);
+    overflow:hidden;
+  }
+  .v3 .xp-fill{
+    position:absolute; inset:0 auto 0 0; width:61%;
+    border-radius:999px;
+    background:linear-gradient(90deg, #0ea5e9 0%, #7c3aed 60%, #db2777 100%);
+    box-shadow:0 0 16px rgba(124,58,237,.55);
+  }
+  .v3 .xp-fill::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
+    transform:translateX(-100%);
+    animation:shimmer 2.2s ease-in-out infinite;
+  }
+  /* segment ticks overlay on xp */
+  .v3 .xp-bar::after{
+    content:""; position:absolute; inset:0;
+    background-image: linear-gradient(90deg, transparent calc(10% - 1px), #fff calc(10% - 1px), #fff 10%, transparent 10%);
+    background-size:10% 100%;
+    pointer-events:none;
+    opacity:.9;
+  }
+  .v3 .xp-foot{
+    margin-top:9px;
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:11.5px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .xp-foot b{color:var(--ink); font-family:'JetBrains Mono',monospace; font-weight:800;}
+  .v3 .xp-foot .untill{color:#0369a1; font-weight:700;}
+
+  /* Streak HERO glass card */
+  .v3 .streak{
+    position:relative;
+    border-radius:20px;
+    padding:20px 22px 18px;
+    overflow:hidden;
+    background:
+      radial-gradient(260px 180px at 100% 0%, rgba(34,197,94,.20), transparent 60%),
+      radial-gradient(220px 160px at 0% 100%, rgba(14,165,233,.15), transparent 60%),
+      radial-gradient(280px 200px at 50% 120%, rgba(124,58,237,.10), transparent 65%),
+      linear-gradient(180deg, rgba(255,255,255,.95) 0%, rgba(244,253,247,.92) 100%);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(34,197,94,.25);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 30px 50px -22px rgba(34,197,94,.22),
+      0 0 0 1px rgba(14,165,233,.05);
+    display:flex; flex-direction:column; gap:12px;
+  }
+  /* scan beam */
+  .v3 .streak::before{
+    content:""; position:absolute; top:-40%; left:-20%; width:240%; height:60%;
+    background:linear-gradient(115deg, transparent 40%, rgba(74,222,128,.18) 50%, transparent 60%);
+    transform:rotate(-8deg);
+    animation:scanBeam 7s linear infinite;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+  }
+
+  .v3 .streak-top{
+    display:flex; align-items:center; justify-content:space-between;
+    position:relative; z-index:2;
+  }
+  .v3 .s-eye{
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+    color:#047857;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .s-eye .pulse{
+    width:8px; height:8px; border-radius:50%;
+    background:#22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,.55), 0 0 14px rgba(34,197,94,.8);
+    animation:livePulse 1.8s ease-in-out infinite;
+  }
+  .v3 .s-bonus{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 9px; border-radius:7px;
+    background:rgba(14,165,233,.12);
+    border:1px solid rgba(14,165,233,.4);
+    color:#0369a1;
+    font-size:10px; font-weight:800; letter-spacing:.08em;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .s-bonus svg{width:10px; height:10px; fill:#0369a1;}
+
+  .v3 .s-hero{
+    display:grid; grid-template-columns:auto 1fr;
+    gap:14px; align-items:center;
+    position:relative; z-index:2;
+  }
+  /* energy orb — holographic core */
+  .v3 .orb{
+    position:relative;
+    width:96px; height:96px;
+    display:grid; place-items:center;
+  }
+  /* outer breathing aura */
+  .v3 .orb::before{
+    content:""; position:absolute; inset:-14px; border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(34,197,94,.35), transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(14,165,233,.18), transparent 70%);
+    z-index:0;
+    animation:orbPulse 3.6s ease-in-out infinite;
+    filter:blur(2px);
+  }
+  /* orbital track (faint ring) */
+  .v3 .orb::after{
+    content:""; position:absolute; inset:6px; border-radius:50%;
+    border:1px dashed rgba(34,197,94,.35);
+    z-index:1;
+    animation:orbSpin 22s linear infinite;
+  }
+  /* rotating iridescent shell */
+  .v3 .orb-shell{
+    position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(
+      from 0deg,
+      rgba(34,197,94,.85) 0deg,
+      rgba(74,222,128,.55) 60deg,
+      rgba(14,165,233,.55) 140deg,
+      rgba(124,58,237,.55) 220deg,
+      rgba(34,197,94,.85) 320deg,
+      rgba(34,197,94,.85) 360deg
+    );
+    -webkit-mask: radial-gradient(circle, transparent 0 36px, #000 37px 46px, transparent 47px);
+            mask: radial-gradient(circle, transparent 0 36px, #000 37px 46px, transparent 47px);
+    filter:drop-shadow(0 0 12px rgba(34,197,94,.45));
+    animation:orbSpin 8s linear infinite;
+  }
+  /* glass core */
+  .v3 .orb-core{
+    position:relative; z-index:3;
+    width:68px; height:68px; border-radius:50%;
+    background:
+      radial-gradient(circle at 35% 28%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.5) 22%, transparent 45%),
+      radial-gradient(circle at 50% 65%, rgba(74,222,128,.35), transparent 65%),
+      linear-gradient(160deg, rgba(255,255,255,.85) 0%, rgba(236,253,245,.85) 50%, rgba(219,234,254,.85) 100%);
+    backdrop-filter:blur(8px);
+    box-shadow:
+      inset 0 -6px 14px rgba(34,197,94,.18),
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 0 0 1px rgba(255,255,255,.7),
+      0 6px 18px -6px rgba(34,197,94,.35);
+    display:grid; place-items:center;
+    animation:orbBreathe 4.2s ease-in-out infinite;
+  }
+  .v3 .orb-core::after{
+    content:""; position:absolute; inset:8% 32% 60% 12%;
+    border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(255,255,255,.85), transparent 70%);
+    animation:coreShine 4.2s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .v3 .orb-core svg{
+    position:relative; z-index:2;
+    width:30px; height:30px;
+    fill:none;
+    stroke:url(#orbGrad);
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    filter:drop-shadow(0 0 6px rgba(34,197,94,.55));
+  }
+  /* orbiting particles */
+  .v3 .orb-orbit{
+    position:absolute; inset:0; z-index:2;
+    pointer-events:none;
+  }
+  .v3 .orb-orbit i{
+    position:absolute; top:50%; left:50%;
+    width:6px; height:6px; margin:-3px 0 0 -3px;
+    border-radius:50%;
+  }
+  .v3 .orb-orbit i.a{
+    background:#22c55e;
+    box-shadow:0 0 10px #22c55e, 0 0 4px #fff inset;
+    animation:orbitA 7s linear infinite;
+  }
+  .v3 .orb-orbit i.b{
+    background:#0ea5e9;
+    box-shadow:0 0 10px #0ea5e9, 0 0 4px #fff inset;
+    animation:orbitB 9s linear infinite;
+  }
+  .v3 .orb-orbit i.c{
+    background:#a78bfa;
+    box-shadow:0 0 10px #a78bfa, 0 0 4px #fff inset;
+    animation:orbitC 11s linear infinite;
+  }
+
+  .v3 .s-big .num{
+    display:block;
+    font-family:'JetBrains Mono',monospace; font-weight:800;
+    font-size:56px; letter-spacing:-.05em; line-height:.9;
+    background:linear-gradient(180deg, #1f2342 0%, #059669 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 18px rgba(34,197,94,.12);
+  }
+  .v3 .s-big .lbl{
+    margin-top:6px;
+    font-size:13px; font-weight:800; color:#047857;
+    letter-spacing:.12em; text-transform:uppercase;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .s-warn{
+    position:relative; z-index:2;
+    font-size:13px; color:var(--ink-2); line-height:1.4;
+  }
+  .v3 .s-warn b{color:#5b21b6; font-family:'JetBrains Mono',monospace; font-weight:800;}
+
+  /* progress bar */
+  .v3 .s-prog{position:relative; z-index:2;}
+  .v3 .s-prog-bar{
+    position:relative;
+    height:10px; border-radius:999px;
+    background:rgba(15,18,38,.06);
+    border:1px solid rgba(15,18,38,.05);
+    overflow:hidden;
+  }
+  .v3 .s-prog-fill{
+    height:100%;
+    width:57%;
+    border-radius:999px;
+    background:linear-gradient(90deg, #22c55e 0%, #4ade80 55%, #86efac 100%);
+    box-shadow:
+      0 0 14px rgba(34,197,94,.5),
+      0 0 28px rgba(74,222,128,.35),
+      inset 0 1px 0 rgba(255,255,255,.6);
+    position:relative;
+  }
+  .v3 .s-prog-fill::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
+    transform:translateX(-100%);
+    animation:shimmer 2.4s ease-in-out infinite;
+  }
+  .v3 .s-prog-bar::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image: linear-gradient(90deg, transparent calc(14.28% - 1px), #fff calc(14.28% - 1px), #fff 14.28%, transparent 14.28%);
+    background-size:14.28% 100%;
+    opacity:.95;
+  }
+  .v3 .s-prog-foot{
+    margin-top:8px;
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:11.5px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .s-prog-foot b{color:var(--ink);}
+  .v3 .s-prog-foot .rew{
+    display:inline-flex; align-items:center; gap:6px;
+    color:#047857;
+    text-transform:uppercase; letter-spacing:.08em; font-weight:800;
+    font-size:10.5px;
+  }
+  .v3 .s-prog-foot .rew svg{width:10px; height:10px; fill:#047857;}
+
+  .v3 .s-cta{
+    position:relative; z-index:2;
+    margin-top:4px;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    height:40px; padding:0 16px;
+    border-radius:11px;
+    background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(240,253,244,.92));
+    border:1px solid rgba(34,197,94,.4);
+    color:#065f46; font-weight:700; font-size:12.5px;
+    letter-spacing:.04em;
+    backdrop-filter:blur(10px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 0 0 3px rgba(34,197,94,.08),
+      0 8px 18px -8px rgba(34,197,94,.35);
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+    align-self:flex-start;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .s-cta:hover{
+    background:linear-gradient(180deg, #ffffff, #ecfdf5);
+    border-color:rgba(34,197,94,.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 0 0 4px rgba(34,197,94,.12),
+      0 12px 26px -8px rgba(34,197,94,.5);
+    transform:translateY(-1px);
+  }
+  .v3 .s-cta svg{width:13px; height:13px; fill:#059669;}
+
+  /* secondary glass cards */
+  .v3 .qstat{
+    position:relative;
+    padding:13px 14px;
+    background:rgba(255,255,255,.78);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(124,58,237,.14);
+    border-radius:14px;
+    display:flex; align-items:center; gap:12px;
+    overflow:hidden;
+    box-shadow: 0 6px 16px -10px rgba(56,90,200,.2), inset 0 1px 0 rgba(255,255,255,.8);
+  }
+  .v3 .qstat::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(124,58,237,.55), transparent);
+  }
+  .v3 .qstat .q-ic{
+    width:32px; height:32px; border-radius:9px;
+    display:grid; place-items:center; flex-shrink:0;
+    background:rgba(15,18,38,.04);
+    border:1px solid rgba(15,18,38,.06);
+  }
+  .v3 .qstat .q-ic svg{width:14px; height:14px;}
+  .v3 .qstat.league .q-ic svg{fill:#0369a1;}
+  .v3 .qstat.acc    .q-ic svg{fill:#047857;}
+  .v3 .qstat.course .q-ic svg{fill:#7c3aed;}
+  .v3 .qstat .q-val{
+    font-family:'JetBrains Mono',monospace; font-weight:800;
+    font-size:18px; color:var(--ink); line-height:1;
+  }
+  .v3 .qstat .q-val .unit{color:var(--muted); font-size:11px; margin-left:1px;}
+  .v3 .qstat .q-lbl{
+    margin-top:5px;
+    font-size:10px; font-weight:800; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .v3 .qstat .q-delta{
+    margin-left:auto;
+    font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:800;
+    padding:3px 7px; border-radius:6px;
+    background:rgba(16,185,129,.10); color:#047857;
+    border:1px solid rgba(16,185,129,.25);
+  }
+  .v3 .qstat.league .q-delta{background:rgba(14,165,233,.10); color:#0369a1; border-color:rgba(14,165,233,.25);}
+  .v3 .qstat.course .q-delta{background:rgba(124,58,237,.10); color:#5b21b6; border-color:rgba(124,58,237,.25);}
+
+  /* particles for v3 (light) */
+  .v3-deco{position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden;}
+  .v3-deco .pp{position:absolute; border-radius:50%;}
+  .v3-deco .pp.a{ width:5px; height:5px; top:60px;  left:480px;  background:#0ea5e9; box-shadow:0 0 14px #38bdf8; animation:float 6s ease-in-out infinite;}
+  .v3-deco .pp.b{ width:4px; height:4px; top:160px; left:680px;  background:#db2777; box-shadow:0 0 14px #f472b6; animation:float 7s ease-in-out infinite 1.2s;}
+  .v3-deco .pp.c{ width:3px; height:3px; bottom:80px; left:340px; background:#7c3aed; box-shadow:0 0 12px #a78bfa; animation:float 5.4s ease-in-out infinite .4s;}
+  .v3-deco .pp.d{ width:4px; height:4px; top:120px; left:1080px; background:#22c55e; box-shadow:0 0 12px #4ade80; animation:float 6.5s ease-in-out infinite .8s;}
+
+  /* ──────────────────────────────────────────────
+     STREAK · DARK GLASS variant (modifier .dark)
+     embedded dark holographic card inside light UI
+     ────────────────────────────────────────────── */
+  .v3 .streak.dark{
+    background:
+      radial-gradient(280px 200px at 100% 0%, rgba(74,222,128,.16), transparent 60%),
+      radial-gradient(220px 160px at 0% 100%, rgba(14,165,233,.12), transparent 60%),
+      radial-gradient(300px 220px at 50% 130%, rgba(124,58,237,.20), transparent 65%),
+      linear-gradient(180deg, rgba(27,29,46,.94) 0%, rgba(20,20,35,.94) 100%);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(134,239,172,.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.06),
+      0 30px 50px -22px rgba(15,18,38,.45),
+      0 0 0 1px rgba(124,58,237,.12);
+    padding:18px 20px 16px;
+    gap:11px;
+    color:#e8eaff;
+  }
+  /* holographic hairline border on top of the card */
+  .v3 .streak.dark > .holo-border{
+    position:absolute; inset:0; pointer-events:none; z-index:3;
+    border-radius:inherit;
+    padding:1px;
+    background:linear-gradient(135deg, rgba(134,239,172,.6), rgba(125,211,252,.4) 38%, rgba(167,139,250,.55) 72%, rgba(134,239,172,.4));
+    -webkit-mask:linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    opacity:.55;
+  }
+  /* scan beam softer + screen-blend on dark */
+  .v3 .streak.dark::before{
+    background:linear-gradient(115deg, transparent 40%, rgba(167,139,250,.12) 50%, transparent 60%);
+    mix-blend-mode:screen;
+    animation-duration:8s;
+  }
+
+  .v3 .streak.dark .s-eye{color:#86efac;}
+  .v3 .streak.dark .s-eye .pulse{
+    background:#4ade80;
+    box-shadow:0 0 0 0 rgba(74,222,128,.5), 0 0 12px rgba(74,222,128,.7);
+  }
+  .v3 .streak.dark .s-bonus{
+    background:rgba(125,211,252,.10);
+    border-color:rgba(125,211,252,.3);
+    color:#7dd3fc;
+  }
+  .v3 .streak.dark .s-bonus svg{fill:#7dd3fc;}
+
+  /* compact dark orb */
+  .v3 .streak.dark .orb{width:84px; height:84px;}
+  .v3 .streak.dark .orb::before{
+    inset:-12px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(74,222,128,.28), transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(124,58,237,.16), transparent 70%);
+  }
+  .v3 .streak.dark .orb::after{
+    inset:5px; border-color:rgba(134,239,172,.28);
+  }
+  .v3 .streak.dark .orb-shell{
+    -webkit-mask:radial-gradient(circle, transparent 0 32px, #000 33px 40px, transparent 41px);
+            mask:radial-gradient(circle, transparent 0 32px, #000 33px 40px, transparent 41px);
+    filter:drop-shadow(0 0 10px rgba(74,222,128,.35));
+  }
+  .v3 .streak.dark .orb-core{
+    width:60px; height:60px;
+    background:
+      radial-gradient(circle at 35% 28%, rgba(255,255,255,.45) 0%, rgba(255,255,255,.12) 22%, transparent 45%),
+      radial-gradient(circle at 50% 65%, rgba(74,222,128,.30), transparent 65%),
+      linear-gradient(160deg, rgba(48,52,82,.92) 0%, rgba(35,36,58,.92) 50%, rgba(20,20,35,.94) 100%);
+    box-shadow:
+      inset 0 -6px 14px rgba(74,222,128,.20),
+      inset 0 1px 0 rgba(255,255,255,.12),
+      0 0 0 1px rgba(134,239,172,.18),
+      0 6px 18px -6px rgba(74,222,128,.28);
+  }
+  .v3 .streak.dark .orb-core::after{
+    background:radial-gradient(ellipse at center, rgba(255,255,255,.5), transparent 70%);
+  }
+  .v3 .streak.dark .orb-core svg{
+    width:26px; height:26px;
+    filter:drop-shadow(0 0 6px rgba(74,222,128,.7));
+  }
+
+  /* numbers / labels */
+  .v3 .streak.dark .s-big .num{
+    font-size:50px;
+    background:linear-gradient(180deg, #ffffff 0%, #86efac 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 18px rgba(74,222,128,.18);
+  }
+  .v3 .streak.dark .s-big .lbl{color:#86efac;}
+  .v3 .streak.dark .s-warn{color:#cbd2f5;}
+  .v3 .streak.dark .s-warn b{color:#c4b5fd; font-family:'JetBrains Mono',monospace; font-weight:800;}
+
+  /* progress bar — same emerald gradient, glass-on-dark */
+  .v3 .streak.dark .s-prog-bar{
+    background:rgba(255,255,255,.06);
+    border-color:rgba(255,255,255,.08);
+  }
+  .v3 .streak.dark .s-prog-fill{
+    box-shadow:
+      0 0 14px rgba(34,197,94,.4),
+      0 0 28px rgba(74,222,128,.25),
+      inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .v3 .streak.dark .s-prog-bar::after{
+    background-image:linear-gradient(90deg, transparent calc(14.28% - 1px), rgba(20,20,35,.9) calc(14.28% - 1px), rgba(20,20,35,.9) 14.28%, transparent 14.28%);
+    background-size:14.28% 100%;
+  }
+  .v3 .streak.dark .s-prog-foot{color:#9aa0bf;}
+  .v3 .streak.dark .s-prog-foot b{color:#fff;}
+  .v3 .streak.dark .s-prog-foot .rew{color:#86efac;}
+  .v3 .streak.dark .s-prog-foot .rew svg{fill:#86efac;}
+
+  /* CTA — dark glass with green border */
+  .v3 .streak.dark .s-cta{
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border-color:rgba(134,239,172,.34);
+    color:#e8eaff;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.08),
+      0 0 0 3px rgba(74,222,128,.06),
+      0 8px 18px -8px rgba(0,0,0,.55);
+  }
+  .v3 .streak.dark .s-cta:hover{
+    background:linear-gradient(180deg, rgba(74,222,128,.12), rgba(74,222,128,.04));
+    border-color:rgba(134,239,172,.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.1),
+      0 0 0 4px rgba(74,222,128,.10),
+      0 12px 26px -8px rgba(74,222,128,.35);
+  }
+  .v3 .streak.dark .s-cta svg{fill:#86efac;}
+
+  /* responsive */
+  @media (max-width:1180px){
+    .hero-inner{grid-template-columns: 200px 1fr;}
+    .hero-secondary{grid-template-columns: 200px 1fr;}
+    .hero-secondary .sec-row{grid-column:1 / -1;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- TOP NAV -->
+  <div class="top">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">IQMO</div>
+      <span class="brand-sep">·</span>
+      <nav class="breadcrumbs"><a href="profile-header-v6.html">Главная</a> <span style="color:var(--muted-2)">/</span> <b>Профиль</b> <span style="color:var(--muted-2)">/</span> <b style="color:var(--violet);">Holographic · Dark-glass streak</b></nav>
+    </div>
+    <div class="nav-right">
+      <button class="pill is--ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V10a6 6 0 1 0-12 0v6l-2 2v1h16v-1l-2-2z"/></svg>
+        Уведомления
+      </button>
+      <button class="pill">К занятиям →</button>
+      <div class="avatar-mini" aria-label="Даша"></div>
+    </div>
+  </div>
+
+  <!-- VARIANT 3 LIGHT · b — Holographic prestige UI · DARK GLASS streak -->
+  <div class="vlabel">
+    <span class="v-num" style="background:linear-gradient(135deg, #1b1d2e, #4ade80 80%);">03 · Futuristic EDU · Dark-glass</span>
+    <h2 class="v-title">Holographic prestige UI — Dark-glass streak</h2>
+    <p class="v-sub">То же светлое поле и identity-блок. Streak — <b>тёмная holographic-card</b> внутри светлого интерфейса: эмоциональное ядро прогресса, аккуратно интегрированное, не «cyberpunk panel».</p>
+  </div>
+
+  <section class="hero v3">
+    <div class="v3-deco">
+      <span class="pp a"></span><span class="pp b"></span><span class="pp c"></span><span class="pp d"></span>
+    </div>
+
+    <div class="hero-inner">
+      <!-- AVATAR -->
+      <div class="av">
+        <div class="av-outer"></div>
+        <div class="av-ticks"></div>
+        <div class="av-img"><img src="iqmo/avatar-dasha.png" alt="Даша" /></div>
+        <div class="av-pct">61%</div>
+        <div class="av-chip">
+          <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>
+          LVL 16
+        </div>
+      </div>
+
+      <!-- IDENTITY -->
+      <div class="h-id">
+        <div class="h-name-row">
+          <h1 class="h-name">Даша Алешина</h1>
+          <span class="h-handle">IQ-2841</span>
+          <span class="h-pro"><svg viewBox="0 0 24 24"><path d="M12 2 14 9h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/></svg>Pro</span>
+        </div>
+        <div class="h-meta-row">
+          <span class="rank">RANK · «Аналитик»</span>
+          <span class="dot"></span>
+          <span>TOP 8% BIO</span>
+          <span class="dot"></span>
+          <span>D+41 / IQMO</span>
+        </div>
+
+        <div class="xp">
+          <div class="xp-head">
+            <span class="xp-curr">
+              <span class="eye">XP · LVL 16 → 17</span>
+              <span class="num">4 280 / 4 500</span>
+            </span>
+            <span class="xp-next">next: <b>17 · «Стратег»</b></span>
+          </div>
+          <div class="xp-bar"><div class="xp-fill"></div></div>
+          <div class="xp-foot">
+            <span>WEEKLY <b>+320 XP</b> · streak ×1.1</span>
+            <span class="untill">▸ 220 XP до LVL 17</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STREAK · DARK GLASS -->
+      <div class="streak dark">
+        <span class="holo-border"></span>
+        <div class="streak-top">
+          <span class="s-eye"><span class="pulse"></span>STREAK · 04</span>
+          <span class="s-bonus">
+            <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>
+            BONUS ×1.1
+          </span>
+        </div>
+
+        <div class="s-hero">
+          <div class="orb">
+            <span class="orb-shell"></span>
+            <span class="orb-orbit"><i class="a"></i><i class="b"></i><i class="c"></i></span>
+            <span class="orb-core">
+              <svg viewBox="0 0 24 24"><path d="M13 2 5 14h6l-1 8 9-12h-6z"/></svg>
+            </span>
+          </div>
+          <div class="s-big">
+            <span class="num">4</span>
+            <span class="lbl">DAYS / СЕРИЯ</span>
+          </div>
+        </div>
+
+        <div class="s-warn">Серия заряжена — продли до конца дня <b>T-02:46</b></div>
+
+        <div class="s-prog">
+          <div class="s-prog-bar"><div class="s-prog-fill"></div></div>
+          <div class="s-prog-foot">
+            <span>04 / 07 → <b>+3 DAY</b></span>
+            <span class="rew">
+              <svg viewBox="0 0 24 24"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4z"/></svg>
+              IRON WILL +200XP
+            </span>
+          </div>
+        </div>
+
+        <button class="s-cta">
+          <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>
+          ▸ QUICK REVIEW · 5 MIN
+        </button>
+      </div>
+    </div>
+
+    <!-- secondary glass -->
+    <div class="hero-secondary">
+      <div class="sec-spacer"></div>
+      <div class="sec-row">
+        <div class="qstat league">
+          <div class="q-ic"><svg viewBox="0 0 24 24"><path d="M5 4h14v2a5 5 0 0 1-4 4.9V13a3 3 0 0 0 3 3v2H6v-2a3 3 0 0 0 3-3v-2.1A5 5 0 0 1 5 6V4zM7 20h10v2H7z"/></svg></div>
+          <div class="q-body">
+            <div class="q-val">#142</div>
+            <div class="q-lbl">LEAGUE · SILVER</div>
+          </div>
+          <div class="q-delta">▲ 8</div>
+        </div>
+        <div class="qstat acc">
+          <div class="q-ic"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg></div>
+          <div class="q-body">
+            <div class="q-val">87<span class="unit">%</span></div>
+            <div class="q-lbl">ACCURACY</div>
+          </div>
+          <div class="q-delta">+2%</div>
+        </div>
+        <div class="qstat course">
+          <div class="q-ic"><svg viewBox="0 0 24 24"><path d="M12 2 2 7v10l10 5 10-5V7z" opacity=".4"/><path d="M12 2 2 7l10 5 10-5z"/></svg></div>
+          <div class="q-body">
+            <div class="q-val">42<span class="unit">%</span></div>
+            <div class="q-lbl">COURSE · BIO</div>
+          </div>
+          <div class="q-delta">+6%</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- footer note 2 -->
+  <div style="padding:0 8px; font-size:12px; color:var(--muted); text-align:center; line-height:1.6;">
+    Dark-glass streak: deep graphite (<code style="font-family:'JetBrains Mono',monospace;">#1b1d2e</code> → <code style="font-family:'JetBrains Mono',monospace;">#23243a</code>) + holographic hairline border (emerald → cyan → violet), приглушённый glow (−45%), компактный orb 84px. Card работает как <b>special status object</b>, не перетягивая всю композицию.
+  </div>
+</div>
+
+</body>
+</html>

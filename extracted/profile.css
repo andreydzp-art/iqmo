@@ -1243,6 +1243,45 @@
     justify-self:center;
   }
 
+  /* ╔══════════════════════════════════════════════════════════════╗
+     ║  FOOTER = ОДИН И ТОТ ЖЕ КОМПОНЕНТ, ЧТО У ОБЫЧНЫХ КАРТ (.ach).  ║
+     ║  Химия/биология теперь рендерят .a-prog + .a-xp с теми же      ║
+     ║  классами, что «Неделя ритма» → computed-размеры совпадают     ║
+     ║  1:1 (чип content-width, max-width:calc(100% - 18px), полоса   ║
+     ║  3px). Ниже — только перекраска под тему карты, размеры берём  ║
+     ║  из базовых .ach .a-xp / .ach .a-prog (НЕ переопределяем).     ║
+     ║  (Блок .c-prog/.c-reward выше больше не используется разметкой,║
+     ║   оставлен как legacy-фоллбэк.)                                ║
+     ╚══════════════════════════════════════════════════════════════╝ */
+  /* Прогресс-полоса: тот же 78%-бар, но компенсируем разницу паддинга
+     карты (.ach имеет padding 12px по бокам, .ach--illus — 0), чтобы
+     computed-ширина совпадала с обычной картой до пикселя. */
+  .ach.ach--illus .a-prog{
+    margin:6px auto 0;
+    width:calc(78% - 18.72px);
+  }
+  /* XP-чип: фиолетовая тема (= .ach.epic .a-xp, как у «Недели ритма»).
+     Размер/форма/паддинги наследуются от базового .ach .a-xp. */
+  .ach.ach--illus .a-xp{
+    background:rgba(168,85,247,.06);
+    border-color:rgba(168,85,247,.22);
+    color:#5b21b6;
+  }
+  .ach.ach--illus .a-xp .a-xp-ico{ background:rgba(168,85,247,.14); }
+  .ach.ach--illus .a-xp .a-xp-ico svg{ fill:#7c3aed; }
+  .ach.ach--illus .a-xp .a-xp-val{ color:#5b21b6; }
+  .ach.ach--illus .a-xp .a-xp-lbl{ color:#7c3aed; }
+  /* Биология — синяя тема (= .ach.rare .a-xp). */
+  .ach.ach--illus.ach--bio .a-xp{
+    background:rgba(59,130,246,.06);
+    border-color:rgba(59,130,246,.22);
+    color:#1e3a8a;
+  }
+  .ach.ach--illus.ach--bio .a-xp .a-xp-ico{ background:rgba(59,130,246,.14); }
+  .ach.ach--illus.ach--bio .a-xp .a-xp-ico svg{ fill:#2563eb; }
+  .ach.ach--illus.ach--bio .a-xp .a-xp-val{ color:#1e3a8a; }
+  .ach.ach--illus.ach--bio .a-xp .a-xp-lbl{ color:#2563eb; }
+
   /* ── HOVER АНИМАЦИЯ: тряска колбы (anim-shake) ── */
   @keyframes ach-ref-orb-press{
     0%,100% { transform:scale(1); }

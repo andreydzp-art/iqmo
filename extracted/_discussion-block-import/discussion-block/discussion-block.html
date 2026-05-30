@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Обсуждение главы — IQMO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Manrope", ui-sans-serif, -apple-system, system-ui, sans-serif;
+    background:#f5f4fb;
+    color:#1b1733;
+    min-height:100vh;
+    padding:48px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:1480px; margin:0 auto}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============================================================
+       SOCIAL — Обсуждение главы (light social-layer)
+       ============================================================ -->
+  <style>
+    .soc-card{
+      position:relative;
+      background:#ffffff;
+      border:1px solid #ecebf3;
+      border-radius:24px;
+      box-shadow:
+        0 20px 50px -40px rgba(40,55,130,.14),
+        0 1px 0 rgba(255,255,255,.6) inset;
+      padding:26px 32px 22px;
+    }
+
+    /* ---------- header ---------- */
+    .soc-head{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:20px; flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .soc-titlewrap{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+    .soc-title{
+      margin:0; font-size:20px; font-weight:800;
+      letter-spacing:-.01em; color:#1b1733;
+      display:inline-flex; align-items:center; gap:9px;
+    }
+    .soc-title .em{font-size:20px; line-height:1}
+    .soc-count{
+      display:inline-flex; align-items:center; gap:7px;
+      font-size:12.5px; color:#7a7592; font-weight:500;
+    }
+    .soc-livedot{
+      width:6px; height:6px; border-radius:50%;
+      background:#10b981;
+      box-shadow:0 0 0 3px rgba(16,185,129,.18);
+      animation:socPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes socPulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+    .soc-sort{
+      display:inline-flex; gap:2px;
+      background:#f4f3f9;
+      border:1px solid #ecebf3;
+      border-radius:10px;
+      padding:3px;
+    }
+    .soc-sort button{
+      background:transparent; border:none;
+      color:#7a7592; cursor:pointer;
+      font-family:inherit; font-weight:600; font-size:12.5px;
+      padding:6px 12px; border-radius:8px;
+      letter-spacing:-.005em;
+      transition:color .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .soc-sort button:hover{color:#1b1733}
+    .soc-sort button.is-active{
+      background:#fff; color:#1b1733;
+      box-shadow:0 1px 2px rgba(40,30,80,.07);
+    }
+
+    /* ---------- presence pills ---------- */
+    .soc-hints{
+      display:flex; flex-wrap:wrap; gap:6px;
+      margin-bottom:14px;
+    }
+    .soc-hint{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 12px 7px 10px;
+      background:#faf9fd;
+      border:1px solid #ecebf3;
+      border-radius:999px;
+      font-size:12.5px; color:#5a557a;
+      line-height:1;
+    }
+    .soc-hint .em{font-size:14px; line-height:1}
+    .soc-hint b{color:#1b1733; font-weight:700}
+
+    /* ---------- comment list ---------- */
+    .soc-list{display:flex; flex-direction:column}
+    .soc-item{
+      position:relative;
+      display:grid;
+      grid-template-columns:44px 1fr;
+      gap:12px;
+      padding:11px 12px;
+      border-radius:12px;
+      transition:background .18s ease, box-shadow .18s ease;
+    }
+    .soc-item + .soc-item{margin-top:2px}
+    .soc-item + .soc-item::before{
+      content:"";
+      position:absolute;
+      left:12px; right:12px; top:-1px; height:1px;
+      background:#f3f1f9;
+      transition:opacity .18s ease;
+    }
+    .soc-item:hover{background:#fafaff; box-shadow:0 4px 14px -10px rgba(40,30,80,.18)}
+    .soc-item:hover::before, .soc-item:hover + .soc-item::before{opacity:0}
+
+    /* avatar */
+    .soc-avatar{
+      position:relative;
+      width:44px; height:44px;
+      display:block;
+      flex-shrink:0;
+      align-self:start;
+      margin-top:-2px;
+    }
+    .soc-avatar img{
+      width:100%; height:100%;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 1px 2px rgba(40,30,80,.10));
+      transition:transform .18s ease, filter .18s ease;
+    }
+    .soc-item:hover .soc-avatar img{
+      transform:translateY(-1px);
+      filter:drop-shadow(0 3px 6px rgba(40,30,80,.16));
+    }
+    .soc-avatar.is-online::after{
+      content:"";
+      position:absolute;
+      right:1px; bottom:3px;
+      width:9px; height:9px;
+      border-radius:50%;
+      background:#10b981;
+      box-shadow:0 0 0 2px #fff, 0 0 0 3px rgba(16,185,129,.22);
+    }
+    .soc-item:hover .soc-avatar.is-online::after{
+      box-shadow:0 0 0 2px #fafaff, 0 0 0 3px rgba(16,185,129,.22);
+    }
+
+    /* meta & text */
+    .soc-meta{
+      display:flex; align-items:center; gap:8px;
+      font-size:12px; line-height:1;
+      margin:2px 0 5px;
+    }
+    .soc-name{
+      font-weight:700; color:#1b1733;
+      letter-spacing:.01em;
+      font-size:12.5px;
+      font-feature-settings:"tnum";
+    }
+    .soc-dot{width:3px; height:3px; border-radius:50%; background:#d4d1e0}
+    .soc-time{color:#a09bb8; font-size:11.5px; font-weight:500}
+    .soc-text{
+      font-size:14px; line-height:1.45; color:#1f1b3e;
+      margin:0 0 7px;
+      text-wrap:pretty;
+      letter-spacing:-.003em;
+    }
+
+    /* actions */
+    .soc-actions{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+    .soc-react{
+      display:inline-flex; align-items:center; gap:5px;
+      background:transparent;
+      border:1px solid transparent;
+      border-radius:999px;
+      padding:3px 9px 3px 7px;
+      font-size:12px; font-weight:600;
+      color:#7a7592;
+      cursor:pointer;
+      font-family:inherit;
+      transition:background .15s ease, border-color .15s ease, color .15s ease, transform .12s ease;
+      line-height:1;
+    }
+    .soc-react .em{font-size:13px; line-height:1; filter:saturate(.95)}
+    .soc-react:hover{background:#f4f3f9; color:#1b1733; transform:translateY(-0.5px)}
+    .soc-react.is-mine{background:#ede9ff; border-color:#ddd3ff; color:#4a32c4}
+    .soc-react-add{
+      color:#b0acc5;
+      opacity:0;
+      transform:translateY(-1px);
+      transition:opacity .18s ease, transform .18s ease, background .15s ease, color .15s ease;
+    }
+    .soc-item:hover .soc-react-add,
+    .soc-item:focus-within .soc-react-add{opacity:1; transform:translateY(0)}
+    .soc-react-add:hover{background:#faf9fd; color:#5b21b6}
+
+    .soc-replies{
+      display:inline-flex; align-items:center; gap:6px;
+      background:transparent;
+      border:none;
+      border-radius:999px;
+      padding:3px 9px;
+      font-size:12px; font-weight:600;
+      color:#7a7592;
+      cursor:pointer;
+      font-family:inherit;
+      margin-left:auto;
+      transition:color .15s ease, background .15s ease;
+    }
+    .soc-replies:hover{color:#5b21b6; background:#faf9fd}
+    .soc-replies .em{font-size:13px}
+
+    /* show-more state */
+    .soc-list.is-collapsed .soc-item.is-extra{display:none}
+    .soc-list:not(.is-collapsed) ~ .soc-foot .soc-more{display:none}
+
+    /* footer */
+    .soc-foot{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      margin-top:14px; padding-top:14px;
+      border-top:1px dashed #ecebf3;
+    }
+    .soc-more{
+      background:transparent;
+      border:none;
+      color:#5a557a;
+      border-radius:10px;
+      padding:8px 4px;
+      font-family:inherit; font-weight:600; font-size:13px;
+      cursor:pointer;
+      letter-spacing:-.005em;
+      transition:color .15s ease;
+    }
+    .soc-more:hover{color:#5b21b6}
+    .soc-write{
+      flex:1; min-width:200px;
+      display:inline-flex; align-items:center; gap:9px;
+      margin-left:auto;
+      background:#faf9fd;
+      color:#7a7592;
+      border:1px solid #ecebf3;
+      border-radius:10px;
+      padding:9px 14px;
+      font-family:inherit; font-weight:500; font-size:13px;
+      cursor:pointer;
+      text-align:left;
+      letter-spacing:-.005em;
+      transition:background .15s ease, border-color .15s ease, color .15s ease;
+    }
+    .soc-write:hover{background:#fff; border-color:#ddd3ff; color:#1b1733}
+    .soc-write svg{width:13px; height:13px; fill:#a09bb8; flex-shrink:0; transition:fill .15s ease}
+    .soc-write:hover svg{fill:#5b21b6}
+
+    @media (max-width: 640px){
+      .soc-card{padding:20px 16px 18px}
+      .soc-head{margin-bottom:14px; gap:12px}
+      .soc-title{font-size:18px}
+      .soc-item{grid-template-columns:38px 1fr; gap:11px; padding:10px 8px}
+      .soc-avatar{width:38px; height:38px}
+      .soc-foot{flex-direction:column-reverse; align-items:stretch}
+      .soc-write{width:100%; margin-left:0}
+      .soc-more{text-align:center; padding:10px}
+    }
+  </style>
+
+  <section class="soc-card" aria-label="Обсуждение главы">
+    <header class="soc-head">
+      <div class="soc-titlewrap">
+        <h2 class="soc-title">
+          <span class="em" aria-hidden="true">💬</span>
+          Обсуждение главы
+        </h2>
+        <span class="soc-count">
+          <span class="soc-livedot" aria-hidden="true"></span>
+          14 учеников обсуждают
+        </span>
+      </div>
+      <div class="soc-sort" role="tablist" aria-label="Сортировка">
+        <button type="button" class="is-active" data-sort="top">Популярные</button>
+        <button type="button" data-sort="new">Новые</button>
+      </div>
+    </header>
+
+    <div class="soc-hints">
+      <span class="soc-hint"><span class="em">👀</span><b>14</b> сейчас проходят</span>
+      <span class="soc-hint"><span class="em">🔥</span><b>84%</b> со второго раза</span>
+      <span class="soc-hint"><span class="em">💀</span>чаще ошибаются в&nbsp;<b>варианте&nbsp;6</b></span>
+    </div>
+
+    <div class="soc-list is-collapsed">
+
+      <!-- 1 -->
+      <article class="soc-item">
+        <div class="soc-avatar is-online" aria-hidden="true"><img src="assets/avatars/iq-1842.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-1842</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">2 ч назад</span>
+          </div>
+          <p class="soc-text">Босс жёстче чем в прошлой главе 💀</p>
+          <div class="soc-actions">
+            <button class="soc-react is-mine" type="button"><span class="em">❤️</span> 12</button>
+            <button class="soc-react" type="button"><span class="em">💀</span> 4</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+            <button class="soc-replies" type="button"><span class="em">💬</span> 2 ответа</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2 -->
+      <article class="soc-item">
+        <div class="soc-avatar is-online" aria-hidden="true"><img src="assets/avatars/iq-5521.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-5521</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">4 ч назад</span>
+          </div>
+          <p class="soc-text">15 задание вообще не понял 😭</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">🔥</span> 8</button>
+            <button class="soc-react" type="button"><span class="em">😭</span> 3</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+            <button class="soc-replies" type="button"><span class="em">💬</span> 5 ответов</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3 -->
+      <article class="soc-item">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-1024.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-1024</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">5 ч назад</span>
+          </div>
+          <p class="soc-text">После этой главы химия стала понятнее 🙌</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">❤️</span> 5</button>
+            <button class="soc-react" type="button"><span class="em">🔥</span> 2</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4 -->
+      <article class="soc-item">
+        <div class="soc-avatar is-online" aria-hidden="true"><img src="assets/avatars/iq-1337.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-1337</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">7 ч назад</span>
+          </div>
+          <p class="soc-text">вариант 9 с первого раза, я в шоке 🔥</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">🔥</span> 9</button>
+            <button class="soc-react" type="button"><span class="em">❤️</span> 3</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+            <button class="soc-replies" type="button"><span class="em">💬</span> 1 ответ</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5 -->
+      <article class="soc-item">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-4408.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-4408</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">12 ч назад</span>
+          </div>
+          <p class="soc-text">кто проходит сейчас? давайте вместе добивать 💪</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">❤️</span> 7</button>
+            <button class="soc-react" type="button"><span class="em">🔥</span> 4</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+            <button class="soc-replies" type="button"><span class="em">💬</span> 3 ответа</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== скрытые до клика «Показать ещё 7» ===== -->
+      <article class="soc-item is-extra">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-2210.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-2210</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">14 ч назад</span>
+          </div>
+          <p class="soc-text">там подвох в формуле — пересчитай моли, и всё сойдётся</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">❤️</span> 6</button>
+            <button class="soc-react" type="button"><span class="em">🔥</span> 2</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="soc-item is-extra">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-9973.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-9973</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">вчера</span>
+          </div>
+          <p class="soc-text">момент с реакциями — топ объяснение, нигде такого не видел</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">❤️</span> 11</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="soc-item is-extra">
+        <div class="soc-avatar is-online" aria-hidden="true"><img src="assets/avatars/iq-1842.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-1842</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">вчера</span>
+          </div>
+          <p class="soc-text">прошёл босса с 5 попытки, но оно того 🙏</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">🔥</span> 6</button>
+            <button class="soc-react" type="button"><span class="em">❤️</span> 4</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="soc-item is-extra">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-5521.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-5521</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">2 дня назад</span>
+          </div>
+          <p class="soc-text">спасибо за подсказку про моли, вытянул 15 задание</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">❤️</span> 14</button>
+            <button class="soc-react" type="button"><span class="em">🔥</span> 3</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="soc-item is-extra">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-1024.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-1024</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">2 дня назад</span>
+          </div>
+          <p class="soc-text">вариант 12 забрал 1.5 часа жизни, но разобрался</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">🔥</span> 5</button>
+            <button class="soc-react" type="button"><span class="em">😭</span> 2</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+            <button class="soc-replies" type="button"><span class="em">💬</span> 2 ответа</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="soc-item is-extra">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-1337.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-1337</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">3 дня назад</span>
+          </div>
+          <p class="soc-text">лучшая глава за всю платформу, не меняйте задания</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">❤️</span> 19</button>
+            <button class="soc-react" type="button"><span class="em">🔥</span> 6</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="soc-item is-extra">
+        <div class="soc-avatar" aria-hidden="true"><img src="assets/avatars/iq-4408.png" alt="" /></div>
+        <div>
+          <div class="soc-meta">
+            <span class="soc-name">IQ-4408</span>
+            <span class="soc-dot" aria-hidden="true"></span>
+            <span class="soc-time">4 дня назад</span>
+          </div>
+          <p class="soc-text">с третьего раза прошёл, но было приятно 🙂</p>
+          <div class="soc-actions">
+            <button class="soc-react" type="button"><span class="em">❤️</span> 4</button>
+            <button class="soc-react" type="button"><span class="em">🔥</span> 2</button>
+            <button class="soc-react soc-react-add" type="button" aria-label="Добавить реакцию">＋</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="soc-foot">
+      <button class="soc-more" type="button" data-target=".soc-list">Показать ещё 7 ↓</button>
+      <button class="soc-write" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        Поделитесь впечатлением о главе…
+      </button>
+    </div>
+  </section>
+
+  <script>
+    (function(){
+      // "Показать ещё" — раскрывает скрытые комментарии
+      document.querySelectorAll('.soc-more').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var sel = btn.getAttribute('data-target');
+          var list = sel ? btn.closest('.soc-card').querySelector(sel) : null;
+          if(!list) return;
+          list.classList.remove('is-collapsed');
+          btn.style.display = 'none';
+        });
+      });
+      // Сортировка: Популярные / Новые
+      document.querySelectorAll('.soc-sort').forEach(function(grp){
+        grp.addEventListener('click', function(e){
+          var b = e.target.closest('button');
+          if(!b) return;
+          grp.querySelectorAll('button').forEach(function(x){x.classList.remove('is-active')});
+          b.classList.add('is-active');
+        });
+      });
+      // Реакции — без рейтинга, просто toggle + счётчик
+      document.querySelectorAll('.soc-react:not(.soc-react-add)').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var txt = btn.textContent.trim();
+          var m = txt.match(/(\d+)/);
+          if(!m) return;
+          var n = parseInt(m[1],10);
+          var mine = btn.classList.toggle('is-mine');
+          n += mine ? 1 : -1;
+          btn.innerHTML = btn.innerHTML.replace(/(\d+)\s*$/, n);
+        });
+      });
+    })();
+  </script>
+
+</div>
+</body>
+</html>

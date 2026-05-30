@@ -1,0 +1,1544 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1320" />
+<title>IQMO · Card Lab · Анимации карточек</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#f3f4fb;
+    --surface:#fff;
+    --line:#e6e8f0;
+    --line-2:#eef0f7;
+    --ink:#0f1226;
+    --ink-2:#2a2e4a;
+    --muted:#6b7094;
+    --muted-2:#9aa0bf;
+    --primary:#4f46e5;
+    --violet:#7c3aed;
+    --emerald:#10b981;
+    --amber:#f59e0b;
+    --shadow-sm:0 1px 2px rgba(15,18,38,.04),0 1px 1px rgba(15,18,38,.03);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:
+      radial-gradient(900px 600px at 50% -10%, rgba(99,102,241,.07), transparent 70%),
+      var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"ss01","cv11";
+    min-height:100vh;
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer; border:0; background:transparent;}
+
+  .shell{
+    max-width:1280px; margin:0 auto; padding:22px 28px 64px;
+    display:flex; flex-direction:column; gap:32px;
+  }
+
+  /* ───── TOP NAV ───── */
+  .top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 18px;
+    background:rgba(255,255,255,.78);
+    backdrop-filter:saturate(140%) blur(10px);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:var(--shadow-sm), 0 0 0 1px var(--line) inset;
+    border-radius:16px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--primary),var(--violet));}
+  .brand-name{font-weight:800; font-size:15px;}
+  .brand-sep{color:var(--line); margin:0 14px;}
+  .crumbs{color:var(--muted); font-size:13.5px;}
+  .crumbs b{color:var(--ink-2); font-weight:600;}
+  .pill{
+    height:36px; padding:0 14px; border-radius:999px;
+    border:1px solid var(--line); background:#fff; color:var(--ink-2);
+    font-size:13px; font-weight:500;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+
+  /* hero text */
+  .lab-hero{
+    padding:0 4px;
+  }
+  .lab-hero .eye{
+    font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .lab-hero h1{
+    margin:0;
+    font-size:30px; font-weight:800; letter-spacing:-.025em;
+    color:var(--ink); line-height:1.1;
+  }
+  .lab-hero p{
+    margin:8px 0 0;
+    font-size:14px; color:var(--muted); max-width:680px;
+    line-height:1.5;
+  }
+  .lab-hero kbd{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; font-weight:700;
+    padding:2px 7px; border-radius:5px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink-2);
+  }
+
+  /* ───── PLAYGROUND BOARD ───── */
+  .board{
+    border-radius:24px;
+    padding:36px 32px;
+    border:1px solid var(--line);
+    background:
+      radial-gradient(circle at 12% 14%, rgba(124,58,237,.04), transparent 40%),
+      radial-gradient(circle at 88% 86%, rgba(99,102,241,.04), transparent 40%),
+      linear-gradient(180deg, #fdfdff 0%, #f7f8fc 100%);
+    box-shadow:var(--shadow-sm);
+  }
+  .board-head{
+    display:flex; align-items:end; justify-content:space-between;
+    margin-bottom:24px;
+    gap:14px; flex-wrap:wrap;
+  }
+  .board-head .lhs h3{
+    margin:0;
+    font-size:18px; font-weight:800; letter-spacing:-.01em;
+  }
+  .board-head .lhs .sub{
+    margin-top:4px;
+    font-size:12.5px; color:var(--muted);
+  }
+  .board-head .lhs .sub code{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    padding:1px 6px; border-radius:4px;
+    background:rgba(124,58,237,.08);
+    color:#7c3aed;
+  }
+  .board-tag{
+    display:inline-flex; align-items:center; gap:6px;
+    height:28px; padding:0 12px;
+    border-radius:999px;
+    background:#fff;
+    border:1px solid var(--line);
+    font-size:11.5px; font-weight:700;
+    color:var(--muted);
+    letter-spacing:.04em;
+  }
+  .board-tag::before{
+    content:""; width:6px; height:6px; border-radius:50%;
+    background:var(--emerald);
+    box-shadow:0 0 0 3px rgba(16,185,129,.18);
+  }
+
+  .stage{
+    display:flex; justify-content:center; align-items:flex-start;
+    flex-wrap:wrap; gap:32px;
+    padding:8px 0 12px;
+  }
+  .stage.row-3{padding:8px 0 0;}
+  .stage-cap{
+    margin-top:14px;
+    text-align:center;
+    font-size:12px; color:var(--muted);
+    width:280px;
+  }
+  .stage-cap b{color:var(--ink-2); font-weight:700;}
+  .stage-cap code{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    padding:1px 6px; border-radius:4px;
+    background:rgba(15,18,38,.05);
+    color:var(--ink-2);
+  }
+  .stage-cell{display:flex; flex-direction:column; align-items:center;}
+
+  /* hint above board */
+  .hint-strip{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 14px;
+    border-radius:10px;
+    background:linear-gradient(135deg, #faf5ff, #f3e8ff);
+    border:1px dashed rgba(124,58,237,.22);
+    font-size:12.5px; color:#6d28d9;
+    align-self:start;
+  }
+  .hint-strip svg{width:14px; height:14px; fill:#7c3aed;}
+
+  /* ════════════════════════════════════════
+       CARD — base (lifted from achievements.html)
+       Made standalone-large for the lab
+       ════════════════════════════════════════ */
+  .card{
+    /* per-rarity vars */
+    --rar-tint:    rgba(148,163,184,.18);
+    --rar-ring:    rgba(148,163,184,.45);
+    --rar-glow:    rgba(148,163,184,.25);
+    --rar-spark:   #cbd5e1;
+    --rar-ink:     #475569;
+    --rar-icon-bg: linear-gradient(180deg, #fafbff 0%, #eef0f7 100%);
+    --halo:        rgba(15,18,38,.05);
+
+    position:relative;
+    width:300px;
+    aspect-ratio: 1 / 1.5;
+    border-radius:22px;
+    background:#fff;
+    border:1px solid var(--line);
+    overflow:hidden;
+    cursor:pointer;
+    display:flex; flex-direction:column;
+    isolation:isolate;
+    transition: transform .26s cubic-bezier(.2,.7,.2,1), box-shadow .26s ease, border-color .26s ease;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 0 0 1px rgba(255,255,255,.5),
+      0 1px 2px rgba(15,18,38,.04),
+      0 18px 40px -28px var(--halo);
+  }
+  .card:hover{
+    transform:translateY(-6px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(15,18,38,.04),
+      0 30px 56px -28px var(--halo);
+    border-color:var(--rar-ring);
+  }
+
+  /* tinted dotted texture on upper half */
+  .card::before{
+    content:""; position:absolute;
+    top:0; left:0; right:0;
+    height:58%;
+    background:
+      radial-gradient(var(--rar-spark) 1px, transparent 1.4px) 0 0 / 14px 14px,
+      radial-gradient(80% 90% at 50% 20%, var(--rar-tint) 0%, transparent 75%);
+    opacity:.55;
+    mask-image:linear-gradient(180deg, transparent 0%, #000 8%, #000 65%, transparent 100%);
+    -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 8%, #000 65%, transparent 100%);
+    z-index:0; pointer-events:none;
+  }
+
+  /* rarity tag */
+  .c-rar{
+    position:absolute; top:14px; left:14px;
+    z-index:4;
+    display:inline-flex; align-items:center; gap:7px;
+    height:24px; padding:0 11px;
+    border-radius:999px;
+    font-size:9.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+    background:rgba(255,255,255,.78);
+    color:var(--rar-ink);
+    border:1px solid rgba(255,255,255,.8);
+    box-shadow:0 1px 2px rgba(15,18,38,.05);
+    backdrop-filter:blur(8px);
+  }
+  .c-rar::before{
+    content:""; width:6px; height:6px; border-radius:50%;
+    background:var(--rar-ring);
+  }
+  .c-pct{
+    position:absolute; top:14px; right:14px;
+    z-index:4;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9.5px; font-weight:800;
+    color:var(--muted-2);
+    background:rgba(255,255,255,.78);
+    padding:5px 8px; border-radius:6px;
+    letter-spacing:.04em;
+    border:1px solid rgba(255,255,255,.6);
+    backdrop-filter:blur(8px);
+  }
+
+  /* orb stage */
+  .c-orb-stage{
+    position:relative;
+    margin:46px auto 14px;
+    width:140px; height:140px;
+    display:grid; place-items:center;
+    z-index:2;
+  }
+  .c-orb-stage::before,
+  .c-orb-stage::after{
+    content:""; position:absolute;
+    inset:0;
+    border-radius:50%;
+    border:1.5px solid var(--rar-ring);
+    pointer-events:none;
+    opacity:.45;
+  }
+  .c-orb-stage::before{
+    transform:rotate(-18deg) scaleX(1.08);
+    mask-image:radial-gradient(ellipse 60% 60% at 50% 50%, transparent 50%, #000 60%);
+    -webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 50%, transparent 50%, #000 60%);
+  }
+  .c-orb-stage::after{
+    transform:rotate(18deg) scaleX(.94);
+    opacity:.25;
+  }
+
+  .c-orb{
+    position:relative;
+    width:96px; height:96px;
+    border-radius:50%;
+    display:grid; place-items:center;
+    background:var(--rar-icon-bg);
+    box-shadow:
+      0 0 0 6px #fff,
+      0 0 0 7px var(--rar-ring),
+      0 14px 28px -10px var(--rar-glow),
+      inset 0 -8px 18px rgba(15,18,38,.04),
+      inset 0 2px 0 rgba(255,255,255,.9);
+    transition: transform .22s ease;
+    transform-origin: 50% 60%;
+    z-index:3;
+  }
+  .c-orb svg{
+    width:46px; height:46px;
+    fill:var(--rar-ink);
+    filter:drop-shadow(0 2px 3px rgba(15,18,38,.10));
+    transform-origin: 50% 60%;
+  }
+
+  .c-spark{
+    position:absolute;
+    width:6px; height:6px;
+    background:
+      linear-gradient(90deg, transparent 45%, var(--rar-spark) 50%, transparent 55%) center/100% 1.2px no-repeat,
+      linear-gradient(0deg, transparent 45%, var(--rar-spark) 50%, transparent 55%) center/1.2px 100% no-repeat;
+    filter:drop-shadow(0 0 3px var(--rar-spark));
+    opacity:.6;
+    pointer-events:none;
+    z-index:2;
+    animation:twinkle 3s ease-in-out infinite;
+  }
+  .c-spark.s1{top:10%; right:8%;}
+  .c-spark.s2{bottom:18%; left:6%; width:4px; height:4px; animation-delay:.8s;}
+  .c-spark.s3{top:62%; right:2%; width:5px; height:5px; animation-delay:1.6s;}
+  @keyframes twinkle{
+    0%,100%{transform:scale(.7); opacity:.3;}
+    50%{transform:scale(1.2); opacity:.9;}
+  }
+
+  .c-title-block{
+    position:relative; z-index:2;
+    text-align:center;
+    padding:0 14px;
+  }
+  .c-title{
+    margin:0;
+    font-size:18px; font-weight:800; letter-spacing:-.02em;
+    color:var(--ink);
+    line-height:1.15;
+  }
+  .c-sub{
+    margin-top:6px;
+    font-size:11.5px; color:var(--muted);
+    line-height:1.4;
+  }
+
+  .c-div{
+    position:relative; z-index:2;
+    display:flex; align-items:center;
+    margin:14px 18px;
+  }
+  .c-div::before,
+  .c-div::after{
+    content:""; flex:1; height:1px;
+    background:var(--line);
+  }
+  .c-div span{
+    width:6px; height:6px;
+    margin:0 9px;
+    background:var(--line);
+    transform:rotate(45deg);
+  }
+
+  .c-prog{
+    position:relative; z-index:2;
+    margin:0 18px;
+  }
+  .c-prog-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px;
+    font-size:10px;
+    font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  .c-prog-row .pp{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.04em;
+    color:var(--ink);
+    text-transform:none;
+  }
+  .c-prog-row .pp b{font-weight:800;}
+  .c-prog-bar{
+    height:8px; border-radius:999px;
+    background:rgba(15,18,38,.05);
+    overflow:hidden;
+    border:1px solid rgba(15,18,38,.04);
+  }
+  .c-prog-bar i{
+    display:block; height:100%; border-radius:999px;
+    background:linear-gradient(90deg, var(--rar-ring), var(--rar-ink));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+  }
+
+  .c-reward{
+    margin:14px 14px 14px;
+    padding:10px 12px;
+    background:rgba(15,18,38,.025);
+    border:1px solid var(--line-2);
+    border-radius:14px;
+    display:grid;
+    grid-template-columns:1fr 1px 1fr;
+    align-items:center;
+    position:relative; z-index:2;
+  }
+  .c-rwd-item{
+    display:flex; align-items:center; gap:8px;
+    padding:2px 4px;
+  }
+  .c-rwd-ico{
+    width:22px; height:22px;
+    border-radius:7px;
+    display:grid; place-items:center;
+    flex-shrink:0;
+  }
+  .c-rwd-ico svg{width:12px; height:12px;}
+  .c-rwd-ico.xp{
+    background:linear-gradient(135deg, #f3eeff, #faf5ff);
+  }
+  .c-rwd-ico.xp svg{fill:#7c3aed;}
+  .c-rwd-ico.date{
+    background:rgba(15,18,38,.04);
+  }
+  .c-rwd-ico.date svg{fill:var(--muted);}
+  .c-rwd-text{display:flex; flex-direction:column; line-height:1.1;}
+  .c-rwd-val{
+    font-size:11.5px; font-weight:800; color:var(--ink);
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.01em;
+  }
+  .c-rwd-lbl{
+    margin-top:2px;
+    font-size:8.5px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted-2);
+  }
+  .c-rwd-sep{
+    width:1px; height:24px;
+    background:var(--line);
+    justify-self:center;
+  }
+
+  /* rarities */
+  .card.common{
+    --rar-tint:    rgba(148,163,184,.18);
+    --rar-ring:    rgba(148,163,184,.45);
+    --rar-glow:    rgba(148,163,184,.25);
+    --rar-spark:   #cbd5e1;
+    --rar-ink:     #475569;
+    --rar-icon-bg: linear-gradient(180deg, #fafbff 0%, #eef0f7 100%);
+    --halo:        rgba(148,163,184,.18);
+  }
+  .card.rare{
+    --rar-tint:    rgba(96,165,250,.22);
+    --rar-ring:    rgba(59,130,246,.55);
+    --rar-glow:    rgba(59,130,246,.32);
+    --rar-spark:   #93c5fd;
+    --rar-ink:     #2563eb;
+    --rar-icon-bg: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+    --halo:        rgba(59,130,246,.26);
+  }
+  .card.epic{
+    --rar-tint:    rgba(192,132,252,.26);
+    --rar-ring:    rgba(168,85,247,.55);
+    --rar-glow:    rgba(168,85,247,.35);
+    --rar-spark:   #d8b4fe;
+    --rar-ink:     #7c3aed;
+    --rar-icon-bg: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
+    --halo:        rgba(168,85,247,.30);
+  }
+  .card.epic::after{
+    content:""; position:absolute; inset:0;
+    border-radius:inherit;
+    padding:1px;
+    background:conic-gradient(from 0deg,
+      rgba(168,85,247,0),
+      rgba(192,132,252,.55) 25%,
+      rgba(168,85,247,.85) 50%,
+      rgba(192,132,252,.55) 75%,
+      rgba(168,85,247,0));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    opacity:0;
+    transition:opacity .3s;
+    pointer-events:none;
+    z-index:5;
+  }
+  .card.epic:hover::after{opacity:1; animation:spin 5s linear infinite;}
+  @keyframes spin{ to{transform:rotate(360deg);} }
+
+  .card.legend{
+    --rar-tint:    rgba(252,211,77,.30);
+    --rar-ring:    rgba(245,158,11,.65);
+    --rar-glow:    rgba(245,158,11,.40);
+    --rar-spark:   #fcd34d;
+    --rar-ink:     #b45309;
+    --rar-icon-bg: linear-gradient(180deg, #fffaf0 0%, #fef3c7 100%);
+    --halo:        rgba(245,158,11,.38);
+  }
+  .card.legend::after{
+    content:""; position:absolute; inset:0;
+    border-radius:inherit;
+    padding:1.4px;
+    background:conic-gradient(from 0deg,
+      #fcd34d, #fef3c7, #d97706, #fbbf24, #b45309, #fcd34d, #fde68a, #d97706, #fcd34d);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:spin 14s linear infinite;
+    opacity:.75;
+    pointer-events:none;
+    z-index:5;
+  }
+  .card.legend .c-title{
+    background:linear-gradient(135deg,#b45309,#f59e0b,#d97706);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+
+  /* ════════════════════════════════════════
+       ANIMATIONS — applied via .anim-* on .card
+       Each variant only affects hover-state behavior.
+       ════════════════════════════════════════ */
+
+  /* ════════════════════════════════════════
+       REF CARD — matches the uploaded screenshot
+       (neon ring + dark inner capsule + sparks + molecules)
+       ════════════════════════════════════════ */
+  .card.ref{
+    width:340px;
+    aspect-ratio: 1 / 1.5;
+    background:
+      radial-gradient(700px 400px at 50% -10%, rgba(192,132,252,.10), transparent 60%),
+      linear-gradient(180deg, #fbfaff 0%, #fff 60%, #fbfaff 100%);
+    border:1px solid rgba(168,85,247,.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(15,18,38,.04),
+      0 22px 50px -28px rgba(124,58,237,.35);
+  }
+  .card.ref:hover{
+    border-color:rgba(168,85,247,.4);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(15,18,38,.04),
+      0 30px 60px -24px rgba(124,58,237,.42);
+  }
+  .card.ref::before{ display:none; } /* we draw our own scene */
+
+  /* faded hexagon / molecule background, top half */
+  .ref-scene{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:62%;
+    z-index:1;
+    pointer-events:none;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 14% 18%, rgba(192,132,252,.18), transparent 14%),
+      radial-gradient(circle at 86% 14%, rgba(192,132,252,.14), transparent 14%),
+      radial-gradient(420px 360px at 50% 28%, rgba(192,132,252,.12), transparent 70%);
+    mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+    -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+  }
+  /* molecular SVG hexagons baked in via mask */
+  .ref-scene::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'><g fill='none' stroke='%23a78bfa' stroke-width='1.1' opacity='.55'><polygon points='30,4 56,18 56,46 30,60 4,46 4,18'/><polygon points='90,44 116,58 116,86 90,100 64,86 64,58'/></g></svg>");
+    background-size:120px 104px;
+    background-position:center;
+    opacity:.55;
+    mask-image:radial-gradient(ellipse 70% 70% at 50% 40%, transparent 32%, #000 56%, transparent 92%);
+    -webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 40%, transparent 32%, #000 56%, transparent 92%);
+  }
+  /* sparkle dots in scene */
+  .ref-scene::after{
+    content:""; position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 22% 30%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 78% 24%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 20% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px),
+      radial-gradient(circle at 82% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px);
+    filter: drop-shadow(0 0 3px rgba(252,231,255,1));
+    opacity:.85;
+  }
+
+  /* the pill rarity tag — gradient + small diamond */
+  .card.ref .c-rar{
+    height:30px; padding:0 14px;
+    font-size:11px; letter-spacing:.18em;
+    background:linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    color:#fff;
+    border:1px solid rgba(255,255,255,.45);
+    box-shadow:
+      0 4px 12px -4px rgba(124,58,237,.5),
+      inset 0 1px 0 rgba(255,255,255,.35);
+    backdrop-filter:none;
+    top:18px; left:18px;
+  }
+  .card.ref .c-rar::before{
+    /* diamond marker */
+    width:11px; height:11px;
+    background:transparent;
+    border-radius:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M12 2 22 9l-10 13L2 9z' opacity='.95'/><path d='M12 2v20M2 9h20' stroke='%23c4b5fd' stroke-width='1.2' fill='none' opacity='.7'/></svg>");
+    background-size:contain;
+    background-repeat:no-repeat;
+  }
+  /* hide percent on ref card — not in reference */
+  .card.ref .c-pct{ display:none; }
+
+  /* ── ORB STAGE — much bigger + custom artwork ── */
+  .card.ref .c-orb-stage{
+    width:240px; height:240px;
+    margin:36px auto 6px;
+    z-index:3;
+  }
+  /* remove the default arcs */
+  .card.ref .c-orb-stage::before,
+  .card.ref .c-orb-stage::after{ display:none; }
+
+  /* the big neon ring */
+  .ref-orb{
+    position:relative;
+    width:200px; height:200px;
+    border-radius:50%;
+    margin:0 auto;
+    background:
+      radial-gradient(circle at 50% 38%, #6d28d9 0%, #4c1d95 60%, #2e1065 100%);
+    box-shadow:
+      0 0 0 5px #fff,
+      0 0 0 7px rgba(255,255,255,.3),
+      0 0 26px 6px rgba(168,85,247,.55),
+      0 0 60px 12px rgba(168,85,247,.30),
+      inset 0 -10px 30px rgba(0,0,0,.4),
+      inset 0 2px 0 rgba(255,255,255,.35);
+    overflow:hidden;
+    transition:transform .22s ease;
+  }
+  /* inner highlight on top of orb */
+  .ref-orb::before{
+    content:""; position:absolute;
+    top:8%; left:18%;
+    width:55%; height:30%;
+    border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(255,255,255,.35), transparent 70%);
+    filter:blur(2px);
+    pointer-events:none;
+  }
+  /* lightning electric scribbles inside orb */
+  .ref-orb::after{
+    content:""; position:absolute; inset:0;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><g fill='none' stroke='%23ddd6fe' stroke-width='1.3' stroke-linecap='round' opacity='.7'><path d='M20 80 Q35 70 40 90 T55 105 Q65 95 70 110'/><path d='M150 70 Q160 85 175 80 T185 100'/><path d='M30 130 Q45 125 50 140 T70 150'/><path d='M160 130 Q170 125 175 140 T180 165'/><path d='M105 30 Q115 40 110 55'/><path d='M95 165 Q100 175 110 178'/></g></svg>");
+    background-size:contain;
+    pointer-events:none;
+    opacity:.9;
+  }
+
+  /* the flask SVG inside the orb — larger, glowy */
+  .ref-orb .ref-flask{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    width:90px; height:90px;
+    z-index:3;
+    filter:
+      drop-shadow(0 0 6px rgba(192,132,252,.9))
+      drop-shadow(0 0 14px rgba(168,85,247,.55));
+    transform-origin:50% 70%;
+  }
+
+  /* check-mark hexagon badge */
+  .ref-check{
+    position:absolute;
+    right:6%; bottom:8%;
+    width:54px; height:54px;
+    z-index:4;
+    filter:drop-shadow(0 4px 10px rgba(124,58,237,.5));
+  }
+
+  /* floating orbs around the ring */
+  .float-ball{
+    position:absolute;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 28%, #ede9fe 0%, #a78bfa 55%, #6d28d9 95%);
+    box-shadow:
+      0 0 8px rgba(168,85,247,.55),
+      inset 0 -2px 4px rgba(0,0,0,.2),
+      inset 0 1px 2px rgba(255,255,255,.6);
+    z-index:5;
+  }
+  .float-ball.fb1{ width:14px; height:14px; top:6%; right:28%; }
+  .float-ball.fb2{ width:18px; height:18px; bottom:20%; left:6%; }
+  .float-ball.fb3{ width:10px; height:10px; top:36%; right:6%; }
+  .float-ball.fb4{ width:8px; height:8px; bottom:6%; left:40%; }
+  /* hex frames floating around */
+  .float-hex{
+    position:absolute;
+    z-index:2;
+    opacity:.55;
+  }
+  .float-hex svg{display:block;}
+  .float-hex.fh1{ top:24%; left:0; width:28px; }
+  .float-hex.fh2{ top:6%; right:8%; width:22px; }
+  .float-hex.fh3{ bottom:14%; right:-2px; width:30px; }
+
+  /* TITLE — larger on ref card */
+  .card.ref .c-title-block{
+    padding:18px 22px 0;
+  }
+  .card.ref .c-title{
+    font-size:24px;
+    color:var(--ink);
+    background:none;
+    -webkit-text-fill-color:initial;
+  }
+  .card.ref .c-sub{
+    font-size:13px;
+    margin-top:8px;
+  }
+
+  /* divider w/ darker diamond — tighter rhythm */
+  .card.ref .c-div{ margin:14px 26px 14px; }
+  .card.ref .c-div::before,
+  .card.ref .c-div::after{ background:rgba(168,85,247,.18); }
+  .card.ref .c-div span{
+    background:#a78bfa;
+    width:7px; height:7px;
+  }
+
+  /* ============================================================
+     PROGRESS — premium glass track w/ shimmer & integrated count
+     ============================================================ */
+  .card.ref .c-prog{ margin:0 26px; display:block; }
+  .card.ref .c-prog-row{
+    margin-bottom:8px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .card.ref .c-prog-row span:first-child{
+    color:#7c3aed;
+    font-size:10.5px; font-weight:800;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+  }
+  /* count chip in the header row */
+  .card.ref .c-prog-row .pp{
+    display:inline-flex; align-items:baseline; gap:3px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px; font-weight:800;
+    color:var(--ink);
+    letter-spacing:.02em;
+    text-transform:none;
+  }
+  .card.ref .c-prog-row .pp b{
+    font-size:15px;
+    background:linear-gradient(135deg, #7c3aed, #a78bfa);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .card.ref .c-prog-row .pp .sep{ color:rgba(124,58,237,.35); margin:0 1px; }
+  /* the wrapper line is no longer needed; bar is on its own */
+  .card.ref .c-prog-line{ display:block; }
+  .card.ref .c-prog-line .pp-out{ display:none; }
+
+  /* the glass track */
+  .card.ref .c-prog-line .c-prog-bar{
+    flex:none;
+    width:100%;
+    height:12px;
+    border-radius:999px;
+    background:
+      linear-gradient(180deg, rgba(168,85,247,.06), rgba(168,85,247,.12));
+    border:1px solid rgba(168,85,247,.18);
+    box-shadow:
+      inset 0 1.5px 3px rgba(76,29,149,.10),
+      inset 0 -1px 0 rgba(255,255,255,.55),
+      0 1px 0 rgba(255,255,255,.6);
+    position:relative; overflow:hidden;
+    backdrop-filter:blur(4px);
+  }
+  /* the fill */
+  .card.ref .c-prog-line .c-prog-bar i{
+    position:relative;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 50%),
+      linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #7c3aed 100%);
+    box-shadow:
+      0 0 12px rgba(168,85,247,.55),
+      0 0 24px rgba(168,85,247,.30),
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -1px 1px rgba(76,29,149,.35);
+    overflow:hidden;
+  }
+  /* shimmer sweep across the fill */
+  .card.ref .c-prog-line .c-prog-bar i::before{
+    content:""; position:absolute;
+    top:0; bottom:0;
+    width:38%;
+    background:linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,.45) 50%,
+      rgba(255,255,255,0) 100%);
+    transform:translateX(-100%) skewX(-18deg);
+    animation:ref-shimmer 3.6s cubic-bezier(.4,0,.2,1) infinite;
+  }
+  /* faint particles drifting inside the fill */
+  .card.ref .c-prog-line .c-prog-bar i::after{
+    content:""; position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 12% 50%, rgba(255,255,255,.7) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 28% 30%, rgba(255,255,255,.5) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 46% 60%, rgba(255,255,255,.6) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 62% 40%, rgba(255,255,255,.5) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 80% 55%, rgba(255,255,255,.65) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 92% 35%, rgba(255,255,255,.45) 0 1px, transparent 1.5px);
+    mix-blend-mode:screen;
+    opacity:.9;
+    animation:ref-drift 6s linear infinite;
+  }
+  @keyframes ref-shimmer{
+    0%   { transform:translateX(-130%) skewX(-18deg); }
+    55%  { transform:translateX(280%)  skewX(-18deg); }
+    100% { transform:translateX(280%)  skewX(-18deg); }
+  }
+  @keyframes ref-drift{
+    0%   { background-position: 0 0; }
+    100% { background-position: 28px 0; }
+  }
+
+  /* ============================================================
+     REWARD CHIPS — glassy purple twin
+     ============================================================ */
+  .card.ref .c-reward{
+    margin:14px 22px 22px;
+    padding:11px 14px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.6), rgba(245,243,255,.6)),
+      radial-gradient(120% 100% at 0% 0%, rgba(168,85,247,.10), transparent 60%);
+    border:1px solid rgba(168,85,247,.22);
+    border-radius:16px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 0 0 1px rgba(255,255,255,.35),
+      0 6px 16px -10px rgba(124,58,237,.25);
+    backdrop-filter:blur(8px);
+    grid-template-columns:1fr 1px 1fr;
+    align-items:center;
+  }
+  .card.ref .c-rwd-item{ gap:10px; padding:2px 4px; align-items:center; }
+  .card.ref .c-rwd-ico{
+    width:34px; height:34px;
+    border-radius:10px;
+    background:linear-gradient(135deg, #ede9fe, #ddd6fe);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 0 0 1px rgba(255,255,255,.6),
+      0 4px 10px -4px rgba(124,58,237,.35);
+  }
+  .card.ref .c-rwd-ico svg{width:18px; height:18px; fill:#7c3aed;}
+  .card.ref .c-rwd-ico.date svg{ fill:#7c3aed; }
+  .card.ref .c-rwd-text{ line-height:1.1; gap:3px; }
+  .card.ref .c-rwd-val{
+    font-size:13.5px; font-weight:800;
+    color:#3b1d70;
+    letter-spacing:.01em;
+    font-family:'Inter', system-ui, sans-serif;
+    font-variant-numeric:tabular-nums;
+  }
+  .card.ref .c-rwd-lbl{
+    color:#7c3aed;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.18em;
+    margin-top:2px;
+    opacity:.85;
+  }
+  /* on ref card: one centered reward */
+  .card.ref .c-reward{
+    margin:14px 22px 22px;
+    padding:11px 14px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.6), rgba(245,243,255,.6)),
+      radial-gradient(120% 100% at 0% 0%, rgba(168,85,247,.10), transparent 60%);
+    border:1px solid rgba(168,85,247,.22);
+    border-radius:16px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 0 0 1px rgba(255,255,255,.35),
+      0 6px 16px -10px rgba(124,58,237,.25);
+    backdrop-filter:blur(8px);
+    grid-template-columns:auto;
+    justify-items:center;
+    align-items:center;
+  }
+  .card.ref .c-rwd-sep,
+  .card.ref .c-reward .c-rwd-item.date,
+  .card.ref .c-reward .c-rwd-item:nth-child(3){ display:none; }
+
+  /* shake animation tuned for the bigger ref orb */
+  @keyframes ref-shake{
+    0%   { transform: translate(-50%, -50%) rotate(0deg); }
+    8%   { transform: translate(-52%, -51%) rotate(-5deg); }
+    18%  { transform: translate(-48%, -50%) rotate(7deg); }
+    28%  { transform: translate(-52%, -51%) rotate(-8deg); }
+    40%  { transform: translate(-48%, -50%) rotate(8deg); }
+    52%  { transform: translate(-51%, -50%) rotate(-5deg); }
+    64%  { transform: translate(-49%, -50%) rotate(4deg); }
+    76%  { transform: translate(-51%, -50%) rotate(-3deg); }
+    88%  { transform: translate(-50%, -50%) rotate(2deg); }
+    100% { transform: translate(-50%, -50%) rotate(0deg); }
+  }
+  @keyframes ref-orb-press{
+    0%,100% { transform:scale(1); }
+    14%     { transform:scale(.97); }
+    35%     { transform:scale(1.05); }
+    60%     { transform:scale(1); }
+  }
+  @keyframes ref-ball-jiggle{
+    0%,100%{ transform: translate(0,0); }
+    25%   { transform: translate(2px,-2px); }
+    50%   { transform: translate(-2px,1px); }
+    75%   { transform: translate(1px,2px); }
+  }
+  .card.ref.anim-shake:hover .ref-orb{ animation: ref-orb-press .9s cubic-bezier(.2,.7,.2,1); }
+  .card.ref.anim-shake:hover .ref-flask{ animation: ref-shake .9s cubic-bezier(.2,.7,.2,1); }
+  .card.ref.anim-shake:hover .float-ball{ animation: ref-ball-jiggle .45s ease-in-out 2; }
+  .card.ref.anim-shake:hover .float-ball.fb2{ animation-delay: .05s; }
+  .card.ref.anim-shake:hover .float-ball.fb3{ animation-delay: .12s; }
+  .card.ref.anim-shake:hover .float-ball.fb4{ animation-delay: .18s; }
+
+  /* —— A. SHAKE (the flask wobble) ——
+     Quick "physical" shake with a small wind-up.
+     Affects: the inner SVG only — orb stays put, so the
+     flask feels like it's reacting, not the whole tile.       */
+  @keyframes shake-flask{
+    0%   { transform: rotate(0deg)   translateY(0); }
+    8%   { transform: rotate(-4deg)  translateY(-1px); }
+    18%  { transform: rotate(6deg)   translateY(0); }
+    28%  { transform: rotate(-7deg)  translateY(-1px); }
+    40%  { transform: rotate(7deg)   translateY(0); }
+    52%  { transform: rotate(-5deg)  translateY(0); }
+    64%  { transform: rotate(4deg)   translateY(0); }
+    76%  { transform: rotate(-3deg)  translateY(0); }
+    88%  { transform: rotate(2deg)   translateY(0); }
+    100% { transform: rotate(0deg)   translateY(0); }
+  }
+  /* tiny orb pulse to sell the "force" of the shake */
+  @keyframes orb-press{
+    0%,100%{ transform:scale(1); }
+    14%    { transform:scale(.97); }
+    35%    { transform:scale(1.04); }
+    60%    { transform:scale(1); }
+  }
+  .anim-shake:hover .c-orb{
+    animation: orb-press .9s cubic-bezier(.2,.7,.2,1);
+  }
+  .anim-shake:hover .c-orb svg{
+    animation: shake-flask .9s cubic-bezier(.2,.7,.2,1);
+  }
+  /* sparkle reacts on hover: faster + brighter */
+  .anim-shake:hover .c-spark{
+    animation-duration: 1.2s;
+    opacity:.9;
+  }
+
+  /* —— B. BUBBLES ——
+     Bubbles rise inside the orb on hover.
+     We add 4 <span> children to .c-orb labeled .bubble.
+     They live behind the SVG, masked by the orb circle.       */
+  .c-orb .bubble{
+    position:absolute;
+    bottom:18%;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(168,85,247,.35) 60%, rgba(168,85,247,0));
+    opacity:0;
+    pointer-events:none;
+    z-index:0;
+  }
+  .c-orb .bubble.b1{left:34%; width:7px; height:7px;}
+  .c-orb .bubble.b2{left:48%; width:5px; height:5px;}
+  .c-orb .bubble.b3{left:60%; width:8px; height:8px;}
+  .c-orb .bubble.b4{left:42%; width:4px; height:4px;}
+  @keyframes bubble-rise{
+    0%   { transform:translate(0,0) scale(.5); opacity:0; }
+    15%  { opacity:.9; }
+    100% { transform:translate(var(--bx,0), -52px) scale(1); opacity:0; }
+  }
+  .anim-bubbles:hover .c-orb .bubble.b1{ --bx:-3px; animation: bubble-rise 1.3s ease-out infinite; }
+  .anim-bubbles:hover .c-orb .bubble.b2{ --bx: 2px; animation: bubble-rise 1.5s ease-out .25s infinite; }
+  .anim-bubbles:hover .c-orb .bubble.b3{ --bx:-2px; animation: bubble-rise 1.7s ease-out .55s infinite; }
+  .anim-bubbles:hover .c-orb .bubble.b4{ --bx: 3px; animation: bubble-rise 1.4s ease-out .8s infinite; }
+  /* gentle slosh in addition */
+  @keyframes slosh{
+    0%,100% { transform:rotate(0); }
+    50%     { transform:rotate(-3deg); }
+  }
+  .anim-bubbles:hover .c-orb svg{
+    animation: slosh 1.6s ease-in-out infinite;
+  }
+
+  /* —— C. FLOAT ——
+     Smooth, continuous up/down float on hover. Very Discord-y. */
+  @keyframes float-y{
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-6px); }
+  }
+  @keyframes glow-pulse{
+    0%,100% { box-shadow:
+                0 0 0 6px #fff,
+                0 0 0 7px var(--rar-ring),
+                0 14px 28px -10px var(--rar-glow),
+                inset 0 -8px 18px rgba(15,18,38,.04),
+                inset 0 2px 0 rgba(255,255,255,.9);
+            }
+    50%     { box-shadow:
+                0 0 0 6px #fff,
+                0 0 0 7px var(--rar-ring),
+                0 20px 38px -10px var(--rar-glow),
+                0 0 28px 4px var(--rar-glow),
+                inset 0 -8px 18px rgba(15,18,38,.04),
+                inset 0 2px 0 rgba(255,255,255,.9);
+            }
+  }
+  .anim-float:hover .c-orb{
+    animation: float-y 2.4s ease-in-out infinite, glow-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* —— D. SPIN —— */
+  @keyframes spin-3d{
+    0%   { transform: perspective(380px) rotateY(0deg); }
+    100% { transform: perspective(380px) rotateY(360deg); }
+  }
+  .anim-spin:hover .c-orb{
+    animation: spin-3d 1.4s cubic-bezier(.5,.05,.5,.95);
+    transform-style:preserve-3d;
+  }
+  .anim-spin .c-orb svg{ backface-visibility:hidden; }
+
+  /* —— E. BURST ——
+     Sparkles explode on hover; orb does a quick punch. */
+  @keyframes burst-out{
+    0%   { transform:translate(0,0) scale(.4); opacity:0; }
+    20%  { opacity:1; }
+    100% { transform:translate(var(--bx,0), var(--by,0)) scale(1.4); opacity:0; }
+  }
+  @keyframes punch{
+    0%   { transform:scale(1); }
+    20%  { transform:scale(1.1); }
+    50%  { transform:scale(.96); }
+    100% { transform:scale(1); }
+  }
+  .anim-burst:hover .c-orb{
+    animation: punch .55s cubic-bezier(.2,.7,.2,1);
+  }
+  .anim-burst .c-spark{
+    /* override the default twinkle when busting */
+    transition: opacity .2s;
+  }
+  .anim-burst:hover .c-spark{ animation: none; opacity:0; }
+  .anim-burst .c-orb-stage .burst{
+    position:absolute;
+    top:50%; left:50%;
+    width:4px; height:4px;
+    background:
+      linear-gradient(90deg, transparent 45%, var(--rar-spark) 50%, transparent 55%) center/100% 1.2px no-repeat,
+      linear-gradient(0deg, transparent 45%, var(--rar-spark) 50%, transparent 55%) center/1.2px 100% no-repeat;
+    filter:drop-shadow(0 0 4px var(--rar-spark));
+    opacity:0;
+    pointer-events:none;
+    z-index:1;
+  }
+  .anim-burst:hover .burst{
+    animation: burst-out .7s ease-out;
+  }
+  .anim-burst .burst:nth-child(1){ --bx: 60px; --by:-20px; }
+  .anim-burst .burst:nth-child(2){ --bx: 50px; --by: 36px; }
+  .anim-burst .burst:nth-child(3){ --bx:-50px; --by: 38px; }
+  .anim-burst .burst:nth-child(4){ --bx:-58px; --by:-22px; }
+  .anim-burst .burst:nth-child(5){ --bx:  0px; --by:-66px; }
+  .anim-burst .burst:nth-child(6){ --bx:  0px; --by: 66px; }
+  .anim-burst .burst:nth-child(7){ --bx: 70px; --by:  6px; }
+  .anim-burst .burst:nth-child(8){ --bx:-70px; --by:  6px; }
+
+  /* —— F. SHINE —— a diagonal light sweep across the whole card */
+  @keyframes shine-sweep{
+    0%   { transform:translateX(-120%) skewX(-18deg); }
+    100% { transform:translateX(220%)  skewX(-18deg); }
+  }
+  .anim-shine{ position:relative; }
+  .anim-shine > .shine-mask{
+    position:absolute; inset:0;
+    border-radius:inherit;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:6;
+  }
+  .anim-shine > .shine-mask::before{
+    content:""; position:absolute;
+    top:0; bottom:0;
+    width:60%;
+    background:linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,255,255,.0) 30%,
+      rgba(255,255,255,.45) 50%,
+      rgba(255,255,255,.0) 70%,
+      transparent 100%);
+    transform:translateX(-120%) skewX(-18deg);
+  }
+  .anim-shine:hover > .shine-mask::before{
+    animation: shine-sweep 1.05s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* footnote */
+  .footnote{
+    padding:0 8px;
+    font-size:12px; color:var(--muted);
+    text-align:center;
+    line-height:1.55;
+  }
+  .footnote a{color:var(--primary); text-decoration:underline; text-underline-offset:2px;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- NAV -->
+  <div class="top">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">IQMO</div>
+      <span class="brand-sep">·</span>
+      <nav class="crumbs">
+        <a href="achievements.html">Коллекция</a>
+        <span style="color:var(--muted-2)">/</span>
+        <b>Card Lab</b>
+      </nav>
+    </div>
+    <a class="pill" href="achievements.html">← К коллекции</a>
+  </div>
+
+  <!-- HERO -->
+  <div class="lab-hero">
+    <div class="eye">Лаборатория карточек</div>
+    <h1>Анимации hover для карточек</h1>
+    <p>Каждая плитка — отдельный hover-эффект. Наведи курсор и оцени поведение. Когда понравится — скажи, и я перенесу анимацию в основной файл <kbd>achievements.html</kbd>.</p>
+  </div>
+
+  <!-- ════════════════ BOARD 1 — SHAKE ════════════════ -->
+  <section class="board">
+    <div class="board-head">
+      <div class="lhs">
+        <h3>① Тряска колбы — <code>.anim-shake</code></h3>
+        <div class="sub">Иконка дрожит и слегка пружинит при hover. Орб даёт мини‑press для физики.</div>
+      </div>
+      <div class="board-tag">наведи курсор</div>
+    </div>
+    <div class="stage">
+      <div class="stage-cell">
+        <article class="card ref anim-shake">
+          <div class="ref-scene"></div>
+          <span class="c-rar">Эпическая</span>
+          <span class="c-pct">6.2%</span>
+
+          <div class="c-orb-stage">
+            <!-- floating hexagons around orb -->
+            <div class="float-hex fh1">
+              <svg viewBox="0 0 30 34" fill="none" stroke="#a78bfa" stroke-width="1.2"><polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/></svg>
+            </div>
+            <div class="float-hex fh2">
+              <svg viewBox="0 0 30 34" fill="none" stroke="#a78bfa" stroke-width="1.2"><polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/></svg>
+            </div>
+            <div class="float-hex fh3">
+              <svg viewBox="0 0 30 34" fill="none" stroke="#a78bfa" stroke-width="1.2"><polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/></svg>
+            </div>
+
+            <!-- the big neon orb -->
+            <div class="ref-orb">
+              <!-- glowing flask -->
+              <svg class="ref-flask" viewBox="0 0 64 64">
+                <defs>
+                  <linearGradient id="glassFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%"  stop-color="#c4b5fd" stop-opacity=".25"/>
+                    <stop offset="55%" stop-color="#a78bfa" stop-opacity=".9"/>
+                    <stop offset="100%" stop-color="#7c3aed"/>
+                  </linearGradient>
+                  <linearGradient id="glassEdge" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="100%" stop-color="#c4b5fd"/>
+                  </linearGradient>
+                </defs>
+                <!-- neck -->
+                <rect x="26" y="6" width="12" height="14" rx="2" fill="none" stroke="url(#glassEdge)" stroke-width="2.2"/>
+                <!-- rim -->
+                <rect x="24" y="4" width="16" height="3" rx="1.5" fill="#fff" opacity=".9"/>
+                <!-- body -->
+                <path d="M26 18 L26 26 L12 52 Q10 58 16 58 L48 58 Q54 58 52 52 L38 26 L38 18 Z"
+                      fill="url(#glassFill)" stroke="url(#glassEdge)" stroke-width="2.2" stroke-linejoin="round"/>
+                <!-- liquid surface highlight -->
+                <path d="M18 44 Q32 40 46 44" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".6"/>
+                <!-- bubbles inside -->
+                <circle cx="22" cy="50" r="1.8" fill="#ffffff" opacity=".9"/>
+                <circle cx="30" cy="52" r="1.2" fill="#ffffff" opacity=".75"/>
+                <circle cx="38" cy="49" r="1.5" fill="#ffffff" opacity=".85"/>
+                <circle cx="42" cy="54" r="1" fill="#ffffff" opacity=".7"/>
+                <!-- glass shine -->
+                <path d="M30 22 L20 48" stroke="#ffffff" stroke-width="1.2" opacity=".55" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <!-- check-mark hexagon badge bottom-right of orb -->
+            <svg class="ref-check" viewBox="0 0 64 64">
+              <defs>
+                <linearGradient id="hexFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%"  stop-color="#ffffff"/>
+                  <stop offset="100%" stop-color="#ede9fe"/>
+                </linearGradient>
+              </defs>
+              <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#hexFill)" stroke="#c4b5fd" stroke-width="2"/>
+              <path d="M20 32 L29 41 L46 24" fill="none" stroke="#7c3aed" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            <!-- floating orbs -->
+            <span class="float-ball fb1"></span>
+            <span class="float-ball fb2"></span>
+            <span class="float-ball fb3"></span>
+            <span class="float-ball fb4"></span>
+          </div>
+
+          <div class="c-title-block">
+            <h4 class="c-title">Первый этап<br/>по химии</h4>
+            <div class="c-sub">Успешно пройди 1 этап по химии</div>
+          </div>
+
+          <div class="c-div"><span></span></div>
+
+          <div class="c-prog">
+            <div class="c-prog-row">
+              <span>Прогресс</span>
+              <span class="pp"><b>1</b><span class="sep">/</span>1</span>
+            </div>
+            <div class="c-prog-line">
+              <div class="c-prog-bar"><i style="width:100%"></i></div>
+            </div>
+          </div>
+
+          <div class="c-reward">
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico xp">
+                <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>
+              </div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">+250 XP</span>
+                <span class="c-rwd-lbl">Награда</span>
+              </div>
+            </div>
+            <div class="c-rwd-sep"></div>
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico date">
+                <svg viewBox="0 0 24 24"><path d="M9 2v6l-5 9a3 3 0 0 0 2.7 4.4h10.6A3 3 0 0 0 20 17l-5-9V2H9zm2 2h2v5l4.3 7.8H6.7L11 9V4z"/></svg>
+              </div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">27 мая 2026</span>
+                <span class="c-rwd-lbl">Получено</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="stage-cap">Колба <b>трясётся</b> + летающие шары немного покачиваются. <code>.ref.anim-shake</code></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ BOARD 2 — BUBBLES ════════════════ -->
+  <section class="board">
+    <div class="board-head">
+      <div class="lhs">
+        <h3>② Пузырьки в колбе — <code>.anim-bubbles</code></h3>
+        <div class="sub">Внутри орба поднимаются пузыри, колба чуть покачивается. Эффект «кипения».</div>
+      </div>
+      <div class="board-tag">наведи курсор</div>
+    </div>
+    <div class="stage">
+      <div class="stage-cell">
+        <article class="card epic anim-bubbles">
+          <span class="c-rar">Эпическая</span>
+          <span class="c-pct">4.1%</span>
+          <div class="c-orb-stage">
+            <span class="c-spark s1"></span>
+            <span class="c-spark s2"></span>
+            <span class="c-spark s3"></span>
+            <div class="c-orb">
+              <span class="bubble b1"></span>
+              <span class="bubble b2"></span>
+              <span class="bubble b3"></span>
+              <span class="bubble b4"></span>
+              <svg viewBox="0 0 24 24"><path d="M9 2v6l-5 9a3 3 0 0 0 2.7 4.4h10.6A3 3 0 0 0 20 17l-5-9V2H9zm2 2h2v5l4.3 7.8H6.7L11 9V4z"/></svg>
+            </div>
+          </div>
+          <div class="c-title-block">
+            <h4 class="c-title">Алхимик</h4>
+            <div class="c-sub">Все темы химии на 80%+</div>
+          </div>
+          <div class="c-div"><span></span></div>
+          <div class="c-prog">
+            <div class="c-prog-row"><span>Прогресс</span><span class="pp"><b>12</b> / 24</span></div>
+            <div class="c-prog-bar"><i style="width:50%"></i></div>
+          </div>
+          <div class="c-reward">
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico xp"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">+400 XP</span>
+                <span class="c-rwd-lbl">Награда</span>
+              </div>
+            </div>
+            <div class="c-rwd-sep"></div>
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico date"><svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">12 тем</span>
+                <span class="c-rwd-lbl">Осталось</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="stage-cap">Бесконечный цикл <b>«кипения»</b> + лёгкий слоушинг. Драматично, но не отвлекает.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ BOARD 3 — other variants ════════════════ -->
+  <section class="board">
+    <div class="board-head">
+      <div class="lhs">
+        <h3>③ Другие варианты hover</h3>
+        <div class="sub">Подойдут разным редкостям. Любой можно скомбинировать с № 1‑2.</div>
+      </div>
+      <div class="board-tag">наведи на каждую</div>
+    </div>
+    <div class="stage row-3">
+
+      <div class="stage-cell">
+        <article class="card legend anim-float">
+          <span class="c-rar">Легендарная</span>
+          <span class="c-pct">1.8%</span>
+          <div class="c-orb-stage">
+            <span class="c-spark s1"></span>
+            <span class="c-spark s2"></span>
+            <span class="c-spark s3"></span>
+            <div class="c-orb">
+              <svg viewBox="0 0 24 24"><path d="M2 7l4 4 6-8 6 8 4-4-2 12H4L2 7zm3 14h14v2H5z"/></svg>
+            </div>
+          </div>
+          <div class="c-title-block">
+            <h4 class="c-title">Магистр биологии</h4>
+            <div class="c-sub">Глава 1 на 90%+</div>
+          </div>
+          <div class="c-div"><span></span></div>
+          <div class="c-prog">
+            <div class="c-prog-row"><span>Прогресс</span><span class="pp"><b>1</b> / 1</span></div>
+            <div class="c-prog-bar"><i style="width:100%"></i></div>
+          </div>
+          <div class="c-reward">
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico xp"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">+500 XP</span>
+                <span class="c-rwd-lbl">Награда</span>
+              </div>
+            </div>
+            <div class="c-rwd-sep"></div>
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico date"><svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm0 6v12h10V8H7zm2 3h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">12 ноя 2026</span>
+                <span class="c-rwd-lbl">Получено</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="stage-cap"><b>Float</b> — орб левитирует + halo пульсирует. <code>.anim-float</code></div>
+      </div>
+
+      <div class="stage-cell">
+        <article class="card rare anim-spin">
+          <span class="c-rar">Редкая</span>
+          <span class="c-pct">22%</span>
+          <div class="c-orb-stage">
+            <span class="c-spark s1"></span>
+            <span class="c-spark s2"></span>
+            <span class="c-spark s3"></span>
+            <div class="c-orb">
+              <!-- lightning -->
+              <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>
+            </div>
+          </div>
+          <div class="c-title-block">
+            <h4 class="c-title">Тройка</h4>
+            <div class="c-sub">3 теста подряд</div>
+          </div>
+          <div class="c-div"><span></span></div>
+          <div class="c-prog">
+            <div class="c-prog-row"><span>Прогресс</span><span class="pp"><b>1</b> / 1</span></div>
+            <div class="c-prog-bar"><i style="width:100%"></i></div>
+          </div>
+          <div class="c-reward">
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico xp"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">+100 XP</span>
+                <span class="c-rwd-lbl">Награда</span>
+              </div>
+            </div>
+            <div class="c-rwd-sep"></div>
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico date"><svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm0 6v12h10V8H7zm2 3h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">20 апр 2026</span>
+                <span class="c-rwd-lbl">Получено</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="stage-cap"><b>3D‑Spin</b> — орб делает один оборот вокруг оси Y. <code>.anim-spin</code></div>
+      </div>
+
+      <div class="stage-cell">
+        <article class="card legend anim-burst">
+          <span class="c-rar">Легендарная</span>
+          <span class="c-pct">2.4%</span>
+          <div class="c-orb-stage">
+            <span class="c-spark s1"></span>
+            <span class="c-spark s2"></span>
+            <span class="c-spark s3"></span>
+            <span class="burst"></span><span class="burst"></span>
+            <span class="burst"></span><span class="burst"></span>
+            <span class="burst"></span><span class="burst"></span>
+            <span class="burst"></span><span class="burst"></span>
+            <div class="c-orb">
+              <!-- star -->
+              <svg viewBox="0 0 24 24"><path d="M12 2 14.4 8.6 21 9l-5.2 4.5L17.2 21 12 17.3 6.8 21l1.4-7.5L3 9l6.6-.4z"/></svg>
+            </div>
+          </div>
+          <div class="c-title-block">
+            <h4 class="c-title">Звёздный час</h4>
+            <div class="c-sub">100 верных подряд</div>
+          </div>
+          <div class="c-div"><span></span></div>
+          <div class="c-prog">
+            <div class="c-prog-row"><span>Прогресс</span><span class="pp"><b>1</b> / 1</span></div>
+            <div class="c-prog-bar"><i style="width:100%"></i></div>
+          </div>
+          <div class="c-reward">
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico xp"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">+750 XP</span>
+                <span class="c-rwd-lbl">Награда</span>
+              </div>
+            </div>
+            <div class="c-rwd-sep"></div>
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico date"><svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm0 6v12h10V8H7zm2 3h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">15 мая 2026</span>
+                <span class="c-rwd-lbl">Получено</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="stage-cap"><b>Burst</b> — на hover искры разлетаются + орб делает punch. <code>.anim-burst</code></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════ BOARD 4 — full card shine ════════════════ -->
+  <section class="board">
+    <div class="board-head">
+      <div class="lhs">
+        <h3>④ Glare — отблеск по всей карточке</h3>
+        <div class="sub">Световая полоса проходит по всей плитке на hover. Подойдёт легендаркам.</div>
+      </div>
+      <div class="board-tag">наведи курсор</div>
+    </div>
+    <div class="stage">
+      <div class="stage-cell">
+        <article class="card legend anim-shine">
+          <div class="shine-mask"></div>
+          <span class="c-rar">Легендарная</span>
+          <span class="c-pct">0.6%</span>
+          <div class="c-orb-stage">
+            <span class="c-spark s1"></span>
+            <span class="c-spark s2"></span>
+            <span class="c-spark s3"></span>
+            <div class="c-orb">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M3.4 8.6a10 10 0 0 1 17.2 0 10 10 0 0 1 0 6.8 10 10 0 0 1-17.2 0 10 10 0 0 1 0-6.8z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            </div>
+          </div>
+          <div class="c-title-block">
+            <h4 class="c-title">Ядро знаний</h4>
+            <div class="c-sub">50 подтем без ошибок</div>
+          </div>
+          <div class="c-div"><span></span></div>
+          <div class="c-prog">
+            <div class="c-prog-row"><span>Прогресс</span><span class="pp"><b>38</b> / 50</span></div>
+            <div class="c-prog-bar"><i style="width:76%"></i></div>
+          </div>
+          <div class="c-reward">
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico xp"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">+800 XP</span>
+                <span class="c-rwd-lbl">Награда</span>
+              </div>
+            </div>
+            <div class="c-rwd-sep"></div>
+            <div class="c-rwd-item">
+              <div class="c-rwd-ico date"><svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5z"/></svg></div>
+              <div class="c-rwd-text">
+                <span class="c-rwd-val">12 шагов</span>
+                <span class="c-rwd-lbl">Осталось</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="stage-cap"><b>Glare</b> — диагональная световая полоса. <code>.anim-shine</code></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="footnote">
+    Скажи номер варианта (или несколько) — перенесу в основной <a href="achievements.html">achievements.html</a>.
+    Можно навешивать комбинации: например, <kbd>anim-shake anim-shine</kbd> на одной карточке.
+  </p>
+
+</div>
+
+</body>
+</html>

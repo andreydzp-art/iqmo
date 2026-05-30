@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1320" />
+<title>IQMO · Коллекция · Награды и достижения</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#f3f4fb;
+    --bg-2:#eaecf5;
+    --surface:#fff;
+    --line:#e6e8f0;
+    --line-2:#eef0f7;
+    --ink:#0f1226;
+    --ink-2:#2a2e4a;
+    --muted:#6b7094;
+    --muted-2:#9aa0bf;
+    --primary:#4f46e5;
+    --primary-2:#6366f1;
+    --violet:#7c3aed;
+    --emerald:#10b981;
+    --amber:#f59e0b;
+    --gold:#fbbf24;
+    --gold-deep:#b45309;
+    --shadow-sm:0 1px 2px rgba(15,18,38,.04),0 1px 1px rgba(15,18,38,.03);
+    --shadow:0 1px 2px rgba(15,18,38,.04),0 8px 24px rgba(15,18,38,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:
+      radial-gradient(900px 600px at 50% -10%, rgba(99,102,241,.07), transparent 70%),
+      var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"ss01","cv11";
+    min-height:100vh;
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer; border:0; background:transparent;}
+
+  .shell{
+    max-width:1280px; margin:0 auto; padding:22px 28px 64px;
+    display:flex; flex-direction:column; gap:24px;
+  }
+
+  /* ───── TOP NAV (matches profile-v5) ───── */
+  .top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 18px;
+    background:rgba(255,255,255,.78);
+    backdrop-filter:saturate(140%) blur(10px);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:var(--shadow-sm), 0 0 0 1px var(--line) inset;
+    border-radius:16px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--primary),var(--violet));}
+  .brand-name{font-weight:800; font-size:15px;}
+  .brand-sep{color:var(--line); margin:0 14px;}
+  .breadcrumbs{color:var(--muted); font-size:13.5px;}
+  .breadcrumbs b{color:var(--ink-2); font-weight:600;}
+  .nav-right{display:flex; align-items:center; gap:8px;}
+  .pill{
+    height:36px; padding:0 14px; border-radius:999px;
+    border:1px solid var(--line); background:#fff; color:var(--ink-2);
+    font-size:13px; font-weight:500;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .pill:hover{background:var(--bg);}
+  .pill.is--ghost{background:transparent;}
+  .avatar-mini{
+    width:30px; height:30px; border-radius:999px;
+    background:#c7d2fe center/cover no-repeat url('iqmo/avatar-dasha.png');
+    background-position:center 18%;
+    background-size:cover;
+  }
+  .crumbs{font-size:13px; color:var(--muted); padding:0 4px;}
+  .crumbs span.sep{opacity:.5; margin:0 6px;}
+  .crumbs a:hover{color:var(--primary);}
+
+  /* ════════ Section head (matches profile-v5) ════════ */
+  .sec-head{
+    display:flex; align-items:end; justify-content:space-between;
+    padding:0 4px;
+    margin-bottom:12px;
+    gap:12px; flex-wrap:wrap;
+  }
+  .sec-eye{
+    font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .sec-title{
+    margin:0;
+    font-size:22px; font-weight:800; letter-spacing:-.02em;
+  }
+  .sec-link{
+    color:var(--primary); font-size:13px; font-weight:700;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .sec-link:hover{color:var(--violet);}
+
+  /* ════════ PANEL ════════ */
+  .panel{
+    border-radius:20px;
+    padding:20px 22px;
+    border:1px solid var(--line);
+    background:#fafbff;
+    box-shadow:var(--shadow-sm);
+  }
+
+  /* ════════ TOOLBAR (matches profile-v5 ach-toolbar) ════════ */
+  .ach-toolbar{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+    flex-wrap:wrap; gap:12px;
+  }
+  .ach-counter{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size:13px; color:var(--muted);
+  }
+  .ach-counter .cnt-big{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:800; font-size:18px; color:var(--ink);
+  }
+  .ach-counter .grade{
+    font-family:'JetBrains Mono',monospace; font-weight:800; font-size:13px;
+    background:linear-gradient(135deg, #9333ea, #c084fc);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .ach-counter b{color:var(--ink); font-family:'JetBrains Mono',monospace; font-weight:800;}
+
+  .ach-filter{
+    display:flex; gap:6px;
+    padding:4px;
+    background:rgba(255,255,255,.6);
+    border:1px solid rgba(255,255,255,.8);
+    border-radius:10px;
+    backdrop-filter:blur(8px);
+  }
+  .ach-filter button{
+    height:30px; padding:0 12px;
+    border-radius:7px;
+    font-size:12px; font-weight:700;
+    color:var(--muted);
+    display:inline-flex; align-items:center; gap:7px;
+  }
+  .ach-filter button:hover{color:var(--ink-2);}
+  .ach-filter button.is-on{
+    background:#fff;
+    color:var(--ink);
+    box-shadow:0 1px 2px rgba(15,18,38,.06);
+  }
+  .ach-filter .cnt{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    color:var(--muted-2);
+  }
+  .ach-filter button.is-on .cnt{color:var(--muted);}
+  .rd{width:7px; height:7px; border-radius:50%;}
+  .rd.com{background:#94a3b8;}
+  .rd.rar{background:#3b82f6;}
+  .rd.epi{background:#9333ea;}
+  .rd.leg{background:linear-gradient(135deg,#fcd34d,#d97706);}
+
+  /* ════════ GROUP HEADING ════════ */
+  .group{display:flex; flex-direction:column; gap:12px;}
+  .group + .group{margin-top:18px;}
+  .group-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 2px;
+    gap:12px;
+  }
+  .group-head h3{
+    margin:0;
+    font-size:12px; font-weight:800;
+    letter-spacing:.1em; text-transform:uppercase;
+    display:inline-flex; align-items:center; gap:8px;
+    color:var(--ink-2);
+  }
+  .group-head h3 .g-dot{width:8px; height:8px; border-radius:3px;}
+  .group-head h3 .g-dot.leg{background:linear-gradient(135deg,#fcd34d,#d97706);}
+  .group-head h3 .g-dot.epi{background:linear-gradient(135deg,#c084fc,#9333ea);}
+  .group-head h3 .g-dot.rar{background:linear-gradient(135deg,#60a5fa,#3b82f6);}
+  .group-head h3 .g-dot.com{background:linear-gradient(135deg,#cbd5e1,#94a3b8);}
+  .group-head .gh-meta{
+    font-size:11.5px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .group-head .gh-meta b{color:var(--ink-2); font-weight:700;}
+
+  /* ════════ COMPACT GRID ════════ */
+  .a-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+  }
+
+  /* ════════════════════════════════════════
+       CARD — collectible capsule
+       ════════════════════════════════════════ */
+  .card{
+    /* per-rarity vars — override on .common/.rare/.epic/.legend */
+    --hat-1: #f8fafc;
+    --hat-2: #eef0f7;
+    --hat-ink: rgba(148,163,184,.28);
+    --c-glow: rgba(148,163,184,.18);
+    --halo:   rgba(15,18,38,.06);
+    --c-ring: var(--line);
+
+    position:relative;
+    aspect-ratio: 1 / 1.1;
+    border-radius:20px;
+    background:#fff;
+    border:1px solid var(--c-ring);
+    overflow:visible;
+    cursor:pointer;
+    display:flex; flex-direction:column;
+    isolation:isolate;
+    transition: transform .22s cubic-bezier(.2,.7,.2,1), box-shadow .22s ease, border-color .22s ease;
+    box-shadow:
+      0 1px 2px rgba(15,18,38,.04),
+      0 14px 28px -22px var(--halo);
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    box-shadow:
+      0 1px 2px rgba(15,18,38,.04),
+      0 26px 40px -22px var(--halo),
+      0 0 0 1px var(--c-ring);
+  }
+
+  /* ───── HAT: top colored zone w/ subtle dotted texture ───── */
+  .card::before{
+    content:""; position:absolute;
+    top:0; left:0; right:0;
+    height:46%;
+    z-index:0;
+    background:
+      radial-gradient(var(--hat-ink) 1px, transparent 1.4px) 0 0 / 14px 14px,
+      radial-gradient(80% 90% at 50% 0%, var(--hat-1) 0%, var(--hat-2) 60%, transparent 100%),
+      var(--hat-2);
+    border-radius:20px 20px 0 0;
+    pointer-events:none;
+    mask-image:linear-gradient(180deg, #000 0%, #000 65%, transparent 100%);
+    -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 65%, transparent 100%);
+  }
+
+  /* ───── ORB (sits at hat/body boundary) ───── */
+  .c-orb-wrap{
+    position:relative;
+    margin:26px auto 0;
+    width:78px; height:78px;
+    display:grid; place-items:center;
+    z-index:3;
+  }
+  /* the soft halo behind orb (the rarity "aura") */
+  .c-orb-wrap::before{
+    content:""; position:absolute;
+    inset:-22px;
+    border-radius:50%;
+    background:radial-gradient(closest-side, var(--c-glow), transparent 70%);
+    opacity:.85;
+    z-index:-1;
+    pointer-events:none;
+  }
+  .c-orb{
+    position:relative;
+    width:70px; height:70px;
+    border-radius:50%;
+    display:grid; place-items:center;
+    /* thick white ring "stamps" the orb onto the card */
+    box-shadow:
+      0 0 0 5px #fff,
+      0 0 0 6px var(--c-ring),
+      0 12px 22px -8px var(--c-glow),
+      inset 0 1px 0 rgba(255,255,255,.55);
+    transition: transform .22s ease;
+  }
+  .card:hover .c-orb{transform:scale(1.06);}
+  .c-orb svg{width:30px; height:30px; fill:#fff; filter:drop-shadow(0 1px 2px rgba(15,18,38,.18));}
+
+  /* ───── corner labels — rarity + percent ───── */
+  .c-rar{
+    position:absolute; top:10px; left:10px;
+    z-index:4;
+    font-size:9px; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+    padding:3px 7px; border-radius:5px;
+    background:rgba(255,255,255,.78);
+    color:var(--muted);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.6);
+  }
+  .c-pct{
+    position:absolute; top:10px; right:10px;
+    z-index:4;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9px; font-weight:800;
+    color:var(--muted);
+    background:rgba(255,255,255,.78);
+    padding:3px 7px; border-radius:5px;
+    letter-spacing:.02em;
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.6);
+  }
+
+  /* ───── TITLE block (in white body, pushed toward bottom) ───── */
+  .c-title-block{
+    position:relative; z-index:2;
+    text-align:center;
+    padding:0 12px 0;
+    margin-top:auto;
+  }
+  .c-title{
+    margin:0;
+    font-size:13px; font-weight:800; letter-spacing:-.005em;
+    color:var(--ink);
+    line-height:1.25;
+  }
+  .c-sub{
+    margin-top:4px;
+    font-size:10.5px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.02em;
+  }
+
+  /* ───── FOOT (earned) ───── */
+  .c-foot{
+    margin:12px 12px 12px;
+    padding-top:10px;
+    border-top:1px dashed var(--line-2);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:6px;
+    position:relative; z-index:2;
+  }
+  .c-xp{
+    display:inline-flex; align-items:center;
+    font-size:10px; font-weight:800;
+    padding:3px 7px; border-radius:6px;
+    background:linear-gradient(135deg,#fef3c7,#fde68a);
+    color:#92400e;
+    border:1px solid rgba(245,158,11,.3);
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.02em;
+  }
+  .c-tag{
+    font-size:10px; font-weight:700;
+    color:var(--muted);
+    letter-spacing:.06em; text-transform:uppercase;
+  }
+
+  /* ─────────── COMMON ─────────── */
+  .card.common{
+    --hat-1: #f8fafc;
+    --hat-2: #eef0f7;
+    --hat-ink: rgba(148,163,184,.30);
+    --c-glow: rgba(148,163,184,.22);
+    --halo:   rgba(148,163,184,.18);
+  }
+  .card.common .c-orb{
+    background:radial-gradient(circle at 32% 28%, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%);
+  }
+  .card.common .c-rar{color:#475569;}
+
+  /* ─────────── RARE ─────────── */
+  .card.rare{
+    --hat-1: #eff6ff;
+    --hat-2: #dbeafe;
+    --hat-ink: rgba(59,130,246,.32);
+    --c-glow: rgba(59,130,246,.32);
+    --halo:   rgba(59,130,246,.28);
+    --c-ring: rgba(59,130,246,.26);
+  }
+  .card.rare:hover{border-color:rgba(59,130,246,.5);}
+  .card.rare .c-orb{
+    background:radial-gradient(circle at 32% 28%, #dbeafe 0%, #60a5fa 38%, #2563eb 95%);
+  }
+  .card.rare .c-rar{color:#1d4ed8;}
+  .card.rare .c-pct{color:#1d4ed8;}
+
+  /* ─────────── EPIC ─────────── */
+  .card.epic{
+    --hat-1: #faf5ff;
+    --hat-2: #f3e8ff;
+    --hat-ink: rgba(168,85,247,.32);
+    --c-glow: rgba(168,85,247,.35);
+    --halo:   rgba(168,85,247,.30);
+    --c-ring: rgba(168,85,247,.30);
+  }
+  .card.epic:hover{border-color:rgba(168,85,247,.55);}
+  /* animated border on hover */
+  .card.epic::after{
+    content:""; position:absolute; inset:0;
+    border-radius:inherit;
+    padding:1px;
+    background:conic-gradient(from 0deg,
+      rgba(168,85,247,0),
+      rgba(192,132,252,.6) 25%,
+      rgba(168,85,247,.9) 50%,
+      rgba(192,132,252,.6) 75%,
+      rgba(168,85,247,0));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    opacity:0;
+    transition:opacity .3s;
+    pointer-events:none;
+    z-index:5;
+  }
+  .card.epic:hover::after{opacity:1; animation:spin 5s linear infinite;}
+  @keyframes spin{ to{transform:rotate(360deg);} }
+  .card.epic .c-orb{
+    background:radial-gradient(circle at 32% 28%, #f5e8ff 0%, #c084fc 38%, #7c3aed 95%);
+  }
+  .card.epic .c-rar{color:#7c3aed;}
+  .card.epic .c-pct{color:#7c3aed;}
+
+  /* ─────────── LEGENDARY ─────────── */
+  .card.legend{
+    --hat-1: #fffaf0;
+    --hat-2: #fef3c7;
+    --hat-ink: rgba(245,158,11,.32);
+    --c-glow: rgba(245,158,11,.40);
+    --halo:   rgba(245,158,11,.38);
+    --c-ring: rgba(245,158,11,.42);
+  }
+  .card.legend:hover{border-color:rgba(245,158,11,.65);}
+  /* always-on holographic conic ring */
+  .card.legend::after{
+    content:""; position:absolute; inset:0;
+    border-radius:inherit;
+    padding:1.2px;
+    background:conic-gradient(from 0deg,
+      #fcd34d, #fef3c7, #d97706, #fbbf24, #b45309, #fcd34d, #fde68a, #d97706, #fcd34d);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:spin 14s linear infinite;
+    opacity:.75;
+    pointer-events:none;
+    z-index:5;
+  }
+  .card.legend:hover::after{opacity:1; animation-duration:6s;}
+  .card.legend .c-orb{
+    background:radial-gradient(circle at 32% 28%, #fffaf0 0%, #fcd34d 28%, #f59e0b 70%, #b45309 100%);
+    box-shadow:
+      0 0 0 5px #fff,
+      0 0 0 6px rgba(245,158,11,.42),
+      0 14px 24px -8px rgba(245,158,11,.55),
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -5px 12px rgba(180,83,9,.22);
+  }
+  /* sparkles on orb */
+  .c-orb-wrap .orb-spark{
+    position:absolute;
+    width:5px; height:5px;
+    background:
+      linear-gradient(90deg, transparent 45%, #fff 50%, transparent 55%) center/100% 1px no-repeat,
+      linear-gradient(0deg, transparent 45%, #fff 50%, transparent 55%) center/1px 100% no-repeat;
+    filter:drop-shadow(0 0 3px rgba(252,211,77,.95));
+    opacity:0;
+    pointer-events:none;
+    z-index:4;
+  }
+  .card.legend .orb-spark{opacity:.95; animation:twinkle 2.4s ease-in-out infinite;}
+  .c-orb-wrap .orb-spark.o1{top:-4px; left:8px;}
+  .c-orb-wrap .orb-spark.o2{bottom:2px; right:2px; animation-delay:1.2s;}
+  @keyframes twinkle{
+    0%,100%{transform:scale(.6); opacity:.3;}
+    50%{transform:scale(1.4); opacity:1;}
+  }
+  .card.legend .c-rar{color:#92400e;}
+  .card.legend .c-pct{color:#b45309;}
+  .card.legend .c-title{
+    background:linear-gradient(135deg,#b45309,#f59e0b,#d97706);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+
+  /* ════════════════════════════════════════
+       LOCKED — mystery silhouette
+       ════════════════════════════════════════ */
+  .card.locked{
+    --c-glow: rgba(15,18,38,.06);
+    --halo:   rgba(15,18,38,.06);
+    border:1.5px dashed var(--line);
+    cursor:default;
+  }
+  .card.locked::after{display:none;}
+  .card.locked:hover{transform:translateY(-2px); border-color:rgba(124,58,237,.32);}
+  /* Locked hat: faded rarity color + diagonal stripes overlay */
+  .card.locked::before{
+    background:
+      repeating-linear-gradient(45deg, rgba(15,18,38,.025) 0 8px, transparent 8px 16px),
+      radial-gradient(80% 90% at 50% 0%, var(--hat-1) 0%, var(--hat-2) 60%, transparent 100%),
+      var(--hat-2);
+    opacity:.7;
+    mask-image:linear-gradient(180deg, #000 0%, #000 65%, transparent 100%);
+    -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 65%, transparent 100%);
+  }
+  .card.locked .c-hat-tex{opacity:.25;}
+
+  .card.locked .c-orb{
+    background:linear-gradient(140deg,#eef0f7,#dde0eb);
+    box-shadow:
+      0 0 0 5px #fff,
+      0 0 0 6px var(--line),
+      0 8px 16px -8px rgba(15,18,38,.10),
+      inset 0 1px 0 rgba(255,255,255,.6),
+      inset 0 -3px 10px rgba(15,18,38,.05);
+    overflow:hidden;
+  }
+  .card.locked .c-orb svg{
+    fill:#9aa0bf;
+    filter:blur(3px) saturate(0);
+    opacity:.55;
+  }
+  /* lock badge */
+  .c-lock{
+    position:absolute;
+    bottom:-2px; right:-2px;
+    z-index:4;
+    width:24px; height:24px;
+    border-radius:50%;
+    background:#fff;
+    border:1.5px solid var(--line);
+    display:grid; place-items:center;
+    box-shadow:0 2px 6px rgba(15,18,38,.12);
+  }
+  .c-lock svg{width:11px; height:11px; fill:var(--muted);}
+  .card.locked.legend .c-lock{border-color:rgba(245,158,11,.5);}
+  .card.locked.legend .c-lock svg{fill:#b45309;}
+  .card.locked.epic .c-lock{border-color:rgba(168,85,247,.45);}
+  .card.locked.epic .c-lock svg{fill:#7c3aed;}
+  .card.locked.rare .c-lock{border-color:rgba(59,130,246,.45);}
+  .card.locked.rare .c-lock svg{fill:#1d4ed8;}
+
+  .card.locked .c-title{color:var(--ink-2);}
+
+  /* progress block at bottom of locked cards */
+  .c-prog{
+    margin:12px 12px 12px;
+    padding-top:10px;
+    border-top:1px dashed var(--line-2);
+    position:relative; z-index:2;
+  }
+  .c-prog-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:5px;
+    font-size:10px; color:var(--muted);
+    letter-spacing:.02em;
+  }
+  .c-prog-row b{
+    color:var(--ink); font-weight:800;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .c-prog-bar{
+    height:5px; border-radius:999px;
+    background:rgba(15,18,38,.06);
+    overflow:hidden;
+  }
+  .c-prog-bar i{
+    display:block; height:100%; border-radius:999px;
+    background:linear-gradient(90deg,#a78bfa,#7c3aed);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .card.locked.legend .c-prog-bar i{background:linear-gradient(90deg,#fcd34d,#f59e0b);}
+  .card.locked.epic   .c-prog-bar i{background:linear-gradient(90deg,#c084fc,#9333ea);}
+  .card.locked.rare   .c-prog-bar i{background:linear-gradient(90deg,#60a5fa,#3b82f6);}
+
+  /* "New" mini-corner */
+  .c-new{
+    position:absolute; top:9px; right:9px;
+    z-index:4;
+    font-size:8.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+    padding:2px 6px; border-radius:4px;
+    color:#fff;
+    background:linear-gradient(135deg,#f59e0b,#d97706);
+    box-shadow:0 2px 6px -2px rgba(245,158,11,.5);
+  }
+  .c-new ~ .c-pct{display:none;}
+
+  /* footnote */
+  .footnote{
+    padding:0 8px;
+    font-size:12px; color:var(--muted);
+    text-align:center;
+    line-height:1.55;
+  }
+  .footnote a{color:var(--primary); text-decoration:underline; text-underline-offset:2px;}
+
+  /* responsive */
+  @media (max-width: 1180px){
+    .a-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+  }
+  @media (max-width: 820px){
+    .a-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- TOP NAV -->
+  <div class="top">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">IQMO</div>
+      <span class="brand-sep">·</span>
+      <nav class="breadcrumbs">
+        <a href="profile-v5.html">Профиль</a>
+        <span style="color:var(--muted-2)">/</span>
+        <b>Коллекция</b>
+      </nav>
+    </div>
+    <div class="nav-right">
+      <button class="pill is--ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V10a6 6 0 1 0-12 0v6l-2 2v1h16v-1l-2-2z"/></svg>
+        Уведомления
+      </button>
+      <a class="pill" href="profile-v5.html">← В профиль</a>
+      <div class="avatar-mini" aria-label="Даша"></div>
+    </div>
+  </div>
+
+  <!-- Crumbs -->
+  <nav class="crumbs">
+    <a href="#">Главная</a><span class="sep">/</span>
+    <a href="profile-v5.html">Профиль</a><span class="sep">/</span>
+    <span style="color:#7c3aed;font-weight:600;">Коллекция</span>
+  </nav>
+
+  <!-- ════════════════════════════
+       ACHIEVEMENTS — compact, profile-style
+       ════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div>
+        <div class="sec-eye">Коллекция</div>
+        <h2 class="sec-title">Награды и достижения</h2>
+      </div>
+      <a class="sec-link" href="profile-v5.html">← Назад в профиль</a>
+    </div>
+
+    <div class="panel">
+
+      <!-- toolbar (matches profile-v5 ach-toolbar) -->
+      <div class="ach-toolbar">
+        <div class="ach-counter">
+          <span><span class="cnt-big">14</span> / 48 получено</span>
+          <span style="color:var(--muted-2);">·</span>
+          <span>редкость <span class="grade">B+</span></span>
+          <span style="color:var(--muted-2);">·</span>
+          <span>топ‑<b>12%</b> по легендарным</span>
+        </div>
+        <div class="ach-filter" role="tablist">
+          <button class="is-on">Все <span class="cnt">48</span></button>
+          <button><span class="rd leg"></span> Леги <span class="cnt">6</span></button>
+          <button><span class="rd epi"></span> Эпики <span class="cnt">9</span></button>
+          <button><span class="rd rar"></span> Редкие <span class="cnt">17</span></button>
+          <button><span class="rd com"></span> Обычные <span class="cnt">16</span></button>
+        </div>
+      </div>
+
+      <!-- ════════ LEGENDARY ════════ -->
+      <div class="group">
+        <div class="group-head">
+          <h3><span class="g-dot leg"></span> Легендарные</h3>
+          <span class="gh-meta">собрано <b>2 / 6</b></span>
+        </div>
+
+        <div class="a-grid">
+
+          <article class="card legend">
+            <span class="c-rar">★ Легендарная</span>
+            <span class="c-pct">1.8%</span>
+            <div class="c-orb-wrap">
+              <span class="orb-spark o1"></span>
+              <span class="orb-spark o2"></span>
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M2 7l4 4 6-8 6 8 4-4-2 12H4L2 7zm3 14h14v2H5z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Магистр биологии</h4>
+              <div class="c-sub">12 ноя 2026</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+500 XP</span>
+              <span class="c-tag">★ Лега</span>
+            </div>
+          </article>
+
+          <article class="card legend">
+            <span class="c-rar">★ Легендарная</span>
+            <span class="c-pct">2.4%</span>
+            <div class="c-orb-wrap">
+              <span class="orb-spark o1"></span>
+              <span class="orb-spark o2"></span>
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M9 2v6l-5 9a3 3 0 0 0 2.7 4.4h10.6A3 3 0 0 0 20 17l-5-9V2H9zm2 2h2v5l4.3 7.8H6.7L11 9V4z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Магистр химии</h4>
+              <div class="c-sub">5 мая 2026</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+500 XP</span>
+              <span class="c-tag">★ Лега</span>
+            </div>
+          </article>
+
+          <article class="card legend locked">
+            <span class="c-rar">★ Легендарная</span>
+            <span class="c-pct">0.6%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M3.4 8.6a10 10 0 0 1 17.2 0 10 10 0 0 1 0 6.8 10 10 0 0 1-17.2 0 10 10 0 0 1 0-6.8z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              </div>
+              <div class="c-lock">
+                <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Ядро знаний</h4>
+              <div class="c-sub">50 подтем без ошибок</div>
+            </div>
+            <div class="c-prog">
+              <div class="c-prog-row"><span>прогресс</span><span><b>38</b>/50</span></div>
+              <div class="c-prog-bar"><i style="width:76%"></i></div>
+            </div>
+          </article>
+
+          <article class="card legend locked">
+            <span class="c-rar">★ Легендарная</span>
+            <span class="c-pct">0.1%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 2 14.4 8.6 21 9l-5.2 4.5L17.2 21 12 17.3 6.8 21l1.4-7.5L3 9l6.6-.4z"/></svg>
+              </div>
+              <div class="c-lock">
+                <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">LVL 50</h4>
+              <div class="c-sub">38 уровней впереди</div>
+            </div>
+            <div class="c-prog">
+              <div class="c-prog-row"><span>уровень</span><span><b>12</b>/50</span></div>
+              <div class="c-prog-bar"><i style="width:24%"></i></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- ════════ EPIC ════════ -->
+      <div class="group">
+        <div class="group-head">
+          <h3><span class="g-dot epi"></span> Эпические</h3>
+          <span class="gh-meta">собрано <b>3 / 9</b></span>
+        </div>
+
+        <div class="a-grid">
+
+          <article class="card epic">
+            <span class="c-new">New</span>
+            <span class="c-rar">◆ Эпическая</span>
+            <span class="c-pct">6.2%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M13 2s4 5 4 9a4 4 0 0 1-8 0c0-2 1-3 1-3s-2 1-3 4a6 6 0 0 0 12 0c0-5-6-10-6-10z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Железная воля</h4>
+              <div class="c-sub">7 дней подряд</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+200 XP</span>
+              <span class="c-tag">2 мая</span>
+            </div>
+          </article>
+
+          <article class="card epic">
+            <span class="c-rar">◆ Эпическая</span>
+            <span class="c-pct">4.1%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5 4 9.8 9 11 5-1.2 9-6 9-11V5l-9-4zm-1 15-4-4 1.4-1.4L11 13.2l5.6-5.6L18 9z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Без ошибок</h4>
+              <div class="c-sub">Вариант на 100%</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+250 XP</span>
+              <span class="c-tag">28 апр</span>
+            </div>
+          </article>
+
+          <article class="card epic">
+            <span class="c-rar">◆ Эпическая</span>
+            <span class="c-pct">7.8%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M5 3c5 3 9 9 14 18M5 21c5-3 9-9 14-18M7 7h10M7 17h10M9 11h6M9 13h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Биоинженер</h4>
+              <div class="c-sub">Блок «Генетика»</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+250 XP</span>
+              <span class="c-tag">20 апр</span>
+            </div>
+          </article>
+
+          <article class="card epic locked">
+            <span class="c-rar">◆ Эпическая</span>
+            <span class="c-pct">3.4%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M9 2v6l-5 9a3 3 0 0 0 2.7 4.4h10.6A3 3 0 0 0 20 17l-5-9V2H9z"/></svg>
+              </div>
+              <div class="c-lock">
+                <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Алхимик</h4>
+              <div class="c-sub">Все темы химии 80%+</div>
+            </div>
+            <div class="c-prog">
+              <div class="c-prog-row"><span>темы</span><span><b>12</b>/24</span></div>
+              <div class="c-prog-bar"><i style="width:50%"></i></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- ════════ RARE ════════ -->
+      <div class="group">
+        <div class="group-head">
+          <h3><span class="g-dot rar"></span> Редкие</h3>
+          <span class="gh-meta">собрано <b>5 / 17</b></span>
+        </div>
+
+        <div class="a-grid">
+
+          <article class="card rare">
+            <span class="c-rar">◇ Редкая</span>
+            <span class="c-pct">18%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 2 14.4 8.6 21 9l-5.2 4.5L17.2 21 12 17.3 6.8 21l1.4-7.5L3 9l6.6-.4z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Сотня очков</h4>
+              <div class="c-sub">100 верных ответов</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+150 XP</span>
+              <span class="c-tag">23 апр</span>
+            </div>
+          </article>
+
+          <article class="card rare">
+            <span class="c-rar">◇ Редкая</span>
+            <span class="c-pct">22%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Тройка</h4>
+              <div class="c-sub">3 теста подряд</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+100 XP</span>
+              <span class="c-tag">20 апр</span>
+            </div>
+          </article>
+
+          <article class="card rare">
+            <span class="c-rar">◇ Редкая</span>
+            <span class="c-pct">16%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 2 4 9l8 13 8-13zm0 3 5 4-5 9-5-9z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Кристалл темпа</h4>
+              <div class="c-sub">10 быстрых тестов</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+120 XP</span>
+              <span class="c-tag">16 апр</span>
+            </div>
+          </article>
+
+          <article class="card rare locked">
+            <span class="c-rar">◇ Редкая</span>
+            <span class="c-pct">9%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2zm0 4v6l4 4 1.4-1.4L13 11.2V6z"/></svg>
+              </div>
+              <div class="c-lock">
+                <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Марафонец</h4>
+              <div class="c-sub">14 дней подряд</div>
+            </div>
+            <div class="c-prog">
+              <div class="c-prog-row"><span>серия</span><span><b>5</b>/14</span></div>
+              <div class="c-prog-bar"><i style="width:36%"></i></div>
+            </div>
+          </article>
+
+          <article class="card rare locked">
+            <span class="c-rar">◇ Редкая</span>
+            <span class="c-pct">11%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 2 14.4 8.6 21 9l-5.2 4.5L17.2 21 12 17.3 6.8 21l1.4-7.5L3 9l6.6-.4z"/></svg>
+              </div>
+              <div class="c-lock">
+                <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Десятка тестов</h4>
+              <div class="c-sub">10 решённых тестов</div>
+            </div>
+            <div class="c-prog">
+              <div class="c-prog-row"><span>тесты</span><span><b>6</b>/10</span></div>
+              <div class="c-prog-bar"><i style="width:60%"></i></div>
+            </div>
+          </article>
+
+          <article class="card rare locked">
+            <span class="c-rar">◇ Редкая</span>
+            <span class="c-pct">14%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 2 4 9l8 13 8-13zm0 3 5 4-5 9-5-9z"/></svg>
+              </div>
+              <div class="c-lock">
+                <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">LVL 15</h4>
+              <div class="c-sub">3 уровня впереди</div>
+            </div>
+            <div class="c-prog">
+              <div class="c-prog-row"><span>уровень</span><span><b>12</b>/15</span></div>
+              <div class="c-prog-bar"><i style="width:80%"></i></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- ════════ COMMON ════════ -->
+      <div class="group">
+        <div class="group-head">
+          <h3><span class="g-dot com"></span> Обычные</h3>
+          <span class="gh-meta">собрано <b>4 / 16</b></span>
+        </div>
+
+        <div class="a-grid">
+
+          <article class="card common">
+            <span class="c-rar">Обычная</span>
+            <span class="c-pct">62%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 2 8 8h3v8H7l5 6 5-6h-4V8h3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Старт</h4>
+              <div class="c-sub">Первый вариант</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+25 XP</span>
+              <span class="c-tag">19 апр</span>
+            </div>
+          </article>
+
+          <article class="card common">
+            <span class="c-rar">Обычная</span>
+            <span class="c-pct">38%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1zm-1 16H8v-6H6V9h5zm6-1.5a1.5 1.5 0 0 1-3 0v-5a1.5 1.5 0 0 1 3 0z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Десятка</h4>
+              <div class="c-sub">10 попыток</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+50 XP</span>
+              <span class="c-tag">22 апр</span>
+            </div>
+          </article>
+
+          <article class="card common">
+            <span class="c-rar">Обычная</span>
+            <span class="c-pct">44%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M4 3h7v18l-3-2-4 2zm9 0h7v18l-4-2-3 2z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">Первая глава</h4>
+              <div class="c-sub">Тема освоена</div>
+            </div>
+            <div class="c-foot">
+              <span class="c-xp">+30 XP</span>
+              <span class="c-tag">21 апр</span>
+            </div>
+          </article>
+
+          <article class="card common locked">
+            <span class="c-rar">Обычная</span>
+            <span class="c-pct">28%</span>
+            <div class="c-orb-wrap">
+              <div class="c-orb">
+                <svg viewBox="0 0 24 24"><path d="M13 2s4 5 4 9a4 4 0 0 1-8 0c0-2 1-3 1-3s-2 1-3 4a6 6 0 0 0 12 0c0-5-6-10-6-10z"/></svg>
+              </div>
+              <div class="c-lock">
+                <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3z"/></svg>
+              </div>
+            </div>
+            <div class="c-title-block">
+              <h4 class="c-title">7 дней подряд</h4>
+              <div class="c-sub">Закройте ещё 2 дня</div>
+            </div>
+            <div class="c-prog">
+              <div class="c-prog-row"><span>серия</span><span><b>5</b>/7</span></div>
+              <div class="c-prog-bar"><i style="width:71%"></i></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- footnote -->
+  <p class="footnote">
+    Награды и уровни — это <a href="#">дополнительная мотивация</a>, а не учебный результат.
+    Главная цель — освоение тем и подготовка к экзамену.
+  </p>
+
+</div>
+
+<script>
+  // Filter bar — visual toggle only
+  document.querySelectorAll('.ach-filter button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('is-on'));
+      btn.classList.add('is-on');
+    });
+  });
+</script>
+
+</body>
+</html>
