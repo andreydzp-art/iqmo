@@ -1077,61 +1077,53 @@
 		);
 	}
 
+	/* ВИТРИНА полученных наград. Профиль больше НЕ показывает каталог
+	   всех возможных ачивок — только то, что пользователь уже получил.
+	   Никаких закрытых/серых/в-процессе/будущих карточек, никаких
+	   фильтров, никаких процентов получения у неполученных. Если
+	   пользователь не открыл ни одной награды — empty-state. */
 	function renderAchievements(list, avatarUrl) {
-		var earned = list.filter(function (a) { return a.unlocked; }).length;
-		var legendRare = list.filter(function (a) {
-			return a.unlocked && (a.rarity === 'legend' || a.rarity === 'epic');
-		}).length;
-		var grade = collectionGrade(earned, list.length, legendRare);
-		var inProgressCount = list.filter(function (a) { return a.inProgress; }).length;
-		var lockedCount = list.filter(function (a) { return !a.unlocked && !a.inProgress; }).length;
+		var earnedList = list.filter(function (a) { return a.unlocked; });
+		var earned = earnedList.length;
 		var avChip = avatarUrl
 			? '<img class="prof-ach-avatar" src="' + esc(avatarUrl) + '" alt="" width="40" height="40" />'
 			: '';
-		var cards = list.map(renderAchievementCard).join('');
+
+		var body;
+		if (earned === 0) {
+			body =
+				'<div class="ach-empty" role="status">' +
+					'<div class="ach-empty-ico" aria-hidden="true">' +
+						'<svg viewBox="0 0 24 24" width="28" height="28"><path d="M12 2.5 14.6 8.7 21.3 9.4 16.2 13.9 17.7 20.5 12 17.1 6.3 20.5 7.8 13.9 2.7 9.4 9.4 8.7 Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' +
+					'</div>' +
+					'<div class="ach-empty-title">Пока нет наград</div>' +
+					'<div class="ach-empty-sub">Проходите варианты, выполняйте серии и открывайте достижения.</div>' +
+				'</div>';
+		} else {
+			body = '<div class="ach-grid" data-ach-filter="all">' + earnedList.map(renderAchievementCard).join('') + '</div>';
+		}
 
 		return (
 			'<section><div class="sec-head"><div class="sec-head-with-av">' + avChip +
 			'<div><div class="sec-eye">Коллекция</div><h2 class="sec-title">Награды и достижения</h2></div></div>' +
-			'<span class="sec-link" aria-hidden="true">Всего ' + list.length + ' достижений</span></div>' +
+			'<span class="sec-link" aria-hidden="true">Всего получено: ' + earned + '</span></div>' +
 			'<div class="panel ach-panel">' +
-				'<div class="ach-toolbar">' +
-					'<div class="ach-counter">' +
-						'<span><span class="cnt-big">' + earned + '</span> / ' + list.length + ' получено</span>' +
-						'<span style="color:var(--muted-2);">·</span>' +
-						'<span>редкость коллекции <span class="grade">' + esc(grade) + '</span></span>' +
-					'</div>' +
-					'<div class="ach-filter" role="tablist" data-ach-filter-bar>' +
-						'<button type="button" class="is-on" data-filter="all" role="tab" aria-selected="true">Все <span class="cnt">' + list.length + '</span></button>' +
-						'<button type="button" data-filter="earned" role="tab" aria-selected="false">Получено <span class="cnt">' + earned + '</span></button>' +
-						'<button type="button" data-filter="inprogress" role="tab" aria-selected="false">В процессе <span class="cnt">' + inProgressCount + '</span></button>' +
-						'<button type="button" data-filter="locked" role="tab" aria-selected="false">Закрыто <span class="cnt">' + lockedCount + '</span></button>' +
-					'</div>' +
+				'<div class="ach-toolbar ach-toolbar--simple">' +
+					'<div class="ach-sub">Здесь появляются только награды, которые вы уже получили.</div>' +
+					(earned > 0
+						? '<div class="ach-counter"><span><span class="cnt-big">' + earned + '</span> получено</span></div>'
+						: ''
+					) +
 				'</div>' +
-				'<div class="ach-grid" data-ach-filter="all">' + cards + '</div>' +
+				body +
 			'</div></section>'
 		);
 	}
 
-	function bindAchievementsFilter() {
-		var root = document.getElementById('prof-root');
-		if (!root || root.__achFilterBound) return;
-		root.__achFilterBound = true;
-		root.addEventListener('click', function (ev) {
-			var btn = ev.target && ev.target.closest && ev.target.closest('[data-ach-filter-bar] button[data-filter]');
-			if (!btn) return;
-			var bar = btn.closest('[data-ach-filter-bar]');
-			var grid = bar && bar.parentNode && bar.parentNode.parentNode &&
-				bar.parentNode.parentNode.querySelector('.ach-grid');
-			if (!grid) return;
-			bar.querySelectorAll('button[data-filter]').forEach(function (b) {
-				var on = b === btn;
-				b.classList.toggle('is-on', on);
-				b.setAttribute('aria-selected', on ? 'true' : 'false');
-			});
-			grid.setAttribute('data-ach-filter', btn.getAttribute('data-filter') || 'all');
-		});
-	}
+	/* Профиль теперь — витрина полученных, фильтров «Все / Получено /
+	   В процессе / Закрыто» больше нет. Функция оставлена no-op для
+	   обратной совместимости с profile-app.js, который её вызывает. */
+	function bindAchievementsFilter() { /* no-op */ }
 
 	function renderActivity(events) {
 		var rows = events.map(function (ev) {

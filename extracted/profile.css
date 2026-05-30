@@ -753,10 +753,55 @@
     grid-template-columns:repeat(6, minmax(0,1fr));
     gap:12px;
   }
-  /* Фильтр коллекции — скрываем карточки, не подходящие под выбранный таб. */
+  /* Фильтр коллекции — legacy. Сейчас профиль — витрина полученных
+     (только .unlocked-карточки попадают в .ach-grid), фильтр-табы
+     удалены из разметки. Селекторы оставлены: если в будущем кто-то
+     добавит .ach-grid c data-ach-filter, поведение будет ожидаемым. */
   .ach-grid[data-ach-filter="earned"]     .ach:not([data-state="earned"])     { display:none; }
   .ach-grid[data-ach-filter="inprogress"] .ach:not([data-state="inprogress"]) { display:none; }
   .ach-grid[data-ach-filter="locked"]     .ach:not([data-state="locked"])     { display:none; }
+  /* ── Упрощённая «шапка» коллекции (без таб-фильтров) ──
+     Слева — подзаголовок-объяснение, справа — счётчик «N получено». */
+  .ach-toolbar.ach-toolbar--simple .ach-sub{
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.45;
+    max-width:560px;
+  }
+  /* ── Empty-state «Пока нет наград» ──
+     Показывается, когда у пользователя нет ни одной полученной
+     карточки. Не плейсхолдер ачивки, а информационная пустышка. */
+  .ach-empty{
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; text-align:center;
+    gap:8px;
+    padding:48px 24px;
+    min-height:200px;
+    border:1px dashed var(--line-2);
+    border-radius:14px;
+    background:rgba(255,255,255,.5);
+    color:var(--muted);
+  }
+  .ach-empty .ach-empty-ico{
+    width:56px; height:56px;
+    display:grid; place-items:center;
+    border-radius:50%;
+    background:rgba(168,85,247,.08);
+    color:#9333ea;
+    margin-bottom:4px;
+  }
+  .ach-empty .ach-empty-ico svg{ display:block; }
+  .ach-empty .ach-empty-title{
+    font-size:15px; font-weight:800;
+    color:var(--ink);
+    letter-spacing:-.005em;
+  }
+  .ach-empty .ach-empty-sub{
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.5;
+    max-width:420px;
+  }
   /* ════════════════════════════════════════════════════════════
        РЕФ-КАРТА (collectible epic) — из прототипа Card Lab v15.
        Карта занимает 2×2 ячейки сетки достижений, внутри всё
