@@ -1336,6 +1336,8 @@
 
 	global.IqmoProfileRender = {
 		render: render,
+		renderHero: renderHero,
+		patchHero: patchHero,
 		renderError: renderError,
 		bindCollectibles: bindCollectibles,
 		bindAvatarPicker: bindAvatarPicker,

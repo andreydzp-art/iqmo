@@ -37,6 +37,9 @@
 		<link rel="stylesheet" href="/iqmo-base.css?v=10" />
 		<link rel="stylesheet" href="/iqmo-topnav.css?v=6" />
 		<link rel="stylesheet" href="/iqmo-hub-hero.css?v=5" />
+		<link rel="stylesheet" href="/profile.css?v=22" />
+		<link rel="stylesheet" href="/profile-hero.css?v=17" />
+		<link rel="stylesheet" href="/profile-avatar-picker.css?v=6" />
 		<link rel="stylesheet" href="/chemistry-level-map.css?v=3" />
 		<link rel="stylesheet" href="/iqmo-chapter-discussion.css?v=8" />
 		<script>try{if(!/[?&]v=/.test(location.search))document.documentElement.classList.add('is--hub');}catch(e){}</script>
@@ -1405,6 +1408,8 @@
 		<script src="/iqmo-avatar.js?v=1"></script>
 		<script src="/chem-progress.js?v=10"></script>
 		<script src="/iqmo-orbit-dots.js?v=1"></script>
+		<script src="/profile-data.js?v=10"></script>
+		<script src="/profile-render.js?v=40"></script>
 		<script>if(/[?&]v=/.test(location.search)){document.write('<script src="/iqmo-live-activity.js?v=2"><\/script><script src="/iqmo-test-runner-layout.js?v=7"><\/script><script src="/iqmo-test-runner-render.js?v=1"><\/script><script src="/iqmo-test-runner-presence.js?v=4"><\/script><script src="/iqmo-test-runner-rewards.js?v=7"><\/script><script src="/iqmo-test-runner-fx.js?v=3"><\/script>');}</script>
 		<script src="/iqmo-leaderboard-ui.js?v=1"></script>
 		<script src="/iqmo-variant-best.js?v=1"></script>
@@ -3040,7 +3045,7 @@
 
 				picker.innerHTML = `
 					<div class="lm lm-shell">
-						${lmHeroProfileHtml({ stats, heroStats, streakStatus, nextActionId, subjectSlug: 'biology' })}
+						<div data-iqmo-profile-hero-mount class="iqmo-profile-hero-mount" aria-busy="true"></div>
 						${bossBest ? lmCh2PromoHtml() : ''}
 						<div id="bio-map-host"></div>
 						${IqmoChapterDiscussion.html()}
@@ -3048,7 +3053,7 @@
 						${lmTipHtml(stats, bossInfo)}
 					</div>
 				`;
-				paintCompactHeroStreakOrb(picker);
+				mountIqmoProfileHero(picker);
 
 				const mapHost = document.getElementById('bio-map-host');
 				if (mapHost && window.IqmoChemLevelMap) {
@@ -3466,12 +3471,69 @@
 			}
 
 			/**
+			 * Монтирует hero-блок профиля 1:1 как на /profile/.
+			 * Раньше тут жил кастомный compact-hero (lmHeroProfileHtml +
+			 * paintCompactHeroStreakOrb), но пользователь явно попросил
+			 * «должен быть точно такой же блок, как и в профиле». Поэтому
+			 * подключаем профильный пайплайн: IqmoProfileData.build(meUser)
+			 * → IqmoProfileRender.renderHero(...) → подмена placeholder'а
+			 * в DOM. Если /api/me ещё не готов / IqmoProfileRender не
+			 * подгружен — оставляем aria-busy и тихо выходим (старый
+			 * compact-hero не возвращаем — отсебятина по требованию снята).
+			 */
+			function mountIqmoProfileHero(host) {
+				if (!host) return;
+				var mount = host.querySelector('[data-iqmo-profile-hero-mount]');
+				if (!mount) return;
+				if (!window.IqmoProfileData || !window.IqmoProfileRender || !window.__iqmoMe) return;
+
+				function inject(meUser) {
+					try {
+						var data = window.IqmoProfileData.build(meUser || {});
+						var html = window.IqmoProfileRender.renderHero({
+							profileData: data,
+							isPublic: false,
+							socialSignals: []
+						});
+						var wrap = document.createElement('div');
+						wrap.innerHTML = html;
+						var hero = wrap.firstElementChild;
+						if (!hero) return;
+						mount.replaceWith(hero);
+						if (window.IqmoProfileRender.bindAvatarPicker) {
+							try { window.IqmoProfileRender.bindAvatarPicker(); } catch (e) {}
+						}
+						if (window.IqmoProfileRender.bindNameEdit) {
+							try { window.IqmoProfileRender.bindNameEdit(); } catch (e) {}
+						}
+					} catch (err) {
+						// Если что-то пошло не так — placeholder остаётся,
+						// без alert'ов в проде. Сообщение для отладки.
+						if (window.console && console.warn) {
+							console.warn('[full-test-biology] mountIqmoProfileHero failed:', err);
+						}
+					}
+				}
+
+				try {
+					if (window.__iqmoMe && typeof window.__iqmoMe.then === 'function') {
+						window.__iqmoMe.then(function (me) { inject(me); })
+							.catch(function () { inject(null); });
+					} else {
+						inject(null);
+					}
+				} catch (e) { inject(null); }
+			}
+
+			/**
 			 * Заполняет streak-orb в compact hero орбитальными точками после
 			 * того, как /api/me ответит. Дни на платформе = дни в IQMO; точки
 			 * рисует общий компонент IqmoOrbitDots (см. /iqmo-orbit-dots.js).
 			 * Делаем «patch DOM», чтобы при ре-рендере hero (после level-up)
 			 * не сбрасывать CSS-анимацию вращения — обновляем точки только если
 			 * число дней действительно поменялось (data-orbit-days сравнение).
+			 *
+			 * Оставлено как dead-code на случай отката к compact-hero.
 			 */
 			function paintCompactHeroStreakOrb(host) {
 				if (!host || !window.IqmoOrbitDots) return;
