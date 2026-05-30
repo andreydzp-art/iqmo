@@ -482,17 +482,18 @@
 
 	function renderAchievementCard(a) {
 		var state = achCardState(a);
-		// Единый шаблон коллекции: ВСЕ редкости (common/rare/epic/
-		// legend/myth) рендерятся через .ach. Раньше chem_stage1
-		// (epic) и bio_stage1 (rare) уходили в .ach--illus с
-		// богатой ref-сценой, отдельным .c-reward внизу и собственным
-		// прогресс-баром — у этих карточек XP-чип визуально оказывался
-		// «не на той же полке», что у соседей. По требованию
-		// (структура «верх → редкость, центр → иконка/название/описание,
-		// низ → прогресс/XP-чип») вернули их под .ach. Художественность
-		// химии/биологии теперь живёт в специальных иконках flask/leaf
-		// в ICONS — они подставляются в .a-art и наследуют всю rarity-
-		// палитру, как у остальных карточек.
+		// Единый LAYOUT (верх=редкость → центр=иконка/название → низ=XP),
+		// но НЕ единый визуальный стиль:
+		//   • обычные/легендарные → базовый .ach с круглой иконкой
+		//     и компактным XP-чипом внизу (.a-xp, position:absolute);
+		//   • эпические/редкие иллюстрированные коллекционные —
+		//     .ach--illus с уникальным фоном (лавандовый/синий halo,
+		//     hex-сцена, орбит-сфера с колбой/листом, золотой ободок
+		//     при hover) и собственным reward-блоком .c-reward,
+		//     который уже стоит внизу карточки в flex-flow.
+		// Триггер — поле iconUrl в каталоге (см. profile-data.js).
+		var hasIllus = !!a.iconUrl;
+		if (hasIllus) return renderAchievementCardIllus(a, state);
 		var cls = a.unlocked ? a.rarity : (a.rarity + ' locked');
 		var icon = ICONS[a.icon] || ICONS.star;
 		var artInner = '<svg viewBox="0 0 24 24">' + icon + '</svg>';
@@ -829,6 +830,9 @@
 		if (a.unlocked) cls.push('is-earned');
 
 		var rarText = rarityLabel(rar);
+		// Процент-плашка слева сверху — единая «верхняя полка»
+		// у всех карточек коллекции (правая часть — c-rar/a-rar).
+		var pctText = (a.pctRare != null) ? rarityPrefix(rar) + a.pctRare + '%' : '';
 
 		var progPct = 0, progCur = 0, progTgt = 1;
 		if (a.progress) {
@@ -921,6 +925,7 @@
 		return (
 			'<article class="' + cls.join(' ') + '" data-state="' + state + '" tabindex="0">' +
 				'<div class="ref-scene" aria-hidden="true"></div>' +
+				(pctText ? '<span class="a-pct">' + esc(pctText) + '</span>' : '') +
 				'<span class="c-rar">' + esc(rarText) + '</span>' +
 				'<div class="c-orb-stage">' +
 					'<div class="float-hex fh1" aria-hidden="true">' + hexSvg + '</div>' +
