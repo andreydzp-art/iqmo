@@ -474,13 +474,6 @@
 
 	function renderAchievementCard(a) {
 		var state = achCardState(a);
-		// «Старт на портале» — отдельный самодостаточный компонент
-		// (renderAchievementCardStart + profile-start-card.css). Внутри
-		// — фиксированная 340×510 карточка, скейлится в 1×1 ячейку
-		// коллекции через transform:scale, пропорции и положение чипа
-		// XP не зависят от .ach--illus сетки — поэтому остальные ачивки
-		// сохраняют свой layout без изменений.
-		if (a.id === 'welcome') return renderAchievementCardStart(a, state);
 		// Иллюстрированные cardStyle (start/shake/bio) с фикс. layout
 		// 340×510 + transform:scale были откачены: при пересчёте сетки
 		// они вылезали за ячейку и обрезали соседей. Возвращаемся к
@@ -974,34 +967,33 @@
 		// SVG рюкзака с уникальными id градиентов (sb-<ach.id>) — иначе
 		// при двух start-card на странице первая «забирает» defs второй
 		// и пейнт ломается. На профиле такой кейс не встречается, но
-		// привычка дешевле дебага. Палитра emerald (как в прототипе
-		// start-card-emerald-standalone.html, .start-card.go).
+		// привычка дешевле дебага.
 		var gid = 'sb-' + (a.id || 'start');
 		var bagSvg =
 			'<svg class="bag" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
 				'<defs>' +
 					'<linearGradient id="' + gid + '-body" x1="32" y1="12" x2="32" y2="58" gradientUnits="userSpaceOnUse">' +
 						'<stop offset="0%" stop-color="#ffffff"/>' +
-						'<stop offset="100%" stop-color="#d7f7e8"/>' +
+						'<stop offset="100%" stop-color="#e6eaf2"/>' +
 					'</linearGradient>' +
 					'<linearGradient id="' + gid + '-pocket" x1="32" y1="34" x2="32" y2="56" gradientUnits="userSpaceOnUse">' +
-						'<stop offset="0%" stop-color="#34d399"/>' +
-						'<stop offset="100%" stop-color="#059669"/>' +
+						'<stop offset="0%" stop-color="#b3bace"/>' +
+						'<stop offset="100%" stop-color="#8d96b2"/>' +
 					'</linearGradient>' +
 					'<linearGradient id="' + gid + '-strap" x1="0" y1="0" x2="0" y2="1">' +
-						'<stop offset="0%" stop-color="#34d399"/>' +
-						'<stop offset="100%" stop-color="#10b981"/>' +
+						'<stop offset="0%" stop-color="#c7cddb"/>' +
+						'<stop offset="100%" stop-color="#9aa2bd"/>' +
 					'</linearGradient>' +
 				'</defs>' +
-				'<path d="M25 16 Q25 7 32 7 Q39 7 39 16" stroke="#34d399" stroke-width="3.4" stroke-linecap="round"/>' +
+				'<path d="M25 16 Q25 7 32 7 Q39 7 39 16" stroke="#c7cddb" stroke-width="3.4" stroke-linecap="round"/>' +
 				'<path d="M22 18 Q14 22 15 36 L16 50" stroke="url(#' + gid + '-strap)" stroke-width="3.4" stroke-linecap="round"/>' +
 				'<path d="M42 18 Q50 22 49 36 L48 50" stroke="url(#' + gid + '-strap)" stroke-width="3.4" stroke-linecap="round"/>' +
-				'<rect x="14" y="15" width="36" height="43" rx="14" fill="url(#' + gid + '-body)" stroke="#9ce8c8" stroke-width="1.4"/>' +
+				'<rect x="14" y="15" width="36" height="43" rx="14" fill="url(#' + gid + '-body)" stroke="#d6dbe7" stroke-width="1.4"/>' +
 				'<path d="M20 22 Q32 18 44 22" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".7"/>' +
-				'<text x="32" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#10b981" letter-spacing=".5">IQ</text>' +
+				'<text x="32" y="34" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#aeb6cc" letter-spacing=".5">IQ</text>' +
 				'<path d="M21 41 Q21 35 27 35 L37 35 Q43 35 43 41 L43 51 Q43 56 37 56 L27 56 Q21 56 21 51 Z" fill="url(#' + gid + '-pocket)"/>' +
-				'<rect x="26" y="44" width="12" height="3.2" rx="1.6" fill="#eafff5" opacity=".9"/>' +
-				'<path d="M25 39.5 Q32 37.5 39 39.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>' +
+				'<rect x="26" y="44" width="12" height="3.2" rx="1.6" fill="#eef0f6" opacity=".85"/>' +
+				'<path d="M25 39.5 Q32 37.5 39 39.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>' +
 			'</svg>';
 
 		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
@@ -1011,7 +1003,7 @@
 		return (
 			'<article class="ach ach--start-host" data-state="' + state + '" tabindex="0">' +
 				'<div class="start-scale">' +
-					'<div class="start-card go">' +
+					'<div class="start-card">' +
 						'<div class="scene"></div>' +
 						'<span class="rarity">' + esc(rarText) + '</span>' +
 						'<div class="orb-stage">' +
