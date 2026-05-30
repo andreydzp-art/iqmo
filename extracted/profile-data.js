@@ -21,7 +21,7 @@
 	var CH1_VARIANT_IDS = [1, 2, 3, 4, 5, 6, 7];
 
 	var ACHIEVEMENT_CATALOG = [
-		{ id: 'welcome', title: 'Старт на портале', desc: 'Начни свой путь в IQMO', rarity: 'common', icon: 'star', iconUrl: '/site/assets/achievement-welcome-start.png', pctRare: 62, xpReward: 50 },
+		{ id: 'welcome', title: 'Старт на портале', desc: 'Начни свой путь в IQMO', rarity: 'common', icon: 'star', pctRare: 62, xpReward: 50 },
 		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', icon: 'book', pctRare: 38, xpReward: 50 },
 		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame', pctRare: 6.2, xpReward: 200 },
 		{ id: 'chem_stage1', title: 'Первый этап по химии', desc: 'Успешно пройди 1 этап по химии', rarity: 'epic', icon: 'trophy', iconUrl: '/site/assets/achievement-chem-stage1.png', pctRare: 2.4, xpReward: 250 },

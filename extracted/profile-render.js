@@ -793,12 +793,10 @@
 	function renderAchievementCardIllus(a, state) {
 		var rar = a.rarity || 'epic';
 		var isBio = (a.id === 'bio_stage1');
-		var isStart = (a.id === 'welcome');
-		// .ach--bio / .ach--start — модификаторы поверх .ach--illus в profile.css
-		// (та же 1×1 ячейка, та же cqi-разметка, перекраска под предмет/сюжет).
+		// .ach--bio — модификатор поверх .ach--illus в profile.css
+		// (та же 1×1 ячейка, та же cqi-разметка, перекраска под биологию).
 		var cls = ['ach', 'ach--illus', 'ach--ref', 'anim-shake'];
 		if (isBio) cls.push('ach--bio');
-		if (isStart) cls.push('ach--start');
 		if (!a.unlocked) cls.push('locked');
 		if (a.inProgress) cls.push('is-progress');
 		if (a.unlocked) cls.push('is-earned');
@@ -819,12 +817,13 @@
 		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
 			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
 
-		// Хексы рамки сцены — синие для био, зелёные для старта, фиолетовые для химии.
-		var hexStroke = isBio ? '#60a5fa' : (isStart ? '#34d399' : '#a78bfa');
+		// Хексы рамки сцены — синие для био, фиолетовые для химии.
+		var hexStroke = isBio ? '#60a5fa' : '#a78bfa';
 		var hexSvg = '<svg viewBox="0 0 30 34" fill="none" stroke="' + hexStroke + '" stroke-width="1.2"><polygon points="15,2 28,9 28,25 15,32 2,25 2,9"/></svg>';
 
-		// Центральный арт: химия → колба, биология → лист, старт → рюкзак.
-		// id градиентов уникальны, чтобы не перетереть друг друга на одной странице.
+		// Центральный арт: химия → колба, биология → лист.
+		// id градиентов уникальны для bio (bioRefLeaf), чтобы не перетереть
+		// fill химической колбы (iqRefGlassFill) на одной странице.
 		var flaskSvg =
 			'<svg class="ref-flask" viewBox="0 0 64 64" aria-hidden="true">' +
 				'<defs>' +
@@ -864,43 +863,12 @@
 				'<path d="M27 16 C22 24 21 34 24 44" stroke="#ffffff" stroke-width="1.5" opacity=".45" stroke-linecap="round" fill="none"/>' +
 			'</svg>';
 
-		// Рюкзак для welcome-карточки: 1:1 с прототипом из start-card-emerald,
-		// упрощённый — без внутренних orbit-arc / sparks (их роль выполняет
-		// общий .c-orb-stage с float-balls, перекрашенными в emerald).
-		var bagSvg =
-			'<svg class="ref-flask ref-bag" viewBox="0 0 64 64" aria-hidden="true">' +
-				'<defs>' +
-					'<linearGradient id="startBagBody" x1="32" y1="12" x2="32" y2="58" gradientUnits="userSpaceOnUse">' +
-						'<stop offset="0%"  stop-color="#ffffff"/>' +
-						'<stop offset="100%" stop-color="#d7f7e8"/>' +
-					'</linearGradient>' +
-					'<linearGradient id="startBagPocket" x1="32" y1="34" x2="32" y2="56" gradientUnits="userSpaceOnUse">' +
-						'<stop offset="0%"  stop-color="#34d399"/>' +
-						'<stop offset="100%" stop-color="#059669"/>' +
-					'</linearGradient>' +
-					'<linearGradient id="startBagStrap" x1="0" x2="0" y1="0" y2="1">' +
-						'<stop offset="0%"  stop-color="#34d399"/>' +
-						'<stop offset="100%" stop-color="#10b981"/>' +
-					'</linearGradient>' +
-				'</defs>' +
-				'<path d="M25 16 Q25 7 32 7 Q39 7 39 16" stroke="#34d399" stroke-width="3.4" stroke-linecap="round" fill="none"/>' +
-				'<path d="M22 18 Q14 22 15 36 L16 50" stroke="url(#startBagStrap)" stroke-width="3.4" stroke-linecap="round" fill="none"/>' +
-				'<path d="M42 18 Q50 22 49 36 L48 50" stroke="url(#startBagStrap)" stroke-width="3.4" stroke-linecap="round" fill="none"/>' +
-				'<rect x="14" y="15" width="36" height="43" rx="14" fill="url(#startBagBody)" stroke="#9ce8c8" stroke-width="1.4"/>' +
-				'<path d="M20 22 Q32 18 44 22" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".7" fill="none"/>' +
-				'<text x="32" y="34" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="13" fill="#10b981" letter-spacing=".5">IQ</text>' +
-				'<path d="M21 41 Q21 35 27 35 L37 35 Q43 35 43 41 L43 51 Q43 56 37 56 L27 56 Q21 56 21 51 Z" fill="url(#startBagPocket)"/>' +
-				'<rect x="26" y="44" width="12" height="3.2" rx="1.6" fill="#eafff5" opacity=".9"/>' +
-				'<path d="M25 39.5 Q32 37.5 39 39.5" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".5" fill="none"/>' +
-			'</svg>';
-
-		var orbInner = isBio ? leafSvg : (isStart ? bagSvg : flaskSvg);
+		var orbInner = isBio ? leafSvg : flaskSvg;
 
 		// Мини-чек в шестиграннике рядом с орбом — синий для био,
-		// зелёный для старта, фиолетовый для химии. id градиента уникальны.
-		var checkSvg;
-		if (isBio) {
-			checkSvg = '<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
+		// фиолетовый для химии. id градиента тоже уникальны.
+		var checkSvg = isBio
+			? '<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
 				'<defs>' +
 					'<linearGradient id="bioRefHexFill" x1="0" x2="0" y1="0" y2="1">' +
 						'<stop offset="0%"  stop-color="#60a5fa"/>' +
@@ -909,20 +877,8 @@
 				'</defs>' +
 				'<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#bioRefHexFill)" stroke="#93c5fd" stroke-width="2"/>' +
 				'<path d="M20 32 L29 41 L46 24" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' +
-			'</svg>';
-		} else if (isStart) {
-			checkSvg = '<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
-				'<defs>' +
-					'<linearGradient id="startRefHexFill" x1="0" x2="0" y1="0" y2="1">' +
-						'<stop offset="0%"  stop-color="#34d399"/>' +
-						'<stop offset="100%" stop-color="#059669"/>' +
-					'</linearGradient>' +
-				'</defs>' +
-				'<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#startRefHexFill)" stroke="#a7f3d0" stroke-width="2"/>' +
-				'<path d="M20 32 L29 41 L46 24" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' +
-			'</svg>';
-		} else {
-			checkSvg = '<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
+			'</svg>'
+			: '<svg class="ref-check" viewBox="0 0 64 64" aria-hidden="true">' +
 				'<defs>' +
 					'<linearGradient id="iqRefHexFill" x1="0" x2="0" y1="0" y2="1">' +
 						'<stop offset="0%"  stop-color="#ffffff"/>' +
@@ -932,7 +888,6 @@
 				'<polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="url(#iqRefHexFill)" stroke="#c4b5fd" stroke-width="2"/>' +
 				'<path d="M20 32 L29 41 L46 24" fill="none" stroke="#7c3aed" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' +
 			'</svg>';
-		}
 
 		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
 
