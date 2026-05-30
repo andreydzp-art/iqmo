@@ -361,6 +361,83 @@
     margin-top:8px; font-size:11.5px; line-height:1.45; text-align:center; opacity:.9;
   }
 
+  /* ──────────────────────────────────────────────────────────────
+     Tooltip-подсказка над карточкой «Супер Босс» (locked).
+     Раньше текст «Откроется после прохождения предыдущих вариантов»
+     висел под карточкой как .pd-bossDesc и занимал место. Теперь
+     это полноценный popover, который показывается при hover/focus
+     на самой карточке.
+     ────────────────────────────────────────────────────────────── */
+  .pd-node.boss{ position:relative; }
+  .pd-bossTip{
+    position:absolute;
+    /* Карточка сейчас сдвинута translateY(10px); +10px компенсируем,
+       чтобы стрелка тултипа смотрела точно в верх карточки. */
+    bottom: calc(100% - 10px + 10px);
+    left:50%;
+    transform: translate(-50%, 6px);
+    width: max-content;
+    max-width: 240px;
+    padding: 9px 13px 10px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #1f2447 0%, #15193a 100%);
+    color: #f4f5fb;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    letter-spacing: .005em;
+    text-transform: none;
+    box-shadow:
+      0 14px 32px -10px rgba(15,18,38,.55),
+      0 0 0 1px rgba(124,102,255,.18),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+    z-index: 30;
+    white-space: normal;
+  }
+  .pd-bossTip::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-5px;
+    transform: translateX(-50%) rotate(45deg);
+    width:10px; height:10px;
+    background: #15193a;
+    box-shadow: 1px 1px 0 rgba(124,102,255,.18);
+  }
+  .pd-node.boss:hover > .pd-bossTip,
+  .pd-node.boss:focus-visible > .pd-bossTip,
+  .pd-node.boss:focus-within > .pd-bossTip,
+  .pd-bossCard:hover ~ .pd-bossTip{
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+  }
+  /* На очень узком экране (моб.) не рисуем над карточкой —
+     показываем под ней, чтобы не вылетал за viewport. */
+  @media (max-width: 540px){
+    .pd-bossTip{
+      bottom: auto;
+      top: calc(100% - 4px);
+      transform: translate(-50%, -6px);
+    }
+    .pd-bossTip::after{
+      bottom: auto;
+      top: -5px;
+      box-shadow: -1px -1px 0 rgba(124,102,255,.18);
+    }
+    .pd-node.boss:hover > .pd-bossTip,
+    .pd-node.boss:focus-visible > .pd-bossTip,
+    .pd-node.boss:focus-within > .pd-bossTip,
+    .pd-bossCard:hover ~ .pd-bossTip{
+      transform: translate(-50%, 0);
+    }
+  }
+
   /* ---- footer hint ---- */
   .pd-foot{
     position:relative; z-index:2;

@@ -357,8 +357,11 @@
 			? '<span class="pd-lockMini" aria-label="Заблокирован">' + PD_LOCK_SVG + '</span>'
 			: '';
 		const bossStateTxt = locked ? 'Заблокирован' : (current ? 'Босс открыт' : 'Побеждён');
-		const bossDesc = locked
-			? 'Откроется после прохождения<br/>предыдущих вариантов'
+		// Текст-подсказку показываем тултипом на hover/focus самой карточки
+		// босса. См. .pd-bossTip в chemistry-level-map.css (этот же файл
+		// подключён и для биологии).
+		const bossTip = locked
+			? '<div class="pd-bossTip" role="tooltip">Откроется после прохождения предыдущих вариантов</div>'
 			: '';
 		const cta = current ? `
 			<button type="button" class="pd-cta" data-v="${v.id}" style="margin-top:12px;width:100%;justify-content:center">
@@ -370,7 +373,7 @@
 		const kicker = '<div class="pd-kicker boss"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg> Финал главы</div>';
 		const previewBossXp = global.IqmoLevelMapXp ? IqmoLevelMapXp.bossPreviewXp() : 550;
 		return `
-			<div class="pd-node boss${locked ? ' locked' : (current ? ' active' : ' passed')}"${dataAttrs}${!locked ? ' role="button" tabindex="0"' : ''}>
+			<div class="pd-node boss${locked ? ' locked' : (current ? ' active' : ' passed')}"${dataAttrs}${!locked ? ' role="button" tabindex="0"' : ''}${locked ? ' tabindex="0"' : ''}>
 		${kicker}
 		<div class="pd-bossCard">
 			<div class="pd-bossTop">
@@ -386,9 +389,9 @@
 				<span class="pd-reward"><svg viewBox="0 0 24 24"><path d="${PD_STAR_PATH}"/></svg> +${previewBossXp} XP</span>
 				<span class="pd-reward">${PD_TROPHY_SVG} Бейдж</span>
 			</div>
-			${bossDesc ? '<div class="pd-bossDesc">' + bossDesc + '</div>' : ''}
 			${cta}
 		</div>
+		${bossTip}
 			</div>`;
 	}
 
