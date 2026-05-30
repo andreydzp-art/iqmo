@@ -1062,26 +1062,25 @@
      (орб + тайтл) держится сверху, footer уходит вниз. Сами размеры
      прогресс-бара и XP-капсулы НЕ меняются — переносится только
      положение блока вниз. */
-  /* footer прижат к низу через margin-top:auto. Карточка — flex-column
-     (см. .ach.ach--illus выше), поэтому .c-footer как flex-ребёнок
-     уходит вниз, а его дети (c-div/c-prog/c-reward) — обычные блоки на
-     всю ширину минус их пиксельные поля (ровно как direct-children в
-     эталоне .card). */
+  /* footer прижат к низу через margin-top:auto (карточка — flex-column).
+     Дети (c-div/c-prog/c-reward) — обычные блоки, без width:100% и
+     align-self:stretch, ширина = контейнер минус их поля. */
   .ach.ach--illus .c-footer{
     margin-top:auto;
   }
   /* ╔══════════════════════════════════════════════════════════════╗
-     ║  FOOTER 1:1 ИЗ ЭТАЛОНА rhythm-card-standalone.html            ║
-     ║  Все значения скопированы В ПИКСЕЛЯХ как в .card.ref (340px).  ║
-     ║  НИКАКИХ cqi / clamp / scale / transform — иначе чип и         ║
-     ║  прогресс «плывут» по размеру. Менялось только положение       ║
-     ║  блока вниз (margin-top:auto). Геометрия чипа/полосы — эталон. ║
+     ║  РАЗМЕРЫ FOOTER — как у соседних карт коллекции (.ach--start). ║
+     ║  Используем clamp(min, Ncqi, эталон_px): на ширине эталона     ║
+     ║  (340px) выходят ровно эталонные размеры чипа/полосы, а на     ║
+     ║  узкой ячейке сетки они пропорционально уменьшаются — чтобы    ║
+     ║  футер не был раздут и совпадал с обычными карточками.         ║
+     ║  Положение блока (margin-top:auto) НЕ меняется.                ║
      ╚══════════════════════════════════════════════════════════════╝ */
-  /* divider — .card.ref .c-div { margin:14px 26px 14px } */
+  /* divider — размеры как у .ach--start .sc-divider */
   .ach.ach--illus .c-div{
     position:relative; z-index:2;
     display:flex; align-items:center;
-    margin:14px 26px 14px;
+    margin:4cqi 7.5cqi;
   }
   .ach.ach--illus .c-div::before,
   .ach.ach--illus .c-div::after{
@@ -1089,25 +1088,25 @@
     background:rgba(168,85,247,.18);
   }
   .ach.ach--illus .c-div span{
-    width:7px; height:7px;
-    margin:0 9px;
+    width:clamp(4px, 2cqi, 7px); height:clamp(4px, 2cqi, 7px);
+    margin:0 2.6cqi;
     background:#a78bfa;
     transform:rotate(45deg);
   }
 
-  /* ── ПРОГРЕСС — 1:1 эталон (.card.ref .c-prog / .c-prog-bar) ── */
+  /* ── ПРОГРЕСС — размеры как у .ach--start (clamp до эталонных px) ── */
   .ach.ach--illus .c-prog{
     position:relative; z-index:2;
-    margin:0 26px;
+    margin:0 7.5cqi;
     display:block;
   }
   .ach.ach--illus .c-prog-row{
     display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:8px;
+    margin-bottom:2.3cqi;
   }
   .ach.ach--illus .c-prog-row > span:first-child{
     color:#7c3aed;
-    font-size:10.5px;
+    font-size:clamp(7.5px, 3cqi, 10.5px);
     font-weight:800;
     letter-spacing:.22em;
     text-transform:uppercase;
@@ -1115,22 +1114,21 @@
   .ach.ach--illus .c-prog-row .pp{
     display:inline-flex; align-items:baseline; gap:3px;
     font-family:'JetBrains Mono',monospace;
-    font-size:13px;
+    font-size:clamp(8px, 3.8cqi, 13px);
     font-weight:800;
     color:#0f1226;
     letter-spacing:.02em;
     text-transform:none;
   }
   .ach.ach--illus .c-prog-row .pp b{
-    font-size:15px;
+    font-size:clamp(9px, 4.4cqi, 15px);
     background:linear-gradient(135deg, #7c3aed, #a78bfa);
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .ach.ach--illus .c-prog-row .pp .sep{ color:rgba(124,58,237,.35); margin:0 1px; }
+  .ach.ach--illus .c-prog-row .pp .sep{ color:rgba(124,58,237,.35); margin:0 .3cqi; }
   .ach.ach--illus .c-prog-line{display:block;}
   .ach.ach--illus .c-prog-bar{
-    width:100%;
-    height:12px;
+    height:clamp(6px, 3.5cqi, 12px);
     border-radius:999px;
     background:linear-gradient(180deg, rgba(168,85,247,.06), rgba(168,85,247,.12));
     border:1px solid rgba(168,85,247,.18);
@@ -1139,7 +1137,6 @@
       inset 0 -1px 0 rgba(255,255,255,.55),
       0 1px 0 rgba(255,255,255,.6);
     position:relative; overflow:hidden;
-    backdrop-filter:blur(4px);
   }
   .ach.ach--illus .c-prog-bar i{
     display:block; height:100%; border-radius:999px;
@@ -1176,11 +1173,11 @@
      лавандовый градиент, рельефные грани, мягкий внутренний свет.
      По ТЗ — должна выглядеть объёмной и притягательной (не серой
      и не плоской). */
-  /* ── REWARD-ЧИП — 1:1 эталон (.card.ref .c-reward) ── */
+  /* ── REWARD-ЧИП — размеры как у .ach--start (clamp до эталонных px) ── */
   .ach.ach--illus .c-reward{
     position:relative; z-index:2;
-    margin:14px 22px 22px;
-    padding:11px 14px;
+    margin:4cqi 6.5cqi 6.5cqi;
+    padding:3.2cqi 4cqi;
     border-radius:16px;
     background:
       linear-gradient(180deg, rgba(255,255,255,.6), rgba(245,243,255,.6)),
@@ -1190,7 +1187,6 @@
       inset 0 1px 0 rgba(255,255,255,.9),
       inset 0 0 0 1px rgba(255,255,255,.35),
       0 6px 16px -10px rgba(124,58,237,.25);
-    backdrop-filter:blur(8px);
     display:grid;
     /* эталон: одна центрированная плитка XP */
     grid-template-columns:auto;
@@ -1198,12 +1194,12 @@
     align-items:center;
   }
   .ach.ach--illus .c-rwd-item{
-    display:flex; align-items:center; gap:10px;
-    padding:2px 4px;
+    display:flex; align-items:center; gap:2.9cqi;
+    padding:.6cqi 1.2cqi;
     min-width:0;
   }
   .ach.ach--illus .c-rwd-ico{
-    width:34px; height:34px;
+    width:clamp(20px, 10cqi, 34px); height:clamp(20px, 10cqi, 34px);
     border-radius:10px;
     display:grid; place-items:center;
     flex-shrink:0;
@@ -1214,16 +1210,16 @@
       0 4px 10px -4px rgba(124,58,237,.35);
   }
   .ach.ach--illus .c-rwd-ico svg{
-    width:18px; height:18px;
+    width:clamp(11px, 5.3cqi, 18px); height:clamp(11px, 5.3cqi, 18px);
     fill:#7c3aed;
   }
   .ach.ach--illus .c-rwd-text{
-    display:flex; flex-direction:column; gap:3px;
+    display:flex; flex-direction:column; gap:.85cqi;
     line-height:1.1;
     min-width:0;
   }
   .ach.ach--illus .c-rwd-val{
-    font-size:13.5px;
+    font-size:clamp(8.5px, 3.95cqi, 13.5px);
     font-weight:800;
     color:#3b1d70;
     letter-spacing:.01em;
@@ -1234,7 +1230,7 @@
   .ach.ach--illus .c-rwd-lbl{
     margin-top:2px;
     color:#7c3aed;
-    font-size:9px;
+    font-size:clamp(6px, 2.65cqi, 9px);
     font-weight:800;
     letter-spacing:.18em;
     text-transform:uppercase;
