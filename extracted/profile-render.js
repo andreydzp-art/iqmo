@@ -250,7 +250,7 @@
 			? 'след.: <b>' + d.nextLevel + ' · «' + esc(d.levelTitle || '') + '»</b>'
 			: 'макс. уровень';
 		var xpUntil = d.nextLevel
-			? '▸ ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до ур. ' + d.nextLevel
+			? '▸ Осталось ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до ур. ' + d.nextLevel
 			: '';
 		var streakFill = Math.min(100, Math.round((Math.min(streakDays, 7) / 7) * 100));
 		var daysLeft = Math.max(0, 7 - streakDays);
@@ -994,7 +994,7 @@
 			? 'след.: <b>' + d.nextLevel + ' · «' + esc(d.levelTitle || '') + '»</b>'
 			: 'макс. уровень';
 		var xpUntil = d.nextLevel
-			? '▸ ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до ур. ' + d.nextLevel
+			? '▸ Осталось ' + IqmoProfileData.fmtPts(d.xpToNext) + ' XP до ур. ' + d.nextLevel
 			: '';
 		var eyeEl = hero.querySelector('.xp-curr .eye');
 		if (eyeEl) eyeEl.textContent = xpEye;
