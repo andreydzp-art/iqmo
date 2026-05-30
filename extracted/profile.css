@@ -1119,7 +1119,10 @@
       inset 0 0 0 1px rgba(255,255,255,.35),
       0 6px 16px -10px rgba(124,58,237,.25);
     display:grid;
-    grid-template-columns:1fr 1px 1fr;
+    /* Раньше было `1fr 1px 1fr` под две плитки (XP + дата) с разделителем.
+       Дата убрана со всех ачивок → остаётся одна центрированная плитка XP. */
+    grid-template-columns:auto;
+    justify-items:center;
     align-items:center;
     gap:1.4cqi;
   }

@@ -457,9 +457,8 @@
 		var rarText = rarityLabel(a.rarity);
 
 		var bottomBlock;
-		if (a.unlocked && a.earnedAt) {
-			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div>' +
-				'<div class="a-meta">' + esc(fmtDate(a.earnedAt)) + '</div></div>';
+		if (a.unlocked) {
+			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div></div>';
 		} else if (a.inProgress && a.progress) {
 			var pct = Math.max(0, Math.min(100, Math.round((a.progress.current / a.progress.target) * 100)));
 			bottomBlock = '<div><div class="a-name">' + esc(a.title) + '</div>' +
@@ -522,18 +521,6 @@
 			progTgt = 1;
 		}
 
-		var dateVal, dateLbl;
-		if (a.unlocked && a.earnedAt) {
-			dateVal = fmtDate(a.earnedAt);
-			dateLbl = 'Получено';
-		} else if (a.inProgress) {
-			dateVal = 'В процессе';
-			dateLbl = 'Статус';
-		} else {
-			dateVal = '—';
-			dateLbl = 'Закрыто';
-		}
-
 		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
 			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
 
@@ -576,7 +563,6 @@
 			'</svg>';
 
 		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
-		var dateSvg = '<svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm0 6v12h10V8H7zm2 3h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg>';
 
 		return (
 			'<article class="' + cls.join(' ') + '" data-state="' + state + '" tabindex="0">' +
@@ -613,14 +599,6 @@
 						'<div class="c-rwd-text">' +
 							'<span class="c-rwd-val">+' + (a.xpReward || 0) + ' XP</span>' +
 							'<span class="c-rwd-lbl">Награда</span>' +
-						'</div>' +
-					'</div>' +
-					'<div class="c-rwd-sep"></div>' +
-					'<div class="c-rwd-item">' +
-						'<div class="c-rwd-ico date">' + dateSvg + '</div>' +
-						'<div class="c-rwd-text">' +
-							'<span class="c-rwd-val">' + esc(dateVal) + '</span>' +
-							'<span class="c-rwd-lbl">' + esc(dateLbl) + '</span>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
