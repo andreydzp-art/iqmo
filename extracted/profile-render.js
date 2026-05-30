@@ -775,17 +775,16 @@
 		);
 	}
 
-	/* Карточка «Старт на портале» — обычная редкость, по прототипу
-	   start-card. Рюкзак-арт + орбита + искры, прогресс 1/1, награда +XP.
-	   Внутренние размеры через container query units (cqi), так что
-	   прототип 340×510 ужимается под стандартную 1×1 ячейку коллекции. */
+	/* Карточка «Старт на портале» — 1:1 с прототипом из Cloud Design
+	   (см. /extracted/_ach-start-card-import/start-card/). Разметка
+	   повторяет start-card.html символ-в-символ; стили лежат в
+	   /profile-start-card.css. Карточка фиксированных 340×510 px и
+	   вписывается в 2×2 ячейки коллекции через CSS-обёртку
+	   .ach--start-host > .start-scale (transform:scale, см. модуль).
+	   В 1×1 ячейке (как было раньше) backpack/орб/искры ужимались
+	   до 0.45× и теряли читаемость деталей. */
 	function renderAchievementCardStart(a, state) {
 		var rar = a.rarity || 'common';
-		var cls = ['ach', 'ach--start'];
-		if (!a.unlocked) cls.push('locked');
-		if (a.inProgress) cls.push('is-progress');
-		if (a.unlocked) cls.push('is-earned');
-
 		var rarText = rarityLabel(rar);
 
 		var progPct = 0, progCur = 0, progTgt = 1;
@@ -802,11 +801,13 @@
 		var tipMeta = '<span>+' + (a.xpReward || 0) + ' XP</span>' +
 			'<span>' + (a.inProgress && a.progress ? (progCur + ' / ' + progTgt) : rarText) + '</span>';
 
-		// SVG рюкзака с градиентами; id'шники градиентов уникальны (sb-<ach.id>),
-		// чтобы не схлопывались, если на странице несколько таких карточек.
+		// SVG рюкзака с уникальными id градиентов (sb-<ach.id>) — иначе
+		// при двух start-card на странице первая «забирает» defs второй
+		// и пейнт ломается. На профиле такой кейс не встречается, но
+		// привычка дешевле дебага.
 		var gid = 'sb-' + (a.id || 'start');
 		var bagSvg =
-			'<svg class="sc-bag" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
+			'<svg class="bag" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
 				'<defs>' +
 					'<linearGradient id="' + gid + '-body" x1="32" y1="12" x2="32" y2="58" gradientUnits="userSpaceOnUse">' +
 						'<stop offset="0%" stop-color="#ffffff"/>' +
@@ -834,37 +835,43 @@
 
 		var xpSvg = '<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 11-13h-7z"/></svg>';
 
+		// Tooltip висит на host'е (а не на .start-card), чтобы после
+		// CSS scale не сжимался и читался одинаково на любой ширине.
 		return (
-			'<article class="' + cls.join(' ') + '" data-state="' + state + '" tabindex="0">' +
-				'<div class="sc-scene" aria-hidden="true"></div>' +
-				'<span class="sc-rarity">' + esc(rarText) + '</span>' +
-				'<div class="sc-orb-stage">' +
-					'<div class="sc-orb">' +
-						'<span class="sc-orbit"></span>' +
-						bagSvg +
-					'</div>' +
-					'<span class="sc-spark s1" aria-hidden="true"></span>' +
-					'<span class="sc-spark s2" aria-hidden="true"></span>' +
-					'<span class="sc-spark s3" aria-hidden="true"></span>' +
-				'</div>' +
-				'<div class="sc-title-block">' +
-					'<h4 class="sc-title">' + esc(a.title) + '</h4>' +
-					'<div class="sc-sub">' + esc(a.desc) + '</div>' +
-				'</div>' +
-				'<div class="sc-divider" aria-hidden="true"><span></span></div>' +
-				'<div class="sc-prog">' +
-					'<div class="sc-prog-row">' +
-						'<span class="sc-label">Прогресс</span>' +
-						'<span class="sc-count"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
-					'</div>' +
-					'<div class="sc-prog-bar"><i style="width:' + progPct + '%"></i></div>' +
-				'</div>' +
-				'<div class="sc-reward">' +
-					'<div class="sc-rwd-item">' +
-						'<div class="sc-rwd-ico">' + xpSvg + '</div>' +
-						'<div class="sc-rwd-text">' +
-							'<span class="sc-rwd-val">+' + (a.xpReward || 0) + ' XP</span>' +
-							'<span class="sc-rwd-lbl">Награда</span>' +
+			'<article class="ach ach--start-host" data-state="' + state + '" tabindex="0">' +
+				'<div class="start-scale">' +
+					'<div class="start-card">' +
+						'<div class="scene"></div>' +
+						'<span class="rarity">' + esc(rarText) + '</span>' +
+						'<div class="orb-stage">' +
+							'<div class="orb">' +
+								'<span class="orbit"></span>' +
+								bagSvg +
+							'</div>' +
+							'<span class="spark s1" aria-hidden="true"></span>' +
+							'<span class="spark s2" aria-hidden="true"></span>' +
+							'<span class="spark s3" aria-hidden="true"></span>' +
+						'</div>' +
+						'<div class="title-block">' +
+							'<h4 class="title">' + esc(a.title) + '</h4>' +
+							'<div class="subtitle">' + esc(a.desc) + '</div>' +
+						'</div>' +
+						'<div class="divider"><span></span></div>' +
+						'<div class="prog">' +
+							'<div class="prog-row">' +
+								'<span class="label">Прогресс</span>' +
+								'<span class="count"><b>' + progCur + '</b><span class="sep">/</span>' + progTgt + '</span>' +
+							'</div>' +
+							'<div class="prog-bar"><i style="width:' + progPct + '%"></i></div>' +
+						'</div>' +
+						'<div class="reward">' +
+							'<div class="reward-item">' +
+								'<div class="reward-ico">' + xpSvg + '</div>' +
+								'<div class="reward-text">' +
+									'<span class="reward-val">+' + (a.xpReward || 0) + ' XP</span>' +
+									'<span class="reward-lbl">Награда</span>' +
+								'</div>' +
+							'</div>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +

@@ -23,6 +23,11 @@
   position:relative;
   display:block;
   width:100%;
+  /* Карточка-награда занимает 2×2 ячейки коллекции, как и обычный
+     start — в 1×1 ячейке прототип 340×510 ужимается до 0.45 scale
+     и теряет читаемость деталей (колбу, гексы, прогресс-бар). */
+  grid-column: span 2;
+  grid-row:    span 2;
   aspect-ratio: 1 / 1.5;
   /* container query — основа scale, см. .shake-scale ниже. */
   container-type: inline-size;

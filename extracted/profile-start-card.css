@@ -1,0 +1,366 @@
+/* ============================================================
+   IQMO · Карточка «Старт на портале» (обычная редкость)
+   --------------------------------------------------------------
+   Самодостаточный компонент на основе референса из Cloud Design
+   (см. /extracted/_ach-start-card-import/start-card/start-card.css).
+   Стили внутри блока .start-card повторяют исходник один-в-один;
+   обёртка .ach.ach--start-host вписывает фиксированную карточку
+   340×510 в стандартную ячейку коллекции через transform:scale —
+   точно так же, как сделано для эпической shake-card в
+   /profile-shake-card.css. Иначе при scale 0.5 на 1×1 ячейке вся
+   полигра «рюкзак / орб / искры» становится нечитаемой мелочью.
+   ============================================================ */
+
+.ach.ach--start-host{
+  position:relative;
+  display:block;
+  width:100%;
+  /* Карточка-награда занимает 2×2 ячейки коллекции, как и эпический
+     shake — в 1×1 ячейке прототип 340×510 ужимается до 0.45 scale
+     и теряет читаемость деталей. */
+  grid-column: span 2;
+  grid-row:    span 2;
+  aspect-ratio: 1 / 1.5;
+  container-type: inline-size;
+  background:transparent;
+  border:0;
+  padding:0;
+  cursor:pointer;
+  overflow:visible;
+  outline:none;
+}
+.ach.ach--start-host:focus-visible{
+  outline:2px solid rgba(124,58,237,.55);
+  outline-offset:4px;
+  border-radius:22px;
+}
+
+/* Locked → desaturated. inProgress оставляет нативный цвет, но
+   с приглушённой подсветкой; стили сделаны симметрично shake-host. */
+.ach.ach--start-host[data-state="locked"] .start-card{
+  filter:grayscale(.85) brightness(.96);
+  opacity:.78;
+}
+.ach.ach--start-host[data-state="locked"]:hover .start-card{
+  filter:grayscale(.7) brightness(.98);
+  opacity:.92;
+}
+
+/* Wrapper, который скейлится. Пропорции прототипа — 340×510. На
+   узких ячейках scale<1, на широких остаётся 1 и центрируется. */
+.ach.ach--start-host > .start-scale{
+  position:absolute;
+  top:0; left:0;
+  width:340px;
+  height:510px;
+  transform-origin: 0 0;
+  transform: scale(min(1, calc(100cqw / 340)));
+}
+@container (min-width: 340px){
+  .ach.ach--start-host > .start-scale{
+    left:50%;
+    transform: translateX(-50%) scale(1);
+    transform-origin: top center;
+  }
+}
+
+/* ── Сама карточка (1:1 с прототипом start-card.css) ──────── */
+.ach.ach--start-host .start-card{
+  --line:#e6e8f0;
+  --line-2:#eef0f7;
+  --ink:#0f1226;
+  --muted:#6b7094;
+  --muted-2:#9aa0bf;
+
+  position:relative;
+  width:340px;
+  height:510px;
+  border-radius:22px;
+  overflow:hidden;
+  display:flex; flex-direction:column;
+  isolation:isolate;
+  cursor:pointer;
+  font-family:'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  color:var(--ink);
+  background:
+    radial-gradient(700px 400px at 50% -10%, rgba(148,163,184,.10), transparent 60%),
+    linear-gradient(180deg, #fbfcfe 0%, #fff 60%, #fbfcfe 100%);
+  border:1px solid rgba(148,163,184,.20);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 1px 2px rgba(15,18,38,.04),
+    0 22px 50px -28px rgba(100,116,139,.30);
+  transition:transform .26s cubic-bezier(.2,.7,.2,1), box-shadow .26s ease, border-color .26s ease;
+}
+.ach.ach--start-host:hover .start-card{
+  transform:translateY(-6px);
+  border-color:rgba(148,163,184,.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 1px 2px rgba(15,18,38,.04),
+    0 30px 60px -24px rgba(100,116,139,.40);
+}
+
+/* ── faint top scene (dots + soft glow) ── */
+.ach.ach--start-host .start-card .scene{
+  position:absolute; top:0; left:0; right:0;
+  height:62%;
+  z-index:1; pointer-events:none; overflow:hidden;
+  background:radial-gradient(420px 320px at 50% 26%, rgba(148,163,184,.10), transparent 70%);
+  mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+}
+.ach.ach--start-host .start-card .scene::after{
+  content:""; position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 22% 30%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 78% 24%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 20% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 82% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px);
+  opacity:.55;
+}
+
+/* ── rarity tag ── */
+.ach.ach--start-host .start-card .rarity{
+  position:absolute; top:18px; left:18px; z-index:4;
+  display:inline-flex; align-items:center; gap:7px;
+  height:30px; padding:0 14px;
+  border-radius:999px;
+  font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+  color:#5b6480;
+  background:rgba(255,255,255,.85);
+  border:1px solid rgba(148,163,184,.35);
+  box-shadow:0 1px 2px rgba(15,18,38,.05), inset 0 1px 0 rgba(255,255,255,.6);
+  backdrop-filter:blur(8px);
+}
+.ach.ach--start-host .start-card .rarity::before{
+  content:""; width:7px; height:7px; border-radius:50%; background:#aeb6cc;
+}
+
+/* ── orb stage ── */
+.ach.ach--start-host .start-card .orb-stage{
+  position:relative;
+  width:240px; height:240px;
+  margin:36px auto 6px;
+  display:grid; place-items:center;
+  z-index:3;
+}
+.ach.ach--start-host .start-card .orb{
+  position:relative;
+  width:200px; height:200px;
+  border-radius:50%;
+  margin:0 auto;
+  overflow:hidden;
+  background:radial-gradient(circle at 50% 36%, #ffffff 0%, #f1f3f9 58%, #e5e9f2 100%);
+  box-shadow:
+    0 0 0 5px #fff,
+    0 0 0 6px rgba(148,163,184,.30),
+    0 16px 32px -12px rgba(100,116,139,.35),
+    inset 0 -10px 26px rgba(148,163,184,.18),
+    inset 0 2px 0 rgba(255,255,255,.95);
+}
+.ach.ach--start-host .start-card .orb::before{
+  content:""; position:absolute;
+  top:8%; left:18%; width:55%; height:30%;
+  border-radius:50%;
+  background:radial-gradient(ellipse at center, rgba(255,255,255,.6), transparent 70%);
+  filter:blur(2px); pointer-events:none;
+}
+
+/* ── backpack art ── */
+.ach.ach--start-host .start-card .bag{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%, -50%);
+  width:122px; height:122px;
+  z-index:3;
+  filter:drop-shadow(0 8px 16px rgba(100,116,139,.30));
+  transform-origin:50% 70%;
+}
+
+/* ── orbit arc + sparkles ── */
+.ach.ach--start-host .start-card .orbit{
+  position:absolute; inset:-4px;
+  border-radius:50%;
+  border:2px solid transparent;
+  border-top-color:rgba(148,163,184,.5);
+  border-right-color:rgba(148,163,184,.22);
+  transform:rotate(-32deg);
+  pointer-events:none; z-index:1;
+}
+.ach.ach--start-host .start-card .spark{
+  position:absolute;
+  background:
+    linear-gradient(90deg, transparent 45%, #c2c8d8 50%, transparent 55%) center/100% 1.4px no-repeat,
+    linear-gradient(0deg, transparent 45%, #c2c8d8 50%, transparent 55%) center/1.4px 100% no-repeat;
+  filter:drop-shadow(0 0 3px #e2e6f0);
+  pointer-events:none; z-index:4;
+  animation:start-twinkle 3s ease-in-out infinite;
+}
+.ach.ach--start-host .start-card .spark.s1{ width:13px; height:13px; top:16%; right:14%; }
+.ach.ach--start-host .start-card .spark.s2{ width:8px;  height:8px;  bottom:30%; left:12%; animation-delay:.7s; }
+.ach.ach--start-host .start-card .spark.s3{ width:7px;  height:7px;  top:54%; right:8%; animation-delay:1.5s; }
+@keyframes start-twinkle{
+  0%,100%{ transform:scale(.7); opacity:.3; }
+  50%    { transform:scale(1.2); opacity:.9; }
+}
+
+/* ── title ── */
+.ach.ach--start-host .start-card .title-block{
+  position:relative; z-index:2;
+  text-align:center;
+  padding:18px 22px 0;
+}
+.ach.ach--start-host .start-card .title{
+  margin:0;
+  font-size:24px; font-weight:800; letter-spacing:-.02em;
+  line-height:1.15; color:var(--ink);
+}
+.ach.ach--start-host .start-card .subtitle{
+  margin-top:8px;
+  font-size:13px; color:#6b7392; line-height:1.4;
+}
+
+/* ── divider ── */
+.ach.ach--start-host .start-card .divider{
+  position:relative; z-index:2;
+  display:flex; align-items:center;
+  margin:14px 26px;
+}
+.ach.ach--start-host .start-card .divider::before,
+.ach.ach--start-host .start-card .divider::after{
+  content:""; flex:1; height:1px; background:rgba(148,163,184,.22);
+}
+.ach.ach--start-host .start-card .divider span{
+  width:7px; height:7px; margin:0 9px;
+  background:#aeb6cc; transform:rotate(45deg);
+}
+
+/* ── progress ── */
+.ach.ach--start-host .start-card .prog{
+  position:relative; z-index:2;
+  margin:0 26px;
+}
+.ach.ach--start-host .start-card .prog-row{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px;
+}
+.ach.ach--start-host .start-card .prog-row .label{
+  font-size:10.5px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+  color:#6b7094;
+}
+.ach.ach--start-host .start-card .prog-row .count{
+  font-family:'JetBrains Mono', ui-monospace, monospace;
+  font-size:13px; font-weight:800;
+  color:var(--ink); letter-spacing:.02em;
+}
+.ach.ach--start-host .start-card .prog-row .count b{
+  font-size:15px;
+  background:linear-gradient(135deg, #5b6480, #939bb6);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.ach.ach--start-host .start-card .prog-row .count .sep{ color:rgba(100,116,139,.4); margin:0 1px; }
+.ach.ach--start-host .start-card .prog-bar{
+  height:12px; border-radius:999px;
+  background:linear-gradient(180deg, rgba(148,163,184,.07), rgba(148,163,184,.14));
+  border:1px solid rgba(148,163,184,.20);
+  box-shadow:
+    inset 0 1.5px 3px rgba(71,85,105,.10),
+    inset 0 -1px 0 rgba(255,255,255,.6),
+    0 1px 0 rgba(255,255,255,.6);
+  overflow:hidden; position:relative;
+}
+.ach.ach--start-host .start-card .prog-bar i{
+  display:block; height:100%; border-radius:999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 50%),
+    linear-gradient(90deg, #8d96b2 0%, #aeb6cc 50%, #7e88a6 100%);
+  box-shadow:
+    0 0 8px rgba(148,163,184,.4),
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 -1px 1px rgba(71,85,105,.30);
+}
+
+/* ── reward (single centered chip) ── */
+.ach.ach--start-host .start-card .reward{
+  position:relative; z-index:2;
+  margin:14px 22px 22px;
+  padding:11px 14px;
+  display:grid; grid-template-columns:auto;
+  justify-items:center; align-items:center;
+  border-radius:16px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.7), rgba(246,248,251,.7)),
+    radial-gradient(120% 100% at 0% 0%, rgba(148,163,184,.08), transparent 60%);
+  border:1px solid rgba(148,163,184,.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 0 0 1px rgba(255,255,255,.35),
+    0 6px 16px -10px rgba(100,116,139,.25);
+}
+.ach.ach--start-host .start-card .reward-item{
+  display:flex; align-items:center; gap:10px; padding:2px 4px;
+}
+.ach.ach--start-host .start-card .reward-ico{
+  width:34px; height:34px; border-radius:10px;
+  display:grid; place-items:center; flex-shrink:0;
+  background:linear-gradient(135deg, #ede9fe, #ddd6fe);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 0 0 1px rgba(255,255,255,.6),
+    0 4px 10px -4px rgba(124,58,237,.35);
+}
+.ach.ach--start-host .start-card .reward-ico svg{ width:18px; height:18px; fill:#7c3aed; }
+.ach.ach--start-host .start-card .reward-text{ display:flex; flex-direction:column; gap:3px; line-height:1.1; }
+.ach.ach--start-host .start-card .reward-val{
+  font-size:13.5px; font-weight:800; color:#2a2e4a;
+  font-variant-numeric:tabular-nums;
+}
+.ach.ach--start-host .start-card .reward-lbl{
+  font-size:9px; font-weight:800; letter-spacing:.18em; text-transform:uppercase;
+  color:#8d96b2; opacity:.9;
+}
+
+/* ── gentle hover motion ── */
+@keyframes start-bag-bob{
+  0%,100%{ transform:translate(-50%, -50%); }
+  50%    { transform:translate(-50%, -56%); }
+}
+@keyframes start-orbit-spin{ to{ transform:rotate(328deg); } }
+.ach.ach--start-host:hover .start-card .bag{ animation:start-bag-bob 2.4s ease-in-out infinite; }
+.ach.ach--start-host:hover .start-card .orbit{ animation:start-orbit-spin 9s linear infinite; }
+.ach.ach--start-host:hover .start-card .spark{ animation-duration:1.4s; opacity:.9; }
+
+@media (prefers-reduced-motion: reduce){
+  .ach.ach--start-host .start-card,
+  .ach.ach--start-host .start-card *{ animation:none !important; transition:none !important; }
+}
+
+/* ── Tooltip overlay (живёт на host'е, не скейлится) ─────── */
+.ach.ach--start-host > .a-tip{
+  position:absolute;
+  left:50%;
+  bottom:calc(100% + 10px);
+  transform:translateX(-50%) translateY(4px);
+  width:max-content;
+  max-width:260px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#0f1226;
+  color:#fff;
+  font-size:12px;
+  line-height:1.4;
+  box-shadow:0 12px 30px -12px rgba(15,18,38,.55);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+  z-index:10;
+}
+.ach.ach--start-host:hover > .a-tip,
+.ach.ach--start-host:focus-visible > .a-tip{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.ach.ach--start-host > .a-tip .tt-name{ font-weight:800; margin-bottom:2px; }
+.ach.ach--start-host > .a-tip .tt-desc{ color:#cbd0e6; margin-bottom:6px; }
+.ach.ach--start-host > .a-tip .tt-meta{ display:flex; gap:10px; font-weight:700; color:#c4b5fd; }
