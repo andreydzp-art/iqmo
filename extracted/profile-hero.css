@@ -20,15 +20,11 @@
 @keyframes iqmoOrbSpin{
   to{transform:rotate(360deg);}
 }
-/* Старые keyframes iqmoOrbitA/B/C удалены — теперь точки позиционируются
-   через --angle на конкретной точке, а вращается контейнер .orb-orbit
-   (см. iqmoOrbitGroupSpin ниже). Это позволяет рендерить произвольное
-   количество точек (1..30) равномерно по окружности и менять их размер
-   через data-orbit-tier на контейнере. */
-@keyframes iqmoOrbitGroupSpin{
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
-}
+/* Каждая точка теперь крутится индивидуально (см. iqmoOrbitDotSpin
+   рядом с .orb-orbit i), поэтому общий iqmoOrbitGroupSpin удалён —
+   контейнер .orb-orbit больше не вращается. Оставшийся iqmoOrbitDotPulse
+   мерцает opacity, не трогая transform — две анимации спокойно
+   живут параллельно на одной точке. */
 @keyframes iqmoOrbitDotPulse{
   0%,100%{opacity:.85;}
   50%{opacity:1;}
@@ -419,16 +415,15 @@
     stroke-linejoin:round;
     filter:drop-shadow(0 0 6px rgba(34,197,94,.55));
   }
-  /* orbiting particles — динамические точки. Количество = дням в IQMO,
-     максимум 30. Каждая точка имеет свой --angle (равномерно по окружности).
-     Контейнер .orb-orbit вращается целиком через iqmoOrbitGroupSpin —
-     это даёт ощущение, что точки кружат вокруг ядра. Радиус задаём
-     через --orbit-r (по умолчанию 48px для большого Profile-orb 96px). */
+  /* orbiting particles — динамические точки. Количество = streak (1 точка
+     на день серии), максимум 30. Каждая точка имеет свой --angle (равно-
+     мерно по окружности) и СВОЮ скорость + направление + цвет — это
+     визуально оживляет орб и даёт ощущение «живой системы», а не
+     синхронного обруча. Параметры тащит iqmo-orbit-dots.js → build().
+     Радиус задаём через --orbit-r (по умолчанию 48px для 96px-орба). */
 .iqmo-hero.v3 .orb-orbit{
     position:absolute; inset:0; z-index:4;
     pointer-events:none;
-    /* умеренная скорость, без раздражения; reduced-motion отключит ниже */
-    animation:iqmoOrbitGroupSpin var(--orbit-duration, 26s) linear infinite;
     transform-origin:50% 50%;
   }
 .iqmo-hero.v3 .orb-orbit i{
@@ -438,26 +433,47 @@
     margin: calc(var(--dot-size, 6px) / -2) 0 0 calc(var(--dot-size, 6px) / -2);
     border-radius:50%;
     display:block;
-    will-change:transform;
+    will-change:transform, opacity;
     backface-visibility:hidden;
-    /* точка стоит на радиусе var(--orbit-r) под углом --angle.
-       Никакого «обратного» rotate не нужно: точка симметрична. */
-    transform:rotate(var(--angle, 0deg)) translateX(var(--orbit-r, 48px));
-    background:linear-gradient(135deg, #22c55e 0%, #0ea5e9 60%, #a78bfa 100%);
-    box-shadow:0 0 8px rgba(34,197,94,.55), 0 0 3px rgba(255,255,255,.9) inset;
-    animation:iqmoOrbitDotPulse 2.4s ease-in-out infinite;
-    animation-delay:calc(var(--angle, 0deg) / 360deg * -2.4s);
+    /* Каждая точка катится по орбите ИНДИВИДУАЛЬНО: --dur — её период
+       (22..32s, разные у соседей), --dir — направление (1/-1), --angle —
+       стартовый сдвиг. iqmoOrbitDotSpin читает все три, поэтому точки
+       расходятся / сходятся со временем как в реальном вращающемся
+       рое — без впечатления «склеенного обруча». */
+    animation:
+      iqmoOrbitDotSpin var(--dur, 26s) linear infinite,
+      iqmoOrbitDotPulse 2.4s ease-in-out infinite;
+    animation-delay: 0s, var(--pdel, 0s);
+    /* Цвет тоже индивидуальный — палитра в HSL по --hue (130..290).
+       Сохраняем тот же визуальный язык: мягкий неоновый градиент с
+       внутренним «глянцем» и наружным glow. */
+    background:
+      radial-gradient(circle at 30% 30%,
+        hsl(var(--hue, 145) 95% 78%) 0%,
+        hsl(var(--hue, 145) 80% 55%) 70%,
+        hsl(var(--hue, 145) 70% 38%) 100%);
+    box-shadow:
+      0 0 8px hsla(var(--hue, 145), 90%, 60%, .55),
+      0 0 3px rgba(255,255,255,.9) inset;
+  }
+@keyframes iqmoOrbitDotSpin{
+    from{ transform: rotate(calc(var(--angle, 0deg) + 0deg * var(--dir, 1))) translateX(var(--orbit-r, 48px)); }
+    to  { transform: rotate(calc(var(--angle, 0deg) + 360deg * var(--dir, 1))) translateX(var(--orbit-r, 48px)); }
   }
   /* Тиры размеров точек — чем больше дней, тем компактнее точки,
-     иначе при 30 точках они визуально сольются и забьют центральную иконку. */
+     иначе при 30 точках они визуально сольются и забьют центральную иконку.
+     Box-shadow тоже завязан на --hue, чтобы тинт точки и её свечение
+     были одного цвета. */
 .iqmo-hero.v3 .orb-orbit[data-orbit-tier="big"]{ --dot-size:7px; }
 .iqmo-hero.v3 .orb-orbit[data-orbit-tier="mid"]{ --dot-size:5.5px; }
 .iqmo-hero.v3 .orb-orbit[data-orbit-tier="small"]{ --dot-size:4px; }
 .iqmo-hero.v3 .orb-orbit[data-orbit-tier="big"] i{
-    box-shadow:0 0 12px rgba(34,197,94,.8), 0 0 4px rgba(255,255,255,.95) inset;
+    box-shadow:
+      0 0 12px hsla(var(--hue, 145), 90%, 65%, .85),
+      0 0 4px rgba(255,255,255,.95) inset;
   }
 .iqmo-hero.v3 .orb-orbit[data-orbit-tier="small"] i{
-    box-shadow:0 0 5px rgba(34,197,94,.45);
+    box-shadow:0 0 5px hsla(var(--hue, 145), 90%, 60%, .55);
   }
 @media (prefers-reduced-motion: reduce){
 .iqmo-hero.v3 .orb-orbit{ animation:none; }
