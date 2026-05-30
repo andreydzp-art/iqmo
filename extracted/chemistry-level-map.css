@@ -145,27 +145,30 @@
   .pd-node.active{padding-bottom:0}
   .pd-node.active .pd-kicker{margin-bottom:4px}
   .pd-node.active .pd-circle{
-    width:116px; height:116px;
+    /* Тот же размер, что у locked-кружков (70×70), чтобы текущий
+       вариант не выбивался по высоте из общей строки. Акцент держим
+       цветом, glow’ом и пульсацией, а не размером. */
+    width:70px; height:70px;
     background:
       radial-gradient(120% 100% at 28% 22%, #c4b6ff 0%, transparent 55%),
       linear-gradient(160deg, #8b7aff 0%, #5b21b6 100%);
     color:#fff; border:none;
     box-shadow:
-      0 0 0 6px rgba(124,102,255,.12),
-      0 0 0 16px rgba(124,102,255,.06),
-      0 24px 44px -16px rgba(91,33,182,.55),
-      inset 0 -4px 12px rgba(0,0,0,.18),
+      0 0 0 5px rgba(124,102,255,.12),
+      0 0 0 12px rgba(124,102,255,.06),
+      0 18px 32px -14px rgba(91,33,182,.55),
+      inset 0 -3px 10px rgba(0,0,0,.18),
       inset 0 2px 0 rgba(255,255,255,.35);
   }
-  .pd-node.active .pd-circle .num{font-size:46px; text-shadow:0 2px 4px rgba(0,0,0,.18)}
+  .pd-node.active .pd-circle .num{font-size:28px; text-shadow:0 2px 4px rgba(0,0,0,.18)}
   .pd-node.active .pd-circle::before{
-    content:""; position:absolute; inset:-22px; border-radius:50%;
+    content:""; position:absolute; inset:-16px; border-radius:50%;
     background: radial-gradient(50% 50% at 50% 50%, rgba(124,102,255,.22) 0%, transparent 65%);
     pointer-events:none; z-index:-1;
     animation: pdBreathe 3.2s ease-in-out infinite;
   }
   .pd-node.active .pd-circle::after{
-    content:""; position:absolute; inset:-9px; border-radius:50%;
+    content:""; position:absolute; inset:-7px; border-radius:50%;
     border:1.5px solid rgba(124,102,255,.45);
     animation: pdPulse 2.4s ease-out infinite;
     pointer-events:none;
@@ -731,10 +734,10 @@
       radial-gradient(120% 100% at 28% 22%, #93c5fd 0%, transparent 55%),
       linear-gradient(160deg, #0ea5e9 0%, #1e3a8a 100%);
     box-shadow:
-      0 0 0 6px rgba(14,165,233,.12),
-      0 0 0 16px rgba(14,165,233,.06),
-      0 24px 44px -16px rgba(30,58,138,.55),
-      inset 0 -4px 12px rgba(0,0,0,.18),
+      0 0 0 5px rgba(14,165,233,.12),
+      0 0 0 12px rgba(14,165,233,.06),
+      0 18px 32px -14px rgba(30,58,138,.55),
+      inset 0 -3px 10px rgba(0,0,0,.18),
       inset 0 2px 0 rgba(255,255,255,.35);
   }
   .pf-card .pd-node.active .pd-circle::before{
