@@ -273,7 +273,12 @@
       radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,.20), transparent 60%),
       linear-gradient(160deg, #8b5cf6 0%, #6d28d9 55%, #4c1d95 100%);
     border-radius:20px;
-    padding:14px 16px 18px;
+    /* Раньше было 14 16 18 — карточка получалась на ~50px выше, чем
+       нижний край соседних узлов (XP-чип у Вариантов 1–6). По требованию
+       пользователя «карточка Супер Босс должна заканчиваться на одном
+       уровне с остальными вариантами» — ужимаем верт. отступы. Сетка
+       .pd-nodes (align-items:start) теперь визуально ровная. */
+    padding:10px 14px 12px;
     color:#fff;
     box-shadow:
       0 22px 44px -18px rgba(91,33,182,.55),
@@ -309,7 +314,9 @@
   .pd-bossTop .pd-lockMini svg{width:10px; height:10px; fill:#fff}
 
   .pd-bossCircle{
-    width:100px; height:100px; margin: 12px auto 10px;
+    /* Уменьшено со 100→78 (–22px), margin 12+10→6+4 (–12px) — итого
+       –34px к высоте карточки. Это было основным «провалом вниз». */
+    width:78px; height:78px; margin: 6px auto 4px;
     border-radius:50%;
     display:grid; place-items:center;
     background:
@@ -321,23 +328,23 @@
     position:relative;
   }
   .pd-bossCircle::after{
-    content:""; position:absolute; inset:-12px; border-radius:50%;
+    content:""; position:absolute; inset:-9px; border-radius:50%;
     border:1.5px solid rgba(255,255,255,.18);
   }
-  .pd-bossCircle svg{width:40px; height:40px; fill:#fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+  .pd-bossCircle svg{width:32px; height:32px; fill:#fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,.3))}
 
-  .pd-bossName{text-align:center; font-size:16px; font-weight:800; letter-spacing:-.005em}
-  .pd-bossState{text-align:center; font-size:11.5px; opacity:.85; margin-top:2px; letter-spacing:.04em}
+  .pd-bossName{text-align:center; font-size:14px; font-weight:800; letter-spacing:-.005em}
+  .pd-bossState{text-align:center; font-size:10.5px; opacity:.85; margin-top:1px; letter-spacing:.04em}
   .pd-bossRewards{
     display:flex; gap:6px; justify-content:center; flex-wrap:wrap;
-    margin-top:10px; padding-top:10px;
+    margin-top:8px; padding-top:8px;
     border-top:1px dashed rgba(255,255,255,.28);
   }
   .pd-bossRewards .pd-reward{
-    font-size:10.5px; font-weight:800; letter-spacing:.04em;
+    font-size:10px; font-weight:800; letter-spacing:.04em;
     background: rgba(255,255,255,.15);
     border:1px solid rgba(255,255,255,.22);
-    padding:4px 8px; border-radius:999px;
+    padding:3px 7px; border-radius:999px;
     display:inline-flex; align-items:center; gap:5px;
   }
   .pd-bossRewards .pd-reward svg{width:11px; height:11px; fill:#fde68a}
@@ -490,18 +497,18 @@
   }
   .pe-card .pd-bossCircle svg{filter: drop-shadow(0 2px 4px rgba(120,60,5,.35))}
   .pe-card .pe-victory-check{
-    position:absolute; right:-4px; top:-4px;
-    width:32px; height:32px; border-radius:50%;
+    position:absolute; right:-2px; top:-2px;
+    width:24px; height:24px; border-radius:50%;
     background:#fff; display:grid; place-items:center;
     border:3px solid #ecfdf5;
     box-shadow:0 5px 12px rgba(0,0,0,.22);
   }
-  .pe-card .pe-victory-check svg{width:16px; height:16px; fill:#059669}
+  .pe-card .pe-victory-check svg{width:12px; height:12px; fill:#059669}
   /* Completed chapter: hide boss reward chips (same as chemistry pg-card) */
   .pe-card .pd-bossRewards{display:none}
   .pe-card .pe-sparkles{display:none}
-  .pe-card .pd-bossName{font-size:17px; margin-top:4px}
-  .pe-card .pd-bossState{font-size:12px; margin-top:4px; opacity:.92}
+  .pe-card .pd-bossName{font-size:14px; margin-top:2px}
+  .pe-card .pd-bossState{font-size:11px; margin-top:2px; opacity:.92}
 
   /* Footer hint becomes a celebratory recap */
   .pe-card .pd-foot{
@@ -549,7 +556,7 @@
       inset 0 -6px 12px rgba(0,0,0,.20);
   }
   .pe-card .pd-bossCircle::after{
-    inset:-13px;
+    inset:-9px;
     border:1px solid rgba(212,169,81,.28);
   }
 
