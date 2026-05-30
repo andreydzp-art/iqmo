@@ -780,28 +780,38 @@
     position:relative;
     padding:0;
     border-radius:22px;
-    border:1px solid rgba(168,85,247,.18);
+    /* Премиум-фон: лёгкий лавандовый градиент сверху + мягкий вираж
+       к чисто-белому в центре и обратно к лаванде. Без этого карточка
+       читается как обычный белый прямоугольник интерфейса. */
+    border:1px solid rgba(168,85,247,.22);
     background:
-      radial-gradient(700px 400px at 50% -10%, rgba(192,132,252,.10), transparent 60%),
-      linear-gradient(180deg, #fbfaff 0%, #fff 60%, #fbfaff 100%);
+      radial-gradient(900px 520px at 50% -8%, rgba(192,132,252,.18), transparent 62%),
+      radial-gradient(420px 320px at 12% 102%, rgba(192,132,252,.10), transparent 68%),
+      linear-gradient(180deg, #f6f1ff 0%, #ffffff 48%, #f6f1ff 100%);
     overflow:hidden;
     cursor:pointer;
     display:block;
     isolation:isolate;
     transition: transform .26s cubic-bezier(.2,.7,.2,1), box-shadow .26s ease, border-color .26s ease;
+    /* Многослойная мягкая тень — карточка чуть отрывается от фона,
+       без тяжёлых чёрных «UI-теней». Верхний highlight + цветной
+       нижний halo для ощущения коллекционного объекта. */
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.9),
-      inset 0 0 0 1px rgba(255,255,255,.5),
-      0 1px 2px rgba(15,18,38,.04),
-      0 22px 50px -28px rgba(124,58,237,.35);
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 0 0 1px rgba(255,255,255,.55),
+      0 1px 2px rgba(15,18,38,.05),
+      0 6px 14px -8px rgba(124,58,237,.28),
+      0 22px 48px -22px rgba(124,58,237,.42);
   }
   .ach.ach--illus:hover{
+    /* «Живая награда»: 200–300 ms, лёгкий подъём + насыщеннее halo. */
     transform:translateY(-6px);
-    border-color:rgba(168,85,247,.4);
+    border-color:rgba(168,85,247,.5);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.9),
-      0 1px 2px rgba(15,18,38,.04),
-      0 30px 60px -24px rgba(124,58,237,.42);
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 1px 2px rgba(15,18,38,.05),
+      0 12px 24px -10px rgba(124,58,237,.40),
+      0 34px 60px -22px rgba(124,58,237,.55);
   }
 
   /* Edge animated frame for epic rarity — медленный обод по контуру. */
@@ -825,61 +835,73 @@
   .ach.ach--illus:hover::after{opacity:1; animation:ach-ref-spin 5s linear infinite;}
   @keyframes ach-ref-spin{ to{transform:rotate(360deg);} }
 
-  /* Фоновая сцена: фиолетовые haloes + молекулы-гексагоны + искры. */
+  /* Фоновая сцена: фиолетовые haloes + молекулы-гексагоны + искры.
+     Сцена покрывает верхнюю часть карты под орбом и формирует «живой»
+     лавандовый подложный паттерн (без него карта читается плоской). */
   .ach.ach--illus .ref-scene{
     position:absolute;
     top:0; left:0; right:0;
-    height:62%;
+    height:64%;
     z-index:1;
     pointer-events:none;
     overflow:hidden;
     background:
-      radial-gradient(circle at 14% 18%, rgba(192,132,252,.18), transparent 14%),
-      radial-gradient(circle at 86% 14%, rgba(192,132,252,.14), transparent 14%),
-      radial-gradient(420px 360px at 50% 28%, rgba(192,132,252,.12), transparent 70%);
+      radial-gradient(circle at 14% 18%, rgba(192,132,252,.26), transparent 16%),
+      radial-gradient(circle at 86% 14%, rgba(192,132,252,.22), transparent 16%),
+      radial-gradient(520px 420px at 50% 30%, rgba(192,132,252,.20), transparent 70%);
     mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
     -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
   }
   .ach.ach--illus .ref-scene::before{
+    /* Hex-сеточка («магические линии») — едва видна, поверх haloes */
     content:""; position:absolute; inset:0;
     background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'><g fill='none' stroke='%23a78bfa' stroke-width='1.1' opacity='.55'><polygon points='30,4 56,18 56,46 30,60 4,46 4,18'/><polygon points='90,44 116,58 116,86 90,100 64,86 64,58'/></g></svg>");
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'><g fill='none' stroke='%23a78bfa' stroke-width='1.1' opacity='.7'><polygon points='30,4 56,18 56,46 30,60 4,46 4,18'/><polygon points='90,44 116,58 116,86 90,100 64,86 64,58'/></g></svg>");
     background-size:120px 104px;
     background-position:center;
-    opacity:.55;
-    mask-image:radial-gradient(ellipse 70% 70% at 50% 40%, transparent 32%, #000 56%, transparent 92%);
-    -webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 40%, transparent 32%, #000 56%, transparent 92%);
+    opacity:.7;
+    mask-image:radial-gradient(ellipse 72% 72% at 50% 40%, transparent 30%, #000 56%, transparent 92%);
+    -webkit-mask-image:radial-gradient(ellipse 72% 72% at 50% 40%, transparent 30%, #000 56%, transparent 92%);
   }
   .ach.ach--illus .ref-scene::after{
+    /* Искры/звёздочки в углах сцены */
     content:""; position:absolute; inset:0;
     background-image:
-      radial-gradient(circle at 22% 30%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
-      radial-gradient(circle at 78% 24%, rgba(255,255,255,.9) 0 1.5px, transparent 2px),
-      radial-gradient(circle at 20% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px),
-      radial-gradient(circle at 82% 70%, rgba(255,255,255,.9) 0 1.2px, transparent 2px);
+      radial-gradient(circle at 22% 30%, rgba(255,255,255,.95) 0 1.6px, transparent 2.2px),
+      radial-gradient(circle at 78% 24%, rgba(255,255,255,.95) 0 1.6px, transparent 2.2px),
+      radial-gradient(circle at 20% 70%, rgba(255,255,255,.95) 0 1.3px, transparent 2.2px),
+      radial-gradient(circle at 82% 70%, rgba(255,255,255,.95) 0 1.3px, transparent 2.2px);
     filter: drop-shadow(0 0 3px rgba(252,231,255,1));
-    opacity:.85;
+    opacity:.95;
   }
 
-  /* Rarity-пилюля «ЭПИЧЕСКАЯ» — градиент + бриллиант-маркер.
-     Все размеры в cqi → масштабируются от ширины карты. На маленькой
-     1×1 ячейке (≈178px ширина) клампы держат текст читаемым. */
+  /* Rarity-пилюля «ЭПИЧЕСКАЯ» — коллекционная метка с насыщенным
+     градиентом и фиолетовым свечением (как у Steam achievement /
+     Brawl Stars rarity tag). Все размеры в cqi → масштабируются от
+     ширины карты. На маленькой 1×1 ячейке (≈178px ширина) клампы
+     держат текст читаемым. */
   .ach.ach--illus .c-rar{
     position:absolute;
     top:4cqi; left:4cqi;
     z-index:4;
     display:inline-flex; align-items:center; gap:2cqi;
-    height:auto; padding:1.4cqi 3.5cqi;
+    height:auto; padding:1.8cqi 4.2cqi;
     min-height:18px;
     border-radius:999px;
     font-size:clamp(8.5px, 3cqi, 12px);
-    font-weight:800; letter-spacing:.14em; text-transform:uppercase;
-    background:linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0)),
+      linear-gradient(135deg, #b791ff 0%, #8b5cf6 55%, #6d28d9 100%);
     color:#fff;
-    border:1px solid rgba(255,255,255,.45);
+    text-shadow:0 1px 0 rgba(76,29,149,.45);
+    border:1px solid rgba(255,255,255,.55);
     box-shadow:
-      0 4px 12px -4px rgba(124,58,237,.5),
-      inset 0 1px 0 rgba(255,255,255,.35);
+      0 0 0 1px rgba(168,85,247,.25),
+      0 4px 14px -2px rgba(124,58,237,.55),
+      0 0 18px -4px rgba(168,85,247,.65),
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -1px 0 rgba(76,29,149,.30);
     white-space:nowrap;
   }
   .ach.ach--illus .c-rar::before{
@@ -889,41 +911,61 @@
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M12 2 22 9l-10 13L2 9z' opacity='.95'/><path d='M12 2v20M2 9h20' stroke='%23c4b5fd' stroke-width='1.2' fill='none' opacity='.7'/></svg>");
     background-size:contain;
     background-repeat:no-repeat;
+    filter:drop-shadow(0 0 3px rgba(255,255,255,.7));
   }
 
-  /* ── ОРБ-СТЕЙДЖ ── */
+  /* ── ОРБ-СТЕЙДЖ ──
+     Стейдж +17% к прежнему 55cqi → 64cqi. Орб внутри ~56cqi (вместо 48).
+     Это та самая «увеличить центральную награду на 15–20%» из ТЗ. */
   .ach.ach--illus .c-orb-stage{
     position:relative;
-    margin:8.5cqi auto 1cqi;
-    width:55cqi; height:55cqi;
+    margin:7cqi auto 0;
+    width:64cqi; height:64cqi;
     display:grid; place-items:center;
     z-index:3;
   }
 
-  /* Большой неон-орб (фиолетовая сфера). */
+  /* Большой неон-орб (фиолетовая сфера). Многослойный glow и контрастный
+     белый ring → ощущение сцены под прожектором, как у эпических наград
+     в Brawl Stars / Clash Royale. */
   .ach.ach--illus .ref-orb{
     position:relative;
-    width:48cqi; height:48cqi;
+    width:56cqi; height:56cqi;
     border-radius:50%;
     margin:0 auto;
     background:
-      radial-gradient(circle at 50% 38%, #6d28d9 0%, #4c1d95 60%, #2e1065 100%);
+      radial-gradient(circle at 50% 32%, #7c3aed 0%, #5b21b6 55%, #2e1065 100%);
     box-shadow:
-      0 0 0 1.2cqi #fff,
-      0 0 0 1.8cqi rgba(255,255,255,.3),
-      0 0 6cqi 1.4cqi rgba(168,85,247,.55),
-      0 0 14cqi 3cqi rgba(168,85,247,.30),
-      inset 0 -2.5cqi 7cqi rgba(0,0,0,.4),
-      inset 0 .5cqi 0 rgba(255,255,255,.35);
+      /* контрастный белый ring */
+      0 0 0 1.4cqi #fff,
+      0 0 0 2.2cqi rgba(255,255,255,.42),
+      /* плотный фиолетовый glow */
+      0 0 7cqi 1.6cqi rgba(168,85,247,.72),
+      0 0 14cqi 3.4cqi rgba(168,85,247,.42),
+      0 0 26cqi 5cqi rgba(168,85,247,.18),
+      /* объём орба */
+      inset 0 -3cqi 8cqi rgba(0,0,0,.45),
+      inset 0 .6cqi 0 rgba(255,255,255,.45);
     overflow:hidden;
-    transition:transform .22s ease;
+    transition:transform .22s ease, box-shadow .26s ease;
+  }
+  .ach.ach--illus:hover .ref-orb{
+    /* На hover glow «дышит» сильнее — карта оживает */
+    box-shadow:
+      0 0 0 1.4cqi #fff,
+      0 0 0 2.4cqi rgba(255,255,255,.55),
+      0 0 9cqi 2cqi rgba(168,85,247,.85),
+      0 0 18cqi 4cqi rgba(168,85,247,.55),
+      0 0 32cqi 6cqi rgba(168,85,247,.26),
+      inset 0 -3cqi 8cqi rgba(0,0,0,.45),
+      inset 0 .6cqi 0 rgba(255,255,255,.5);
   }
   .ach.ach--illus .ref-orb::before{
     content:""; position:absolute;
     top:8%; left:18%;
     width:55%; height:30%;
     border-radius:50%;
-    background:radial-gradient(ellipse at center, rgba(255,255,255,.35), transparent 70%);
+    background:radial-gradient(ellipse at center, rgba(255,255,255,.4), transparent 70%);
     filter:blur(2px);
     pointer-events:none;
   }
@@ -940,21 +982,21 @@
     position:absolute;
     top:50%; left:50%;
     transform:translate(-50%, -50%);
-    width:22cqi; height:22cqi;
+    width:26cqi; height:26cqi;
     z-index:3;
     filter:
-      drop-shadow(0 0 1.4cqi rgba(192,132,252,.9))
-      drop-shadow(0 0 3cqi rgba(168,85,247,.55));
+      drop-shadow(0 0 1.8cqi rgba(192,132,252,.95))
+      drop-shadow(0 0 3.6cqi rgba(168,85,247,.6));
     transform-origin:50% 70%;
   }
 
   /* Hex-чекмарк в правом нижнем углу орба. */
   .ach.ach--illus .ref-check{
     position:absolute;
-    right:6%; bottom:8%;
-    width:13cqi; height:13cqi;
+    right:5%; bottom:6%;
+    width:15cqi; height:15cqi;
     z-index:4;
-    filter:drop-shadow(0 .8cqi 2.4cqi rgba(124,58,237,.5));
+    filter:drop-shadow(0 1cqi 2.6cqi rgba(124,58,237,.55));
   }
 
   /* Плавающие фиолетовые шарики вокруг орба. */
@@ -984,24 +1026,27 @@
   .ach.ach--illus .float-hex.fh2{ top:6%; right:8%; width:5.2cqi; }
   .ach.ach--illus .float-hex.fh3{ bottom:14%; right:-2px; width:7cqi; }
 
-  /* ── ТАЙТЛ И SUB ── */
+  /* ── ТАЙТЛ И SUB ──
+     Тайтл — главный текст карты. Подвинут ближе к орбу
+     (padding-top уменьшен до 1.6cqi, было 3.5cqi) и кегль увеличен,
+     чтобы не терялся на фоне яркой орбы. */
   .ach.ach--illus .c-title-block{
     position:relative; z-index:2;
     text-align:center;
-    padding:3.5cqi 5cqi 0;
+    padding:1.6cqi 5cqi 0;
   }
   .ach.ach--illus .c-title{
     margin:0;
-    font-size:clamp(11.5px, 6cqi, 24px);
-    font-weight:800; letter-spacing:-.02em;
-    color:#0f1226;
-    line-height:1.12;
+    font-size:clamp(12.5px, 6.6cqi, 26px);
+    font-weight:900; letter-spacing:-.018em;
+    color:#0d0825;
+    line-height:1.10;
     text-wrap:balance;
   }
   .ach.ach--illus .c-sub{
-    margin-top:1.6cqi;
+    margin-top:1.4cqi;
     font-size:clamp(8.5px, 3.4cqi, 13px);
-    color:#6b7094;
+    color:#5e6280;
     line-height:1.35;
     text-wrap:balance;
     display:-webkit-box;
@@ -1029,62 +1074,63 @@
     transform:rotate(45deg);
   }
 
-  /* ── ПРОГРЕСС (glass track + shimmer) ── */
+  /* ── ПРОГРЕСС (glass track + shimmer) ──
+     По ТЗ — второстепенный элемент. Сделан тоньше (1.8cqi вместо 2.8),
+     легче (приглушённый track), и подпись «прогресс» уменьшена и
+     полупрозрачна — не дробит карту визуально. */
   .ach.ach--illus .c-prog{
     position:relative; z-index:2;
     margin:0 6cqi;
   }
   .ach.ach--illus .c-prog-row{
     display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:1.6cqi;
+    margin-bottom:1.2cqi;
     gap:6px;
   }
   .ach.ach--illus .c-prog-row > span:first-child{
-    color:#7c3aed;
-    font-size:clamp(7.5px, 2.6cqi, 11.5px);
-    font-weight:800;
+    color:rgba(124,58,237,.7);
+    font-size:clamp(7px, 2.4cqi, 10.5px);
+    font-weight:700;
     letter-spacing:.18em;
     text-transform:uppercase;
   }
   .ach.ach--illus .c-prog-row .pp{
     display:inline-flex; align-items:baseline; gap:1px;
     font-family:'JetBrains Mono',monospace;
-    font-size:clamp(9px, 3.4cqi, 14px);
-    font-weight:800;
-    color:#0f1226;
+    font-size:clamp(8.5px, 3cqi, 12.5px);
+    font-weight:700;
+    color:#3b1d70;
     letter-spacing:.02em;
   }
   .ach.ach--illus .c-prog-row .pp b{
-    font-size:clamp(10.5px, 4cqi, 16px);
+    font-size:clamp(10px, 3.6cqi, 14px);
     background:linear-gradient(135deg, #7c3aed, #a78bfa);
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .ach.ach--illus .c-prog-row .pp .sep{ color:rgba(124,58,237,.35); margin:0 1px; }
+  .ach.ach--illus .c-prog-row .pp .sep{ color:rgba(124,58,237,.3); margin:0 1px; }
   .ach.ach--illus .c-prog-line{display:block;}
   .ach.ach--illus .c-prog-bar{
     width:100%;
-    height:2.8cqi;
-    min-height:6px;
+    height:1.8cqi;
+    min-height:5px;
     border-radius:999px;
-    background:linear-gradient(180deg, rgba(168,85,247,.06), rgba(168,85,247,.12));
-    border:1px solid rgba(168,85,247,.18);
+    background:linear-gradient(180deg, rgba(168,85,247,.05), rgba(168,85,247,.10));
+    border:1px solid rgba(168,85,247,.14);
     box-shadow:
-      inset 0 1.5px 3px rgba(76,29,149,.10),
-      inset 0 -1px 0 rgba(255,255,255,.55),
-      0 1px 0 rgba(255,255,255,.6);
+      inset 0 1px 2px rgba(76,29,149,.08),
+      inset 0 -1px 0 rgba(255,255,255,.5);
     position:relative; overflow:hidden;
   }
   .ach.ach--illus .c-prog-bar i{
     display:block; height:100%; border-radius:999px;
     position:relative;
     background:
-      linear-gradient(180deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 50%),
+      linear-gradient(180deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,0) 50%),
       linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #7c3aed 100%);
     box-shadow:
-      0 0 12px rgba(168,85,247,.55),
-      0 0 24px rgba(168,85,247,.30),
-      inset 0 1px 0 rgba(255,255,255,.55),
-      inset 0 -1px 1px rgba(76,29,149,.35);
+      0 0 8px rgba(168,85,247,.45),
+      0 0 16px rgba(168,85,247,.22),
+      inset 0 1px 0 rgba(255,255,255,.45);
     overflow:hidden;
   }
   .ach.ach--illus .c-prog-bar i::before{
@@ -1104,20 +1150,27 @@
     100% { transform:translateX(280%)  skewX(-18deg); }
   }
 
-  /* ── РЕВАРД: XP + дата в стеклянной полосе ── */
+  /* ── РЕВАРД: XP-капсула ──
+     Капсула — не просто полоса, а отдельный «трофей»: насыщенный
+     лавандовый градиент, рельефные грани, мягкий внутренний свет.
+     По ТЗ — должна выглядеть объёмной и притягательной (не серой
+     и не плоской). */
   .ach.ach--illus .c-reward{
     position:relative; z-index:2;
-    margin:2.6cqi 5cqi 5cqi;
-    padding:2.2cqi 3cqi;
-    border-radius:12px;
+    margin:2.8cqi 5cqi 5cqi;
+    padding:2.6cqi 3.2cqi;
+    border-radius:14px;
     background:
-      linear-gradient(180deg, rgba(255,255,255,.6), rgba(245,243,255,.6)),
-      radial-gradient(120% 100% at 0% 0%, rgba(168,85,247,.10), transparent 60%);
-    border:1px solid rgba(168,85,247,.22);
+      linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.10) 55%, rgba(237,233,254,.55)),
+      radial-gradient(140% 120% at 0% 0%, rgba(168,85,247,.22), transparent 65%),
+      linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e9d5ff 100%);
+    border:1px solid rgba(168,85,247,.32);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.9),
-      inset 0 0 0 1px rgba(255,255,255,.35),
-      0 6px 16px -10px rgba(124,58,237,.25);
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 0 0 1px rgba(255,255,255,.45),
+      inset 0 -1.4cqi 3cqi rgba(168,85,247,.18),
+      0 6px 14px -8px rgba(124,58,237,.30),
+      0 14px 28px -16px rgba(124,58,237,.40);
     display:grid;
     /* Раньше было `1fr 1px 1fr` под две плитки (XP + дата) с разделителем.
        Дата убрана со всех ачивок → остаётся одна центрированная плитка XP. */
@@ -1125,27 +1178,41 @@
     justify-items:center;
     align-items:center;
     gap:1.4cqi;
+    transition: box-shadow .26s ease, border-color .26s ease;
+  }
+  .ach.ach--illus:hover .c-reward{
+    border-color:rgba(168,85,247,.5);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 0 0 1px rgba(255,255,255,.55),
+      inset 0 -1.4cqi 3cqi rgba(168,85,247,.28),
+      0 8px 18px -8px rgba(124,58,237,.45),
+      0 18px 32px -14px rgba(124,58,237,.55);
   }
   .ach.ach--illus .c-rwd-item{
-    display:flex; align-items:center; gap:1.6cqi;
+    display:flex; align-items:center; gap:1.8cqi;
     padding:1px 0;
     min-width:0;
   }
   .ach.ach--illus .c-rwd-ico{
-    width:7.6cqi; height:7.6cqi;
-    min-width:18px; min-height:18px;
-    border-radius:8px;
+    width:8.4cqi; height:8.4cqi;
+    min-width:20px; min-height:20px;
+    border-radius:9px;
     display:grid; place-items:center;
     flex-shrink:0;
-    background:linear-gradient(135deg, #ede9fe, #ddd6fe);
+    background:
+      radial-gradient(circle at 32% 28%, #fff 0%, #ede9fe 45%, #c4b5fd 100%);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.9),
-      inset 0 0 0 1px rgba(255,255,255,.6),
-      0 4px 10px -4px rgba(124,58,237,.35);
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 0 0 1px rgba(255,255,255,.7),
+      inset 0 -.7cqi 1.4cqi rgba(124,58,237,.22),
+      0 5px 12px -4px rgba(124,58,237,.45),
+      0 0 14px -4px rgba(168,85,247,.55);
   }
   .ach.ach--illus .c-rwd-ico svg{
     width:55%; height:55%;
-    fill:#7c3aed;
+    fill:#6d28d9;
+    filter:drop-shadow(0 1px 0 rgba(255,255,255,.9));
   }
   .ach.ach--illus .c-rwd-text{
     display:flex; flex-direction:column; gap:1px;
@@ -1153,8 +1220,8 @@
     min-width:0;
   }
   .ach.ach--illus .c-rwd-val{
-    font-size:clamp(9px, 3.2cqi, 14.5px);
-    font-weight:800;
+    font-size:clamp(9.5px, 3.4cqi, 15px);
+    font-weight:900;
     color:#3b1d70;
     letter-spacing:.01em;
     font-variant-numeric:tabular-nums;
@@ -1164,10 +1231,10 @@
   }
   .ach.ach--illus .c-rwd-lbl{
     margin-top:.4cqi;
-    color:#7c3aed;
+    color:#6d28d9;
     font-size:clamp(6.5px, 2.2cqi, 10px);
     font-weight:800;
-    letter-spacing:.14em;
+    letter-spacing:.16em;
     text-transform:uppercase;
     opacity:.85;
     white-space:nowrap;
