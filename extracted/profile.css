@@ -1142,7 +1142,11 @@
   /* ── ПРОГРЕСС — размеры как у .ach--start (clamp до эталонных px) ── */
   .ach.ach--illus .c-prog{
     position:relative; z-index:2;
-    margin:0 7.5cqi;
+    /* margin-top:auto прижимает полосу к низу карточки (illus =
+       flex-column). Снизу — резерв под XP-чип (.a-xp absolute,
+       bottom:10px, высота ≈22px → 32px суммарно) + дышащий
+       зазор. Полоса декоративная, width:100% всегда. */
+    margin: auto 7.5cqi clamp(40px, 13cqi, 46px);
     display:block;
   }
   .ach.ach--illus .c-prog-row{

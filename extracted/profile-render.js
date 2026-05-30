@@ -994,18 +994,27 @@
 					'<h4 class="c-title">' + esc(a.title) + '</h4>' +
 					'<div class="c-sub">' + esc(a.desc) + '</div>' +
 				'</div>' +
-				// FOOTER — буквально тот же компонент, что у обычной карты
-				// «Неделя ритма»: тонкий .a-prog + компактный XP-чип .a-xp снизу.
-				// Те же HTML-теги и CSS-классы → идентичные computed-размеры
-				// (ширина/высота/padding чипа, длина полосы). Отличие только в
-				// теме (фиолет=epic / синий=bio) — задаётся правилами
-				// .ach--illus .a-xp в profile.css.
-				// На illus-картах полосу показываем всегда, пока есть
-				// a.progress и карта не unlocked — даже при current=0
-				// (как было в старом .c-prog: пустая полоска = «ещё в начале»).
-				((!a.unlocked && a.progress)
-					? '<div class="a-prog" aria-label="' + progCur + ' из ' + progTgt + '"><i style="width:' + progPct + '%"></i></div>'
-					: '') +
+				// FOOTER illus-карт:
+				//   1) Полоса прогресса .c-prog — декоративная, ВСЕГДА 1/1
+				//      на 100%. Геометрия и шиммер взяты 1:1 из эталонов
+				//      (start-na-portale-standalone.html, rhythm-card-
+				//      standalone.html, chem/bio). Реальный a.progress
+				//      сюда не подставляется по требованию: «полоса
+				//      сделана в дизайне только для красоты, не привязана
+				//      ни к каким значениям».
+				//   2) XP-чип .a-xp — тот же компонент, что у обычной
+				//      карты (одинаковые computed-размеры/паддинги/шрифт);
+				//      различается только тема через .ach--illus(.--bio/
+				//      .--start) .a-xp в profile.css.
+				'<div class="c-prog" aria-hidden="true">' +
+					'<div class="c-prog-row">' +
+						'<span>Прогресс</span>' +
+						'<span class="pp"><b>1</b><span class="sep">/</span>1</span>' +
+					'</div>' +
+					'<div class="c-prog-line">' +
+						'<div class="c-prog-bar"><i style="width:100%"></i></div>' +
+					'</div>' +
+				'</div>' +
 				'<div class="a-xp' + ((a.unlocked || a.inProgress) ? '' : ' a-xp--locked') + '">' +
 					'<span class="a-xp-ico">' + xpSvg + '</span>' +
 					'<span class="a-xp-val">+' + (a.xpReward || 0) + ' XP</span>' +
