@@ -78,6 +78,26 @@
 		return pluralRu(n, ['день подряд', 'дня подряд', 'дней подряд']);
 	}
 
+	/**
+	 * Подсказка для streak-орба. Раньше тут было «Вы уже N дней в IQMO»
+	 * (точки = дни на портале), но это запутывало: при streak=4 точек было
+	 * 27 — пользователь резонно спрашивал, почему не 4. Теперь 1 точка = 1
+	 * день серии, и tooltip говорит ровно про это.
+	 */
+	function streakTooltip(streakDays) {
+		var n = Math.max(0, Math.round(Number(streakDays) || 0));
+		if (n === 0) {
+			return 'Серия ещё не запущена. Закройте дневную цель — каждый день подряд добавит точку на орб.';
+		}
+		var capped = Math.min(30, n);
+		var label = n > 30
+			? '30+ ' + pluralRu(30, ['день', 'дня', 'дней'])
+			: n + ' ' + pluralRu(n, ['день', 'дня', 'дней']);
+		return 'Серия — ' + label + ' подряд. На орбе ' + capped +
+			pluralRu(capped, [' точка', ' точки', ' точек']) +
+			' — по одной за каждый день серии. Не теряй огонёк.';
+	}
+
 	function daysInIqmoLabel(ts) {
 		if (!ts) return '';
 		// ts уже в миллисекундах (БД-конвенция IQMO), см. memberSinceLabel().
@@ -269,14 +289,12 @@
 		var accDelta = '';
 		var courseDelta = '';
 		var orbGradId = 'iqmo-orb-grad-' + gid;
-		// Дни в IQMO → точки на орбе (1 точка = 1 день, max 30, потом «30+»).
-		// Чем больше дней — тем компактнее точки (см. data-orbit-tier).
-		var orbitDays = global.IqmoOrbitDots
-			? IqmoOrbitDots.daysSince(d.memberSince)
-			: 0;
+		// Серия (streak) → точки на орбе (1 точка = 1 день подряд, max 30, потом «30+»).
+		// Чем длиннее серия — тем компактнее точки (см. data-orbit-tier).
+		var orbitDays = Math.max(0, Math.round(Number(streakDays) || 0));
 		var orbitDotsHtml = global.IqmoOrbitDots ? IqmoOrbitDots.build(orbitDays) : '';
 		var orbitTier = global.IqmoOrbitDots ? IqmoOrbitDots.tierFor(orbitDays) : 'big';
-		var orbitTip = global.IqmoOrbitDots ? IqmoOrbitDots.tooltipText(orbitDays) : '';
+		var orbitTip = streakTooltip(orbitDays);
 		// «Быстрое повторение» ведёт на предмет, в котором ученик активнее.
 		var subjects = p && p.subjectsProgressData ? p.subjectsProgressData : null;
 		var reviewHref = '/full-test-chemistry/';
@@ -1046,7 +1064,7 @@
 		var orbit = hero.querySelector('.orb-orbit');
 		var orbEl = hero.querySelector('.orb');
 		if (orbit && global.IqmoOrbitDots) {
-			var newDays = IqmoOrbitDots.daysSince(d.memberSince);
+			var newDays = Math.max(0, Math.round(Number(streakDays) || 0));
 			var prevDays = Number(orbit.getAttribute('data-orbit-days'));
 			if (!Number.isFinite(prevDays) || newDays !== prevDays) {
 				orbit.innerHTML = IqmoOrbitDots.build(newDays);
@@ -1054,7 +1072,7 @@
 				orbit.setAttribute('data-orbit-days', String(newDays));
 			}
 			if (orbEl) {
-				var tipText = IqmoOrbitDots.tooltipText(newDays);
+				var tipText = streakTooltip(newDays);
 				var tipEl = orbEl.querySelector('.orb-tip');
 				if (tipEl) {
 					tipEl.textContent = tipText;

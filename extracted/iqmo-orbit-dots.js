@@ -1,11 +1,18 @@
 /**
  * IQMO · OrbitDots — точки, вращающиеся вокруг центра орба.
- * Количество точек = количеству дней пользователя на платформе
- * (даёт визуальное ощущение «персонаж развивается со временем»).
+ *
+ * Семантика по умолчанию (актуальная): 1 точка = 1 день серии (streak).
+ * Раньше точки считались по дням на платформе (daysSince(memberSince)),
+ * но это путало пользователей: при streak=4 точек было ~27, и они резонно
+ * спрашивали, «почему не 4». Сейчас вызывающая сторона (profile-render.js)
+ * передаёт сюда уже готовое число (streakDays), а компонент остаётся
+ * нейтральным к источнику.
  *
  * Используется на:
  *   - странице Profile (большой dark streak-orb 96px)
- *   - compact hero на Full Test страницах (мини-орб ~56px)
+ *   - compact hero на Full Test страницах (мини-орб ~56px) — legacy.
+ *     Сейчас Full Test тоже рендерит профильный hero, так что вызовы
+ *     daysSince()/tooltipText() из этих страниц — dead code.
  *
  * API:
  *   IqmoOrbitDots.build(daysCount, { maxDots = 30 })
@@ -20,8 +27,14 @@
  *       8–15 → mid, 16+ → small).
  *
  *   IqmoOrbitDots.tooltipText(daysCount, { maxDots = 30 })
- *     → строка для подсказки на hover («Вы уже N дней в IQMO…»).
+ *     → legacy-tooltip про дни на платформе. В Profile-hero не зовётся —
+ *       там tooltip формирует profile-render.js (streakTooltip), потому что
+ *       текст должен говорить про серию, а не про дни в IQMO.
  *       При daysCount > maxDots возвращает «30+ дней».
+ *
+ *   IqmoOrbitDots.daysSince(memberSinceMs)
+ *     → утилита: число дней с момента регистрации (legacy для full-test
+ *       compact hero, не используется на Profile).
  *
  * Скорость вращения и стили орб-track задаются CSS на стороне страницы.
  */
