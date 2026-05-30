@@ -15,8 +15,6 @@ function Nav({ narrow }) {
         </div>
         <div className="nav-links">
           <a href="#how">Как это работает</a>
-          <a href="#compare">Сравнение</a>
-          <a href="#price">Цена</a>
           <a href="#trust">Программа</a>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -24,7 +22,7 @@ function Nav({ narrow }) {
             Войти
           </a>
           <button type="button" className="btn btn-accent" style={{ padding: '10px 16px', fontSize: 14 }} data-open-register data-cta-source="nav">
-            Попробовать бесплатно
+            Начать обучение
           </button>
         </div>
       </div>
@@ -33,15 +31,15 @@ function Nav({ narrow }) {
 }
 
 // ── 1 · Hero ──────────────────────────────────────────────────────────
-function Hero({ narrow, price, headline }) {
+function Hero({ narrow, headline }) {
   return (
     <section className="section hero">
       <div className="hero-bg"/>
       <div className="wrap hero-grid">
         <div className="hero-content">
           <div className="price-pill" style={{ marginBottom: 6 }}>
-            <span className="chip">−85%</span>
-            <span><b className="strike">от 2 000 ₽</b> за урок репетитора</span>
+            <span className="chip">ОГЭ-2026</span>
+            <span>26 типов задач · 10 тем по&nbsp;ФИПИ</span>
           </div>
 
           <h1 className="display" style={{ marginTop: 18 }}>
@@ -53,13 +51,13 @@ function Hero({ narrow, price, headline }) {
           </h1>
 
           <p className="lead">
-            Интерактивные задания, геймификация, система уровней и подготовка к&nbsp;ОГЭ,
+            Интерактивные задания, геймификация, система уровней и&nbsp;подготовка к&nbsp;ОГЭ,
             от&nbsp;которой ребёнок не&nbsp;может оторваться&nbsp;— как&nbsp;от хорошей игры.
           </p>
 
           <div className="hero-cta">
             <button type="button" className="btn btn-accent btn-lg" data-open-register data-cta-source="hero">
-              Попробовать бесплатно {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
+              Начать подготовку {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
             </button>
             <a className="btn btn-ghost btn-lg" href="/express-chemistry.html">
               {React.cloneElement(Ic.play, { width: 14, height: 14 })} Посмотреть демо · 90&nbsp;сек
@@ -69,15 +67,15 @@ function Hero({ narrow, price, headline }) {
           <div className="hero-meta">
             <span className="hero-meta-item">
               <span style={{ display: 'inline-flex', color: 'var(--success)' }}>{React.cloneElement(Ic.check, { width: 14, height: 14 })}</span>
-              Первая неделя — <strong>0 ₽</strong>
+              Программа по&nbsp;спецификации <strong>ФИПИ</strong>
             </span>
             <span className="hero-meta-item">
               <span style={{ display: 'inline-flex', color: 'var(--success)' }}>{React.cloneElement(Ic.check, { width: 14, height: 14 })}</span>
-              Без привязки карты
+              Прогресс по&nbsp;каждой теме
             </span>
             <span className="hero-meta-item">
               <span style={{ display: 'inline-flex', color: 'var(--success)' }}>{React.cloneElement(Ic.check, { width: 14, height: 14 })}</span>
-              Отмена в&nbsp;один клик
+              Уровни, XP и&nbsp;серии дней
             </span>
           </div>
 
@@ -119,8 +117,8 @@ function Problem() {
   const items = [
     { icon: Ic.ghost,      title: 'Ребёнок не хочет заниматься',
       text: 'YouTube, TikTok, игры — что угодно, лишь бы не учебники. Знакомо?' },
-    { icon: Ic.money,      title: 'Репетиторы дорогие',
-      text: '2 000–4 000 ₽ за час. За 3 месяца до экзамена — это 60–120 тысяч.' },
+    { icon: Ic.brain,      title: 'Не видно, что освоено',
+      text: 'Учится «по теме» — а где провал, не понятно. На пробнике сюрпризы.' },
     { icon: Ic.hourglass,  title: 'Подготовка хаотичная',
       text: 'Учебники, сайты, тесты, видео — всё разное. Нет системы и прогресса.' },
     { icon: Ic.clock,      title: 'Времени всё меньше',
@@ -246,79 +244,11 @@ function WhyDifferent({ narrow }) {
 }
 
 // ── 4 · Comparison ────────────────────────────────────────────────────
-function Comparison({ price }) {
-  const tutorBad = [
-    'От 2 000 до 4 000 ₽ за один час',
-    'Качество зависит от конкретного преподавателя',
-    'Сложно подобрать удобное время',
-    'Скучный формат «как в школе»',
-    'Только 1–2 раза в неделю',
-    'Нет понятной аналитики прогресса',
-  ];
-  const usGood = [
-    `Всего ${price} ₽ за неделю — безлимитно`,
-    'Единая программа, выстроенная под ОГЭ',
-    'Доступ 24/7: с телефона, ноутбука, планшета',
-    'Геймификация — XP, уровни, ачивки, серии',
-    'Можно заниматься хоть каждый день по 15 минут',
-    'Подробная аналитика для ребёнка и родителя',
-  ];
-  return (
-    <section className="section" id="compare">
-      <div className="wrap">
-        <div className="section-head center">
-          <span className="eyebrow">Сравнение</span>
-          <h2 className="title">Один час репетитора&nbsp;— или <span className="hl">целая неделя подготовки</span></h2>
-          <p className="lead">Цифры говорят сами за себя.</p>
-        </div>
-
-        <div className="compare">
-          <div className="compare-col tutor">
-            <span className="tag">Репетитор</span>
-            <h3>Классическое решение</h3>
-            <div className="price-line">
-              2 000–4 000 ₽ <span className="unit">/ один час</span>
-            </div>
-            <ul>
-              {tutorBad.map((t, i) => (
-                <li key={i}>
-                  <span className="ic">{Ic.x}</span>
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="compare-col us">
-            <span className="tag">IQMO School</span>
-            <h3>Современная платформа</h3>
-            <div className="price-line">
-              {price} ₽ <span className="unit">/ неделя безлимитно</span>
-            </div>
-            <ul>
-              {usGood.map((t, i) => (
-                <li key={i}>
-                  <span className="ic">{Ic.check}</span>
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-            <div style={{
-              marginTop: 22,
-              padding: '14px 16px',
-              borderRadius: 14,
-              background: 'color-mix(in oklab, var(--accent) 10%, transparent)',
-              border: '1px dashed color-mix(in oklab, var(--accent) 40%, transparent)',
-              fontSize: 14, color: 'var(--ink-2)',
-            }}>
-              За цену <b>одного</b> часа репетитора ребёнок получает{' '}
-              <b style={{ color: 'var(--accent)' }}>7–14 недель</b> ежедневной подготовки на&nbsp;IQMO.
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+// Блок сравнения с репетитором/тарифами снят с главной (главная не
+// должна ассоциироваться с продажей доступа). Экспорт сохранён, чтобы
+// не падал window.IQMO_SECTIONS, но компонент ничего не рендерит.
+function Comparison() {
+  return null;
 }
 
 // ── 5 · How children actually use it ─────────────────────────────────
@@ -517,85 +447,11 @@ function Trust() {
 }
 
 // ── 7 · Pricing ───────────────────────────────────────────────────────
-function Pricing({ price }) {
-  return (
-    <section className="section" id="price">
-      <div className="wrap">
-        <div className="section-head center">
-          <span className="eyebrow">Цена</span>
-          <h2 className="title">Один час репетитора&nbsp;— или <span className="hl">целая неделя</span> подготовки?</h2>
-          <p className="lead">Дешевле, чем доставка одного кофе.</p>
-        </div>
-
-        <div className="price-grid">
-          {/* big price card */}
-          <div className="price-card">
-            <Pill tone="glass">⭐ Самый популярный план</Pill>
-            <div style={{ marginTop: 22, display: 'flex', alignItems: 'baseline', gap: 4 }}>
-              <span className="number">{price}<span className="ruble">₽</span></span>
-            </div>
-            <div className="per">в&nbsp;неделю · доступ ко&nbsp;всему</div>
-
-            <ul>
-              <li>Безлимитные задания и&nbsp;все темы ОГЭ</li>
-              <li>Геймификация: уровни, XP, ачивки, серии</li>
-              <li>Аналитика и&nbsp;разбор ошибок</li>
-              <li>Еженедельный отчёт для родителя</li>
-              <li>Доступ с&nbsp;телефона, планшета, ноутбука</li>
-              <li>Отмена в&nbsp;один клик в&nbsp;любой момент</li>
-            </ul>
-
-            <div style={{ marginTop: 26, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <button type="button" className="btn btn-accent btn-lg" style={{ background: '#fff', color: 'var(--accent)' }} data-open-register data-cta-source="pricing">
-                Начать бесплатно {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
-              </button>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,.55)', alignSelf: 'center', maxWidth: 180 }}>
-                Первая неделя&nbsp;— 0&nbsp;₽. Карту привязывать не&nbsp;нужно.
-              </div>
-            </div>
-          </div>
-
-          {/* "vs" math card */}
-          <div className="vs-card">
-            <h3 className="sub" style={{ marginBottom: 14 }}>За эту цену вы&nbsp;экономите</h3>
-            <div className="vs-row">
-              <span className="what">1&nbsp;занятие репетитора (1&nbsp;час)</span>
-              <span className="amt" style={{ color: 'var(--danger)' }}>−2 500 ₽</span>
-            </div>
-            <div className="vs-row">
-              <span className="what">Кофе с&nbsp;доставкой</span>
-              <span className="amt" style={{ color: 'var(--danger)' }}>−380 ₽</span>
-            </div>
-            <div className="vs-row">
-              <span className="what">Подписка на&nbsp;игру / стриминг</span>
-              <span className="amt" style={{ color: 'var(--danger)' }}>−599 ₽</span>
-            </div>
-            <div className="vs-row">
-              <span className="what" style={{ fontWeight: 700, color: 'var(--ink)' }}>IQMO School · 1 неделя</span>
-              <span className="amt" style={{ color: 'var(--accent)' }}>{price} ₽</span>
-            </div>
-
-            <div style={{
-              marginTop: 22, padding: 18, borderRadius: 16,
-              background: 'color-mix(in oklab, var(--success) 8%, var(--bg-soft))',
-              border: '1px solid color-mix(in oklab, var(--success) 25%, transparent)',
-            }}>
-              <div style={{ fontSize: 13, color: 'var(--ink-3)' }}>За&nbsp;3&nbsp;месяца подготовки родители экономят</div>
-              <div style={{
-                fontFamily: 'var(--font-display)', fontSize: 38, fontWeight: 800,
-                letterSpacing: '-0.03em', color: 'var(--success)', marginTop: 4,
-              }}>
-                72 000 ₽
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 2 }}>
-                по сравнению с&nbsp;2 занятиями репетитора в&nbsp;неделю
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+// Блок тарифов снят с главной — продажа доступа не должна быть на
+// маркетинговой странице образовательной платформы. Экспорт сохранён
+// для совместимости, но компонент ничего не рендерит.
+function Pricing() {
+  return null;
 }
 
 // ── 8 · Final CTA ─────────────────────────────────────────────────────
@@ -610,11 +466,12 @@ function FinalCTA() {
             а&nbsp;не&nbsp;через давление.
           </h2>
           <p className="lead" style={{ margin: '16px auto 0' }}>
-            Первая неделя&nbsp;— бесплатно. Без привязки карты. Отмена в&nbsp;один клик.
+            Программа по&nbsp;ФИПИ, тренажёр и&nbsp;пробники ОГЭ. Серии, XP-уровни и&nbsp;ачивки —
+            чтобы хотелось вернуться завтра.
           </p>
           <div className="row">
             <button type="button" className="btn btn-accent btn-lg" data-open-register data-cta-source="final">
-              Начать бесплатно {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
+              Начать обучение {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
             </button>
             <a className="btn btn-ghost btn-lg" href="/">
               {React.cloneElement(Ic.play, { width: 14, height: 14 })} Посмотреть платформу
@@ -636,16 +493,11 @@ function FinalCTA() {
 }
 
 // ── Sticky mobile CTA ─────────────────────────────────────────────────
-function StickyCTA({ price }) {
-  return (
-    <div className="sticky-cta">
-      <div className="left">
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{price} ₽/нед</div>
-        <div className="p">первая неделя <b>0 ₽</b> · без карты</div>
-      </div>
-      <button type="button" className="btn btn-accent" data-open-register data-cta-source="sticky">Попробовать</button>
-    </div>
-  );
+// Сохраняем экспорт для совместимости (компонент мог импортироваться
+// из стороннего кода/превью), но на главной не рендерим — главная не
+// должна ассоциироваться с продажей доступа.
+function StickyCTA() {
+  return null;
 }
 
 window.IQMO_SECTIONS = {

@@ -12,9 +12,8 @@ const Nav = () => {
   const links = [
     { l: "Платформа", href: "#gamification" },
     { l: "Возможности", href: "#features" },
-    { l: "Сравнение", href: "#comparison" },
     { l: "Отзывы", href: "#trust" },
-    { l: "Цена", href: "#pricing" },
+    { l: "Вопросы", href: "#faq" },
   ];
 
   return (
@@ -45,7 +44,7 @@ const Nav = () => {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <a href="/login.html" className="btn btn-ghost" style={{ padding: "12px 18px", fontSize: 14 }}>Войти</a>
           <button type="button" className="btn btn-primary" style={{ padding: "12px 20px", fontSize: 14 }} data-open-register data-cta-source="nav">
-            Попробовать <IconArrow size={16} stroke={2.2}/>
+            Начать обучение <IconArrow size={16} stroke={2.2}/>
           </button>
         </div>
       </div>

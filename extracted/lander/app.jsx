@@ -1,6 +1,11 @@
 // ============================================================
 // IQMO School — App entry
 // ============================================================
+//
+// С главных страниц IQMO снят весь продающий слой (тарифы, цены,
+// продление доступа, sticky-CTA с ₽). Главная и /lander/ должны
+// читаться как образовательная платформа: предметы, тренажёр,
+// прогресс, XP и достижения.
 const App = () => {
   // Reveal-on-scroll: tag every section's first-level child to fade in.
   React.useEffect(() => {
@@ -27,23 +32,11 @@ const App = () => {
         <div className="reveal"><Mobile/></div>
         <div className="reveal"><Gamification/></div>
         <div className="reveal"><Features/></div>
-        <div className="reveal"><Comparison/></div>
         <div className="reveal"><Trust/></div>
-        <div className="reveal"><Pricing/></div>
         <div className="reveal"><FAQ/></div>
         <div className="reveal"><FinalCTA/></div>
       </main>
       <Footer/>
-
-      {/* Sticky mobile CTA */}
-      <div className="sticky-cta">
-        <div className="price-tag">
-          299&nbsp;₽ <span>в неделю · без репетитора</span>
-        </div>
-        <button type="button" className="btn btn-primary" data-open-register data-cta-source="sticky">
-          Попробовать <IconArrow size={14} stroke={2.4}/>
-        </button>
-      </div>
     </div>
   );
 };

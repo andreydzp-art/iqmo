@@ -32,7 +32,7 @@ const FinalCTA = () => {
           borderColor: "rgba(255,255,255,.12)",
         }}>
           <span className="dot" style={{ background: "var(--mint-400)" }}/>
-          299 ₽ в&nbsp;неделю · попробовать бесплатно
+          ОГЭ Химия · Биология · 2026
         </div>
 
         <h2 className="h-display" style={{ marginTop: 26, color: "white" }}>
@@ -49,12 +49,13 @@ const FinalCTA = () => {
           color: "rgba(255,255,255,.75)", margin: "26px auto 0",
           textAlign: "center", maxWidth: 640, fontSize: 19,
         }}>
-          Попробуйте современный формат подготовки к&nbsp;ОГЭ, который дети действительно хотят открывать каждый день.
+          Современный формат подготовки к&nbsp;ОГЭ — карта тем по&nbsp;ФИПИ,
+          тренажёр заданий, серии и&nbsp;XP-уровни.
         </p>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 40, justifyContent: "center" }}>
           <button type="button" className="btn btn-primary btn-lg" style={{ padding: "20px 32px", fontSize: 17 }} data-open-register data-cta-source="final">
-            Попробовать бесплатно <IconArrow size={18} stroke={2.2}/>
+            Начать обучение <IconArrow size={18} stroke={2.2}/>
           </button>
           <a href="/express-chemistry.html" className="btn btn-lg" style={{
             background: "rgba(255,255,255,.08)",
@@ -73,10 +74,10 @@ const FinalCTA = () => {
           fontSize: 13, color: "rgba(255,255,255,.7)", fontWeight: 600,
         }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <IconShield size={16} stroke={2} style={{ color: "var(--mint-400)" }}/> 7 дней пробного периода
+            <IconShield size={16} stroke={2} style={{ color: "var(--mint-400)" }}/> Программа по&nbsp;спецификации ФИПИ
           </span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <IconCheck size={16} stroke={2.4} style={{ color: "var(--mint-400)" }}/> Отмена в&nbsp;1 клик
+            <IconCheck size={16} stroke={2.4} style={{ color: "var(--mint-400)" }}/> 26 типов задач ОГЭ
           </span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
             <IconWifi size={16} stroke={2} style={{ color: "var(--mint-400)" }}/> На&nbsp;всех устройствах

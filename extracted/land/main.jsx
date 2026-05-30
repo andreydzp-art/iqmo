@@ -1,22 +1,23 @@
 /* global React, ReactDOM */
 // IQMO School — production landing (/land)
+//
+// Главная не должна ассоциироваться с продажей доступа: блоки Pricing,
+// Comparison и StickyCTA сняты с рендера (компоненты остались в
+// window.IQMO_SECTIONS на случай, если их кто-то импортирует со стороны),
+// price/headline-копия — в чисто образовательном тоне.
 
-const { Nav, Hero, Problem, WhyDifferent, Comparison, HowUsed, Trust, Pricing, FinalCTA, StickyCTA } = window.IQMO_SECTIONS;
+const { Nav, Hero, Problem, WhyDifferent, HowUsed, Trust, FinalCTA } = window.IQMO_SECTIONS;
 
 const TWEAK_DEFAULTS = {
   direction: 'premium',
   theme: 'light',
-  price: 299,
-  headline: 'Подготовка к ОГЭ без репетиторов |за 299 ₽ в неделю|',
+  headline: 'Подготовка к ОГЭ |в формате тренажёра|',
   heroLayout: 'split',
   mascotInDash: true,
-  stickyMobileCta: true,
   showFloatCards: true,
 };
 
 function Landing({ narrow, t }) {
-  const headline = t.headline.replace(/299/g, String(t.price));
-
   return (
     <div
       className="iqmo"
@@ -29,15 +30,12 @@ function Landing({ narrow, t }) {
       style={{ minHeight: '100%' }}
     >
       <Nav narrow={narrow} />
-      <Hero narrow={narrow} price={t.price} headline={headline} />
+      <Hero narrow={narrow} headline={t.headline} />
       <Problem />
       <WhyDifferent narrow={narrow} />
-      <Comparison price={t.price} />
       <HowUsed />
       <Trust />
-      <Pricing price={t.price} />
       <FinalCTA />
-      {t.stickyMobileCta && <StickyCTA price={t.price} />}
     </div>
   );
 }

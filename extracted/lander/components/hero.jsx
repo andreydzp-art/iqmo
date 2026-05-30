@@ -16,7 +16,7 @@ const Hero = () => {
             </div>
 
             <h1 className="hero-headline">
-              Подготовка к&nbsp;ОГЭ <span className="gradient-text">без репетиторов</span> за&nbsp;299&nbsp;₽ в&nbsp;неделю
+              Подготовка к&nbsp;ОГЭ <span className="gradient-text">в&nbsp;формате тренажёра</span> — без давления и&nbsp;скуки
             </h1>
 
             <p className="hero-sub">
@@ -25,7 +25,7 @@ const Hero = () => {
 
             <div className="hero-ctas">
               <button type="button" className="btn btn-primary" data-open-register data-cta-source="hero">
-                Попробовать бесплатно <IconArrow size={16} stroke={2.2}/>
+                Начать подготовку <IconArrow size={16} stroke={2.2}/>
               </button>
               <a href="/express-chemistry.html" className="btn btn-secondary">
                 <IconPlay size={14} stroke={2.2}/> Посмотреть платформу
@@ -71,8 +71,8 @@ const Hero = () => {
                   <div className="lbl">предметов</div>
                 </div>
                 <div>
-                  <div className="num">−40 000 ₽</div>
-                  <div className="lbl">экономия</div>
+                  <div className="num">26</div>
+                  <div className="lbl">типов задач ОГЭ</div>
                 </div>
               </div>
             </div>

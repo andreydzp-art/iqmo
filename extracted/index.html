@@ -815,7 +815,7 @@ h1,h2,h3,p{margin:0}
       <button type="button" class="btn btn--ghost btn--sm" id="iqmo-nav-logout" hidden>Выйти</button>
       <!-- Гостю — primary CTA на регистрацию; авторизованному — на учёбу.
            Классы iqmo-only-{guest,authed} переключаются в iqmo-nav.js по /api/me. -->
-      <a href="#start" class="btn btn--primary btn--sm iqmo-only-guest" data-open-register>Попробовать бесплатно</a>
+      <a href="#start" class="btn btn--primary btn--sm iqmo-only-guest" data-open-register>Начать обучение</a>
       <a href="/subject-biology/" class="btn btn--primary btn--sm iqmo-only-authed" id="iqmo-nav-classes" hidden>К занятиям</a>
     </div>
   </div>
@@ -949,7 +949,7 @@ h1,h2,h3,p{margin:0}
         <div class="cmp__list">
           <div class="cmp__row"><span class="ic">✕</span><span>1,5–2 часа за раз — устаёшь и забываешь</span></div>
           <div class="cmp__row"><span class="ic">✕</span><span>Темы вне формата ФИПИ — учишь то, что не спросят</span></div>
-          <div class="cmp__row"><span class="ic">✕</span><span>Репетитор — от 1 500 ₽ за час</span></div>
+          <div class="cmp__row"><span class="ic">✕</span><span>Прогресс не виден: не понятно, что освоено, а где «дыра»</span></div>
           <div class="cmp__row"><span class="ic">✕</span><span>Ошибки никто не отслеживает — повторяете те же</span></div>
         </div>
       </div>
@@ -959,7 +959,7 @@ h1,h2,h3,p{margin:0}
         <div class="cmp__list">
           <div class="cmp__row"><span class="ic">✓</span><span>30 минут в день — занимайтесь в окно</span></div>
           <div class="cmp__row"><span class="ic">✓</span><span>Только 10 тем ФИПИ — точно как в КИМе</span></div>
-          <div class="cmp__row"><span class="ic">✓</span><span>Доступ дешевле одного занятия с репетитором</span></div>
+          <div class="cmp__row"><span class="ic">✓</span><span>Карта тем и XP-уровни показывают прогресс по каждой теме</span></div>
           <div class="cmp__row"><span class="ic">✓</span><span>Банк ошибок сам возвращает слабые темы</span></div>
         </div>
       </div>
@@ -974,7 +974,7 @@ h1,h2,h3,p{margin:0}
       <div class="countdown__copy">
         <h2>До ОГЭ осталось<br/>не так много</h2>
         <p>Если начать сегодня и заниматься по 30 минут в день — на экзамене будет уверенность, а не паника.</p>
-        <div style="margin-top:22px"><a href="#start" class="btn btn--primary" data-open-register>Начать сегодня</a></div>
+        <div style="margin-top:22px"><a href="#start" class="btn btn--primary" data-open-register>Начать обучение</a></div>
       </div>
       <div class="countdown__digits" id="countdown-digits">
         <div class="cd-cell"><div class="cd-cell__num" id="cd-d">35</div><div class="cd-cell__lbl">Дней</div></div>
@@ -995,8 +995,8 @@ h1,h2,h3,p{margin:0}
     </div>
     <div class="faq">
       <details class="faq__item" open>
-        <summary class="faq__sum"><span>Сколько стоит подготовка?</span><span class="faq__chev">+</span></summary>
-        <div class="faq__ans">Первые 7 дней — бесплатно, без привязки карты. Дальше — фиксированная подписка, которая дешевле одного занятия с репетитором за месяц. Можно отменить в любой момент.</div>
+        <summary class="faq__sum"><span>Как устроена подготовка?</span><span class="faq__chev">+</span></summary>
+        <div class="faq__ans">10 тем ФИПИ, разбитых на мини-уровни. На каждой теме — теория, тренажёр и пробники по формату ОГЭ. Проходить можно по 30 минут в день, прогресс синхронизируется на всех устройствах.</div>
       </details>
       <details class="faq__item">
         <summary class="faq__sum"><span>А если я начну с нуля?</span><span class="faq__chev">+</span></summary>
@@ -1023,9 +1023,9 @@ h1,h2,h3,p{margin:0}
   <div class="final__deco"></div>
   <div class="wrap final__inner">
     <h2>Начните <em>сегодня</em> —<br/>через месяц вы себя не узнаете</h2>
-    <p>7 дней бесплатно. Без привязки карты. Можно отменить в любой момент.</p>
+    <p>Карта тем по ФИПИ, серии и XP-уровни, разбор ошибок. Прогресс виден с первой сессии.</p>
     <div class="final__btns">
-      <a href="#" class="btn btn--primary" data-open-register>Начать бесплатно</a>
+      <a href="#" class="btn btn--primary" data-open-register>Начать обучение</a>
       <a href="#product" class="btn btn--ghost">Посмотреть демо</a>
     </div>
     <div class="final__note">★★★★★ 4,8 / 5 — на основе 312 отзывов учеников</div>
@@ -1053,13 +1053,13 @@ h1,h2,h3,p{margin:0}
   <div class="modal__card">
     <aside class="modal__side">
       <div>
-        <span class="modal__eyebrow">★ 7 дней бесплатно</span>
-        <h2 class="modal__h">Начнём за <em>2 минуты</em>.<br/>Карта не нужна.</h2>
-        <p class="modal__sub">Пробный период — полный доступ ко всем темам, заданиям и пробникам ФИПИ. Без автосписаний.</p>
+        <span class="modal__eyebrow">★ ОГЭ Химия · Биология</span>
+        <h2 class="modal__h">Начнём за <em>2 минуты</em>.<br/>Регистрация без оплаты.</h2>
+        <p class="modal__sub">Полный курс по ФИПИ: темы, тренажёр и пробники ОГЭ. Прогресс сохраняется в вашем профиле и синхронизируется на всех устройствах.</p>
       </div>
       <div>
         <div class="modal__perks">
-          <div class="modal__perk"><span class="ic">✓</span><span>Доступ ко всем 10 темам химии</span></div>
+          <div class="modal__perk"><span class="ic">✓</span><span>Все 10 тем химии в одном тренажёре</span></div>
           <div class="modal__perk"><span class="ic">✓</span><span>Серия дней и XP-уровни с первого дня</span></div>
           <div class="modal__perk"><span class="ic">✓</span><span>Прогресс синхронизируется на всех устройствах</span></div>
         </div>

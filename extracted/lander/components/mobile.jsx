@@ -47,7 +47,7 @@ const Mobile = () => {
             </div>
 
             <div style={{ marginTop: 32, display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <button type="button" className="btn btn-primary" data-open-register data-cta-source="mobile">Попробовать бесплатно <IconArrow size={16} stroke={2.2}/></button>
+              <button type="button" className="btn btn-primary" data-open-register data-cta-source="mobile">Начать подготовку <IconArrow size={16} stroke={2.2}/></button>
               <a href="#features" className="btn btn-secondary">Подробнее <IconChevron size={14} stroke={2.2}/></a>
             </div>
           </div>
