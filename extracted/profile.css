@@ -1140,13 +1140,29 @@
   }
 
   /* ── ПРОГРЕСС — размеры как у .ach--start (clamp до эталонных px) ── */
+  /* Общий футер illus-карт: полоса + XP-чип в одну колонку.
+     align-items:stretch → оба ребёнка получают одинаковую ширину
+     (= ширине max-content из них). За счёт display:inline-flex сам
+     wrapper занимает только нужную ширину, поэтому правило не
+     ломает положение по центру (margin:auto auto). */
+  .ach.ach--illus .illus-foot{
+    position:relative; z-index:2;
+    /* margin-top:auto прижимает к низу (illus = flex-column).
+       align-self:center даёт wrapper'у content-width внутри
+       flex-column родителя (без align-self он растянулся бы
+       на всю ширину карты). */
+    margin: auto 0 clamp(10px, 3cqi, 14px);
+    align-self:center;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:clamp(6px, 2.2cqi, 10px);
+    max-width:calc(100% - 18px);
+  }
   .ach.ach--illus .c-prog{
     position:relative; z-index:2;
-    /* margin-top:auto прижимает полосу к низу карточки (illus =
-       flex-column). Снизу — резерв под XP-чип (.a-xp absolute,
-       bottom:10px, высота ≈22px → 32px суммарно) + дышащий
-       зазор. Полоса декоративная, width:100% всегда. */
-    margin: auto 7.5cqi clamp(40px, 13cqi, 46px);
+    /* Снимаем горизонтальные margin — шириной управляет .illus-foot. */
+    margin:0;
     display:block;
   }
   .ach.ach--illus .c-prog-row{
@@ -1312,6 +1328,15 @@
   /* XP-чип: фиолетовая тема (= .ach.epic .a-xp, как у «Недели ритма»).
      Размер/форма/паддинги наследуются от базового .ach .a-xp. */
   .ach.ach--illus .a-xp{
+    /* На illus-картах XP-чип — flex-child внутри .illus-foot,
+       а не absolute (как на базовой .ach). Гасим absolute-позицию
+       и max-width:calc(100%-18px) (унаследованные от .ach .a-xp),
+       чтобы wrapper-stretch мог уравнять его ширину с .c-prog-bar. */
+    position:static;
+    left:auto; bottom:auto;
+    transform:none;
+    max-width:none;
+    justify-content:center;
     background:rgba(168,85,247,.06);
     border-color:rgba(168,85,247,.22);
     color:#5b21b6;

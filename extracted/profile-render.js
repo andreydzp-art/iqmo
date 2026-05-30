@@ -994,31 +994,35 @@
 					'<h4 class="c-title">' + esc(a.title) + '</h4>' +
 					'<div class="c-sub">' + esc(a.desc) + '</div>' +
 				'</div>' +
-				// FOOTER illus-карт:
-				//   1) Полоса прогресса .c-prog — декоративная, ВСЕГДА 1/1
-				//      на 100%. Геометрия и шиммер взяты 1:1 из эталонов
+				// FOOTER illus-карт.
+				// .illus-foot — общий flex-column-wrapper для полосы и
+				// чипа: align-items:stretch выравнивает оба ребёнка по
+				// одной ширине (= max-content), поэтому .c-prog-bar и
+				// .a-xp визуально одной длины (см. profile.css).
+				//   1) Полоса .c-prog — декоративная, ВСЕГДА 1/1 на 100%.
+				//      Геометрия/шиммер взяты 1:1 из эталонов
 				//      (start-na-portale-standalone.html, rhythm-card-
 				//      standalone.html, chem/bio). Реальный a.progress
-				//      сюда не подставляется по требованию: «полоса
-				//      сделана в дизайне только для красоты, не привязана
-				//      ни к каким значениям».
+				//      не подставляется — полоса для красоты.
 				//   2) XP-чип .a-xp — тот же компонент, что у обычной
-				//      карты (одинаковые computed-размеры/паддинги/шрифт);
-				//      различается только тема через .ach--illus(.--bio/
-				//      .--start) .a-xp в profile.css.
-				'<div class="c-prog" aria-hidden="true">' +
-					'<div class="c-prog-row">' +
-						'<span>Прогресс</span>' +
-						'<span class="pp"><b>1</b><span class="sep">/</span>1</span>' +
+				//      карты (одинаковые шрифт/иконка/высота); тема
+				//      перекрашена через .ach--illus(.--bio/.--start)
+				//      .a-xp в profile.css.
+				'<div class="illus-foot">' +
+					'<div class="c-prog" aria-hidden="true">' +
+						'<div class="c-prog-row">' +
+							'<span>Прогресс</span>' +
+							'<span class="pp"><b>1</b><span class="sep">/</span>1</span>' +
+						'</div>' +
+						'<div class="c-prog-line">' +
+							'<div class="c-prog-bar"><i style="width:100%"></i></div>' +
+						'</div>' +
 					'</div>' +
-					'<div class="c-prog-line">' +
-						'<div class="c-prog-bar"><i style="width:100%"></i></div>' +
+					'<div class="a-xp' + ((a.unlocked || a.inProgress) ? '' : ' a-xp--locked') + '">' +
+						'<span class="a-xp-ico">' + xpSvg + '</span>' +
+						'<span class="a-xp-val">+' + (a.xpReward || 0) + ' XP</span>' +
+						'<span class="a-xp-lbl">награда</span>' +
 					'</div>' +
-				'</div>' +
-				'<div class="a-xp' + ((a.unlocked || a.inProgress) ? '' : ' a-xp--locked') + '">' +
-					'<span class="a-xp-ico">' + xpSvg + '</span>' +
-					'<span class="a-xp-val">+' + (a.xpReward || 0) + ' XP</span>' +
-					'<span class="a-xp-lbl">награда</span>' +
 				'</div>' +
 				'<div class="a-tip">' +
 					'<div class="tt-name">' + esc(a.title) + '</div>' +
