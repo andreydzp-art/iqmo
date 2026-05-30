@@ -942,6 +942,7 @@
 					'<h4 class="c-title">' + esc(a.title) + '</h4>' +
 					'<div class="c-sub">' + esc(a.desc) + '</div>' +
 				'</div>' +
+				'<div class="c-footer">' +
 				'<div class="c-div" aria-hidden="true"><span></span></div>' +
 				'<div class="c-prog">' +
 					'<div class="c-prog-row">' +
@@ -960,6 +961,7 @@
 							'<span class="c-rwd-lbl">Награда</span>' +
 						'</div>' +
 					'</div>' +
+				'</div>' +
 				'</div>' +
 				'<div class="a-tip">' +
 					'<div class="tt-name">' + esc(a.title) + '</div>' +

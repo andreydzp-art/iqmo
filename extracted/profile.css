@@ -920,7 +920,7 @@
      Это та самая «увеличить центральную награду на 15–20%» из ТЗ. */
   .ach.ach--illus .c-orb-stage{
     position:relative;
-    margin:7cqi auto 0;
+    margin:2.4cqi auto 0;
     width:64cqi; height:64cqi;
     display:grid; place-items:center;
     z-index:3;
@@ -1056,16 +1056,22 @@
     overflow:hidden;
   }
 
-  /* Декоративный диаг с ромбом. Это начало «нижнего footer'а»
-     (диаг → прогресс → XP-награда). margin-top:auto прижимает весь
-     этот блок к низу карточки — XP-чип встаёт на ту же полку, что и
-     .a-xp у обычных карточек. Карточка теперь flex-column, поэтому
-     центр (орб + тайтл) держится сверху, footer — внизу. */
+  /* ── НИЖНИЙ FOOTER (диаг → прогресс → XP-награда) ──
+     По требованию: footer как отдельный блок, прижатый к низу
+     карточки через margin-top:auto. Карточка — flex-column, центр
+     (орб + тайтл) держится сверху, footer уходит вниз. Сами размеры
+     прогресс-бара и XP-капсулы НЕ меняются — переносится только
+     положение блока вниз. */
+  .ach.ach--illus .c-footer{
+    margin-top:auto;
+    display:flex;
+    flex-direction:column;
+  }
+  /* Декоративный диаг с ромбом — визуальный разделитель перед footer'ом. */
   .ach.ach--illus .c-div{
     position:relative; z-index:2;
     display:flex; align-items:center;
     margin:2.4cqi 6cqi;
-    margin-top:auto;
   }
   .ach.ach--illus .c-div::before,
   .ach.ach--illus .c-div::after{
