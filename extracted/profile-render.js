@@ -824,12 +824,14 @@
 		var rar = a.rarity || 'epic';
 		var isBio = (a.id === 'bio_stage1');
 		var isStart = (a.id === 'welcome');
-		// .ach--bio / .ach--start — модификаторы поверх .ach--illus
-		// (та же 1×1 ячейка, та же cqi-разметка, перекраска и подмена
-		// центрального art-блока).
+		var isDream = (a.cardStyle === 'dream');
+		// .ach--bio / .ach--start / .ach--dream — модификаторы поверх
+		// .ach--illus (та же 1×1 ячейка, та же cqi-разметка, перекраска
+		// и подмена центрального art-блока).
 		var cls = ['ach', 'ach--illus', 'ach--ref', 'anim-shake'];
 		if (isBio)   cls.push('ach--bio');
 		if (isStart) cls.push('ach--start');
+		if (isDream) cls.push('ach--dream');
 		if (!a.unlocked) cls.push('locked');
 		if (a.inProgress) cls.push('is-progress');
 		if (a.unlocked) cls.push('is-earned');
@@ -931,6 +933,35 @@
 
 		var orbInner = isStart ? bagSvg : (isBio ? leafSvg : flaskSvg);
 
+		// Подушка для dream-карточки («Неделя ритма»): мягкий синий
+		// puffy-cushion с жемчужно-белой звездой по центру (точная
+		// копия эталона nedelya-ritma-standalone.html). id градиента
+		// уникальный (sb-dream), чтобы не пересекаться с другими SVG.
+		var pillowSvg =
+			'<svg class="dream-pillow" viewBox="0 0 124 88" aria-hidden="true">' +
+				'<defs>' +
+					'<linearGradient id="sbDreamPillow" x1="62" y1="14" x2="62" y2="80" gradientUnits="userSpaceOnUse">' +
+						'<stop offset="0%"  stop-color="#cfe2ff"/>' +
+						'<stop offset="52%" stop-color="#5e9cf4"/>' +
+						'<stop offset="100%" stop-color="#3878e6"/>' +
+					'</linearGradient>' +
+				'</defs>' +
+				'<path d="M24 30 C18 25 18 19 25 17 C49 10 75 10 99 17 C106 19 106 25 100 30 ' +
+					'C105 43 105 53 100 66 C106 70 106 76 99 78 C75 85 49 85 25 78 ' +
+					'C18 76 18 70 24 66 C19 53 19 43 24 30 Z" ' +
+					'fill="url(#sbDreamPillow)" stroke="#2f6fd6" stroke-width="2" stroke-linejoin="round"/>' +
+				'<path d="M30 24 C50 18 74 18 94 24" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".55" fill="none"/>' +
+				'<path d="M62 30 L66 44 L80 48 L66 52 L62 66 L58 52 L44 48 L58 44 Z" fill="#e8f1ff" opacity=".85"/>' +
+				'<circle cx="25" cy="22" r="1.6" fill="#2f6fd6" opacity=".5"/>' +
+				'<circle cx="99" cy="22" r="1.6" fill="#2f6fd6" opacity=".5"/>' +
+				'<circle cx="25" cy="73" r="1.6" fill="#2f6fd6" opacity=".5"/>' +
+				'<circle cx="99" cy="73" r="1.6" fill="#2f6fd6" opacity=".5"/>' +
+			'</svg>';
+
+		// Звезда-искра 4-конечная (path сделан из 4 эллиптических Безье).
+		// Используется в dream-варианте 3 раза по разным позициям.
+		var dreamSparkSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 C12.8 7 17 11.2 24 12 C17 12.8 12.8 17 12 24 C11.2 17 7 12.8 0 12 C7 11.2 11.2 7 12 0 Z"/></svg>';
+
 		// Мини-чек в шестиграннике рядом с орбом — синий для био,
 		// фиолетовый для химии. id градиента тоже уникальны.
 		var checkSvg = isBio
@@ -961,6 +992,10 @@
 		//   • start (welcome) → орбита внутри орба + 3 искры по бокам;
 		//     никаких hex/чек-бейджей/floating ball — это другой
 		//     визуальный язык (эмеральд, чистая иллюстрация).
+		//   • dream (three_tests «Неделя ритма») → синий стеклянный орб
+		//     с подушкой, две скрещенные орбиты, 3 звёздочки-искры
+		//     внутри орба и 4 синие капли вокруг (эталон —
+		//     nedelya-ritma-standalone.html, .card.ref.start.dream).
 		//   • bio/chem → 3 hex + .ref-orb + checkSvg + 4 float-ball.
 		var orbStageInner = isStart
 			? (
@@ -971,6 +1006,21 @@
 				'<span class="start-spark ss1" aria-hidden="true"></span>' +
 				'<span class="start-spark ss2" aria-hidden="true"></span>' +
 				'<span class="start-spark ss3" aria-hidden="true"></span>'
+			)
+			: isDream
+			? (
+				'<div class="ref-orb">' +
+					'<span class="start-orbit" aria-hidden="true"></span>' +
+					'<span class="dream-orbit2" aria-hidden="true"></span>' +
+					pillowSvg +
+					'<span class="dream-spark ds1" aria-hidden="true">' + dreamSparkSvg + '</span>' +
+					'<span class="dream-spark ds2" aria-hidden="true">' + dreamSparkSvg + '</span>' +
+					'<span class="dream-spark ds3" aria-hidden="true">' + dreamSparkSvg + '</span>' +
+				'</div>' +
+				'<span class="dream-ball b1" aria-hidden="true"></span>' +
+				'<span class="dream-ball b2" aria-hidden="true"></span>' +
+				'<span class="dream-ball b3" aria-hidden="true"></span>' +
+				'<span class="dream-ball b4" aria-hidden="true"></span>'
 			)
 			: (
 				'<div class="float-hex fh1" aria-hidden="true">' + hexSvg + '</div>' +

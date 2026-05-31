@@ -1780,6 +1780,252 @@
   .ach.ach--illus.ach--start.locked .c-title{ color:var(--muted); }
   .ach.ach--illus.ach--start.locked .c-sub{ color:var(--muted-2); }
 
+  /* ════════════════════════════════════════════════════════════
+       «НЕДЕЛЯ РИТМА» — dream-вариант .ach--illus.
+       Модификатор .ach--dream поверх .ach--illus: тот же footprint,
+       та же 1×1 ячейка, тот же footer (.illus-foot с прогресс-баром
+       и .a-xp), что и у Старта/Хим/Био. Меняем только палитру (синий
+       glassy), фон, иллюстрацию (подушка вместо рюкзака/листа/колбы),
+       вторую орбиту и 4 синие капли вокруг шара.
+       Эталон — nedelya-ritma-standalone.html (.card.ref.start.dream).
+       ════════════════════════════════════════════════════════════ */
+  .ach.ach--illus.ach--dream{
+    border:1px solid rgba(96,165,250,.20);
+    background:
+      radial-gradient(900px 540px at 50% -8%, rgba(96,165,250,.18), transparent 62%),
+      linear-gradient(180deg, #f6faff 0%, #fff 58%, #f6faff 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 1px 2px rgba(15,18,38,.04),
+      0 22px 50px -28px rgba(37,99,235,.32);
+  }
+  .ach.ach--illus.ach--dream:hover{
+    border-color:rgba(96,165,250,.44);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 1px 2px rgba(15,18,38,.04),
+      0 30px 60px -24px rgba(37,99,235,.40);
+  }
+  /* Conic-glow при hover — синяя версия. */
+  .ach.ach--illus.ach--dream::after{
+    background:conic-gradient(from 0deg,
+      rgba(96,165,250,0),
+      rgba(147,197,253,.55) 25%,
+      rgba(37,99,235,.85) 50%,
+      rgba(147,197,253,.55) 75%,
+      rgba(96,165,250,0));
+  }
+  /* Сцена — лёгкий blue glow без молекул-hex. */
+  .ach.ach--illus.ach--dream .ref-scene{
+    background:radial-gradient(440px 340px at 50% 28%, rgba(96,165,250,.12), transparent 70%);
+  }
+  .ach.ach--illus.ach--dream .ref-scene::before{ display:none; }
+  .ach.ach--illus.ach--dream .ref-scene::after{ filter:none; opacity:.6; }
+  /* Rarity-pill — мягкий белый с синей точкой (карточка common). */
+  .ach.ach--illus.ach--dream .c-rar{
+    background:rgba(255,255,255,.85);
+    color:#3f5a86;
+    border:1px solid rgba(96,165,250,.32);
+    box-shadow:
+      0 1px 2px rgba(15,18,38,.05),
+      inset 0 1px 0 rgba(255,255,255,.6);
+    backdrop-filter:blur(8px);
+  }
+  .ach.ach--illus.ach--dream .c-rar::before{
+    width:1.9cqi; height:1.9cqi;
+    border-radius:50%;
+    background:#60a5fa;
+    background-image:none;
+    box-shadow:0 0 0 .8cqi rgba(96,165,250,.18);
+  }
+  /* ORB — глянцевый стеклянный синий шар (overflow:visible — наружные
+     dream-orbit2 и dream-spark выходят за края). */
+  .ach.ach--illus.ach--dream .ref-orb{
+    overflow:visible;
+    background:radial-gradient(circle at 50% 34%, #ffffff 0%, #eaf3ff 48%, #cfe2fb 100%);
+    box-shadow:
+      0 0 0 1.5cqi rgba(255,255,255,.92),
+      0 0 0 2cqi rgba(147,197,253,.38),
+      0 0 7cqi 2cqi rgba(96,165,250,.30),
+      0 4cqi 10cqi -3cqi rgba(37,99,235,.30),
+      inset 0 -3.5cqi 7cqi rgba(96,165,250,.22),
+      inset 0 .5cqi 0 rgba(255,255,255,.95);
+  }
+  .ach.ach--illus.ach--dream .ref-orb::before{
+    background:radial-gradient(ellipse at center, rgba(255,255,255,.75), transparent 70%);
+    z-index:5;
+  }
+  .ach.ach--illus.ach--dream .ref-orb::after{ display:none; }
+  /* Подушка — крупная, по центру шара. */
+  .ach.ach--illus.ach--dream .dream-pillow{
+    position:absolute;
+    left:50%; bottom:12%;
+    transform:translateX(-50%);
+    width:60%; height:auto;
+    z-index:3;
+    filter:drop-shadow(0 2cqi 3.5cqi rgba(37,99,235,.28));
+    transform-origin:50% 70%;
+  }
+  /* Орбитальное кольцо вокруг шара (используем .start-orbit, перекрашиваем). */
+  .ach.ach--illus.ach--dream .start-orbit{
+    position:absolute; inset:-2cqi;
+    border-radius:50%;
+    border:.5cqi solid transparent;
+    border-top-color:rgba(96,165,250,.65);
+    border-right-color:rgba(147,197,253,.30);
+    box-shadow:0 0 3cqi rgba(96,165,250,.22);
+    transform:rotate(-32deg);
+    pointer-events:none;
+    z-index:1;
+  }
+  /* Вторая встречная орбита внутри (ближе к шару). */
+  .ach.ach--illus.ach--dream .dream-orbit2{
+    position:absolute; inset:.5cqi;
+    border-radius:50%;
+    border:.4cqi solid transparent;
+    border-left-color:rgba(191,219,254,.7);
+    border-bottom-color:rgba(96,165,250,.22);
+    transform:rotate(28deg);
+    pointer-events:none;
+    z-index:1;
+  }
+  /* Звёздочки-искры внутри орба, поверх подушки. */
+  .ach.ach--illus.ach--dream .dream-spark{
+    position:absolute;
+    z-index:4;
+    pointer-events:none;
+    animation:ach-dream-tw 3s ease-in-out infinite;
+  }
+  .ach.ach--illus.ach--dream .dream-spark svg{
+    display:block; width:100%; height:100%;
+    fill:#ffffff;
+    filter:drop-shadow(0 .3cqi .6cqi rgba(37,99,235,.20)) drop-shadow(0 0 1.6cqi rgba(191,219,254,.9));
+  }
+  .ach.ach--illus.ach--dream .dream-spark.ds1{ width:12cqi; height:12cqi; top:14%; left:50%; transform:translateX(-50%); }
+  .ach.ach--illus.ach--dream .dream-spark.ds2{ width:7.4cqi; height:7.4cqi; top:34%; left:14%; animation-delay:.7s; }
+  .ach.ach--illus.ach--dream .dream-spark.ds3{ width:6.6cqi; height:6.6cqi; top:39%; right:13%; animation-delay:1.4s; }
+  @keyframes ach-dream-tw{
+    0%,100%{ opacity:.78; transform:scale(.92); }
+    50%    { opacity:1;   transform:scale(1.06); }
+  }
+  /* центральная звезда — отдельная анимация, чтобы сохранить translateX(-50%). */
+  .ach.ach--illus.ach--dream .dream-spark.ds1{ animation-name:ach-dream-tw-c; }
+  @keyframes ach-dream-tw-c{
+    0%,100%{ opacity:.8; transform:translateX(-50%) scale(.92); }
+    50%    { opacity:1;  transform:translateX(-50%) scale(1.06); }
+  }
+  /* Дрейфующие синие капли вокруг шара (используем .dream-ball, не
+     .float-ball — у dream-карты другая палитра). */
+  .ach.ach--illus.ach--dream .dream-ball{
+    position:absolute;
+    border-radius:50%;
+    z-index:5;
+    background:radial-gradient(circle at 32% 28%, #ffffff 0%, #93c5fd 55%, #3b82f6 95%);
+    box-shadow:
+      0 0 1.5cqi rgba(59,130,246,.5),
+      inset 0 -.5cqi 1cqi rgba(13,42,148,.18),
+      inset 0 .25cqi .5cqi rgba(255,255,255,.7);
+  }
+  .ach.ach--illus.ach--dream .dream-ball.b1{ width:3.8cqi; height:3.8cqi; top:33%; right:3%; }
+  .ach.ach--illus.ach--dream .dream-ball.b2{ width:2.2cqi; height:2.2cqi; top:9%;  right:26%; }
+  .ach.ach--illus.ach--dream .dream-ball.b3{ width:2.6cqi; height:2.6cqi; bottom:20%; left:7%; }
+  .ach.ach--illus.ach--dream .dream-ball.b4{ width:1.6cqi; height:1.6cqi; bottom:9%;  left:42%; }
+  /* Subtitle — мягкий синий. */
+  .ach.ach--illus.ach--dream .c-sub{ color:#5b7196; }
+  /* Divider — синий ромб (если c-div где-то останется). */
+  .ach.ach--illus.ach--dream .c-div::before,
+  .ach.ach--illus.ach--dream .c-div::after{ background:rgba(96,165,250,.20); }
+  .ach.ach--illus.ach--dream .c-div span{ background:#60a5fa; }
+  /* Прогресс — синий. */
+  .ach.ach--illus.ach--dream .c-prog-row > span:first-child{ color:#2563eb; }
+  .ach.ach--illus.ach--dream .c-prog-row .pp b{
+    background:linear-gradient(135deg, #2563eb, #60a5fa);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .ach.ach--illus.ach--dream .c-prog-row .pp .sep{ color:rgba(37,99,235,.35); }
+  .ach.ach--illus.ach--dream .c-prog-bar{
+    background:linear-gradient(180deg, rgba(96,165,250,.06), rgba(96,165,250,.13));
+    border:1px solid rgba(96,165,250,.20);
+    box-shadow:
+      inset 0 1.5px 3px rgba(13,42,148,.10),
+      inset 0 -1px 0 rgba(255,255,255,.55),
+      0 1px 0 rgba(255,255,255,.6);
+  }
+  .ach.ach--illus.ach--dream .c-prog-bar i{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 50%),
+      linear-gradient(90deg, #3b82f6 0%, #60a5fa 50%, #2563eb 100%);
+    box-shadow:
+      0 0 12px rgba(96,165,250,.55),
+      0 0 24px rgba(96,165,250,.30),
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -1px 1px rgba(13,42,148,.30);
+  }
+  /* XP-чип — синяя тема (тот же компонент, что у обычной карты). */
+  .ach.ach--illus.ach--dream .a-xp{
+    background:rgba(96,165,250,.06);
+    border-color:rgba(96,165,250,.22);
+    color:#1e3a8a;
+  }
+  .ach.ach--illus.ach--dream .a-xp .a-xp-ico{ background:rgba(96,165,250,.14); }
+  .ach.ach--illus.ach--dream .a-xp .a-xp-ico svg{ fill:#2563eb; }
+  .ach.ach--illus.ach--dream .a-xp .a-xp-val{ color:#1e3a8a; }
+  .ach.ach--illus.ach--dream .a-xp .a-xp-lbl{ color:#2563eb; }
+  /* Процент-плашка слева сверху — синяя. */
+  .ach.ach--illus.ach--dream .a-pct{
+    border-color:rgba(96,165,250,.30);
+    box-shadow:0 2px 6px -2px rgba(37,99,235,.25);
+    color:#1d4ed8;
+  }
+  /* Hover-движение: подушка чуть «дышит» вверх, орбиты крутятся
+     навстречу, искры мерцают чаще, капли дрейфуют. */
+  @keyframes ach-dream-bob{
+    0%,100%{ transform:translateX(-50%) translateY(0) scale(1); }
+    50%    { transform:translateX(-50%) translateY(-.6cqi) scale(1.025); }
+  }
+  @keyframes ach-dream-orbit-spin{ to{ transform:rotate(332deg); } }
+  @keyframes ach-dream-orbit2-spin{ to{ transform:rotate(-332deg); } }
+  @keyframes ach-dream-drift{
+    0%,100%{ transform:translate(0,0); }
+    50%    { transform:translate(-.4cqi,-1cqi); }
+  }
+  .ach.ach--illus.ach--dream:hover .dream-pillow{
+    animation:ach-dream-bob 2.6s ease-in-out infinite;
+  }
+  .ach.ach--illus.ach--dream:hover .start-orbit{
+    animation:ach-dream-orbit-spin 9s linear infinite;
+  }
+  .ach.ach--illus.ach--dream:hover .dream-orbit2{
+    animation:ach-dream-orbit2-spin 13s linear infinite;
+  }
+  .ach.ach--illus.ach--dream:hover .dream-spark{ animation-duration:1.5s; }
+  .ach.ach--illus.ach--dream:hover .dream-ball{
+    animation:ach-dream-drift 2.4s ease-in-out infinite;
+  }
+  .ach.ach--illus.ach--dream:hover .dream-ball.b2{ animation-delay:.3s; }
+  .ach.ach--illus.ach--dream:hover .dream-ball.b3{ animation-delay:.5s; }
+  .ach.ach--illus.ach--dream:hover .dream-ball.b4{ animation-delay:.7s; }
+  /* Базовая anim-shake (тряска колбы) для dream не нужна — у нас
+     другая иллюстрация и собственный bob. */
+  .ach.ach--illus.ach--dream.anim-shake:hover .ref-orb,
+  .ach.ach--illus.ach--dream.anim-shake:hover .ref-flask{
+    animation:none;
+  }
+  /* a11y: уважать prefers-reduced-motion. */
+  @media (prefers-reduced-motion: reduce){
+    .ach.ach--illus.ach--dream,
+    .ach.ach--illus.ach--dream *{ animation:none !important; transition:none !important; }
+  }
+  /* LOCKED — обесцветить орб/подушку, приглушить тексты. */
+  .ach.ach--illus.ach--dream.locked .ref-orb{ filter:grayscale(.85); }
+  .ach.ach--illus.ach--dream.locked .dream-pillow{
+    filter:grayscale(.75) drop-shadow(0 1cqi 2cqi rgba(15,18,38,.2));
+  }
+  .ach.ach--illus.ach--dream.locked .dream-ball,
+  .ach.ach--illus.ach--dream.locked .dream-spark{ filter:grayscale(.7); opacity:.55; }
+  .ach.ach--illus.ach--dream.locked .c-title{ color:var(--muted); }
+  .ach.ach--illus.ach--dream.locked .c-sub{ color:var(--muted-2); }
+
   .ach-filter button .cnt{
     margin-left:6px;
     font-family:'JetBrains Mono',monospace;

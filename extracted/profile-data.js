@@ -22,8 +22,8 @@
 
 	var ACHIEVEMENT_CATALOG = [
 		{ id: 'welcome', title: 'Старт на портале', desc: 'Начни свой путь в IQMO', rarity: 'common', icon: 'star', illus: true, pctRare: 62, xpReward: 50 },
-		{ id: 'three_tests', title: 'Тройка тестов', desc: 'Завершено 3 учтённых теста.', rarity: 'common', icon: 'book', pctRare: 38, xpReward: 50 },
-		{ id: 'streak7', title: 'Неделя ритма', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame', pctRare: 6.2, xpReward: 200 },
+		{ id: 'three_tests', title: 'Неделя ритма', desc: 'Пройди 3 теста на портале', rarity: 'common', icon: 'spark', illus: true, cardStyle: 'dream', pctRare: 38, xpReward: 150 },
+		{ id: 'streak7', title: 'Семидневная серия', desc: '7 дней подряд с закрытой дневной целью.', rarity: 'epic', icon: 'flame', pctRare: 6.2, xpReward: 200 },
 		{ id: 'chem_stage1', title: 'Первый этап по химии', desc: 'Успешно пройди 1 этап по химии', rarity: 'epic', icon: 'flask', iconUrl: '/site/assets/achievement-chem-stage1.png', pctRare: 2.4, xpReward: 250 },
 		{ id: 'bio_stage1', title: 'Первый этап по биологии', desc: 'Успешно пройди 1 этап по биологии', rarity: 'rare', icon: 'leaf', iconUrl: '/site/assets/achievement-bio-stage1.png', pctRare: 1.8, xpReward: 500 },
 		{ id: 'ten_tests', title: 'Десятка', desc: '10 завершённых попыток.', rarity: 'rare', icon: 'medal', pctRare: 18, xpReward: 150 },
@@ -288,11 +288,18 @@
 		var chemV = summarizeVariants('iqmo-chem-v-', CH1_VARIANT_IDS);
 		var totalTasks = 0;
 		try { totalTasks = Number(lsGet('iqmo-chem-points-total-tasks', 0)) || 0; } catch (e2) {}
+		// `three_tests` разблокируется в chem-progress.js по `attemptStats.total >= 3`
+		// (= количеству завершённых тестов). Берём то же поле, чтобы UI прогресс
+		// совпадал с реальным условием выдачи; total-tasks (число задач) тут не
+		// подходит, у одного теста их обычно 5-30.
+		var attemptsTotal = (snap && snap.attemptStats && snap.attemptStats.total) || 0;
 
 		function progressFor(catId) {
 			switch (catId) {
 				case 'streak7':
 					return { current: Math.min(streakDays, 7), target: 7 };
+				case 'three_tests':
+					return { current: Math.min(attemptsTotal, 3), target: 3 };
 				case 'chem_stage1':
 					return { current: Math.min(chemV.passed, CH1_VARIANT_IDS.length), target: CH1_VARIANT_IDS.length };
 				case 'bio_stage1':
@@ -438,7 +445,7 @@
 				eye: 'Награда за серию',
 				big: Math.max(0, 7 - (streak.days || 0)) + ' дн.',
 				text: 'до бонуса 7 дней подряд',
-				foot: 'награда: <b>значок «Неделя ритма»</b>',
+				foot: 'награда: <b>значок «Семидневная серия»</b>',
 				pct: Math.min(100, Math.round(((streak.days || 0) / 7) * 100))
 			},
 			{

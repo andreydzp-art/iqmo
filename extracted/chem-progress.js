@@ -267,8 +267,8 @@
 
 	var BADGE_LIVE_TITLES = {
 		welcome: 'Старт',
-		three_tests: 'Тройка тестов',
-		streak7: 'Неделя ритма',
+		three_tests: 'Неделя ритма',
+		streak7: 'Семидневная серия',
 		chem_stage1: 'Этап 1 · Химия',
 		bio_stage1: 'Этап 1 · Биология',
 		ten_tests: 'Десятка',
