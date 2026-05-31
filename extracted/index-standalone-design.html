@@ -549,6 +549,8 @@ h1,h2,h3,p{margin:0}
 .gamify .sec__title em{color:var(--sun)}
 .gamify .sec__sub{color:rgba(255,255,255,.7)}
 .gamify__grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:8px}
+/* После full-bleed gamify — воздух до жёлтого countdown (без двойного padding у .sec) */
+.gamify + .sec{padding-top:clamp(40px,5vw,64px)}
 .gcard{
   background:rgba(255,255,255,.04);
   border:1.5px solid rgba(255,255,255,.08);
@@ -1150,7 +1152,7 @@ h1,h2,h3,p{margin:0}
 <!-- ========== COMPARE (removed: содержала ценовые сравнения с репетитором; убрано по правкам «Главная без подписки/продаж») ========== -->
 
 <!-- ========== COUNTDOWN ========== -->
-<section class="sec" style="padding-top:0">
+<section class="sec">
   <div class="wrap">
     <div class="countdown">
       <div class="countdown__copy">
