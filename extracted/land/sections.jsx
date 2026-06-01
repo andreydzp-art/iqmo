@@ -483,8 +483,10 @@ function FinalCTA() {
           <div>© IQMO School · 2026</div>
           <div style={{ display: 'flex', gap: 20 }}>
             <a href="mailto:support@iqmo.ru">Контакты</a>
+            {/* TEMP[hide-legal-2026-06-01]: «Оферта» и «Политика» временно скрыты в подвале лендера по запросу владельца. Документы доступны напрямую: /docs/oferta.pdf, /docs/privacy_policy.pdf. Юридические дисклеймеры в форме регистрации/оплаты оставлены. Откатить: git revert или раскомментировать ниже.
             <a href="/docs/oferta.pdf" target="_blank" rel="noopener">Оферта</a>
             <a href="/docs/privacy_policy.pdf" target="_blank" rel="noopener">Политика</a>
+            */}
           </div>
         </footer>
       </div>
