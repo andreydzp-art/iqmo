@@ -85,9 +85,11 @@
 
 	if (/\/subject-biology/.test(path))                ctx = 'subject-bio';
 	else if (/\/subject-chemistry/.test(path))         ctx = 'subject-chem';
+	else if (/\/subject-mathematics/.test(path))       ctx = 'subject-math';
 	else if (/\/profile/.test(path))                   ctx = 'profile';
 	else if (/\/full-test-biology\/chapter-2/.test(path))   ctx = 'ch2-bio';
 	else if (/\/full-test-chemistry\/chapter-2/.test(path)) ctx = 'ch2-chem';
+	else if (/\/full-test-mathematics\/chapter-2/.test(path)) ctx = 'ch2-math';
 	else if (/warmup-chemistry/.test(path))            ctx = 'warmup-chem';
 	else if (/\/topic-/.test(path))                    ctx = 'topic';
 	else if (path === '/' || path === '' || /\/index\.html$/.test(path) && !/\//.test(path.replace(/^\//, '').replace(/\/index\.html$/, '')))
@@ -102,6 +104,10 @@
 			welcome: { e: '🧑‍🚀', t: 'Привет! Вот твой дашборд по химии. Выбирай тему или вариант и вперёд!' },
 			tip:     { e: '🔬', t: 'Не забывай про раздел «Мои ошибки» — там собраны задания, которые стоит повторить.' }
 		},
+		'subject-math': {
+			welcome: { e: '🧑‍🚀', t: 'Привет! Это твой дашборд по математике. Выбирай вариант — и поехали решать.' },
+			tip:     { e: '📐', t: 'Часть 2 (задания 20–25) — самооценка. Решай на бумаге, потом сверяйся с разбором.' }
+		},
 		'profile': {
 			welcome: { e: '🧑‍🚀', t: 'Это твой профиль. Здесь видны награды, уровень и статистика.' },
 			tip:     { e: '🏆', t: 'Решай варианты, чтобы открывать новые награды и подниматься в рейтинге.' }
@@ -113,6 +119,10 @@
 		'ch2-chem': {
 			welcome: { e: '🧑‍🚀', t: 'Глава 2 по химии — задания с развёрнутым ответом. Не забывай уравнивать реакции!' },
 			tip:     { e: '⚖️', t: 'Проверяй коэффициенты и заряды ионов перед отправкой.' }
+		},
+		'ch2-math': {
+			welcome: { e: '🧑‍🚀', t: 'Часть 2 — задания 20–25. Решаешь на бумаге, после ответа открываешь разбор и сам ставишь оценку.' },
+			tip:     { e: '✏️', t: 'Записывай каждое преобразование — за полное и аккуратное решение дают 2 балла.' }
 		},
 		'warmup-chem': {
 			welcome: { e: '🧑‍🚀', t: 'Разминка! Короткие тематические блоки — идеально для повторения.' },

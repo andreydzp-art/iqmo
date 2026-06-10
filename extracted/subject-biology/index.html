@@ -59,6 +59,7 @@
     /* Subject-marks — ТОЛЬКО для аватаров предметов */
     --bio-1:#34d399; --bio-2:#10b981;
     --chem-1:#a78bfa; --chem-2:#7c3aed;
+    --math-1:#60a5fa; --math-2:#2563eb;
     --phys-1:#60a5fa; --phys-2:#2563eb;
     --hist-1:#fb923c; --hist-2:#ea580c;
     --shadow-sm:0 1px 2px rgba(15,18,38,.04),0 1px 1px rgba(15,18,38,.03);
@@ -348,6 +349,7 @@
   .subj-item.active::before{ content:""; position:absolute; left:-14px; top:8px; bottom:8px; width:3px; background:var(--mark, var(--primary)); border-radius:0 3px 3px 0;}
   .subj-item.tone-bio.active::before { background:var(--bio-2);}
   .subj-item.tone-chem.active::before{ background:var(--chem-2);}
+  .subj-item.tone-math.active::before{ background:var(--math-2);}
   .subj-item.tone-phys.active::before{ background:var(--phys-2);}
   .subj-item__ico{ width:30px; height:30px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; background:var(--tone,#eef1f6); color:var(--tone-ink,#2a2f38);}
   .subj-item__ico svg{ width:16px; height:16px;}
@@ -356,6 +358,7 @@
   .subj-item.active .subj-item__count{ background:#fff; color:var(--primary);}
   .tone-bio{ --tone:var(--emerald-50); --tone-ink:var(--emerald);}
   .tone-chem{ --tone:#f3eeff; --tone-ink:#7c3aed;}
+  .tone-math{ --tone:#dbeafe; --tone-ink:#2563eb;}
 
   /* ===== FOOTER ===== */
   .ft{ margin-top:32px; background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:28px; box-shadow:var(--shadow-sm); display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
@@ -506,6 +509,11 @@
           <a href="/subject-chemistry/" class="subj-item tone-chem">
             <span class="subj-item__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v7L5 20a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-10V3"/><path d="M7 16h10"/></svg></span>
             <span class="subj-item__lbl">Химия</span>
+            <span class="subj-item__count">ОГЭ</span>
+          </a>
+          <a href="/subject-mathematics/" class="subj-item tone-math">
+            <span class="subj-item__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l3 7L15 5h6"/></svg></span>
+            <span class="subj-item__lbl">Математика</span>
             <span class="subj-item__count">ОГЭ</span>
           </a>
         </div>
