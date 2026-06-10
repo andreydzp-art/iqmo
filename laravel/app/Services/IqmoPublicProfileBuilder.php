@@ -107,7 +107,7 @@ final class IqmoPublicProfileBuilder
 
         $chemV = self::summarizeVariants($keys, 'iqmo-chem-v-');
         $bioV = self::summarizeVariants($keys, 'iqmo-bio-v-');
-        $mathV = self::summarizeVariants($keys, 'iqmo-math-v-', range(1, 19));
+        $mathV = self::summarizeVariants($keys, 'iqmo-math-v-', range(1, 24));
         $chemTopics = self::chemTopicsSummary($keys);
 
         $chemMapPct = count(self::CH1_VARIANT_IDS) > 0
@@ -119,8 +119,8 @@ final class IqmoPublicProfileBuilder
             ? (int) round(($bioV['passed'] / count(self::CH1_VARIANT_IDS)) * 100)
             : 0;
 
-        // Математика: 19 готовых вариантов. $mathV['total'] = 19 благодаря
-        // range(1, 19), переданному в summarizeVariants выше. Когда добавим
+        // Математика: 24 готовых варианта. $mathV['total'] = 24 благодаря
+        // range(1, 24), переданному в summarizeVariants выше. Когда добавим
         // ещё ready-варианты — расширь и список здесь.
         $mathPct = $mathV['total'] > 0
             ? (int) round(($mathV['passed'] / $mathV['total']) * 100)
@@ -129,7 +129,7 @@ final class IqmoPublicProfileBuilder
         $subjects = [
             self::subjectCard('biology', 'Биология', 'ОГЭ · карта уровней · глава 1', $bioPct, $bioV, '/full-test-biology/', $level['current']),
             self::subjectCard('chemistry', 'Химия', 'ОГЭ · 10 тем · '.count(self::CHEM_TOPICS).' разделов', $chemPct, $chemV, '/subject-chemistry/', $level['current'], $chemTopics),
-            self::subjectCard('mathematics', 'Математика', 'ОГЭ · 19 вариантов · 25 заданий', $mathPct, $mathV, '/full-test-mathematics/', $level['current']),
+            self::subjectCard('mathematics', 'Математика', 'ОГЭ · 24 варианта · 25 заданий', $mathPct, $mathV, '/full-test-mathematics/', $level['current']),
         ];
 
         $coursePct = count($subjects) > 0

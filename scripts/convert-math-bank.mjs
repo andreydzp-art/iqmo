@@ -1,41 +1,64 @@
 #!/usr/bin/env node
-// Одноразовый конвертер: oge_math.js (исходник пользователя) → mathematics-bank.js + mathematics-variants.js.
+// Конвертер: oge_math.js (несколько batch-источников) → mathematics-bank.js + mathematics-variants.js.
 //
 // Особенности:
-//   • Перенумеровывает варианты 6→1, 7→2, 8→3, 9→4, 10→5 (просьба владельца).
-//   • Внутри варианта qid идут 1..25, в общем банке qid = (variant-1)*25 + type, итого 1..125.
-//   • Задания 20–25 (part:2) → type:'written', maxPoints:2, self-check на экране результатов.
-//   • Задания 1–19 → type:'input' (число/строка цифр) или type:'single' (если есть options и answer — одна цифра).
-//   • Все image: 'vN_*.png' рендерятся как <figure class="q-figure"><img src="/img/mathematics/...">.
-//   • Текст question с \n → <p>...</p><p>...</p>; LaTeX-формул нет, только юникод (√, ², °, π).
+//   • Поддерживает несколько BATCHES (каждый — свой oge_math.js со своим маппингом
+//     orig variant → итоговый id и со своим imagePrefix для изображений).
+//   • qid = (id - 1) * 25 + type — стабильный, прогрессы пользователей не съезжают.
+//   • Задания 20–25 (part === 2) → type:'written', maxPoints:2, self-check.
+//   • Задания 1–19 → 'input' или 'single' (если answer — единичная цифра + есть options).
+//   • OVERRIDES по qid точечно правят авторские ошибки (см. teplica qid=3).
+//
+// Использование (из корня репо):
+//   node scripts/convert-math-bank.mjs
+// Скрипт ожидает оба архива распакованными (см. BATCHES.path ниже).
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
-const SRC = process.argv[2] || 'E:\\1\\_math-archive-3\\oge_math.js';
+// ============================================================================
+// Конфигурация batch-ей.
+// При получении нового архива от автора — добавляем сюда новую запись.
+// ============================================================================
+//
+// remap: orig variant в файле → итоговый id в банке (стабильный для qid).
+// imagePrefix: префикс к именам картинок при сохранении в /img/mathematics/.
+//   Пустой prefix '' = имена остаются как в архиве (используется для batch 1,
+//   у которого уникальные `v1_..v20_*` имена). Для batch 2 имена `v1_..v5_*`
+//   конфликтуют с batch 1, поэтому добавляем 'b2_' и в имена файлов, и в
+//   ссылки внутри `body` заданий.
+const BATCHES = [
+	{
+		name: 'batch-1 (files (3).zip)',
+		path: 'E:\\1\\_math-archive-3\\oge_math.js',
+		imagesDir: 'E:\\1\\_math-archive-3\\images\\images',
+		imagePrefix: '',
+		remap: {
+			6: 1, 7: 2, 8: 3, 9: 4, 10: 5,
+			1: 6, 2: 7, 3: 8, 4: 9, 5: 10,
+			11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16,
+			18: 17, 19: 18, 20: 19,
+		},
+	},
+	{
+		name: 'batch-2 (oge_math_1-5.js)',
+		path: 'E:\\1\\_math-1-5\\oge_math.js',
+		imagesDir: 'E:\\1\\_math-1-5\\images\\images',
+		imagePrefix: 'b2_',
+		remap: {
+			1: 20, 2: 21, 3: 22, 4: 23, 5: 24,
+		},
+	},
+];
+
 const OUT_BANK = resolve(ROOT, 'extracted/mathematics-bank.js');
 const OUT_VARIANTS = resolve(ROOT, 'extracted/mathematics-variants.js');
+const OUT_IMG_DIR = resolve(ROOT, 'extracted/img/mathematics');
 
-// --- 1. Читаем исходник пользователя как обычный JS-модуль через eval. ----
-// (Внутри SRC есть `const questions = [...]; module.exports = questions;`)
-const srcRaw = readFileSync(SRC, 'utf8');
-let questions;
-{
-	// Простейший способ: вырезать в исходнике финальный CJS-блок и подставить return.
-	const stripped = srcRaw.replace(/if\s*\(typeof\s+module[\s\S]*?\}/m, '');
-	const fn = new Function(stripped + '\n;return questions;');
-	questions = fn();
-}
-if (!Array.isArray(questions)) {
-	throw new Error('Исходный файл не вернул массив questions');
-}
-console.log(`[convert] прочитано задач: ${questions.length}`);
-
-// --- 2. Заголовки заданий по номеру задания ОГЭ (тема). --------------------
 const TYPE_TITLES = {
 	1: 'Практическое задание',
 	2: 'Практическое задание',
@@ -64,26 +87,21 @@ const TYPE_TITLES = {
 	25: 'Часть 2 · Планиметрия (вычисление)',
 };
 
-// --- 3. Хелперы рендеринга. ------------------------------------------------
 function escHtml(s) {
-	return String(s)
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;');
+	return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function renderBody(question, image) {
-	// Разбиваем по \n\n на абзацы; одиночные \n → <br>.
+function renderBody(question, image, imagePrefix) {
 	const paragraphs = String(question)
 		.split(/\n{2,}/)
 		.map((p) => '<p>' + escHtml(p.trim()).replace(/\n/g, '<br>') + '</p>')
 		.join('');
-
 	let figure = '';
 	if (image) {
+		const fname = imagePrefix + image;
 		figure =
 			'<figure class="q-figure">' +
-			`<img class="q-figure__img" src="/img/mathematics/${image}" alt="Иллюстрация к заданию ОГЭ по математике" loading="lazy" decoding="async" />` +
+			`<img class="q-figure__img" src="/img/mathematics/${fname}" alt="Иллюстрация к заданию ОГЭ по математике" loading="lazy" decoding="async" />` +
 			'</figure>';
 	}
 	return paragraphs + figure;
@@ -96,132 +114,87 @@ function renderHint(explanation) {
 		.join('');
 }
 
-// --- 4. Определение типа задания. ------------------------------------------
 function pickType(item) {
 	if (item.part === 2) return 'written';
 	if (Array.isArray(item.options) && item.options.length > 0) {
 		const ans = String(item.answer).trim();
 		if (/^[1-9]\d?$/.test(ans) && ans.length === 1) return 'single';
-		// Многосимвольные ответы вида "213", "23", "13" — это либо соответствие, либо «несколько утверждений».
-		// Тип 11 ОГЭ (соответствие графиков и функций) и тип 19 (несколько верных утверждений)
-		// — в нашем UI остаются 'input' с проверкой строки цифр.
 		return 'input';
 	}
 	return 'input';
 }
 
-function pickCorrect(item, type) {
-	if (type === 'written') return null;
-	const ans = String(item.answer).trim();
-	if (type === 'single') {
-		// answer вида "1", "2", "3", "4" — индекс выбранного варианта.
-		return ans;
-	}
-	return ans;
+function pickCorrect(item) {
+	return String(item.answer).trim();
 }
 
-// --- 5. Конвертация. -------------------------------------------------------
-// VARIANT_REMAP — карта «исходный variant в oge_math.js» → «итоговый id в банке».
-//
-// История:
-//   • Первый архив (10.06.2026) содержал варианты 6–10 → выложили под id 1–5.
-//   • Второй архив добавил варианты 1–5 и 11–20 (вариант 17 неполный, пропущен).
-//
-// Стабильность qid: задание qid = (id - 1) * 25 + orig.type. Пользовательские
-// прогрессы привязаны к qid, поэтому id 1–5 (бывшие orig 6–10) НЕ ТРОГАЕМ —
-// новые варианты добавляем под id 6 и далее. Когда автор пришлёт ещё —
-// расширь карту, не меняя уже опубликованных пар.
-const VARIANT_REMAP = {
-	// Уже опубликованные (id 1–5):
-	6: 1,
-	7: 2,
-	8: 3,
-	9: 4,
-	10: 5,
-	// Добавлены 10.06.2026 из архива files (3).zip (id 6–10):
-	1: 6,
-	2: 7,
-	3: 8,
-	4: 9,
-	5: 10,
-	// Добавлены 10.06.2026 (id 11–16):
-	11: 11,
-	12: 12,
-	13: 13,
-	14: 14,
-	15: 15,
-	16: 16,
-	// orig 17 неполный (только задания 11–25), пропускаем — оставляем coming.
-	// orig 18–20 → id 17–19:
-	18: 17,
-	19: 18,
-	20: 19,
-};
+function readBatch(batch) {
+	if (!existsSync(batch.path)) {
+		throw new Error(`[convert] не найден источник ${batch.name}: ${batch.path}`);
+	}
+	const raw = readFileSync(batch.path, 'utf8');
+	const stripped = raw.replace(/if\s*\(typeof\s+module[\s\S]*?\}/m, '');
+	const fn = new Function(stripped + '\n;return questions;');
+	const questions = fn();
+	if (!Array.isArray(questions)) throw new Error(`[convert] ${batch.name}: questions не массив`);
+	console.log(`[convert] ${batch.name}: задач ${questions.length}`);
+	return questions;
+}
 
-const sortedQuestions = [...questions].sort((a, b) => {
-	const va = VARIANT_REMAP[a.variant] ?? 99;
-	const vb = VARIANT_REMAP[b.variant] ?? 99;
-	if (va !== vb) return va - vb;
-	return a.type - b.type;
-});
-
+// ============================================================================
+// Сборка банка.
+// ============================================================================
 const bank = [];
-const variants = [];
+const variantsMap = new Map(); // id → array of qid
+const imageRenames = []; // {srcDir, srcName, dstName}
 
-for (const orig of sortedQuestions) {
-	const newVariant = VARIANT_REMAP[orig.variant];
-	if (newVariant == null) {
-		console.warn(`[convert] пропущено задание variant=${orig.variant} (не в карте 6→1)`);
-		continue;
-	}
-	const qid = (newVariant - 1) * 25 + orig.type;
-	const type = pickType(orig);
-	const item = {
-		id: qid,
-		type,
-		title: TYPE_TITLES[orig.type] || `Задание №${orig.type}`,
-		body: renderBody(orig.question, orig.image),
-		hint: renderHint(orig.explanation),
-	};
-	if (type === 'written') {
-		item.maxPoints = 2;
-	} else {
-		item.correct = pickCorrect(orig, type);
-		if (Array.isArray(orig.options)) {
-			// Сохраняем варианты так, как ожидает рендер biology (single → массив строк, перед которым ставится номер).
-			// Опции уже идут с префиксом "1) ...", "2) ..." — у нас рендер biology генерирует свой номер,
-			// поэтому вырезаем префикс "1) " чтобы избежать дублирования.
-			item.options = orig.options.map((opt) => String(opt).replace(/^\s*(?:[АA-Я])\)\s*/i, '').replace(/^\s*\d+\)\s*/, ''));
+for (const batch of BATCHES) {
+	const questions = readBatch(batch);
+	for (const orig of questions) {
+		const newId = batch.remap[orig.variant];
+		if (newId == null) {
+			console.warn(`[convert] ${batch.name}: пропущено variant=${orig.variant} (нет в remap)`);
+			continue;
 		}
+		const qid = (newId - 1) * 25 + orig.type;
+		const type = pickType(orig);
+		const item = {
+			id: qid,
+			type,
+			title: TYPE_TITLES[orig.type] || `Задание №${orig.type}`,
+			body: renderBody(orig.question, orig.image, batch.imagePrefix),
+			hint: renderHint(orig.explanation),
+		};
+		if (type === 'written') {
+			item.maxPoints = 2;
+		} else {
+			item.correct = pickCorrect(orig);
+			if (Array.isArray(orig.options)) {
+				item.options = orig.options.map((opt) =>
+					String(opt).replace(/^\s*(?:[АA-Я])\)\s*/i, '').replace(/^\s*\d+\)\s*/, ''),
+				);
+			}
+		}
+		bank.push(item);
+
+		if (orig.image) {
+			imageRenames.push({
+				srcDir: batch.imagesDir,
+				srcName: orig.image,
+				dstName: batch.imagePrefix + orig.image,
+			});
+		}
+		if (!variantsMap.has(newId)) variantsMap.set(newId, []);
+		variantsMap.get(newId).push(qid);
 	}
-	bank.push(item);
 }
 
-// Группируем по variant.
-const byVariant = new Map();
-for (const orig of sortedQuestions) {
-	const newVariant = VARIANT_REMAP[orig.variant];
-	if (newVariant == null) continue;
-	if (!byVariant.has(newVariant)) byVariant.set(newVariant, []);
-	byVariant.get(newVariant).push((newVariant - 1) * 25 + orig.type);
-}
-for (const [vid, qids] of [...byVariant.entries()].sort((a, b) => a[0] - b[0])) {
-	variants.push({
-		id: vid,
-		title: `Вариант ${vid}`,
-		qids: qids.sort((a, b) => a - b),
-		status: 'ready',
-	});
-}
-
-// --- 5b. Точечные исправления авторских данных (overrides). ----------------
-// Если в исходном oge_math.js обнаружена ошибка (например, расходящиеся
-// answer и explanation — см. задачу 3 варианта 1, где answer="112500" при
-// разборе "5·4,5 м² = 225000 см²"), фиксируем её здесь, чтобы она пережила
-// повторные конвертации. Ключ — qid в выходном банке.
+// ============================================================================
+// Точечные исправления авторских данных.
+// ============================================================================
 const OVERRIDES = {
-	// Задача 3, вариант 1 (orig variant 6): площадь основания теплицы.
-	// 5 м × 4,5 м = 22,5 м² = 225000 см²; авторские 112500 — опечатка.
+	// qid=3: задача 3 варианта 1 (теплица). 5 м × 4,5 м = 22,5 м² = 225 000 см²;
+	// авторские 112 500 — опечатка ровно вдвое.
 	3: {
 		correct: '225000',
 		hint:
@@ -240,42 +213,47 @@ for (const item of bank) {
 }
 console.log(`[convert] применено overrides: ${overrideCount}`);
 
-console.log(`[convert] выходной банк: ${bank.length} вопросов; вариантов: ${variants.length}`);
+// ============================================================================
+// Сборка списка вариантов.
+// ============================================================================
+bank.sort((a, b) => a.id - b.id);
+const variantIds = [...variantsMap.keys()].sort((a, b) => a - b);
+const variants = variantIds.map((id) => ({
+	id,
+	title: `Вариант ${id}`,
+	qids: variantsMap.get(id).sort((a, b) => a - b),
+	status: 'ready',
+}));
 
-// --- 6. Сериализация в JS. -------------------------------------------------
+console.log(`[convert] банк: ${bank.length} вопросов; вариантов ready: ${variants.length}`);
+
+// ============================================================================
+// Сериализация в JS.
+// ============================================================================
 function serializeQuestion(q) {
 	const lines = ['\t{'];
 	lines.push(`\t\tid: ${q.id},`);
 	lines.push(`\t\ttype: ${JSON.stringify(q.type)},`);
 	lines.push(`\t\ttitle: ${JSON.stringify(q.title)},`);
 	lines.push(`\t\tbody: ${JSON.stringify(q.body)},`);
-	if (q.options) {
-		lines.push(`\t\toptions: [${q.options.map((o) => JSON.stringify(o)).join(', ')}],`);
-	}
-	if (q.correct != null) {
-		lines.push(`\t\tcorrect: ${JSON.stringify(q.correct)},`);
-	}
-	if (q.maxPoints) {
-		lines.push(`\t\tmaxPoints: ${q.maxPoints},`);
-	}
+	if (q.options) lines.push(`\t\toptions: [${q.options.map((o) => JSON.stringify(o)).join(', ')}],`);
+	if (q.correct != null) lines.push(`\t\tcorrect: ${JSON.stringify(q.correct)},`);
+	if (q.maxPoints) lines.push(`\t\tmaxPoints: ${q.maxPoints},`);
 	lines.push(`\t\thint: ${JSON.stringify(q.hint)},`);
 	lines.push('\t}');
 	return lines.join('\n');
 }
 
 const bankFile = `// mathematics-bank.js — банк вопросов ОГЭ по математике.
-// Сгенерировано scripts/convert-math-bank.mjs из oge_math.js.
-//   • VARIANT_REMAP в скрипте задаёт пары «orig variant → итоговый id».
-//   • qid = (id - 1)*25 + type, уникален и стабилен (см. историю VARIANT_REMAP).
+// Сгенерировано scripts/convert-math-bank.mjs из нескольких batch-источников.
+//   • qid = (id - 1)*25 + type — стабилен между запусками (см. BATCHES.remap в скрипте).
 //   • Задания 20–25 (часть 2) → type:'written', maxPoints:2 (self-check на экране результатов).
-//   • Картинки лежат в /img/mathematics/ (имена с префиксом v\${origVariant}_).
+//   • Картинки лежат в /img/mathematics/ (имена с префиксом batch'а, если указан).
 window.MATHEMATICS_QUESTIONS = [
 ${bank.map(serializeQuestion).join(',\n')},
 ];
 `;
 
-// Дописываем заглушки до round-числа (как у biology — до id 29), чтобы карта
-// уровней не «прыгала» при добавлении новых ready-вариантов.
 const COMING_UP_TO = 29;
 const lastReadyId = variants.length ? variants[variants.length - 1].id : 0;
 const comingTail = [];
@@ -302,3 +280,30 @@ writeFileSync(OUT_BANK, bankFile, 'utf8');
 writeFileSync(OUT_VARIANTS, variantsFile, 'utf8');
 console.log(`[convert] записано: ${OUT_BANK}`);
 console.log(`[convert] записано: ${OUT_VARIANTS}`);
+
+// ============================================================================
+// Выводим список переименований картинок (копированием займётся отдельный
+// шаг — см. README в комментарии). Так конвертер остаётся идемпотентным
+// и не трогает файловую систему вне `extracted/`.
+// ============================================================================
+import { copyFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+
+mkdirSync(OUT_IMG_DIR, { recursive: true });
+const seen = new Set();
+let copied = 0;
+let skipped = 0;
+for (const r of imageRenames) {
+	const key = r.dstName;
+	if (seen.has(key)) { skipped++; continue; }
+	seen.add(key);
+	const src = join(r.srcDir, r.srcName);
+	const dst = join(OUT_IMG_DIR, r.dstName);
+	if (!existsSync(src)) {
+		console.warn(`[convert] нет исходника картинки: ${src}`);
+		continue;
+	}
+	copyFileSync(src, dst);
+	copied++;
+}
+console.log(`[convert] картинок скопировано: ${copied}, пропущено (дубли): ${skipped}`);
