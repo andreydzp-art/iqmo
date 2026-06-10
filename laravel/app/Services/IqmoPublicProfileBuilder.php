@@ -107,6 +107,7 @@ final class IqmoPublicProfileBuilder
 
         $chemV = self::summarizeVariants($keys, 'iqmo-chem-v-');
         $bioV = self::summarizeVariants($keys, 'iqmo-bio-v-');
+        $mathV = self::summarizeVariants($keys, 'iqmo-math-v-', [1, 2, 3, 4, 5]);
         $chemTopics = self::chemTopicsSummary($keys);
 
         $chemMapPct = count(self::CH1_VARIANT_IDS) > 0
@@ -118,9 +119,16 @@ final class IqmoPublicProfileBuilder
             ? (int) round(($bioV['passed'] / count(self::CH1_VARIANT_IDS)) * 100)
             : 0;
 
+        // Математика: 5 вариантов (бывшие 6–10 из сборника). $mathV['total'] = 5
+        // благодаря кастомному списку variantIds, переданному в summarizeVariants выше.
+        $mathPct = $mathV['total'] > 0
+            ? (int) round(($mathV['passed'] / $mathV['total']) * 100)
+            : 0;
+
         $subjects = [
             self::subjectCard('biology', 'Биология', 'ОГЭ · карта уровней · глава 1', $bioPct, $bioV, '/full-test-biology/', $level['current']),
             self::subjectCard('chemistry', 'Химия', 'ОГЭ · 10 тем · '.count(self::CHEM_TOPICS).' разделов', $chemPct, $chemV, '/subject-chemistry/', $level['current'], $chemTopics),
+            self::subjectCard('mathematics', 'Математика', 'ОГЭ · 5 вариантов · 25 заданий', $mathPct, $mathV, '/full-test-mathematics/', $level['current']),
         ];
 
         $coursePct = count($subjects) > 0
@@ -297,16 +305,22 @@ final class IqmoPublicProfileBuilder
      * @param  array<string, mixed>  $keys
      * @return array{passed: int, finished: int, total: int, stars: int, maxStars: int, avgPart1: int}
      */
-    private static function summarizeVariants(array $keys, string $prefix): array
+    /**
+     * @param  list<int>|null  $variantIds  Кастомный список ID; если null — берём CH1_VARIANT_IDS (7 вариантов главы 1 био/химии).
+     *                                      Для математики передаём [1..5] — у неё другое количество вариантов.
+     * @return array{passed:int,finished:int,total:int,stars:int,maxStars:int,avgPart1:int}
+     */
+    private static function summarizeVariants(array $keys, string $prefix, ?array $variantIds = null): array
     {
+        $ids = $variantIds ?? self::CH1_VARIANT_IDS;
         $passed = 0;
         $finished = 0;
         $totalStars = 0;
-        $maxStars = count(self::CH1_VARIANT_IDS) * 3;
+        $maxStars = count($ids) * 3;
         $pctSum = 0;
         $pctCount = 0;
 
-        foreach (self::CH1_VARIANT_IDS as $id) {
+        foreach ($ids as $id) {
             $state = self::keyVal($keys, $prefix.$id, null);
             if (!is_array($state) || empty($state['finished'])) {
                 continue;
@@ -325,7 +339,7 @@ final class IqmoPublicProfileBuilder
         return [
             'passed' => $passed,
             'finished' => $finished,
-            'total' => count(self::CH1_VARIANT_IDS),
+            'total' => count($ids),
             'stars' => $totalStars,
             'maxStars' => $maxStars,
             'avgPart1' => $pctCount > 0 ? (int) round($pctSum / $pctCount) : 0,
@@ -401,12 +415,15 @@ final class IqmoPublicProfileBuilder
         ?array $chemTopics = null,
     ): array {
         $meta = [];
+        // `$variants['total']` приходит из summarizeVariants() и учитывает кастомный список ID
+        // (для math это 5, для bio/chem остаётся 7 из CH1_VARIANT_IDS).
+        $totalVariants = (int) ($variants['total'] ?? count(self::CH1_VARIANT_IDS));
         if ($chemTopics !== null) {
             $meta[] = ['label' => 'тем', 'value' => $chemTopics['doneTopics'].' / '.$chemTopics['totalTopics']];
-            $meta[] = ['label' => 'вариантов', 'value' => $variants['passed'].' / '.count(self::CH1_VARIANT_IDS)];
+            $meta[] = ['label' => 'вариантов', 'value' => $variants['passed'].' / '.$totalVariants];
             $meta[] = ['label' => 'звёзды', 'value' => $variants['stars'].' / '.$variants['maxStars']];
         } else {
-            $meta[] = ['label' => 'вариантов', 'value' => $variants['passed'].' / '.count(self::CH1_VARIANT_IDS)];
+            $meta[] = ['label' => 'вариантов', 'value' => $variants['passed'].' / '.$totalVariants];
             $meta[] = ['label' => 'звёзды', 'value' => $variants['stars'].' / '.$variants['maxStars']];
         }
 

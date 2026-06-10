@@ -365,7 +365,7 @@ Route::get('/{file}', function (string $file) use ($serveStatic) {
 //      подпапке.
 //   2. Прописать slug в массив `$SUBJECTS` ниже.
 //   3. `node scripts/sync-site.mjs` → коммит → пуш.
-$SUBJECTS = ['chemistry', 'biology'];
+$SUBJECTS = ['chemistry', 'biology', 'mathematics'];
 
 Route::get('/subject-{slug}.html', function (string $slug) use ($SUBJECTS) {
     if (! in_array($slug, $SUBJECTS, true)) {
@@ -394,7 +394,7 @@ Route::get('/subject-{slug}', function (string $slug) use ($serveStatic, $SUBJEC
 // уровней + сам тест с вопросами, тот же подход к clean URL, что и у
 // /subject-<slug>/). Файлы — `public/site/full-test-<slug>/index.html`,
 // синхронизируются из `extracted/full-test-<slug>/index.html`.
-$FULL_TESTS = ['chemistry', 'biology'];
+$FULL_TESTS = ['chemistry', 'biology', 'mathematics'];
 
 Route::get('/full-test-{slug}.html', function (string $slug) use ($FULL_TESTS) {
     if (! in_array($slug, $FULL_TESTS, true)) {
