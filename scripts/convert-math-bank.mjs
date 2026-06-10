@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
-const SRC = process.argv[2] || 'C:\\Users\\user\\Downloads\\oge_math.js';
+const SRC = process.argv[2] || 'E:\\1\\_math-archive-3\\oge_math.js';
 const OUT_BANK = resolve(ROOT, 'extracted/mathematics-bank.js');
 const OUT_VARIANTS = resolve(ROOT, 'extracted/mathematics-variants.js');
 
@@ -122,11 +122,41 @@ function pickCorrect(item, type) {
 
 // --- 5. Конвертация. -------------------------------------------------------
 // VARIANT_REMAP — карта «исходный variant в oge_math.js» → «итоговый id в банке».
-// Сейчас оригинальный архив содержал только варианты 6–10 (5 шт.), их и
-// перенумеровали в 1–5. Когда автор пришлёт ещё варианты — добавь сюда
-// новые ключи (например, 11→6, 12→7, ...) и перезапусти скрипт. Заодно
-// переключи status у нужных id с 'coming' на 'ready' в mathematics-variants.js.
-const VARIANT_REMAP = { 6: 1, 7: 2, 8: 3, 9: 4, 10: 5 };
+//
+// История:
+//   • Первый архив (10.06.2026) содержал варианты 6–10 → выложили под id 1–5.
+//   • Второй архив добавил варианты 1–5 и 11–20 (вариант 17 неполный, пропущен).
+//
+// Стабильность qid: задание qid = (id - 1) * 25 + orig.type. Пользовательские
+// прогрессы привязаны к qid, поэтому id 1–5 (бывшие orig 6–10) НЕ ТРОГАЕМ —
+// новые варианты добавляем под id 6 и далее. Когда автор пришлёт ещё —
+// расширь карту, не меняя уже опубликованных пар.
+const VARIANT_REMAP = {
+	// Уже опубликованные (id 1–5):
+	6: 1,
+	7: 2,
+	8: 3,
+	9: 4,
+	10: 5,
+	// Добавлены 10.06.2026 из архива files (3).zip (id 6–10):
+	1: 6,
+	2: 7,
+	3: 8,
+	4: 9,
+	5: 10,
+	// Добавлены 10.06.2026 (id 11–16):
+	11: 11,
+	12: 12,
+	13: 13,
+	14: 14,
+	15: 15,
+	16: 16,
+	// orig 17 неполный (только задания 11–25), пропускаем — оставляем coming.
+	// orig 18–20 → id 17–19:
+	18: 17,
+	19: 18,
+	20: 19,
+};
 
 const sortedQuestions = [...questions].sort((a, b) => {
 	const va = VARIANT_REMAP[a.variant] ?? 99;
@@ -184,6 +214,32 @@ for (const [vid, qids] of [...byVariant.entries()].sort((a, b) => a[0] - b[0])) 
 	});
 }
 
+// --- 5b. Точечные исправления авторских данных (overrides). ----------------
+// Если в исходном oge_math.js обнаружена ошибка (например, расходящиеся
+// answer и explanation — см. задачу 3 варианта 1, где answer="112500" при
+// разборе "5·4,5 м² = 225000 см²"), фиксируем её здесь, чтобы она пережила
+// повторные конвертации. Ключ — qid в выходном банке.
+const OVERRIDES = {
+	// Задача 3, вариант 1 (orig variant 6): площадь основания теплицы.
+	// 5 м × 4,5 м = 22,5 м² = 225000 см²; авторские 112500 — опечатка.
+	3: {
+		correct: '225000',
+		hint:
+			'<p>Основание теплицы — прямоугольник со сторонами 5&nbsp;м (диаметр полуцилиндра) и 4,5&nbsp;м (длина). ' +
+			'Площадь&nbsp;= 5&nbsp;·&nbsp;4,5&nbsp;=&nbsp;22,5&nbsp;м². ' +
+			'Переводим в см²: 1&nbsp;м²&nbsp;=&nbsp;10&nbsp;000&nbsp;см², значит 22,5&nbsp;·&nbsp;10&nbsp;000&nbsp;=&nbsp;225&nbsp;000&nbsp;см².</p>',
+	},
+};
+
+let overrideCount = 0;
+for (const item of bank) {
+	const o = OVERRIDES[item.id];
+	if (!o) continue;
+	for (const k of Object.keys(o)) item[k] = o[k];
+	overrideCount++;
+}
+console.log(`[convert] применено overrides: ${overrideCount}`);
+
 console.log(`[convert] выходной банк: ${bank.length} вопросов; вариантов: ${variants.length}`);
 
 // --- 6. Сериализация в JS. -------------------------------------------------
@@ -208,24 +264,36 @@ function serializeQuestion(q) {
 }
 
 const bankFile = `// mathematics-bank.js — банк вопросов ОГЭ по математике.
-// Сгенерировано из oge_math.js (варианты 6–10) скриптом scripts/convert-math-bank.mjs.
-//   • Варианты перенумерованы 6→1, 7→2, 8→3, 9→4, 10→5 (внутри текста заданий старая нумерация не упоминается).
-//   • qid = (variant-1)*25 + type, итого 125 заданий.
+// Сгенерировано scripts/convert-math-bank.mjs из oge_math.js.
+//   • VARIANT_REMAP в скрипте задаёт пары «orig variant → итоговый id».
+//   • qid = (id - 1)*25 + type, уникален и стабилен (см. историю VARIANT_REMAP).
 //   • Задания 20–25 (часть 2) → type:'written', maxPoints:2 (self-check на экране результатов).
-//   • Картинки лежат в /img/mathematics/.
+//   • Картинки лежат в /img/mathematics/ (имена с префиксом v\${origVariant}_).
 window.MATHEMATICS_QUESTIONS = [
 ${bank.map(serializeQuestion).join(',\n')},
 ];
 `;
 
+// Дописываем заглушки до round-числа (как у biology — до id 29), чтобы карта
+// уровней не «прыгала» при добавлении новых ready-вариантов.
+const COMING_UP_TO = 29;
+const lastReadyId = variants.length ? variants[variants.length - 1].id : 0;
+const comingTail = [];
+for (let i = lastReadyId + 1; i <= COMING_UP_TO; i++) {
+	comingTail.push(`\t{ id: ${i}, title: "Вариант ${i}", qids: [], status: "coming" }`);
+}
+
 const variantsFile = `// mathematics-variants.js — варианты ОГЭ по математике (см. mathematics-bank.js).
-// Сгенерировано scripts/convert-math-bank.mjs из 5 готовых вариантов сборника (бывшие 6–10).
+// Сгенерировано scripts/convert-math-bank.mjs. Карта уровней full-test-mathematics
+// ожидает >= 7 вариантов в массиве (6 узлов + 1 финальный босс), поэтому к ready
+// дописываются заглушки coming до id ${COMING_UP_TO}.
 window.MATHEMATICS_VARIANTS = [
 ${variants
 	.map(
 		(v) =>
 			`\t{ id: ${v.id}, title: ${JSON.stringify(v.title)}, qids: [${v.qids.join(', ')}], status: ${JSON.stringify(v.status)} }`,
 	)
+	.concat(comingTail)
 	.join(',\n')},
 ];
 `;
