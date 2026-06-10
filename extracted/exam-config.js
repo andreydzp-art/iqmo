@@ -4,7 +4,9 @@
 		chemistry: { fullTestMinutes: 180, trialMinutes: 25 },
 		biology: { fullTestMinutes: 180, trialMinutes: 25 },
 		physics: { fullTestMinutes: 180, trialMinutes: 25 },
-		math: { fullTestMinutes: 180, trialMinutes: 25 },
+		// ОГЭ по математике — 3 часа 55 минут (235 мин). См. демоверсию ФИПИ.
+		mathematics: { fullTestMinutes: 235, trialMinutes: 25 },
+		math: { fullTestMinutes: 235, trialMinutes: 25 },
 		russian: { fullTestMinutes: 180, trialMinutes: 25 }
 	};
 
