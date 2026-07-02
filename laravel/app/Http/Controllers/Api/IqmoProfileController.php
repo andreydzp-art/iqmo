@@ -12,6 +12,15 @@ final class IqmoProfileController extends Controller
     /** @var list<string> */
     private const SYNC_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
 
+    /** Максимум ключей в profile_state — защита от разрастания стейта. */
+    private const MAX_STATE_KEYS = 5000;
+
+    /** Максимальный размер сериализованного keys_json (512 KB). */
+    private const MAX_STATE_BYTES = 512 * 1024;
+
+    /** Сколько последних версий храним в profile_history на юзера. */
+    private const HISTORY_KEEP = 80;
+
     public function stateGet(Request $request)
     {
         $userId = (int) $request->attributes->get('iqmo_user_id');
@@ -22,19 +31,10 @@ final class IqmoProfileController extends Controller
             return response()->json(['error' => ApiErrorCode::NO_STATE], 500);
         }
 
-        $keys = $row->keys_json;
-        if (is_string($keys)) {
-            $decoded = json_decode($keys, true);
-            $keys = is_array($decoded) ? $decoded : [];
-        }
-        if (!is_array($keys)) {
-            $keys = [];
-        }
-
         return response()->json([
             'revision' => (int) ($row->revision ?? 0),
             'updatedAt' => (int) ($row->updated_at ?? 0),
-            'keys' => $keys,
+            'keys' => $this->decodeKeys($row->keys_json),
         ]);
     }
 
@@ -73,49 +73,62 @@ final class IqmoProfileController extends Controller
 
         $serverRev = (int) ($row->revision ?? 0);
         if ($baseRevision !== null && $baseRevision !== $serverRev) {
-            $keys = $row->keys_json;
-            if (is_string($keys)) {
-                $decoded = json_decode($keys, true);
-                $keys = is_array($decoded) ? $decoded : [];
-            }
-            if (!is_array($keys)) {
-                $keys = [];
-            }
-
             return response()->json([
                 'error' => ApiErrorCode::REVISION_MISMATCH,
                 'server' => [
                     'revision' => $serverRev,
-                    'keys' => $keys,
+                    'keys' => $this->decodeKeys($row->keys_json),
                 ],
             ], 409);
         }
 
-        $existing = $row->keys_json;
-        if (is_string($existing)) {
-            $decoded = json_decode($existing, true);
-            $existing = is_array($decoded) ? $decoded : [];
-        }
-        if (!is_array($existing)) {
-            $existing = [];
-        }
-
+        $existing = $this->decodeKeys($row->keys_json);
         $sanitized = self::mergeSyncKeys($existing, $incomingKeys);
 
         $keysJson = json_encode($sanitized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        // Верхний предел размера стейта. Без него забагованный/зловредный клиент
+        // может запушить многомегабайтный localStorage-снимок, и каждый push
+        // копирует его в profile_history (до HISTORY_KEEP строк) — десятки МБ
+        // на юзера. Легитимный прогресс — единицы КБ.
+        if (count($sanitized) > self::MAX_STATE_KEYS || strlen($keysJson) > self::MAX_STATE_BYTES) {
+            return response()->json(['error' => ApiErrorCode::PAYLOAD_TOO_LARGE], 413);
+        }
+
         $newRev = $serverRev + 1;
         $now = (int) (microtime(true) * 1000);
 
-        $prevJson = is_string($row->keys_json) ? $row->keys_json : json_encode($row->keys_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $this->snapshotHistory($userId, $prevJson, (int) $row->revision);
-
-        DB::connection('iqmo')->table('profile_state')
+        // Оптимистичный лок: пишем только если ревизия в БД всё ещё та, что мы
+        // прочитали. Два конкурентных PUT одного юзера (interval-push +
+        // beforeunload-push из iqmo-sync.js летят одновременно) раньше оба
+        // читали revision=N, оба проходили проверку baseRevision и оба писали
+        // N+1 — обновление первого терялось. Теперь проигравший гонку получает
+        // affected=0 и 409: клиент перечитывает состояние и ретраит.
+        $affected = DB::connection('iqmo')->table('profile_state')
             ->where('user_id', $userId)
+            ->where('revision', $serverRev)
             ->update([
                 'keys_json' => $keysJson,
                 'revision' => $newRev,
                 'updated_at' => $now,
             ]);
+
+        if ($affected === 0) {
+            $fresh = DB::connection('iqmo')->table('profile_state')->where('user_id', $userId)->first();
+
+            return response()->json([
+                'error' => ApiErrorCode::REVISION_MISMATCH,
+                'server' => [
+                    'revision' => (int) ($fresh->revision ?? $serverRev),
+                    'keys' => $this->decodeKeys($fresh->keys_json ?? null),
+                ],
+            ], 409);
+        }
+
+        // История — best-effort и только после успешной записи (иначе
+        // проигравший гонку писатель плодил бы orphan-снимки предыдущего стейта).
+        $prevJson = is_string($row->keys_json) ? $row->keys_json : json_encode($row->keys_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->snapshotHistory($userId, $prevJson, $serverRev);
 
         return response()->json(['ok' => true, 'revision' => $newRev, 'updatedAt' => $now]);
     }
@@ -162,16 +175,7 @@ final class IqmoProfileController extends Controller
             [$histJson, $newRev, $now, $userId]
         );
 
-        $keys = $hist->keys_json;
-        if (is_string($keys)) {
-            $decoded = json_decode($keys, true);
-            $keys = is_array($decoded) ? $decoded : [];
-        }
-        if (!is_array($keys)) {
-            $keys = [];
-        }
-
-        return response()->json(['ok' => true, 'revision' => $newRev, 'keys' => $keys]);
+        return response()->json(['ok' => true, 'revision' => $newRev, 'keys' => $this->decodeKeys($hist->keys_json)]);
     }
 
     private function ensureProfileRow(int $userId): void
@@ -198,13 +202,39 @@ final class IqmoProfileController extends Controller
 
         $cntRow = DB::connection('iqmo')->selectOne('SELECT COUNT(*) AS c FROM profile_history WHERE user_id = ?', [$userId]);
         $cnt = (int) (($cntRow->c ?? 0));
-        if ($cnt > 80) {
-            $toDelete = $cnt - 80;
-            DB::connection('iqmo')->delete(
-                'DELETE FROM profile_history WHERE user_id = ? ORDER BY id ASC LIMIT ?',
-                [$userId, $toDelete]
-            );
+        if ($cnt > self::HISTORY_KEEP) {
+            // Оставляем HISTORY_KEEP самых свежих версий. `DELETE ... ORDER BY
+            // ... LIMIT` — MySQL-only синтаксис (на sqlite в тестах падает),
+            // поэтому удаляем через «id не входит в N новейших» — портируемо
+            // для обоих драйверов.
+            $keepIds = DB::connection('iqmo')->table('profile_history')
+                ->where('user_id', $userId)
+                ->orderByDesc('id')
+                ->limit(self::HISTORY_KEEP)
+                ->pluck('id')
+                ->all();
+            DB::connection('iqmo')->table('profile_history')
+                ->where('user_id', $userId)
+                ->whereNotIn('id', $keepIds)
+                ->delete();
         }
+    }
+
+    /**
+     * Декодирует keys_json (строка JSON от sqlite/старого драйвера или уже
+     * распакованный массив от mysql2/json-каста) в ассоциативный массив.
+     *
+     * @return array<string, mixed>
+     */
+    private function decodeKeys(mixed $raw): array
+    {
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return is_array($raw) ? $raw : [];
     }
 
     /**
