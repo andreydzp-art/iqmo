@@ -924,6 +924,9 @@ h1,h2,h3,p{margin:0}
 </head>
 <body>
 
+<!-- Skip-link для клавиатурной навигации: невидим до фокуса (Tab). -->
+<a href="#content" class="skip-link" style="position:absolute;left:-9999px;top:0;z-index:1000;background:var(--dark);color:#fff;padding:10px 16px;border-radius:0 0 10px 0;font-weight:700;" onfocus="this.style.left='0'" onblur="this.style.left='-9999px'">Перейти к содержимому</a>
+
 <!-- ========== NAV ========== -->
 <header class="nav">
   <div class="wrap nav__inner">
@@ -950,6 +953,7 @@ h1,h2,h3,p{margin:0}
   </div>
 </header>
 
+<main id="content">
 <!-- ========== HERO ========== -->
 <section class="hero">
   <div class="hero__deco"></div>
@@ -1269,6 +1273,7 @@ h1,h2,h3,p{margin:0}
     <div class="final__note">★★★★★ 4,8 / 5 — на основе 312 отзывов учеников</div>
   </div>
 </section>
+</main>
 
 <!-- ========== FOOTER ========== -->
 <footer class="foot">

@@ -26,3 +26,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# FrankenPHP/Caddy локальный кэш сертификатов (php artisan serve)
+/public/caddy

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Статическая карта сайта для поисковиков (Яндекс/Google).
+  Обслуживается nginx-ом напрямую из laravel/public/sitemap.xml.
+  При добавлении предмета/раздела — дополнить список ниже (симметрично
+  $SUBJECTS / $FULL_TESTS в routes/web.php). Личные и служебные страницы
+  (login, profile, admin) сюда НЕ входят намеренно.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.iqmoschool.ru/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+
+  <url><loc>https://www.iqmoschool.ru/subject-chemistry/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.iqmoschool.ru/subject-biology/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.iqmoschool.ru/subject-mathematics/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+
+  <url><loc>https://www.iqmoschool.ru/full-test-chemistry/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.iqmoschool.ru/full-test-biology/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.iqmoschool.ru/full-test-mathematics/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <url><loc>https://www.iqmoschool.ru/topic-atom-structure.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-periodic-table.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-chemical-bond.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-chemical-reactions.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-inorganic-classes.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-metals-compounds.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-nonmetals-compounds.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-organic-substances.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-solutions-dissociation.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.iqmoschool.ru/topic-life-ecology.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>
