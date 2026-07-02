@@ -94,16 +94,24 @@ final class AdminAnalyticsController extends Controller
             ]);
             report($e);
 
-            return response()->json([
-                'meta' => [
-                    'source' => 'error',
-                    'days' => $days,
-                    'error' => ApiErrorCode::BUILD_FAILED,
-                    'errorMessage' => $e->getMessage(),
-                    'errorClass' => get_class($e),
-                    'errorAt' => basename($e->getFile()).':'.$e->getLine(),
-                ],
-            ], 500)->withHeaders([
+            $meta = [
+                'source' => 'error',
+                'days' => $days,
+                'error' => ApiErrorCode::BUILD_FAILED,
+            ];
+            // Детали исключения (message/class/место) отдаём в ответ ТОЛЬКО в
+            // debug-режиме. В проде (APP_DEBUG=false) не раскрываем внутренности
+            // даже под admin-gate: при компрометации admin-cookie это лишняя
+            // поверхность (стек, пути, имена классов). Полная диагностика всегда
+            // уходит в Log::error + report() выше — админ видит generic
+            // build_failed, разработчик берёт детали из логов/локального debug.
+            if (config('app.debug')) {
+                $meta['errorMessage'] = $e->getMessage();
+                $meta['errorClass'] = get_class($e);
+                $meta['errorAt'] = basename($e->getFile()).':'.$e->getLine();
+            }
+
+            return response()->json(['meta' => $meta], 500)->withHeaders([
                 'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
             ]);
         }
