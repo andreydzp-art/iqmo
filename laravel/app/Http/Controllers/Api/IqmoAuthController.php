@@ -18,11 +18,24 @@ final class IqmoAuthController extends Controller
         $email = strtolower(trim((string) $request->input('email', '')));
         $password = (string) $request->input('password', '');
 
-        if (!preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]+$/', $email)) {
+        // Длину email проверяем наравне с форматом: без cap'а строка на
+        // 10 000 символов проходит regex, а INSERT затем падает на
+        // `data too long` (SQLSTATE 22001) — это НЕ 23000, поэтому код ниже
+        // не распознаёт её как duplicate и отдаёт 500 вместо 400. 254 —
+        // RFC-максимум для адреса; колонка users.email (320) с запасом.
+        if (!preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]+$/', $email) || strlen($email) > 254) {
             return response()->json(['error' => 'invalid_email'], 400);
         }
         if (strlen($password) < 8) {
             return response()->json(['error' => 'password_short'], 400);
+        }
+        // bcrypt игнорирует байты после 72-го: пароль длиннее молча
+        // обрезается, и его «хвост» ни на что не влияет (в т.ч. при логине).
+        // Явно отклоняем, чтобы пользователь не задал пароль с бессмысленным
+        // суффиксом. Login намеренно НЕ капаем: существующие аккаунты с таким
+        // паролем должны продолжать входить (сравнение — та же обрезка).
+        if (strlen($password) > 72) {
+            return response()->json(['error' => 'password_long'], 400);
         }
 
         $hash = Hash::make($password);

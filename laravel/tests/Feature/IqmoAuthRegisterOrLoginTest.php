@@ -207,4 +207,37 @@ final class IqmoAuthRegisterOrLoginTest extends TestCase
         $fresh->assertStatus(400);
         $fresh->assertJson(['error' => 'password_short']);
     }
+
+    public function test_register_with_overlong_email_returns_400_not_500(): void
+    {
+        // Раньше email длиннее колонки (320) проходил regex, а INSERT падал
+        // с SQLSTATE 22001 → 500. Теперь отклоняется валидацией как 400.
+        $longLocal = str_repeat('a', 300);
+        $response = $this->postJson('/api/auth/register', [
+            'email' => $longLocal.'@iqmo.test',
+            'password' => 'long-enough-password-1',
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertJson(['error' => 'invalid_email']);
+
+        $count = DB::connection('iqmo')->table('users')->count();
+        $this->assertSame(0, $count, 'Переросший email не должен доходить до INSERT.');
+    }
+
+    public function test_register_with_password_over_72_bytes_returns_400(): void
+    {
+        // bcrypt обрезает пароль на 72 байте; принимать более длинный — значит
+        // молча игнорировать хвост. Отклоняем явно.
+        $response = $this->postJson('/api/auth/register', [
+            'email' => 'longpass@iqmo.test',
+            'password' => str_repeat('x', 73),
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertJson(['error' => 'password_long']);
+
+        $count = DB::connection('iqmo')->table('users')->count();
+        $this->assertSame(0, $count, 'Переросший пароль не должен создавать аккаунт.');
+    }
 }
