@@ -83,7 +83,7 @@ final class AnalyticsIngestTest extends TestCase
         return ['iqmo_session' => $token];
     }
 
-    private function postEvents(array $events, array $cookies = null): \Illuminate\Testing\TestResponse
+    private function postEvents(array $events, ?array $cookies = null): \Illuminate\Testing\TestResponse
     {
         $cookies ??= $this->authedCookie();
 
