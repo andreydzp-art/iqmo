@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Services\IqmoJwt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\Concerns\UsesIqmoSqlite;
 use Tests\TestCase;
 
 /**
@@ -21,6 +22,8 @@ use Tests\TestCase;
  */
 final class IqmoProfileStateGuardsTest extends TestCase
 {
+    use UsesIqmoSqlite;
+
     private const JWT_SECRET = 'profile-state-guards-secret';
 
     private const UID = 7;
@@ -32,14 +35,7 @@ final class IqmoProfileStateGuardsTest extends TestCase
         config(['iqmo.jwt_secret' => self::JWT_SECRET]);
         config(['services.iqmo.jwt_secret' => self::JWT_SECRET]);
 
-        config([
-            'database.connections.iqmo' => [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => false,
-            ],
-        ]);
+        $this->useIqmoSqlite();
 
         Schema::connection('iqmo')->create('users', function ($table): void {
             $table->bigIncrements('id');

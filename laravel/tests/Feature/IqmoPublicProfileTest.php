@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\Concerns\UsesIqmoSqlite;
 use Tests\TestCase;
 
 /**
@@ -13,20 +14,15 @@ use Tests\TestCase;
  */
 final class IqmoPublicProfileTest extends TestCase
 {
+    use UsesIqmoSqlite;
+
     private const USER_ID = 868;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        config([
-            'database.connections.iqmo' => [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => false,
-            ],
-        ]);
+        $this->useIqmoSqlite();
 
         Schema::connection('iqmo')->create('users', function ($table): void {
             $table->bigIncrements('id');

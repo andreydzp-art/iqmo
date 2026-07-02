@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Services\IqmoJwt;
+use Tests\Concerns\UsesIqmoSqlite;
 use Tests\TestCase;
 
 /**
@@ -30,6 +31,8 @@ use Tests\TestCase;
  */
 final class IqmoProfileStateMismatchTest extends TestCase
 {
+    use UsesIqmoSqlite;
+
     private const JWT_SECRET = 'profile-state-mismatch-secret';
 
     private const COOKIE_OWNER_ID = 42;
@@ -47,14 +50,7 @@ final class IqmoProfileStateMismatchTest extends TestCase
         // упрётся в «no such table profile_state» и отдаст 500 — нам это
         // подходит, мы проверяем только что НЕ возвращается 409.
         // Mismatch-case (case 1) до этой строки не доходит — early return.
-        config([
-            'database.connections.iqmo' => [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => false,
-            ],
-        ]);
+        $this->useIqmoSqlite();
     }
 
     private function cookieFor(int $uid): array

@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Services\IqmoJwt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\Concerns\UsesIqmoSqlite;
 use Tests\TestCase;
 
 /**
@@ -29,6 +30,8 @@ use Tests\TestCase;
  */
 final class AnalyticsIngestTest extends TestCase
 {
+    use UsesIqmoSqlite;
+
     private const JWT_SECRET = 'analytics-ingest-test-secret';
 
     private const USER_ID = 42;
@@ -44,14 +47,7 @@ final class AnalyticsIngestTest extends TestCase
         // живой MySQL. Контроллер ходит через DB::connection('iqmo'), нам этого
         // достаточно — структура колонок повторяется ровно в том виде, в каком
         // её ждёт `analytics_events`.
-        config([
-            'database.connections.iqmo' => [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => false,
-            ],
-        ]);
+        $this->useIqmoSqlite();
 
         // Нет FK на users — реальный prod-стейт мы тут не воспроизводим (users
         // живут в другом инстансе MySQL, миграция Node-сервера). Цель теста —

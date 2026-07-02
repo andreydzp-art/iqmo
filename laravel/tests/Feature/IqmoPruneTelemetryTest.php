@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\Concerns\UsesIqmoSqlite;
 use Tests\TestCase;
 
 /**
@@ -14,17 +15,14 @@ use Tests\TestCase;
  */
 final class IqmoPruneTelemetryTest extends TestCase
 {
+    use UsesIqmoSqlite;
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->useIqmoSqlite();
         config([
-            'database.connections.iqmo' => [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => false,
-            ],
             'iqmo.retention.quiz_events_days' => 180,
             'iqmo.retention.quiz_sessions_days' => 180,
             'iqmo.retention.live_activity_days' => 30,
