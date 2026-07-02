@@ -123,6 +123,9 @@ class AnalyticsIngestController extends Controller
                 'event' => $name,
                 'payload_json' => json_encode($payload, JSON_UNESCAPED_UNICODE),
                 'received_at' => $now,
+                // dedup_key = purchaseId для покупок (идемпотентность E7), NULL
+                // для остальных событий (NULL-строки не конфликтуют в UNIQUE).
+                'dedup_key' => $name === 'iqmo.purchase' ? ($payload['purchaseId'] ?? null) : null,
             ];
         }
 
@@ -132,9 +135,12 @@ class AnalyticsIngestController extends Controller
 
         // Same connection as IqmoAuthController/IqmoAdminOverviewBuilder so the FK to users
         // resolves and the admin top-questions rollup actually sees the rows.
-        DB::connection('iqmo')->table('analytics_events')->insert($rows);
+        // insertOrIgnore: повтор iqmo.purchase (тот же user_id+purchaseId) молча
+        // отбрасывается на UNIQUE(user_id, dedup_key) — ретрай не задваивает
+        // выручку. Не-покупки (dedup_key IS NULL) не конфликтуют и пишутся все.
+        $saved = DB::connection('iqmo')->table('analytics_events')->insertOrIgnore($rows);
 
-        return response()->json(['ok' => true, 'saved' => count($rows)]);
+        return response()->json(['ok' => true, 'saved' => $saved]);
     }
 
     private function clampStr(mixed $v, int $max): string

@@ -59,6 +59,9 @@ final class AnalyticsIngestTest extends TestCase
             $table->string('event', 64);
             $table->text('payload_json');
             $table->unsignedBigInteger('received_at');
+            // Зеркалит миграцию 2026_07_02 (идемпотентность iqmo.purchase, E7).
+            $table->string('dedup_key', 64)->nullable();
+            $table->unique(['user_id', 'dedup_key'], 'uq_analytics_user_dedup');
         });
     }
 
@@ -331,5 +334,47 @@ final class AnalyticsIngestTest extends TestCase
         $response->assertStatus(413);
         $response->assertJson(['error' => 'payload_too_large']);
         $this->assertSame(0, DB::connection('iqmo')->table('analytics_events')->count());
+    }
+
+    public function test_duplicate_purchase_is_ignored_idempotent(): void
+    {
+        // E7: повтор iqmo.purchase с тем же purchaseId (ретрай после сбоя/500)
+        // не должен задваивать выручку. UNIQUE(user_id, dedup_key) + insertOrIgnore.
+        $purchase = ['event' => 'iqmo.purchase', 'payload' => [
+            'purchaseId' => 'order-777',
+            'revenue' => 1990,
+            'currency' => 'RUB',
+        ]];
+
+        $this->postEvents([$purchase])->assertStatus(200);
+        $this->postEvents([$purchase])->assertStatus(200); // ретрай
+
+        $count = DB::connection('iqmo')->table('analytics_events')
+            ->where('event', 'iqmo.purchase')->count();
+        $this->assertSame(1, $count, 'Повтор покупки с тем же purchaseId должен игнорироваться.');
+    }
+
+    public function test_different_purchase_ids_are_both_saved(): void
+    {
+        $this->postEvents([['event' => 'iqmo.purchase', 'payload' => ['purchaseId' => 'order-1', 'revenue' => 100]]])
+            ->assertStatus(200);
+        $this->postEvents([['event' => 'iqmo.purchase', 'payload' => ['purchaseId' => 'order-2', 'revenue' => 200]]])
+            ->assertStatus(200);
+
+        $count = DB::connection('iqmo')->table('analytics_events')
+            ->where('event', 'iqmo.purchase')->count();
+        $this->assertSame(2, $count, 'Разные purchaseId должны сохраняться оба.');
+    }
+
+    public function test_repeated_non_purchase_events_are_not_deduped(): void
+    {
+        // Не-покупки имеют dedup_key IS NULL и не конфликтуют — пишутся все.
+        $view = ['event' => 'chem.topic_view', 'payload' => ['topicSlug' => 'periodic-table']];
+        $this->postEvents([$view])->assertStatus(200);
+        $this->postEvents([$view])->assertStatus(200);
+
+        $count = DB::connection('iqmo')->table('analytics_events')
+            ->where('event', 'chem.topic_view')->count();
+        $this->assertSame(2, $count, 'Повторные topic_view не должны дедуплицироваться.');
     }
 }
