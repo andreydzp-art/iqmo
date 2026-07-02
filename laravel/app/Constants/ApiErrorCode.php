@@ -58,6 +58,8 @@ final class ApiErrorCode
 
     public const PASSWORD_SHORT = 'password_short';
 
+    public const PASSWORD_LONG = 'password_long';
+
     public const NO_CONTACT = 'no_contact';
 
     public const NO_STATE = 'no_state';

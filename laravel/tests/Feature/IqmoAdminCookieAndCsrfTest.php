@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Services\IqmoJwt;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cookie;
+use Tests\Concerns\UsesIqmoSqlite;
 use Tests\TestCase;
 
 /**
@@ -15,6 +16,8 @@ use Tests\TestCase;
  */
 final class IqmoAdminCookieAndCsrfTest extends TestCase
 {
+    use UsesIqmoSqlite;
+
     private const JWT_SECRET = 'admin-cookie-test-secret';
 
     private const ADMIN_EMAIL = 'admin@iqmo.test';
@@ -30,14 +33,7 @@ final class IqmoAdminCookieAndCsrfTest extends TestCase
         config(['iqmo.admin_emails' => [self::ADMIN_EMAIL]]);
         config(['iqmo.cookie_secure' => false]);
 
-        config([
-            'database.connections.iqmo' => [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => false,
-            ],
-        ]);
+        $this->useIqmoSqlite();
 
         Schema::connection('iqmo')->create('users', function ($table): void {
             $table->bigIncrements('id');

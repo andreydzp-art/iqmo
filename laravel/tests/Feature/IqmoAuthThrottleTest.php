@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\RateLimiter;
+use Tests\Concerns\UsesIqmoSqlite;
 use Tests\TestCase;
 
 /**
@@ -26,6 +27,8 @@ use Tests\TestCase;
  */
 final class IqmoAuthThrottleTest extends TestCase
 {
+    use UsesIqmoSqlite;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,14 +40,7 @@ final class IqmoAuthThrottleTest extends TestCase
         // падает на «no such table: users», контроллер ловит throwable и
         // отдаёт 500 — нам этого достаточно, мы проверяем только то, что
         // throttle middleware дал не-429 на первых N и 429 на (N+1)-м.
-        config([
-            'database.connections.iqmo' => [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => false,
-            ],
-        ]);
+        $this->useIqmoSqlite();
 
         // Чистим лимитеры между тестами: cache=array уже изолирует от
         // других тестов, но в рамках одного метода предыдущие keys
