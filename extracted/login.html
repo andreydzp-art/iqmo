@@ -182,8 +182,8 @@
 						</div>
 						<p class="form__err" id="formLoginErr" style="display: none; margin: 0; padding: 10px 12px; border-radius: 10px; background: #fff4f4; color: #9b2c2c; font-size: 14px"></p>
 						<div class="form__body">
-							<input type="email" class="form-input input-email" name="email" placeholder="Введите email адрес" autocomplete="username" inputmode="email" required />
-							<input type="password" class="form-input input-password" name="password" placeholder="Введите пароль" autocomplete="current-password" required />
+							<input type="email" class="form-input input-email" name="email" placeholder="Введите email адрес" autocomplete="username" inputmode="email" required aria-label="Введите email адрес" />
+							<input type="password" class="form-input input-password" name="password" placeholder="Введите пароль" autocomplete="current-password" required aria-label="Введите пароль" />
 							<input type="submit" name="login-btn" value="Войти" class="btn form__btn form-login__btn" />
 						</div>
 						<div class="form-login__footer">
@@ -206,9 +206,9 @@
 						</div>
 						<p class="form__err" id="formRegisterErr" style="display: none; margin: 0; padding: 10px 12px; border-radius: 10px; background: #fff4f4; color: #9b2c2c; font-size: 14px"></p>
 						<div class="form__body">
-							<input type="email" class="form-input input-email" name="email" placeholder="Email" autocomplete="email" inputmode="email" required />
-							<input type="password" class="form-input input-password" name="password" placeholder="Пароль (не короче 8 символов)" autocomplete="new-password" required minlength="8" />
-							<input type="password" class="form-input input-password2" name="password2" placeholder="Пароль ещё раз" autocomplete="new-password" required minlength="8" />
+							<input type="email" class="form-input input-email" name="email" placeholder="Email" autocomplete="email" inputmode="email" required aria-label="Email" />
+							<input type="password" class="form-input input-password" name="password" placeholder="Пароль (не короче 8 символов)" autocomplete="new-password" required minlength="8" aria-label="Пароль (не короче 8 символов)" />
+							<input type="password" class="form-input input-password2" name="password2" placeholder="Пароль ещё раз" autocomplete="new-password" required minlength="8" aria-label="Пароль ещё раз" />
 							<input type="submit" value="Создать аккаунт" class="btn form__btn" />
 						</div>
 						<div class="form-login__footer">
@@ -226,7 +226,7 @@
 							<p class="form__descr">Автоматическая отправка письма пока не подключена. Напишите на support@iqmo.ru или в Telegram из подвала сайта.</p>
 						</div>
 						<div class="form__body">
-							<input type="email" class="form-input input-email" placeholder="Введите email адрес" autocomplete="email" inputmode="email" required />
+							<input type="email" class="form-input input-email" placeholder="Введите email адрес" autocomplete="email" inputmode="email" required aria-label="Введите email адрес" />
 							<input type="submit" name="" value="Готово" class="btn form__btn form-password__btn" />
 						</div>
 						<div class="form-login__footer">
