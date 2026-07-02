@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /login.html
+Disallow: /uploads/login.html
+Disallow: /profile
+
+Sitemap: https://www.iqmoschool.ru/sitemap.xml
