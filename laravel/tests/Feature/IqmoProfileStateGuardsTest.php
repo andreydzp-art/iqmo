@@ -48,6 +48,7 @@ final class IqmoProfileStateGuardsTest extends TestCase
             $table->unsignedBigInteger('user_id')->primary();
             $table->text('keys_json');
             $table->unsignedBigInteger('revision')->default(0);
+            $table->unsignedBigInteger('xp')->default(0);
             $table->unsignedBigInteger('updated_at');
         });
         Schema::connection('iqmo')->create('profile_history', function ($table): void {

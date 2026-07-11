@@ -41,21 +41,25 @@ final class IqmoLeaderboardController extends Controller
 
         $meId = $this->resolveCurrentUserId($request);
 
-        $xpPath = '$."' . self::XP_KEY . '"';
         $avatarPath = '$."'.IqmoAvatarResolver::STORAGE_KEY.'"';
 
-        // Top N. JOIN на profile_state может быть NULL (если у пользователя ни одной
-        // синхронизации не было) — тогда COALESCE даёт 0, и такой пользователь окажется
-        // в самом конце.
+        // XP берём из денормализованной индексируемой колонки ps.xp (perf, audit):
+        // раньше здесь был JSON_EXTRACT прямо в ORDER BY и в COUNT(*) ранга —
+        // по такому выражению индекс невозможен, и каждый (публичный) запрос был
+        // полным сканом users ⋈ profile_state. Колонку поддерживает
+        // IqmoProfileController::statePut/restore. avatar_raw остаётся из JSON —
+        // он в SELECT, не в фильтре/сортировке, скан по нему не идёт.
+        // JOIN на profile_state может быть NULL (нет ни одной синхронизации) —
+        // COALESCE даёт 0, и такой пользователь окажется в самом конце.
         $topRows = DB::connection('iqmo')->select(
             "SELECT u.id AS uid, u.email,
-                    COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS UNSIGNED), 0) AS xp,
+                    COALESCE(ps.xp, 0) AS xp,
                     JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS avatar_raw
              FROM users u
              LEFT JOIN profile_state ps ON ps.user_id = u.id
              ORDER BY xp DESC, u.id ASC
              LIMIT " . $limit,
-            [$xpPath, $avatarPath]
+            [$avatarPath]
         );
 
         $items = [];
@@ -79,20 +83,20 @@ final class IqmoLeaderboardController extends Controller
         if ($meId > 0) {
             $meRow = DB::connection('iqmo')->selectOne(
                 "SELECT u.email,
-                        COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS UNSIGNED), 0) AS xp,
+                        COALESCE(ps.xp, 0) AS xp,
                         JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS avatar_raw
                  FROM users u
                  LEFT JOIN profile_state ps ON ps.user_id = u.id
                  WHERE u.id = ?",
-                [$xpPath, $avatarPath, $meId]
+                [$avatarPath, $meId]
             );
             if ($meRow) {
                 $myXp = (int) $meRow->xp;
                 $rankRow = DB::connection('iqmo')->selectOne(
                     "SELECT COUNT(*) AS c FROM users u
                      LEFT JOIN profile_state ps ON ps.user_id = u.id
-                     WHERE COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(ps.keys_json, ?)) AS UNSIGNED), 0) > ?",
-                    [$xpPath, $myXp]
+                     WHERE COALESCE(ps.xp, 0) > ?",
+                    [$myXp]
                 );
                 $me = [
                     'uid' => $meId,

@@ -12,6 +12,13 @@ final class IqmoProfileController extends Controller
     /** @var list<string> */
     private const SYNC_PREFIXES = ['iqmo-chem-', 'iqmo-bio-'];
 
+    /**
+     * Ключ localStorage с накопительным XP (см. extracted/chem-progress.js).
+     * Денормализуется в индексируемую profile_state.xp при каждой записи —
+     * leaderboard читает его вместо полного скана JSON (perf, audit).
+     */
+    private const XP_KEY = 'iqmo-chem-progress-points-v1';
+
     /** Максимум ключей в profile_state — защита от разрастания стейта. */
     private const MAX_STATE_KEYS = 5000;
 
@@ -104,6 +111,9 @@ final class IqmoProfileController extends Controller
         // читали revision=N, оба проходили проверку baseRevision и оба писали
         // N+1 — обновление первого терялось. Теперь проигравший гонку получает
         // affected=0 и 409: клиент перечитывает состояние и ретраит.
+        // Денормализованный XP в индексируемую колонку (perf лидерборда).
+        $xp = max(0, (int) ($sanitized[self::XP_KEY] ?? 0));
+
         $affected = DB::connection('iqmo')->table('profile_state')
             ->where('user_id', $userId)
             ->where('revision', $serverRev)
@@ -111,6 +121,7 @@ final class IqmoProfileController extends Controller
                 'keys_json' => $keysJson,
                 'revision' => $newRev,
                 'updated_at' => $now,
+                'xp' => $xp,
             ]);
 
         if ($affected === 0) {
@@ -175,6 +186,10 @@ final class IqmoProfileController extends Controller
         // гонку получает affected=0 → 409, и клиент перечитывает состояние.
         // (Заодно ушли от MySQL-only CAST(? AS JSON) — query-builder портируем
         // на sqlite в Feature-тестах, как и statePut.)
+        // Денормализованный XP — из восстанавливаемого снапшота (perf лидерборда).
+        $histKeys = $this->decodeKeys($hist->keys_json);
+        $xp = max(0, (int) ($histKeys[self::XP_KEY] ?? 0));
+
         $affected = DB::connection('iqmo')->table('profile_state')
             ->where('user_id', $userId)
             ->where('revision', $curRev)
@@ -182,6 +197,7 @@ final class IqmoProfileController extends Controller
                 'keys_json' => $histJson,
                 'revision' => $newRev,
                 'updated_at' => $now,
+                'xp' => $xp,
             ]);
 
         if ($affected === 0) {

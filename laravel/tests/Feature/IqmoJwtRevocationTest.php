@@ -58,6 +58,7 @@ final class IqmoJwtRevocationTest extends TestCase
             $table->unsignedBigInteger('user_id')->primary();
             $table->text('keys_json');
             $table->unsignedInteger('revision')->default(0);
+            $table->unsignedBigInteger('xp')->default(0);
             $table->unsignedBigInteger('updated_at');
         });
         Schema::connection('iqmo')->create('profile_history', function ($table): void {
