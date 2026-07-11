@@ -73,7 +73,12 @@ final class IqmoPublicProfileTest extends TestCase
         $response->assertJsonPath('isPublic', true);
         $response->assertJsonPath('profileId', 'IQ-0868');
         $response->assertJsonPath('profileData.profileId', 'IQ-0868');
-        $response->assertJsonPath('profileData.name', 'Anna Test');
+        // Приватность (audit): без заданного пользователем имени публичный
+        // профиль НЕ должен раскрывать имя, восстановленное из e-mail — иначе
+        // перебор IQ-id выдаёт ПДн ученика. Показываем нейтральную подпись,
+        // а имя из локали e-mail ('Anna Test') не должно утекать.
+        $response->assertJsonPath('profileData.name', 'Ученик IQMO');
+        $this->assertNotSame('Anna Test', $response->json('profileData.name'));
         $response->assertJsonPath('profileData.email', null);
         $response->assertJsonPath('profileData.isAuthed', false);
         $response->assertJsonMissing(['email' => 'anna.test@iqmo.ru']);

@@ -44,7 +44,7 @@ header('Content-Type: application/json');
 
 if (! $loopback && ! $secretOk) {
     http_response_code(403);
-    echo json_encode(['ok' => false, 'reason' => 'forbidden', 'remote' => $remote]);
+    echo json_encode(['ok' => false, 'reason' => 'forbidden']);
     exit;
 }
 
@@ -56,7 +56,6 @@ if (! function_exists('opcache_reset')) {
 $ok = opcache_reset();
 echo json_encode([
     'ok' => (bool) $ok,
-    'remote' => $remote,
     'usedSecret' => $secretOk,
     'cachedAt' => time(),
 ]);

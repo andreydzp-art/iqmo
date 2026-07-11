@@ -284,7 +284,7 @@
 		b[id] = Date.now();
 		lsSet(KEY_BADGES, b);
 		try {
-			if (global.IqmoLiveActivity && IqmoLiveActivity.emit) {
+			if (window.IqmoLiveActivity && IqmoLiveActivity.emit) {
 				IqmoLiveActivity.emit({
 					type: 'badge_earned',
 					badgeId: id,
@@ -665,10 +665,10 @@
 			}
 			lsSet(KEY_STREAK, streak);
 			try {
-				if (global.IqmoLiveActivity && IqmoLiveActivity.emit && (streak.days || 0) >= 2) {
+				if (window.IqmoLiveActivity && IqmoLiveActivity.emit && (streak.days || 0) >= 2) {
 					IqmoLiveActivity.emit({ type: 'streak_saved', streakDays: streak.days });
 				}
-				if (global.IqmoLiveActivity && IqmoLiveActivity.emit) {
+				if (window.IqmoLiveActivity && IqmoLiveActivity.emit) {
 					IqmoLiveActivity.emit({ type: 'daily_goal_completed' });
 				}
 			} catch (eSt) {}

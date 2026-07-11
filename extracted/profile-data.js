@@ -5,6 +5,15 @@
 (function (global) {
 	'use strict';
 
+	// Экранирование недоверенных строк, попадающих в HTML события профиля
+	// (текст рендерится через innerHTML в profile-render.js). Напр. variantTitle
+	// приходит из синкаемого localStorage и может содержать разметку.
+	function escHtml(s) {
+		return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+			return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+		});
+	}
+
 	var CHEM_TOPICS = [
 		{ key: 'iqmo-chem-topic01-subtopics', n: 6, label: '01 · Периодическая система' },
 		{ key: 'iqmo-chem-topic02-subtopics', n: 6, label: '02 · Строение атома' },
@@ -233,9 +242,9 @@
 				var pct = la.percent != null ? la.percent : '';
 				events.push({
 					type: 'test',
-					text: 'Завершён <b>' + modeRu(la.mode) + '</b>' +
-						(la.variantTitle ? ' · ' + la.variantTitle : '') +
-						' по ' + subj,
+					text: 'Завершён <b>' + escHtml(modeRu(la.mode)) + '</b>' +
+						(la.variantTitle ? ' · ' + escHtml(la.variantTitle) : '') +
+						' по ' + escHtml(subj),
 					pills: pct !== '' ? [{ kind: 'pct', value: pct + '%' }] : [],
 					time: ChemProgress.formatRelativeTime(la.finishedAt)
 				});

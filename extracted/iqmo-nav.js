@@ -244,7 +244,7 @@
 		}
 
 		try {
-			if (global.IqmoAvatar && IqmoAvatar.paintNavAndCards) IqmoAvatar.paintNavAndCards();
+			if (window.IqmoAvatar && IqmoAvatar.paintNavAndCards) IqmoAvatar.paintNavAndCards();
 		} catch (eAv) {}
 
 		return loggedIn;

@@ -139,7 +139,9 @@ final class IqmoProfileBioSyncTest extends TestCase
     {
         $this->getJson('/api/profile/IQ-0007')
             ->assertOk()
-            ->assertJsonPath('profileData.name', 'Bio')
+            // Приватность (audit): без заданного имени публичный профиль отдаёт
+            // нейтральную подпись, а не имя, восстановленное из e-mail.
+            ->assertJsonPath('profileData.name', 'Ученик IQMO')
             ->assertJsonMissing(['publicNotice' => 'Прогресс по биологии может храниться только на устройстве ученика и не отображаться здесь.']);
     }
 }
