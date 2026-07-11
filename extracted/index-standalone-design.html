@@ -20,6 +20,29 @@ ym(108770166,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',
 <title>IQMO — подготовка к ОГЭ онлайн</title>
 <meta name="description" content="IQMO: темы по ФИПИ, разминка по слотам, пробный и полный вариант. Химия ОГЭ в тренажёре." />
 <link rel="canonical" href="https://www.iqmoschool.ru/" />
+<!-- Структурированные данные (audit, SEO): EdTech-организация + курс.
+     Это реальный лендинг, отдаваемый на `/` (см. web.php Route::get('/')). -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      "@id": "https://www.iqmoschool.ru/#org",
+      "name": "IQMO",
+      "url": "https://www.iqmoschool.ru/",
+      "description": "Онлайн-тренажёр подготовки к ОГЭ: задания по ФИПИ, серии, уровни и прогресс."
+    },
+    {
+      "@type": "Course",
+      "name": "Подготовка к ОГЭ по химии",
+      "description": "Темы по кодификатору ФИПИ, разминка по слотам, пробный и полный вариант ОГЭ по химии в игровом тренажёре.",
+      "inLanguage": "ru",
+      "provider": { "@id": "https://www.iqmoschool.ru/#org" }
+    }
+  ]
+}
+</script>
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="IQMO" />
 <meta property="og:locale" content="ru_RU" />
