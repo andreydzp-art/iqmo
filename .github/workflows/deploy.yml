@@ -14,6 +14,12 @@ concurrency:
   group: deploy-main
   cancel-in-progress: true
 
+# Least privilege (audit): деплой-джобе нужен только checkout (read) + SSH
+# наружу; запись в репозиторий через GITHUB_TOKEN не используется. Явно
+# сужаем токен, чтобы скомпрометированный сторонний action не смог пушить.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: PHPUnit (Unit) gate

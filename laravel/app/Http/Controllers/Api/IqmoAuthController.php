@@ -13,6 +13,14 @@ use Illuminate\Support\Str;
 
 final class IqmoAuthController extends Controller
 {
+    /**
+     * Фиктивный валидный bcrypt-хэш (cost 12) для timing-safe логина: когда
+     * e-mail не найден, мы всё равно выполняем Hash::check против него, чтобы
+     * время ответа не отличалось от «пользователь есть, пароль неверный».
+     * Иначе латентность выдаёт, зарегистрирован ли e-mail (user-enumeration).
+     */
+    private const DUMMY_PASSWORD_HASH = '$2y$12$TAH7cFjdN.2SPKmm/GbV4.LSfEPTVgevF3lms5F8ZdrOdGyXngECi';
+
     public function register(Request $request)
     {
         $email = strtolower(trim((string) $request->input('email', '')));
@@ -117,7 +125,11 @@ final class IqmoAuthController extends Controller
         $password = (string) $request->input('password', '');
 
         $row = DB::connection('iqmo')->table('users')->where('email', $email)->first();
-        if (!$row || !Hash::check($password, (string) $row->password_hash)) {
+        // Timing-safe (audit): даже без найденного пользователя выполняем
+        // bcrypt-сравнение с фиктивным хэшем — постоянное время ответа не даёт
+        // отличить «e-mail не зарегистрирован» от «пароль неверный».
+        $passwordOk = Hash::check($password, (string) ($row->password_hash ?? self::DUMMY_PASSWORD_HASH));
+        if (!$row || !$passwordOk) {
             return response()->json(['error' => 'invalid_credentials'], 401);
         }
 

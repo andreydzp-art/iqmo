@@ -176,7 +176,7 @@
 			tickerEl.innerHTML =
 				'<div class="live-act-ticker__line">' +
 				'<span class="live-act-ticker__ico">' +
-				(ev.icon || '✨') +
+				esc(ev.icon || '✨') +
 				'</span><span><b>' +
 				esc(ev.text) +
 				'</b>' +
@@ -255,7 +255,7 @@
 					return (
 						'<li class="live-act-card__item">' +
 						'<span class="live-act-card__item-ico">' +
-						(ev.icon || '✨') +
+						esc(ev.icon || '✨') +
 						'</span><span>' +
 						esc(ev.text) +
 						'<span class="live-act-card__item-meta">' +

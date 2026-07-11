@@ -32,7 +32,10 @@ Route::prefix('api')->group(function (): void {
         ->middleware('throttle:60,1');
 
     // Публичный профиль по Profile ID (IQ-0868). Без auth; без e-mail.
+    // throttle (audit): роут перечислим по последовательному IQ-id — лимит
+    // 30/мин на IP тормозит массовый перебор/скрейпинг профилей учеников.
     Route::get('/profile/{profileId}', [IqmoPublicProfileController::class, 'show'])
+        ->middleware('throttle:30,1')
         ->where('profileId', 'IQ-[0-9]+');
 
     Route::middleware(['iqmo.jwt'])->group(function (): void {

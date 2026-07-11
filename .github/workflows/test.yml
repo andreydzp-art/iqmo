@@ -27,6 +27,10 @@ concurrency:
   group: tests-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege (audit): тестам нужен только read-доступ к репозиторию.
+permissions:
+  contents: read
+
 jobs:
   phpunit-unit:
     name: PHPUnit (Unit)

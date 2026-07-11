@@ -245,7 +245,29 @@
 		return JSON.stringify(body);
 	}
 
-	async function pushState(force) {
+	// Сериализация push'ей (audit): 90s-interval, 3.5s-debounce (markDirty),
+	// явный IqmoSync.pushState() раньше могли лететь одновременно, каждый со
+	// своим baseRevision → 409-гонки и потеря обновлений. Мьютекс гарантирует
+	// один PUT за раз; если во время него пришёл новый триггер — до-push
+	// после завершения текущего (с уже обновлённым lastKnownRevision).
+	let pushInFlight = null;
+	let pushAgain = false;
+	function pushState(force) {
+		if (pushInFlight) {
+			pushAgain = true;
+			return pushInFlight;
+		}
+		pushInFlight = _pushStateImpl(force).finally(function () {
+			pushInFlight = null;
+			if (pushAgain) {
+				pushAgain = false;
+				pushState(false);
+			}
+		});
+		return pushInFlight;
+	}
+
+	async function _pushStateImpl(force) {
 		if (!authed) return;
 		// Stale-tab guard. Если другая вкладка перелогинилась, наш push
 		// уйдёт с данными старого юзера под cookie нового — защищаемся.

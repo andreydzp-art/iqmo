@@ -163,17 +163,43 @@ final class IqmoProfileController extends Controller
             return response()->json(['error' => ApiErrorCode::NO_STATE], 500);
         }
 
-        $prevJson = is_string($cur->keys_json) ? $cur->keys_json : json_encode($cur->keys_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $this->snapshotHistory($userId, $prevJson, (int) $cur->revision);
-
-        $newRev = ((int) $cur->revision) + 1;
+        $curRev = (int) $cur->revision;
+        $newRev = $curRev + 1;
         $now = (int) (microtime(true) * 1000);
         $histJson = is_string($hist->keys_json) ? $hist->keys_json : json_encode($hist->keys_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        DB::connection('iqmo')->update(
-            'UPDATE profile_state SET keys_json = CAST(? AS JSON), revision = ?, updated_at = ? WHERE user_id = ?',
-            [$histJson, $newRev, $now, $userId]
-        );
+        // Оптимистичный лок (audit): как в statePut. Раньше restore делал
+        // безусловный UPDATE ... WHERE user_id после отдельного чтения $cur —
+        // конкурентный interval-push между чтением и записью молча терялся.
+        // Теперь пишем только если revision в БД всё ещё $curRev; проигравший
+        // гонку получает affected=0 → 409, и клиент перечитывает состояние.
+        // (Заодно ушли от MySQL-only CAST(? AS JSON) — query-builder портируем
+        // на sqlite в Feature-тестах, как и statePut.)
+        $affected = DB::connection('iqmo')->table('profile_state')
+            ->where('user_id', $userId)
+            ->where('revision', $curRev)
+            ->update([
+                'keys_json' => $histJson,
+                'revision' => $newRev,
+                'updated_at' => $now,
+            ]);
+
+        if ($affected === 0) {
+            $fresh = DB::connection('iqmo')->table('profile_state')->where('user_id', $userId)->first();
+
+            return response()->json([
+                'error' => ApiErrorCode::REVISION_MISMATCH,
+                'server' => [
+                    'revision' => (int) ($fresh->revision ?? $curRev),
+                    'keys' => $this->decodeKeys($fresh->keys_json ?? null),
+                ],
+            ], 409);
+        }
+
+        // История — best-effort и только после успешной записи (иначе
+        // проигравший гонку restore плодил бы orphan-снимок).
+        $prevJson = is_string($cur->keys_json) ? $cur->keys_json : json_encode($cur->keys_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->snapshotHistory($userId, $prevJson, $curRev);
 
         return response()->json(['ok' => true, 'revision' => $newRev, 'keys' => $this->decodeKeys($hist->keys_json)]);
     }

@@ -753,14 +753,19 @@
 				elTimer.classList.toggle('is--danger', left < 3*60);
 				if (left === 0) finishTest();
 			}
-			setInterval(tickTimer, 1000);
+			var timerId = setInterval(tickTimer, 1000);
 			tickTimer();
 
 			// ============================================================
 			// FINISH & RESULT
 			// ============================================================
 			function finishTest() {
+				// Re-entry guard (audit): кнопка «Завершить», таймер (left===0) и
+				// переход с последнего вопроса могут вызвать finishTest несколько
+				// раз — без этого XP/аналитика начислялись бы дважды.
+				if (state.finished) return;
 				state.finished = true;
+				if (timerId) { clearInterval(timerId); timerId = null; }
 				saveState();
 				try {
 					if (window.MistakesStore) {
