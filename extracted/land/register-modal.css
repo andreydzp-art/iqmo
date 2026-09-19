@@ -184,16 +184,20 @@
 .field label { font-size: 12.5px; font-weight: 800; color: var(--ink-2); }
 .field input {
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px; /* 16px — заодно убирает автозум iOS при фокусе */
+  font-weight: 700;
   color: var(--ink);
-  padding: 14px 16px;
-  border-radius: 13px;
-  border: 1.5px solid var(--line);
-  background: #fff;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 2px solid #c9befa;
+  background: #fbfaff;
   outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  box-shadow: 0 2px 0 rgba(91, 61, 245, 0.08);
 }
-.field input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(91, 61, 245, 0.15); }
+/* Читаемый placeholder вместо дефолтного бледно-серого */
+.field input::placeholder { color: #6f7380; font-weight: 600; }
+.field input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(91, 61, 245, 0.15); }
 .field.has-error input { border-color: var(--coral); background: #fff7f7; }
 .field.has-error label { color: var(--coral); }
 .field__err { font-size: 12px; font-weight: 700; color: var(--coral); min-height: 14px; }
