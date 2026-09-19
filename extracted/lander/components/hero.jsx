@@ -27,9 +27,6 @@ const Hero = () => {
               <button type="button" className="btn btn-primary" data-open-register data-cta-source="hero">
                 Начать подготовку <IconArrow size={16} stroke={2.2}/>
               </button>
-              <a href="/express-chemistry.html" className="btn btn-secondary">
-                <IconPlay size={14} stroke={2.2}/> Посмотреть платформу
-              </a>
             </div>
 
             <div className="hero-trust">

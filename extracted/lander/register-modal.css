@@ -80,7 +80,9 @@
   letter-spacing: 0.12em;
   margin-bottom: 18px;
 }
-.modal__h { font-size: 30px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; }
+/* color обязателен: без него заголовок наследует тёмный --ink страницы и
+   сливается с тёмной панелью модалки (виден оставался только жёлтый em). */
+.modal__h { font-size: 30px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; color: #fff; }
 .modal__h em { font-style: normal; color: var(--sun); }
 .modal__sub { margin-top: 14px; font-size: 14.5px; color: rgba(255, 255, 255, 0.7); line-height: 1.5; }
 .modal__perks { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }

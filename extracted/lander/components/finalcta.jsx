@@ -57,15 +57,6 @@ const FinalCTA = () => {
           <button type="button" className="btn btn-primary btn-lg" style={{ padding: "20px 32px", fontSize: 17 }} data-open-register data-cta-source="final">
             Начать обучение <IconArrow size={18} stroke={2.2}/>
           </button>
-          <a href="/express-chemistry.html" className="btn btn-lg" style={{
-            background: "rgba(255,255,255,.08)",
-            color: "white",
-            border: "1px solid rgba(255,255,255,.18)",
-            backdropFilter: "blur(20px)",
-            padding: "20px 32px", fontSize: 17,
-          }}>
-            <IconPlay size={16} stroke={2.2}/> Посмотреть платформу
-          </a>
         </div>
 
         <div style={{

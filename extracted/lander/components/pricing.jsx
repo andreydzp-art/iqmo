@@ -148,9 +148,6 @@ const Pricing = () => {
                 <button type="button" className="btn btn-primary btn-lg" style={{ flex: 1, minWidth: 200 }} data-open-register data-cta-source="pricing">
                   Попробовать бесплатно <IconArrow size={18} stroke={2.2}/>
                 </button>
-                <a href="/express-chemistry.html" className="btn btn-secondary btn-lg">
-                  Посмотреть платформу
-                </a>
               </div>
               <div style={{ marginTop: 14, fontSize: 13, color: "var(--ink-500)", display: "flex", alignItems: "center", gap: 8 }}>
                 <IconShield size={14} stroke={2}/> 7 дней пробного периода · отмена в&nbsp;1 клик

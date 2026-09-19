@@ -59,9 +59,6 @@ function Hero({ narrow, headline }) {
             <button type="button" className="btn btn-accent btn-lg" data-open-register data-cta-source="hero">
               Начать подготовку {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
             </button>
-            <a className="btn btn-ghost btn-lg" href="/express-chemistry.html">
-              {React.cloneElement(Ic.play, { width: 14, height: 14 })} Посмотреть демо · 90&nbsp;сек
-            </a>
           </div>
 
           <div className="hero-meta">
@@ -473,9 +470,6 @@ function FinalCTA() {
             <button type="button" className="btn btn-accent btn-lg" data-open-register data-cta-source="final">
               Начать обучение {React.cloneElement(Ic.arrow, { width: 18, height: 18 })}
             </button>
-            <a className="btn btn-ghost btn-lg" href="/">
-              {React.cloneElement(Ic.play, { width: 14, height: 14 })} Посмотреть платформу
-            </a>
           </div>
         </div>
 
