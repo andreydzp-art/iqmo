@@ -136,6 +136,12 @@
     if (cur > 0) setStep(cur - 1);
   });
 
+  // Платёжный шаг после регистрации (оплата 1 ₽ = подтверждение аккаунта).
+  // Пока PAYMENT_URL пуст — клик по кнопке ничего не делает (виджета ещё нет);
+  // включение оплаты = вставить сюда ссылку виджета. Возврат после успешной
+  // оплаты настраивается на стороне виджета: вести в личный кабинет /profile/.
+  const PAYMENT_URL = '';
+
   nextBtn.addEventListener('click', () => {
     if (cur === 0) {
       if (!validateStep1()) return;
@@ -143,14 +149,21 @@
       return;
     }
     showDonePanel();
-    const href = subjectHref();
+    // Авто-перехода на курс больше нет: дальше только через «Оплатить 1 рубль».
     const link = document.getElementById('register-done-link');
-    if (link) link.setAttribute('href', href);
-    setTimeout(() => {
-      try {
-        window.location.href = href;
-      } catch (_) {}
-    }, 1100);
+    if (link) {
+      link.setAttribute('href', '#');
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!PAYMENT_URL) return; // виджет ещё не подключён — ничего не происходит
+        try {
+          const u = new URL(PAYMENT_URL, location.origin);
+          const email = (document.getElementById('reg-email') || {}).value || '';
+          if (email.trim()) u.searchParams.set('email', email.trim());
+          window.location.href = u.toString();
+        } catch (_) {}
+      });
+    }
   });
 
   form.addEventListener('submit', (e) => e.preventDefault());
