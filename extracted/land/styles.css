@@ -125,7 +125,7 @@ html, body { margin: 0; padding: 0; }
   margin: 0 auto;
   padding: 0 20px;
 }
-.iqmo .section { padding: 64px 0; position: relative; }
+.iqmo .section { padding: 52px 0; position: relative; }
 .iqmo .section-soft { background: var(--bg-soft); }
 
 /* ── Type scale ── */
@@ -305,7 +305,7 @@ html, body { margin: 0; padding: 0; }
   align-items: center;
 }
 @media (min-width: 980px) {
-  .iqmo .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 64px; padding: 40px 0 80px; }
+  .iqmo .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 64px; padding: 40px 0 36px; }
 }
 .iqmo .hero-bg {
   position: absolute;
