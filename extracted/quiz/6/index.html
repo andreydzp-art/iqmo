@@ -326,10 +326,10 @@ h1,h2,h3,p{margin:0}
 .gate__sub b{color:var(--ink)}
 .gate__ask{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:10px}
 .gate__field{margin-bottom:8px;text-align:left;display:flex;flex-direction:column;gap:6px}
-.gate__field input{font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);padding:14px 16px;border-radius:13px;border:1.5px solid var(--line);background:#fff;outline:none;transition:border-color .15s ease,box-shadow .15s ease;width:100%}
-.gate__field input:focus{border-color:var(--leaf);box-shadow:0 0 0 4px rgba(58,166,111,.14)}
+.gate__field input{font-family:inherit;font-size:16px;font-weight:700;color:var(--ink);padding:15px 18px;border-radius:14px;border:2px solid #9fd4b6;background:#f7fcf9;outline:none;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;width:100%;box-shadow:0 2px 0 rgba(58,166,111,.10)}
+.gate__field input:focus{border-color:var(--leaf);background:#fff;box-shadow:0 0 0 4px rgba(58,166,111,.16)}
 .gate__field.has-error input{border-color:var(--coral);background:#fff7f7}
-.gate__field input::placeholder{color:#b6b8c0;font-weight:500}
+.gate__field input::placeholder{color:#6f7380;font-weight:600}
 .gate__err{font-size:12px;font-weight:700;color:var(--coral);min-height:14px}
 .gate__btn{width:100%;background:var(--leaf);color:#fff;border:0;padding:15px 22px;border-radius:14px;font-weight:900;font-size:15px;box-shadow:0 4px 0 #2b8557,0 12px 24px -10px rgba(58,166,111,.5);cursor:pointer;transition:transform .12s ease,opacity .15s ease;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .gate__btn:hover:not(:disabled){transform:translateY(-1px)}
@@ -903,15 +903,13 @@ gateForm.addEventListener('submit', e=>{
     return;
   }
 
-  // Fallback (PAYMENT_URL не задан): прежний флоу — короткий «sending» beat,
-  // затем результат.
+  // PAYMENT_URL не задан: по требованию владельца после клика НИЧЕГО не
+  // открывается — ни слайда результата, ни перехода. Лид уже сохранён выше.
+  // Когда появится ссылка платёжного виджета — сработает ветка редиректа выше.
   gateBtn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .8s linear infinite"></span> Отправляем...';
   setTimeout(()=>{
-    closeEmailGate();
-    // Last question (#12) is treated as "answered" with the gate having held it back —
-    // jump directly to result per spec ("результат уже посчитан").
-    state.i = QUIZ.questions.length;
-    renderResult();
+    gateBtn.disabled = false;
+    gateBtn.textContent = 'Оплатить 1 рубль и получить результат';
   }, 700);
 });
 
