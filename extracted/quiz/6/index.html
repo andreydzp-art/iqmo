@@ -371,10 +371,10 @@ h1,h2,h3,p{margin:0}
     <div class="gate__ask">Куда отправить результат?</div>
     <form id="gateForm" novalidate>
       <div class="gate__field" id="gateField">
-        <input id="gateEmail" type="email" placeholder="ты@example.ru" autocomplete="email" inputmode="email" />
+        <input id="gateEmail" type="email" placeholder="Введите ваш email" autocomplete="email" inputmode="email" />
         <span class="gate__err" id="gateErr"></span>
       </div>
-      <button type="submit" class="gate__btn" id="gateBtn">Получить результат</button>
+      <button type="submit" class="gate__btn" id="gateBtn">Оплатить 1 рубль и получить результат</button>
     </form>
     <p class="gate__note">🔒 Без спама. Только твой результат.</p>
   </div>
@@ -816,10 +816,18 @@ const gateErr = document.getElementById('gateErr');
 const gateForm = document.getElementById('gateForm');
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/* Платёжный шаг после email-гейта (оплата 1 ₽ за результат).
+   PAYMENT_URL — ссылка на платёжный виджет/страницу оплаты. Пока пустая —
+   работает прежний флоу (результат сразу после email), чтобы не отправлять
+   живой рекламный трафик в несуществующую оплату. Включение оплаты =
+   вставить сюда ссылку. Возврат с оплаты: виджет должен вести обратно на
+   /quiz/6/?paid=1 — тогда покажем результат из сохранённого состояния. */
+const PAYMENT_URL = '';
+
 function openEmailGate(){
   track('gate_shown');
   gateBtn.disabled = false;
-  gateBtn.textContent = 'Получить результат';
+  gateBtn.textContent = 'Оплатить 1 рубль и получить результат';
   gate.classList.add('is-open');
   document.body.style.overflow = 'hidden';
   gateInput.value = '';
@@ -872,8 +880,31 @@ gateForm.addEventListener('submit', e=>{
     if (window.dataLayer) dataLayer.push({ event: 'quiz_email_captured', quiz: 'biology', variant: 'v3', score: state.correct });
   } catch (eYm) {}
 
-  // Tiny "sending" beat for trust, then show result
   gateBtn.disabled = true;
+
+  if (PAYMENT_URL) {
+    // Оплата: слайд результата здесь НЕ показываем — сохраняем состояние
+    // для возврата (?paid=1) и уходим на платёжный виджет.
+    try {
+      localStorage.setItem('iqmo-quiz-pending-' + QUIZ_ID, JSON.stringify({
+        correct: state.correct,
+        wrongTopics: state.wrongTopics,
+        email: v,
+        ts: Date.now()
+      }));
+    } catch (eSt) {}
+    try { if (window.ym) ym(108770166, 'reachGoal', 'begin_checkout'); } catch (eBc) {}
+    gateBtn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .8s linear infinite"></span> Переходим к оплате...';
+    setTimeout(()=>{
+      const u = new URL(PAYMENT_URL, location.origin);
+      u.searchParams.set('email', v);
+      location.href = u.toString();
+    }, 400);
+    return;
+  }
+
+  // Fallback (PAYMENT_URL не задан): прежний флоу — короткий «sending» beat,
+  // затем результат.
   gateBtn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .8s linear infinite"></span> Отправляем...';
   setTimeout(()=>{
     closeEmailGate();
@@ -884,7 +915,26 @@ gateForm.addEventListener('submit', e=>{
   }, 700);
 });
 
-renderStart();
+/* Возврат с оплаты (?paid=1): показываем результат из состояния, сохранённого
+   перед уходом на виджет. Без сохранённого состояния (прямой заход по ссылке)
+   — обычный старт квиза. */
+(function initQuiz(){
+  try {
+    if (new URLSearchParams(location.search).get('paid') === '1') {
+      const raw = localStorage.getItem('iqmo-quiz-pending-' + QUIZ_ID);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        state.correct = saved.correct | 0;
+        state.wrongTopics = Array.isArray(saved.wrongTopics) ? saved.wrongTopics : [];
+        state.email = String(saved.email || '');
+        state.i = QUIZ.questions.length;
+        renderResult();
+        return;
+      }
+    }
+  } catch (eInit) {}
+  renderStart();
+})();
 </script>
 </body>
 </html>
